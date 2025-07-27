@@ -3461,17 +3461,2497 @@ This matrix-based approach transforms traditional database operations into effic
 
 ## Question 5
 
-**Discuss how to applylinear algebratoimage processingtasks.**
+**Discuss how to apply linear algebra to image processing tasks.**
 
-**Answer:** _[To be filled]_
+**Answer:** Linear algebra forms the mathematical foundation of modern image processing, providing efficient tools for image representation, transformation, enhancement, and analysis. Images are naturally represented as matrices, making linear algebraic operations directly applicable for various image processing tasks including filtering, compression, feature extraction, and computer vision applications.
+
+**1. Image Representation and Basic Operations:**
+
+**1.1 Image as Matrix Representation:**
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.ndimage import convolve, gaussian_filter
+from scipy.linalg import svd
+from sklearn.decomposition import PCA, TruncatedSVD
+from skimage import data, color, filters, feature, transform
+from skimage.restoration import denoise_tv_chambolle
+import cv2
+from PIL import Image
+import time
+
+def image_matrix_fundamentals():
+    """Demonstrate fundamental image-matrix operations"""
+    
+    print("Image-Matrix Fundamentals")
+    print("=" * 25)
+    
+    # Load sample images
+    # Grayscale image
+    gray_image = data.camera()  # 512x512 grayscale
+    
+    # Color image  
+    color_image = data.astronaut()  # RGB image
+    
+    print(f"Grayscale image shape: {gray_image.shape}")
+    print(f"Color image shape: {color_image.shape}")
+    print(f"Grayscale data type: {gray_image.dtype}")
+    print(f"Grayscale value range: [{gray_image.min()}, {gray_image.max()}]")
+    
+    # Basic matrix operations on images
+    print(f"\n1. Basic Matrix Operations:")
+    
+    # Image arithmetic
+    brightened = gray_image + 50
+    darkened = gray_image - 50
+    contrast_enhanced = gray_image * 1.5
+    gamma_corrected = np.power(gray_image / 255.0, 0.5) * 255
+    
+    # Clamp values to valid range
+    brightened = np.clip(brightened, 0, 255)
+    darkened = np.clip(darkened, 0, 255)
+    contrast_enhanced = np.clip(contrast_enhanced, 0, 255)
+    gamma_corrected = np.clip(gamma_corrected, 0, 255)
+    
+    print(f"  Brightened range: [{brightened.min()}, {brightened.max()}]")
+    print(f"  Darkened range: [{darkened.min()}, {darkened.max()}]")
+    print(f"  Contrast enhanced range: [{contrast_enhanced.min()}, {contrast_enhanced.max()}]")
+    
+    # Image statistics using linear algebra
+    print(f"\n2. Image Statistics:")
+    
+    # Mean, variance using matrix operations
+    mean_intensity = np.mean(gray_image)
+    variance = np.var(gray_image)
+    std_dev = np.std(gray_image)
+    
+    # Histogram as matrix operation
+    histogram = np.bincount(gray_image.flatten(), minlength=256)
+    
+    print(f"  Mean intensity: {mean_intensity:.2f}")
+    print(f"  Variance: {variance:.2f}")
+    print(f"  Standard deviation: {std_dev:.2f}")
+    print(f"  Histogram shape: {histogram.shape}")
+    
+    # Matrix norms for image analysis
+    l1_norm = np.linalg.norm(gray_image, ord=1)
+    l2_norm = np.linalg.norm(gray_image, ord='fro')  # Frobenius norm
+    max_norm = np.linalg.norm(gray_image, ord=np.inf)
+    
+    print(f"  L1 norm: {l1_norm:.0f}")
+    print(f"  L2 (Frobenius) norm: {l2_norm:.0f}")
+    print(f"  Max norm: {max_norm:.0f}")
+    
+    # 3. Channel operations for color images
+    print(f"\n3. Color Channel Operations:")
+    
+    # Split RGB channels
+    red_channel = color_image[:, :, 0]
+    green_channel = color_image[:, :, 1]
+    blue_channel = color_image[:, :, 2]
+    
+    print(f"  Red channel shape: {red_channel.shape}")
+    print(f"  Channel statistics:")
+    print(f"    Red - mean: {np.mean(red_channel):.1f}, std: {np.std(red_channel):.1f}")
+    print(f"    Green - mean: {np.mean(green_channel):.1f}, std: {np.std(green_channel):.1f}")
+    print(f"    Blue - mean: {np.mean(blue_channel):.1f}, std: {np.std(blue_channel):.1f}")
+    
+    # Color space conversion using matrix multiplication
+    # RGB to Grayscale using weighted sum
+    rgb_to_gray_weights = np.array([0.2989, 0.5870, 0.1140])
+    grayscale_converted = color_image @ rgb_to_gray_weights
+    
+    print(f"  RGB to Grayscale conversion shape: {grayscale_converted.shape}")
+    print(f"  Converted grayscale range: [{grayscale_converted.min():.1f}, {grayscale_converted.max():.1f}]")
+    
+    return gray_image, color_image, red_channel, green_channel, blue_channel, grayscale_converted
+
+gray_img, color_img, red_ch, green_ch, blue_ch, gray_converted = image_matrix_fundamentals()
+```
+
+**1.2 Geometric Transformations:**
+```python
+def geometric_transformations():
+    """Demonstrate geometric transformations using linear algebra"""
+    
+    print("\nGeometric Transformations:")
+    print("-" * 25)
+    
+    image = gray_img
+    h, w = image.shape
+    
+    # 1. Translation
+    print(f"1. Translation:")
+    
+    def translate_image(image, tx, ty):
+        """Translate image using affine transformation matrix"""
+        h, w = image.shape
+        
+        # Translation matrix
+        T = np.array([
+            [1, 0, tx],
+            [0, 1, ty],
+            [0, 0, 1]
+        ])
+        
+        # Create coordinate meshgrid
+        y_coords, x_coords = np.mgrid[0:h, 0:w]
+        coords = np.vstack([x_coords.ravel(), y_coords.ravel(), np.ones(h*w)])
+        
+        # Apply transformation
+        transformed_coords = T @ coords
+        x_new = transformed_coords[0].reshape(h, w)
+        y_new = transformed_coords[1].reshape(h, w)
+        
+        # Interpolate new image
+        translated = np.zeros_like(image)
+        
+        # Simple nearest neighbor interpolation
+        valid_mask = (x_new >= 0) & (x_new < w) & (y_new >= 0) & (y_new < h)
+        x_valid = x_new[valid_mask].astype(int)
+        y_valid = y_new[valid_mask].astype(int)
+        
+        translated[valid_mask] = image[y_valid, x_valid]
+        
+        return translated
+    
+    translated = translate_image(image, 50, 30)
+    print(f"  Translated image shape: {translated.shape}")
+    print(f"  Non-zero pixels: {np.count_nonzero(translated)}")
+    
+    # 2. Rotation
+    print(f"\n2. Rotation:")
+    
+    def rotate_image(image, angle_degrees):
+        """Rotate image using rotation matrix"""
+        angle_rad = np.radians(angle_degrees)
+        cos_a, sin_a = np.cos(angle_rad), np.sin(angle_rad)
+        
+        # Rotation matrix (around center)
+        h, w = image.shape
+        cx, cy = w // 2, h // 2
+        
+        R = np.array([
+            [cos_a, -sin_a, cx - cos_a * cx + sin_a * cy],
+            [sin_a, cos_a, cy - sin_a * cx - cos_a * cy],
+            [0, 0, 1]
+        ])
+        
+        # Apply transformation
+        y_coords, x_coords = np.mgrid[0:h, 0:w]
+        coords = np.vstack([x_coords.ravel(), y_coords.ravel(), np.ones(h*w)])
+        
+        transformed_coords = R @ coords
+        x_new = transformed_coords[0].reshape(h, w)
+        y_new = transformed_coords[1].reshape(h, w)
+        
+        # Bilinear interpolation
+        rotated = np.zeros_like(image, dtype=float)
+        
+        valid_mask = (x_new >= 0) & (x_new < w-1) & (y_new >= 0) & (y_new < h-1)
+        
+        x_floor = np.floor(x_new[valid_mask]).astype(int)
+        y_floor = np.floor(y_new[valid_mask]).astype(int)
+        x_ceil = x_floor + 1
+        y_ceil = y_floor + 1
+        
+        # Bilinear weights
+        wx = x_new[valid_mask] - x_floor
+        wy = y_new[valid_mask] - y_floor
+        
+        # Bilinear interpolation
+        rotated[valid_mask] = (
+            (1 - wx) * (1 - wy) * image[y_floor, x_floor] +
+            wx * (1 - wy) * image[y_floor, x_ceil] +
+            (1 - wx) * wy * image[y_ceil, x_floor] +
+            wx * wy * image[y_ceil, x_ceil]
+        )
+        
+        return rotated.astype(image.dtype)
+    
+    rotated = rotate_image(image, 45)
+    print(f"  Rotated image shape: {rotated.shape}")
+    print(f"  Rotation preserves area: {np.sum(rotated > 0)} pixels")
+    
+    # 3. Scaling
+    print(f"\n3. Scaling:")
+    
+    def scale_image(image, sx, sy):
+        """Scale image using scaling matrix"""
+        h, w = image.shape
+        
+        # Scaling matrix
+        S = np.array([
+            [sx, 0, 0],
+            [0, sy, 0],
+            [0, 0, 1]
+        ])
+        
+        # Create new image dimensions
+        new_h, new_w = int(h * sy), int(w * sx)
+        scaled = np.zeros((new_h, new_w), dtype=image.dtype)
+        
+        # Inverse transformation for sampling
+        S_inv = np.linalg.inv(S)
+        
+        y_coords, x_coords = np.mgrid[0:new_h, 0:new_w]
+        coords = np.vstack([x_coords.ravel(), y_coords.ravel(), np.ones(new_h * new_w)])
+        
+        orig_coords = S_inv @ coords
+        x_orig = orig_coords[0].reshape(new_h, new_w)
+        y_orig = orig_coords[1].reshape(new_h, new_w)
+        
+        # Interpolate
+        valid_mask = (x_orig >= 0) & (x_orig < w-1) & (y_orig >= 0) & (y_orig < h-1)
+        
+        x_floor = np.floor(x_orig[valid_mask]).astype(int)
+        y_floor = np.floor(y_orig[valid_mask]).astype(int)
+        x_ceil = x_floor + 1
+        y_ceil = y_floor + 1
+        
+        wx = x_orig[valid_mask] - x_floor
+        wy = y_orig[valid_mask] - y_floor
+        
+        scaled[valid_mask] = (
+            (1 - wx) * (1 - wy) * image[y_floor, x_floor] +
+            wx * (1 - wy) * image[y_floor, x_ceil] +
+            (1 - wx) * wy * image[y_ceil, x_floor] +
+            wx * wy * image[y_ceil, x_ceil]
+        )
+        
+        return scaled
+    
+    scaled_up = scale_image(image, 1.5, 1.5)
+    scaled_down = scale_image(image, 0.5, 0.5)
+    
+    print(f"  Original: {image.shape}")
+    print(f"  Scaled up (1.5x): {scaled_up.shape}")
+    print(f"  Scaled down (0.5x): {scaled_down.shape}")
+    
+    # 4. General Affine Transformation
+    print(f"\n4. General Affine Transformation:")
+    
+    def affine_transform(image, matrix):
+        """Apply general affine transformation"""
+        h, w = image.shape
+        
+        # Apply transformation
+        y_coords, x_coords = np.mgrid[0:h, 0:w]
+        coords = np.vstack([x_coords.ravel(), y_coords.ravel(), np.ones(h*w)])
+        
+        transformed_coords = matrix @ coords
+        x_new = transformed_coords[0].reshape(h, w)
+        y_new = transformed_coords[1].reshape(h, w)
+        
+        # Create output image
+        transformed = np.zeros_like(image, dtype=float)
+        
+        valid_mask = (x_new >= 0) & (x_new < w-1) & (y_new >= 0) & (y_new < h-1)
+        
+        # Simple nearest neighbor for demonstration
+        x_round = np.round(x_new[valid_mask]).astype(int)
+        y_round = np.round(y_new[valid_mask]).astype(int)
+        
+        # Ensure indices are valid
+        valid_indices = (x_round >= 0) & (x_round < w) & (y_round >= 0) & (y_round < h)
+        final_mask = np.zeros_like(valid_mask)
+        final_mask[valid_mask] = valid_indices
+        
+        x_final = x_round[valid_indices]
+        y_final = y_round[valid_indices]
+        
+        transformed[final_mask] = image[y_final, x_final]
+        
+        return transformed.astype(image.dtype)
+    
+    # Shear transformation
+    shear_matrix = np.array([
+        [1, 0.3, 0],
+        [0.2, 1, 0],
+        [0, 0, 1]
+    ])
+    
+    sheared = affine_transform(image, shear_matrix)
+    print(f"  Sheared image non-zero pixels: {np.count_nonzero(sheared)}")
+    
+    return translated, rotated, scaled_up, scaled_down, sheared
+
+translated, rotated, scaled_up, scaled_down, sheared = geometric_transformations()
+```
+
+**2. Image Filtering and Convolution:**
+
+```python
+def image_filtering_convolution():
+    """Demonstrate image filtering using linear algebra and convolution"""
+    
+    print("\nImage Filtering and Convolution:")
+    print("-" * 31)
+    
+    image = gray_img.astype(float)
+    
+    # 1. Basic Convolution Kernels
+    print(f"1. Basic Convolution Kernels:")
+    
+    # Define common kernels
+    kernels = {
+        'identity': np.array([[0, 0, 0],
+                             [0, 1, 0],
+                             [0, 0, 0]]),
+        
+        'box_blur': np.ones((5, 5)) / 25,
+        
+        'gaussian': np.array([[1, 2, 1],
+                             [2, 4, 2],
+                             [1, 2, 1]]) / 16,
+        
+        'edge_horizontal': np.array([[-1, -1, -1],
+                                   [0, 0, 0],
+                                   [1, 1, 1]]),
+        
+        'edge_vertical': np.array([[-1, 0, 1],
+                                 [-1, 0, 1],
+                                 [-1, 0, 1]]),
+        
+        'sobel_x': np.array([[-1, 0, 1],
+                           [-2, 0, 2],
+                           [-1, 0, 1]]),
+        
+        'sobel_y': np.array([[-1, -2, -1],
+                           [0, 0, 0],
+                           [1, 2, 1]]),
+        
+        'laplacian': np.array([[0, -1, 0],
+                             [-1, 4, -1],
+                             [0, -1, 0]]),
+        
+        'sharpen': np.array([[0, -1, 0],
+                           [-1, 5, -1],
+                           [0, -1, 0]])
+    }
+    
+    # Apply kernels
+    filtered_images = {}
+    
+    for kernel_name, kernel in kernels.items():
+        filtered = convolve(image, kernel, mode='constant')
+        filtered_images[kernel_name] = filtered
+        
+        print(f"  {kernel_name}: kernel shape {kernel.shape}, "
+              f"output range [{filtered.min():.1f}, {filtered.max():.1f}]")
+    
+    # 2. Custom Convolution Implementation
+    print(f"\n2. Custom Convolution Implementation:")
+    
+    def custom_convolve_2d(image, kernel, padding='valid'):
+        """Custom 2D convolution implementation"""
+        
+        if len(image.shape) != 2 or len(kernel.shape) != 2:
+            raise ValueError("Both image and kernel must be 2D")
+        
+        img_h, img_w = image.shape
+        ker_h, ker_w = kernel.shape
+        
+        if padding == 'valid':
+            out_h = img_h - ker_h + 1
+            out_w = img_w - ker_w + 1
+            padded_image = image
+        elif padding == 'same':
+            out_h, out_w = img_h, img_w
+            pad_h = ker_h // 2
+            pad_w = ker_w // 2
+            padded_image = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+        else:
+            raise ValueError("Padding must be 'valid' or 'same'")
+        
+        # Initialize output
+        output = np.zeros((out_h, out_w))
+        
+        # Flip kernel (for convolution)
+        kernel_flipped = np.flip(np.flip(kernel, 0), 1)
+        
+        # Perform convolution
+        for i in range(out_h):
+            for j in range(out_w):
+                # Extract patch
+                patch = padded_image[i:i+ker_h, j:j+ker_w]
+                
+                # Element-wise multiply and sum
+                output[i, j] = np.sum(patch * kernel_flipped)
+        
+        return output
+    
+    # Test custom convolution
+    custom_blur = custom_convolve_2d(image, kernels['gaussian'], padding='same')
+    scipy_blur = convolve(image, kernels['gaussian'], mode='constant')
+    
+    print(f"  Custom convolution shape: {custom_blur.shape}")
+    print(f"  SciPy convolution shape: {scipy_blur.shape}")
+    print(f"  Results similar: {np.allclose(custom_blur, scipy_blur[:custom_blur.shape[0], :custom_blur.shape[1]], atol=1e-10)}")
+    
+    # 3. Separable Filters
+    print(f"\n3. Separable Filters:")
+    
+    def create_separable_gaussian(size, sigma):
+        """Create separable Gaussian filter"""
+        
+        # 1D Gaussian kernel
+        x = np.arange(size) - size // 2
+        gaussian_1d = np.exp(-x**2 / (2 * sigma**2))
+        gaussian_1d /= np.sum(gaussian_1d)
+        
+        # 2D kernel as outer product
+        gaussian_2d = np.outer(gaussian_1d, gaussian_1d)
+        
+        return gaussian_1d, gaussian_2d
+    
+    # Compare separable vs non-separable filtering
+    gaussian_1d, gaussian_2d = create_separable_gaussian(7, 1.5)
+    
+    # Method 1: Direct 2D convolution
+    start_time = time.time()
+    filtered_2d = convolve(image, gaussian_2d, mode='constant')
+    time_2d = time.time() - start_time
+    
+    # Method 2: Separable (two 1D convolutions)
+    start_time = time.time()
+    temp = convolve(image, gaussian_1d.reshape(-1, 1), mode='constant')
+    filtered_separable = convolve(temp, gaussian_1d.reshape(1, -1), mode='constant')
+    time_separable = time.time() - start_time
+    
+    print(f"  2D convolution time: {time_2d:.4f}s")
+    print(f"  Separable convolution time: {time_separable:.4f}s")
+    print(f"  Speedup: {time_2d / time_separable:.1f}x")
+    print(f"  Results identical: {np.allclose(filtered_2d, filtered_separable)}")
+    
+    # 4. Frequency Domain Filtering
+    print(f"\n4. Frequency Domain Filtering:")
+    
+    def frequency_domain_filter(image, filter_func):
+        """Apply filter in frequency domain"""
+        
+        # Forward FFT
+        f_image = np.fft.fft2(image)
+        f_image_shifted = np.fft.fftshift(f_image)
+        
+        # Create frequency filter
+        h, w = image.shape
+        u, v = np.meshgrid(np.arange(w), np.arange(h))
+        u = u - w // 2
+        v = v - h // 2
+        
+        # Apply filter
+        filter_mask = filter_func(u, v, h, w)
+        f_filtered = f_image_shifted * filter_mask
+        
+        # Inverse FFT
+        f_filtered_shifted = np.fft.ifftshift(f_filtered)
+        filtered_image = np.real(np.fft.ifft2(f_filtered_shifted))
+        
+        return filtered_image, filter_mask
+    
+    # Low-pass filter (Gaussian)
+    def gaussian_lowpass(u, v, h, w, cutoff=50):
+        d_squared = u**2 + v**2
+        return np.exp(-d_squared / (2 * cutoff**2))
+    
+    # High-pass filter
+    def gaussian_highpass(u, v, h, w, cutoff=30):
+        return 1 - gaussian_lowpass(u, v, h, w, cutoff)
+    
+    # Apply frequency domain filters
+    lowpass_filtered, lowpass_mask = frequency_domain_filter(image, gaussian_lowpass)
+    highpass_filtered, highpass_mask = frequency_domain_filter(image, gaussian_highpass)
+    
+    print(f"  Frequency domain filtering completed")
+    print(f"  Low-pass result range: [{lowpass_filtered.min():.1f}, {lowpass_filtered.max():.1f}]")
+    print(f"  High-pass result range: [{highpass_filtered.min():.1f}, {highpass_filtered.max():.1f}]")
+    
+    return filtered_images, custom_blur, gaussian_1d, gaussian_2d, lowpass_filtered, highpass_filtered
+
+filtered_imgs, custom_blur, gauss_1d, gauss_2d, lowpass_filt, highpass_filt = image_filtering_convolution()
+```
+
+**3. Image Compression using Matrix Decomposition:**
+
+```python
+def image_compression_svd():
+    """Demonstrate image compression using SVD and other matrix decomposition techniques"""
+    
+    print("\nImage Compression using Matrix Decomposition:")
+    print("-" * 43)
+    
+    image = gray_img.astype(float)
+    
+    # 1. SVD-based Image Compression
+    print(f"1. SVD-based Compression:")
+    
+    # Perform SVD
+    U, s, Vt = svd(image, full_matrices=False)
+    
+    print(f"  Original image shape: {image.shape}")
+    print(f"  SVD components: U{U.shape}, s{s.shape}, Vt{Vt.shape}")
+    print(f"  Total singular values: {len(s)}")
+    
+    # Analyze singular value distribution
+    cumulative_energy = np.cumsum(s**2) / np.sum(s**2)
+    
+    # Find number of components for different compression ratios
+    compression_ratios = [0.90, 0.95, 0.99]
+    components_needed = []
+    
+    for ratio in compression_ratios:
+        k = np.argmax(cumulative_energy >= ratio) + 1
+        components_needed.append(k)
+        print(f"  {ratio*100}% energy retained with {k} components ({k/len(s)*100:.1f}% of total)")
+    
+    # Reconstruct images with different numbers of components
+    compressed_images = {}
+    compression_stats = {}
+    
+    test_components = [1, 5, 10, 20, 50, 100, min(200, len(s))]
+    
+    for k in test_components:
+        if k <= len(s):
+            # Reconstruct using first k components
+            reconstructed = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+            
+            # Compute compression metrics
+            original_size = image.size * 8  # Assume 8 bytes per pixel
+            compressed_size = (U[:, :k].size + s[:k].size + Vt[:k, :].size) * 8
+            compression_ratio = original_size / compressed_size
+            
+            # Compute quality metrics
+            mse = np.mean((image - reconstructed)**2)
+            psnr = 20 * np.log10(255) - 10 * np.log10(mse)
+            
+            compressed_images[k] = reconstructed
+            compression_stats[k] = {
+                'compression_ratio': compression_ratio,
+                'mse': mse,
+                'psnr': psnr,
+                'energy_retained': cumulative_energy[k-1] if k <= len(cumulative_energy) else 1.0
+            }
+            
+            print(f"  k={k:3d}: compression={compression_ratio:.1f}x, "
+                  f"PSNR={psnr:.1f}dB, energy={cumulative_energy[k-1]*100:.1f}%")
+    
+    # 2. Block-based DCT Compression
+    print(f"\n2. Block-based DCT Compression:")
+    
+    def dct_2d(block):
+        """2D Discrete Cosine Transform"""
+        return cv2.dct(block.astype(np.float32))
+    
+    def idct_2d(block):
+        """2D Inverse Discrete Cosine Transform"""
+        return cv2.idct(block.astype(np.float32))
+    
+    def block_dct_compress(image, block_size=8, quality_factor=50):
+        """Compress image using block-based DCT"""
+        
+        h, w = image.shape
+        
+        # Pad image to make it divisible by block_size
+        pad_h = (block_size - h % block_size) % block_size
+        pad_w = (block_size - w % block_size) % block_size
+        
+        padded_image = np.pad(image, ((0, pad_h), (0, pad_w)), mode='edge')
+        
+        # JPEG-like quantization matrix (simplified)
+        quantization_matrix = np.array([
+            [16, 11, 10, 16, 24, 40, 51, 61],
+            [12, 12, 14, 19, 26, 58, 60, 55],
+            [14, 13, 16, 24, 40, 57, 69, 56],
+            [14, 17, 22, 29, 51, 87, 80, 62],
+            [18, 22, 37, 56, 68, 109, 103, 77],
+            [24, 35, 55, 64, 81, 104, 113, 92],
+            [49, 64, 78, 87, 103, 121, 120, 101],
+            [72, 92, 95, 98, 112, 100, 103, 99]
+        ]) * (100 - quality_factor) / 50
+        
+        compressed_image = np.zeros_like(padded_image)
+        
+        # Process each block
+        for i in range(0, padded_image.shape[0], block_size):
+            for j in range(0, padded_image.shape[1], block_size):
+                # Extract block
+                block = padded_image[i:i+block_size, j:j+block_size]
+                
+                # DCT
+                dct_block = dct_2d(block - 128)  # Center around 0
+                
+                # Quantization
+                quantized_block = np.round(dct_block / quantization_matrix)
+                
+                # Dequantization
+                dequantized_block = quantized_block * quantization_matrix
+                
+                # Inverse DCT
+                reconstructed_block = idct_2d(dequantized_block) + 128
+                
+                compressed_image[i:i+block_size, j:j+block_size] = reconstructed_block
+        
+        # Remove padding
+        compressed_image = compressed_image[:h, :w]
+        
+        return compressed_image
+    
+    # Apply DCT compression with different quality factors
+    quality_factors = [10, 30, 50, 70, 90]
+    dct_compressed = {}
+    
+    for quality in quality_factors:
+        compressed = block_dct_compress(image, quality_factor=quality)
+        mse = np.mean((image - compressed)**2)
+        psnr = 20 * np.log10(255) - 10 * np.log10(mse)
+        
+        dct_compressed[quality] = compressed
+        
+        print(f"  Quality {quality}: PSNR = {psnr:.1f} dB")
+    
+    # 3. PCA-based Compression
+    print(f"\n3. PCA-based Compression:")
+    
+    def pca_image_compression(image, n_components):
+        """Compress image using PCA"""
+        
+        # Reshape image to 2D array (pixels as samples)
+        h, w = image.shape
+        image_flat = image.reshape(h, -1)
+        
+        # Apply PCA
+        pca = PCA(n_components=n_components)
+        compressed_data = pca.fit_transform(image_flat)
+        
+        # Reconstruct
+        reconstructed_flat = pca.inverse_transform(compressed_data)
+        reconstructed = reconstructed_flat.reshape(h, w)
+        
+        # Compute compression ratio
+        original_size = h * w
+        compressed_size = compressed_data.size + pca.components_.size + pca.mean_.size
+        compression_ratio = original_size / compressed_size
+        
+        return reconstructed, compression_ratio, pca.explained_variance_ratio_
+    
+    # Test PCA compression
+    pca_components = [10, 20, 50, 100]
+    pca_compressed = {}
+    
+    for n_comp in pca_components:
+        if n_comp < min(image.shape):
+            compressed, comp_ratio, var_ratio = pca_image_compression(image, n_comp)
+            
+            mse = np.mean((image - compressed)**2)
+            psnr = 20 * np.log10(255) - 10 * np.log10(mse)
+            
+            pca_compressed[n_comp] = compressed
+            
+            print(f"  {n_comp} components: compression={comp_ratio:.1f}x, "
+                  f"PSNR={psnr:.1f}dB, variance={np.sum(var_ratio)*100:.1f}%")
+    
+    # 4. Comparison of Compression Methods
+    print(f"\n4. Compression Method Comparison:")
+    
+    # Compare different methods at similar compression ratios
+    target_psnr = 25  # dB
+    
+    print(f"  Targeting PSNR ≈ {target_psnr} dB:")
+    
+    # Find best SVD rank
+    best_svd_k = None
+    best_svd_psnr = 0
+    for k, stats in compression_stats.items():
+        if abs(stats['psnr'] - target_psnr) < abs(best_svd_psnr - target_psnr):
+            best_svd_k = k
+            best_svd_psnr = stats['psnr']
+    
+    if best_svd_k:
+        print(f"    SVD (k={best_svd_k}): PSNR={best_svd_psnr:.1f}dB, "
+              f"compression={compression_stats[best_svd_k]['compression_ratio']:.1f}x")
+    
+    return compressed_images, compression_stats, dct_compressed, pca_compressed
+
+svd_compressed, comp_stats, dct_compressed, pca_compressed = image_compression_svd()
+```
+
+**4. Feature Extraction and Computer Vision:**
+
+```python
+def feature_extraction_computer_vision():
+    """Demonstrate feature extraction using linear algebra techniques"""
+    
+    print("\nFeature Extraction and Computer Vision:")
+    print("-" * 38)
+    
+    image = gray_img.astype(float)
+    
+    # 1. Edge Detection using Gradient Operators
+    print(f"1. Edge Detection:")
+    
+    # Sobel operators
+    sobel_x = np.array([[-1, 0, 1],
+                       [-2, 0, 2],
+                       [-1, 0, 1]])
+    
+    sobel_y = np.array([[-1, -2, -1],
+                       [0, 0, 0],
+                       [1, 2, 1]])
+    
+    # Compute gradients
+    grad_x = convolve(image, sobel_x, mode='constant')
+    grad_y = convolve(image, sobel_y, mode='constant')
+    
+    # Gradient magnitude and direction
+    gradient_magnitude = np.sqrt(grad_x**2 + grad_y**2)
+    gradient_direction = np.arctan2(grad_y, grad_x)
+    
+    print(f"  Gradient magnitude range: [{gradient_magnitude.min():.1f}, {gradient_magnitude.max():.1f}]")
+    print(f"  Gradient direction range: [{gradient_direction.min():.2f}, {gradient_direction.max():.2f}] radians")
+    
+    # Prewitt operators
+    prewitt_x = np.array([[-1, 0, 1],
+                         [-1, 0, 1],
+                         [-1, 0, 1]])
+    
+    prewitt_y = np.array([[-1, -1, -1],
+                         [0, 0, 0],
+                         [1, 1, 1]])
+    
+    prewitt_grad_x = convolve(image, prewitt_x, mode='constant')
+    prewitt_grad_y = convolve(image, prewitt_y, mode='constant')
+    prewitt_magnitude = np.sqrt(prewitt_grad_x**2 + prewitt_grad_y**2)
+    
+    print(f"  Prewitt magnitude range: [{prewitt_magnitude.min():.1f}, {prewitt_magnitude.max():.1f}]")
+    
+    # 2. Corner Detection using Structure Tensor
+    print(f"\n2. Corner Detection (Harris):")
+    
+    def harris_corner_detection(image, k=0.04, threshold=0.01):
+        """Harris corner detection using structure tensor"""
+        
+        # Compute gradients
+        grad_x = convolve(image, sobel_x, mode='constant')
+        grad_y = convolve(image, sobel_y, mode='constant')
+        
+        # Compute structure tensor components
+        Ixx = grad_x * grad_x
+        Iyy = grad_y * grad_y
+        Ixy = grad_x * grad_y
+        
+        # Apply Gaussian smoothing to structure tensor
+        sigma = 1.5
+        gaussian_kernel = np.outer(
+            np.exp(-np.arange(-3, 4)**2 / (2 * sigma**2)),
+            np.exp(-np.arange(-3, 4)**2 / (2 * sigma**2))
+        )
+        gaussian_kernel /= np.sum(gaussian_kernel)
+        
+        Sxx = convolve(Ixx, gaussian_kernel, mode='constant')
+        Syy = convolve(Iyy, gaussian_kernel, mode='constant')
+        Sxy = convolve(Ixy, gaussian_kernel, mode='constant')
+        
+        # Compute Harris response
+        det_S = Sxx * Syy - Sxy * Sxy
+        trace_S = Sxx + Syy
+        
+        harris_response = det_S - k * trace_S**2
+        
+        # Find corners above threshold
+        corners = harris_response > threshold * harris_response.max()
+        
+        return harris_response, corners
+    
+    harris_response, corners = harris_corner_detection(image)
+    
+    print(f"  Harris response range: [{harris_response.min():.2e}, {harris_response.max():.2e}]")
+    print(f"  Detected corners: {np.sum(corners)}")
+    
+    # 3. Texture Analysis using Gray-Level Co-occurrence Matrix
+    print(f"\n3. Texture Analysis (GLCM):")
+    
+    def compute_glcm(image, distance=1, angle=0):
+        """Compute Gray-Level Co-occurrence Matrix"""
+        
+        # Quantize image to reduce GLCM size
+        quantized = np.round(image / 4).astype(int)  # Reduce to 64 levels
+        max_val = quantized.max()
+        
+        # Initialize GLCM
+        glcm = np.zeros((max_val + 1, max_val + 1))
+        
+        # Compute offset based on distance and angle
+        dy = int(distance * np.sin(angle))
+        dx = int(distance * np.cos(angle))
+        
+        h, w = quantized.shape
+        
+        # Fill GLCM
+        for i in range(h):
+            for j in range(w):
+                # Check if neighbor is within bounds
+                ni, nj = i + dy, j + dx
+                if 0 <= ni < h and 0 <= nj < w:
+                    glcm[quantized[i, j], quantized[ni, nj]] += 1
+        
+        # Normalize GLCM
+        glcm = glcm / np.sum(glcm)
+        
+        return glcm
+    
+    def glcm_features(glcm):
+        """Compute texture features from GLCM"""
+        
+        # Contrast
+        i, j = np.meshgrid(range(glcm.shape[0]), range(glcm.shape[1]), indexing='ij')
+        contrast = np.sum(glcm * (i - j)**2)
+        
+        # Energy (Angular Second Moment)
+        energy = np.sum(glcm**2)
+        
+        # Homogeneity
+        homogeneity = np.sum(glcm / (1 + (i - j)**2))
+        
+        # Correlation
+        mu_i = np.sum(i * glcm)
+        mu_j = np.sum(j * glcm)
+        sigma_i = np.sqrt(np.sum((i - mu_i)**2 * glcm))
+        sigma_j = np.sqrt(np.sum((j - mu_j)**2 * glcm))
+        
+        if sigma_i > 0 and sigma_j > 0:
+            correlation = np.sum((i - mu_i) * (j - mu_j) * glcm) / (sigma_i * sigma_j)
+        else:
+            correlation = 0
+        
+        return {
+            'contrast': contrast,
+            'energy': energy,
+            'homogeneity': homogeneity,
+            'correlation': correlation
+        }
+    
+    # Compute GLCM for different directions
+    angles = [0, np.pi/4, np.pi/2, 3*np.pi/4]
+    texture_features = {}
+    
+    for i, angle in enumerate(angles):
+        glcm = compute_glcm(image, distance=1, angle=angle)
+        features = glcm_features(glcm)
+        texture_features[f'angle_{int(np.degrees(angle))}'] = features
+        
+        print(f"  Angle {int(np.degrees(angle))}°: contrast={features['contrast']:.3f}, "
+              f"energy={features['energy']:.3f}, homogeneity={features['homogeneity']:.3f}")
+    
+    # 4. Histogram of Oriented Gradients (HOG)
+    print(f"\n4. Histogram of Oriented Gradients:")
+    
+    def compute_hog_features(image, cell_size=8, block_size=2, n_bins=9):
+        """Compute HOG features"""
+        
+        # Compute gradients
+        grad_x = convolve(image, sobel_x, mode='constant')
+        grad_y = convolve(image, sobel_y, mode='constant')
+        
+        magnitude = np.sqrt(grad_x**2 + grad_y**2)
+        orientation = np.arctan2(grad_y, grad_x) * 180 / np.pi
+        orientation[orientation < 0] += 180  # Convert to 0-180 range
+        
+        h, w = image.shape
+        
+        # Compute HOG for each cell
+        n_cells_y = h // cell_size
+        n_cells_x = w // cell_size
+        
+        cell_histograms = np.zeros((n_cells_y, n_cells_x, n_bins))
+        
+        for i in range(n_cells_y):
+            for j in range(n_cells_x):
+                # Extract cell
+                y_start, y_end = i * cell_size, (i + 1) * cell_size
+                x_start, x_end = j * cell_size, (j + 1) * cell_size
+                
+                cell_magnitude = magnitude[y_start:y_end, x_start:x_end]
+                cell_orientation = orientation[y_start:y_end, x_start:x_end]
+                
+                # Compute histogram
+                hist, _ = np.histogram(
+                    cell_orientation.ravel(),
+                    bins=n_bins,
+                    range=(0, 180),
+                    weights=cell_magnitude.ravel()
+                )
+                
+                cell_histograms[i, j] = hist
+        
+        # Block normalization
+        n_blocks_y = n_cells_y - block_size + 1
+        n_blocks_x = n_cells_x - block_size + 1
+        
+        hog_features = []
+        
+        for i in range(n_blocks_y):
+            for j in range(n_blocks_x):
+                # Extract block
+                block = cell_histograms[i:i+block_size, j:j+block_size].ravel()
+                
+                # L2 normalization
+                norm = np.linalg.norm(block)
+                if norm > 0:
+                    block = block / norm
+                
+                hog_features.extend(block)
+        
+        return np.array(hog_features)
+    
+    hog_features = compute_hog_features(image)
+    
+    print(f"  HOG feature vector length: {len(hog_features)}")
+    print(f"  HOG feature range: [{hog_features.min():.3f}, {hog_features.max():.3f}]")
+    print(f"  HOG feature mean: {hog_features.mean():.3f}")
+    
+    return gradient_magnitude, gradient_direction, harris_response, corners, texture_features, hog_features
+
+grad_mag, grad_dir, harris_resp, corners, texture_feat, hog_feat = feature_extraction_computer_vision()
+```
+
+**5. Advanced Image Processing Applications:**
+
+```python
+def advanced_image_processing():
+    """Demonstrate advanced image processing applications using linear algebra"""
+    
+    print("\nAdvanced Image Processing Applications:")
+    print("-" * 40)
+    
+    image = gray_img.astype(float)
+    
+    # 1. Image Denoising using Total Variation
+    print(f"1. Image Denoising:")
+    
+    # Add noise to image
+    noise_level = 25
+    noisy_image = image + np.random.normal(0, noise_level, image.shape)
+    noisy_image = np.clip(noisy_image, 0, 255)
+    
+    # Total Variation denoising
+    denoised_tv = denoise_tv_chambolle(noisy_image, weight=0.1)
+    
+    # Gaussian denoising
+    denoised_gaussian = gaussian_filter(noisy_image, sigma=1.0)
+    
+    # Compute quality metrics
+    def compute_psnr(original, processed):
+        mse = np.mean((original - processed)**2)
+        if mse == 0:
+            return float('inf')
+        return 20 * np.log10(255) - 10 * np.log10(mse)
+    
+    psnr_noisy = compute_psnr(image, noisy_image)
+    psnr_tv = compute_psnr(image, denoised_tv * 255)
+    psnr_gaussian = compute_psnr(image, denoised_gaussian)
+    
+    print(f"  Original vs Noisy: PSNR = {psnr_noisy:.1f} dB")
+    print(f"  TV Denoising: PSNR = {psnr_tv:.1f} dB")
+    print(f"  Gaussian Denoising: PSNR = {psnr_gaussian:.1f} dB")
+    
+    # 2. Image Inpainting using Matrix Completion
+    print(f"\n2. Image Inpainting:")
+    
+    def create_mask(shape, missing_ratio=0.3):
+        """Create random mask for inpainting"""
+        mask = np.random.rand(*shape) > missing_ratio
+        return mask
+    
+    def matrix_completion_inpainting(image, mask, max_iter=100):
+        """Simple matrix completion for inpainting"""
+        
+        # Initialize with mean of known pixels
+        inpainted = image.copy()
+        mean_value = np.mean(image[mask])
+        inpainted[~mask] = mean_value
+        
+        for iteration in range(max_iter):
+            # Apply low-rank approximation
+            U, s, Vt = svd(inpainted, full_matrices=False)
+            
+            # Keep top components (adjust rank as needed)
+            rank = min(50, len(s))
+            inpainted_lowrank = U[:, :rank] @ np.diag(s[:rank]) @ Vt[:rank, :]
+            
+            # Restore known pixels
+            inpainted_lowrank[mask] = image[mask]
+            
+            # Check convergence
+            if iteration > 0:
+                change = np.linalg.norm(inpainted - inpainted_lowrank)
+                if change < 1e-3:
+                    break
+            
+            inpainted = inpainted_lowrank
+        
+        return inpainted
+    
+    # Create damaged image
+    mask = create_mask(image.shape, missing_ratio=0.2)
+    damaged_image = image.copy()
+    damaged_image[~mask] = 0
+    
+    # Inpaint
+    inpainted = matrix_completion_inpainting(damaged_image, mask)
+    
+    psnr_damaged = compute_psnr(image, damaged_image)
+    psnr_inpainted = compute_psnr(image, inpainted)
+    
+    print(f"  Damaged image: PSNR = {psnr_damaged:.1f} dB")
+    print(f"  Inpainted image: PSNR = {psnr_inpainted:.1f} dB")
+    print(f"  Missing pixels: {np.sum(~mask)} ({np.sum(~mask)/mask.size*100:.1f}%)")
+    
+    # 3. Image Registration using Cross-Correlation
+    print(f"\n3. Image Registration:")
+    
+    def template_matching(image, template):
+        """Template matching using normalized cross-correlation"""
+        
+        # Normalize template and image
+        template_norm = (template - np.mean(template)) / np.std(template)
+        
+        h_img, w_img = image.shape
+        h_temp, w_temp = template.shape
+        
+        result = np.zeros((h_img - h_temp + 1, w_img - w_temp + 1))
+        
+        for i in range(result.shape[0]):
+            for j in range(result.shape[1]):
+                # Extract patch
+                patch = image[i:i+h_temp, j:j+w_temp]
+                patch_norm = (patch - np.mean(patch)) / np.std(patch)
+                
+                # Normalized cross-correlation
+                correlation = np.sum(patch_norm * template_norm) / (h_temp * w_temp)
+                result[i, j] = correlation
+        
+        return result
+    
+    # Create template from center of image
+    center_y, center_x = image.shape[0] // 2, image.shape[1] // 2
+    template_size = 50
+    template = image[
+        center_y - template_size//2:center_y + template_size//2,
+        center_x - template_size//2:center_x + template_size//2
+    ]
+    
+    # Find template in image
+    correlation_map = template_matching(image, template)
+    
+    # Find best match
+    best_match = np.unravel_index(np.argmax(correlation_map), correlation_map.shape)
+    max_correlation = correlation_map[best_match]
+    
+    print(f"  Template size: {template.shape}")
+    print(f"  Best match at: {best_match}")
+    print(f"  Max correlation: {max_correlation:.3f}")
+    
+    # 4. Image Morphology using Structuring Elements
+    print(f"\n4. Mathematical Morphology:")
+    
+    def morphological_operation(image, structuring_element, operation='erosion'):
+        """Basic morphological operations"""
+        
+        # Convert to binary if needed
+        binary_image = (image > 128).astype(int)
+        
+        h_img, w_img = binary_image.shape
+        h_se, w_se = structuring_element.shape
+        
+        result = np.zeros_like(binary_image)
+        
+        # Pad image
+        pad_h, pad_w = h_se // 2, w_se // 2
+        padded = np.pad(binary_image, ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+        
+        for i in range(h_img):
+            for j in range(w_img):
+                # Extract neighborhood
+                neighborhood = padded[i:i+h_se, j:j+w_se]
+                
+                if operation == 'erosion':
+                    # Erosion: all SE pixels must match
+                    result[i, j] = int(np.all(neighborhood >= structuring_element))
+                elif operation == 'dilation':
+                    # Dilation: any SE pixel matches
+                    result[i, j] = int(np.any(neighborhood * structuring_element))
+        
+        return result
+    
+    # Create structuring elements
+    se_cross = np.array([[0, 1, 0],
+                        [1, 1, 1],
+                        [0, 1, 0]])
+    
+    se_square = np.ones((5, 5))
+    
+    # Apply morphological operations
+    binary_image = (image > 128).astype(int)
+    
+    eroded = morphological_operation(binary_image, se_cross, 'erosion')
+    dilated = morphological_operation(binary_image, se_cross, 'dilation')
+    
+    # Opening and closing
+    opened = morphological_operation(eroded, se_cross, 'dilation')
+    closed = morphological_operation(dilated, se_cross, 'erosion')
+    
+    print(f"  Binary image pixels: {np.sum(binary_image)}")
+    print(f"  After erosion: {np.sum(eroded)}")
+    print(f"  After dilation: {np.sum(dilated)}")
+    print(f"  After opening: {np.sum(opened)}")
+    print(f"  After closing: {np.sum(closed)}")
+    
+    return noisy_image, denoised_tv, inpainted, correlation_map, binary_image, eroded, dilated
+
+noisy_img, denoised_img, inpainted_img, corr_map, binary_img, eroded_img, dilated_img = advanced_image_processing()
+```
+
+**6. Complete Image Processing Framework:**
+
+```python
+def complete_image_processing_framework():
+    """Comprehensive framework demonstrating linear algebra in image processing"""
+    
+    print("\nComplete Image Processing Framework:")
+    print("=" * 38)
+    
+    class LinearAlgebraImageProcessor:
+        """Image processing framework using linear algebra"""
+        
+        def __init__(self):
+            self.filters = {}
+            self.transforms = {}
+            self.features = {}
+            
+        def add_filter(self, name, kernel):
+            """Add convolution filter"""
+            self.filters[name] = kernel
+            
+        def apply_filter(self, image, filter_name):
+            """Apply named filter to image"""
+            if filter_name not in self.filters:
+                raise ValueError(f"Filter '{filter_name}' not found")
+            return convolve(image, self.filters[filter_name], mode='constant')
+        
+        def geometric_transform(self, image, transform_matrix):
+            """Apply geometric transformation"""
+            # This would use scipy.ndimage.affine_transform in practice
+            return transform.warp(image, transform_matrix.T)
+        
+        def compress_svd(self, image, k):
+            """Compress image using SVD"""
+            U, s, Vt = svd(image, full_matrices=False)
+            return U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+        
+        def extract_hog_features(self, image):
+            """Extract HOG features"""
+            return feature.hog(image, orientations=9, pixels_per_cell=(8, 8),
+                              cells_per_block=(2, 2), block_norm='L2-Hys')
+        
+        def process_pipeline(self, image, operations):
+            """Process image through pipeline of operations"""
+            result = image.copy()
+            
+            for operation, params in operations:
+                if operation == 'filter':
+                    result = self.apply_filter(result, params['name'])
+                elif operation == 'transform':
+                    result = self.geometric_transform(result, params['matrix'])
+                elif operation == 'compress':
+                    result = self.compress_svd(result, params['k'])
+                elif operation == 'normalize':
+                    result = (result - result.min()) / (result.max() - result.min())
+                
+            return result
+    
+    # Demonstrate framework
+    processor = LinearAlgebraImageProcessor()
+    
+    # Add standard filters
+    processor.add_filter('gaussian', np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16)
+    processor.add_filter('sobel_x', np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]))
+    processor.add_filter('laplacian', np.array([[0, -1, 0], [-1, 4, -1], [0, -1, 0]]))
+    
+    # Define processing pipeline
+    pipeline = [
+        ('filter', {'name': 'gaussian'}),
+        ('compress', {'k': 50}),
+        ('normalize', {}),
+        ('filter', {'name': 'sobel_x'})
+    ]
+    
+    # Process image
+    processed = processor.process_pipeline(gray_img.astype(float), pipeline)
+    
+    print(f"  Framework initialized with {len(processor.filters)} filters")
+    print(f"  Pipeline applied: {len(pipeline)} operations")
+    print(f"  Final image range: [{processed.min():.3f}, {processed.max():.3f}]")
+    
+    # Performance analysis
+    print(f"\n  Performance Summary:")
+    print(f"    Original image: {gray_img.shape} ({gray_img.size} pixels)")
+    print(f"    Processing pipeline: {len(pipeline)} stages")
+    print(f"    Output characteristics: shape={processed.shape}, dtype={processed.dtype}")
+    
+    # Applications summary
+    applications = {
+        'Computer Vision': ['Edge detection', 'Corner detection', 'Feature extraction'],
+        'Image Enhancement': ['Denoising', 'Sharpening', 'Contrast adjustment'],
+        'Compression': ['SVD-based', 'DCT-based', 'PCA-based'],
+        'Medical Imaging': ['Image registration', 'Segmentation', 'Enhancement'],
+        'Robotics': ['Object recognition', 'SLAM', 'Navigation'],
+        'Graphics': ['Filtering', 'Transformations', 'Morphology']
+    }
+    
+    print(f"\n  Linear Algebra Applications in Image Processing:")
+    for domain, techniques in applications.items():
+        print(f"    {domain}: {', '.join(techniques)}")
+    
+    return processor, processed
+
+processor, processed_img = complete_image_processing_framework()
+```
+
+**Summary and Key Benefits:**
+
+**Linear Algebra in Image Processing provides:**
+
+1. **Efficient Representation**: Images as matrices enable vectorized operations
+2. **Geometric Transformations**: Affine transformations via matrix multiplication
+3. **Filtering**: Convolution as matrix operations for noise reduction and enhancement
+4. **Compression**: SVD, DCT, and PCA for lossy/lossless compression
+5. **Feature Extraction**: Gradients, corners, textures using matrix computations
+6. **Advanced Processing**: Denoising, inpainting, morphology through linear methods
+
+**Core Applications:**
+- **Computer Vision**: Object detection, recognition, tracking
+- **Medical Imaging**: Enhancement, segmentation, registration
+- **Remote Sensing**: Satellite image analysis, change detection
+- **Graphics**: Rendering, filtering, special effects
+- **Robotics**: Visual navigation, SLAM, perception
+
+The mathematical rigor of linear algebra provides both theoretical understanding and computational efficiency for modern image processing systems.
 
 ---
 
 ## Question 6
 
-**Discuss the role oflinear algebraindeep learning, specifically in trainingconvolutional neural networks.**
+**Discuss the role of linear algebra in deep learning, specifically in training convolutional neural networks.**
 
-**Answer:** _[To be filled]_
+**Answer:** Linear algebra serves as the mathematical foundation of deep learning and convolutional neural networks (CNNs), providing the computational framework for forward propagation, backpropagation, weight updates, and optimization. Understanding these linear algebraic operations is crucial for designing, implementing, and optimizing deep learning systems effectively.
+
+**1. Forward Propagation in CNNs:**
+
+**1.1 Convolution as Matrix Multiplication:**
+```python
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from scipy.signal import convolve2d
+import matplotlib.pyplot as plt
+import time
+from sklearn.datasets import make_classification
+from sklearn.preprocessing import StandardScaler
+
+def convolution_as_matrix_multiplication():
+    """Demonstrate convolution as matrix multiplication"""
+    
+    print("Convolution as Matrix Multiplication")
+    print("=" * 35)
+    
+    # Create sample input
+    input_size = 5
+    kernel_size = 3
+    
+    # Input image (5x5)
+    X = np.array([
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 10],
+        [11, 12, 13, 14, 15],
+        [16, 17, 18, 19, 20],
+        [21, 22, 23, 24, 25]
+    ], dtype=float)
+    
+    # Kernel (3x3)
+    K = np.array([
+        [1, 0, -1],
+        [2, 0, -2],
+        [1, 0, -1]
+    ], dtype=float)
+    
+    print(f"Input shape: {X.shape}")
+    print(f"Kernel shape: {K.shape}")
+    
+    # Method 1: Direct convolution
+    output_direct = convolve2d(X, K, mode='valid')
+    print(f"Direct convolution output shape: {output_direct.shape}")
+    
+    # Method 2: Convert to matrix multiplication
+    def convolution_to_toeplitz(input_matrix, kernel, output_shape):
+        """Convert convolution to Toeplitz matrix multiplication"""
+        
+        input_h, input_w = input_matrix.shape
+        kernel_h, kernel_w = kernel.shape
+        output_h, output_w = output_shape
+        
+        # Create Toeplitz matrix
+        toeplitz_matrix = np.zeros((output_h * output_w, input_h * input_w))
+        
+        # Fill Toeplitz matrix
+        for i in range(output_h):
+            for j in range(output_w):
+                output_idx = i * output_w + j
+                
+                for ki in range(kernel_h):
+                    for kj in range(kernel_w):
+                        input_i = i + ki
+                        input_j = j + kj
+                        input_idx = input_i * input_w + input_j
+                        
+                        if 0 <= input_i < input_h and 0 <= input_j < input_w:
+                            toeplitz_matrix[output_idx, input_idx] = kernel[ki, kj]
+        
+        return toeplitz_matrix
+    
+    # Create Toeplitz matrix
+    output_shape = (input_size - kernel_size + 1, input_size - kernel_size + 1)
+    toeplitz_matrix = convolution_to_toeplitz(X, K, output_shape)
+    
+    # Perform matrix multiplication
+    X_flattened = X.flatten()
+    output_matrix = toeplitz_matrix @ X_flattened
+    output_matrix = output_matrix.reshape(output_shape)
+    
+    print(f"Matrix multiplication output shape: {output_matrix.shape}")
+    print(f"Results match: {np.allclose(output_direct, output_matrix)}")
+    
+    print(f"\nToeplitz matrix shape: {toeplitz_matrix.shape}")
+    print(f"Sparsity: {np.sum(toeplitz_matrix == 0) / toeplitz_matrix.size * 100:.1f}% zeros")
+    
+    return X, K, output_direct, toeplitz_matrix
+
+X, K, output_conv, toeplitz = convolution_as_matrix_multiplication()
+```
+
+**1.2 Multi-Channel Convolution:**
+```python
+def multi_channel_convolution():
+    """Demonstrate multi-channel convolution operations"""
+    
+    print("\nMulti-Channel Convolution:")
+    print("-" * 26)
+    
+    # Multi-channel input (batch_size=1, channels=3, height=5, width=5)
+    batch_size, in_channels, height, width = 1, 3, 5, 5
+    out_channels = 2
+    kernel_size = 3
+    
+    # Create random input
+    np.random.seed(42)
+    X = np.random.randn(batch_size, in_channels, height, width)
+    
+    # Create random kernels (out_channels, in_channels, kernel_height, kernel_width)
+    W = np.random.randn(out_channels, in_channels, kernel_size, kernel_size)
+    
+    print(f"Input shape: {X.shape}")
+    print(f"Weight shape: {W.shape}")
+    
+    # Manual convolution computation
+    def manual_conv2d(input_tensor, weights):
+        """Manual 2D convolution computation"""
+        
+        batch_size, in_channels, in_h, in_w = input_tensor.shape
+        out_channels, _, kernel_h, kernel_w = weights.shape
+        
+        out_h = in_h - kernel_h + 1
+        out_w = in_w - kernel_w + 1
+        
+        output = np.zeros((batch_size, out_channels, out_h, out_w))
+        
+        for b in range(batch_size):
+            for oc in range(out_channels):
+                for i in range(out_h):
+                    for j in range(out_w):
+                        # Extract patch
+                        patch = input_tensor[b, :, i:i+kernel_h, j:j+kernel_w]
+                        
+                        # Compute dot product with kernel
+                        output[b, oc, i, j] = np.sum(patch * weights[oc])
+        
+        return output
+    
+    # Compute using manual implementation
+    output_manual = manual_conv2d(X, W)
+    
+    # Compare with PyTorch
+    X_torch = torch.tensor(X, dtype=torch.float32)
+    W_torch = torch.tensor(W, dtype=torch.float32)
+    
+    output_torch = F.conv2d(X_torch, W_torch)
+    
+    print(f"Manual output shape: {output_manual.shape}")
+    print(f"PyTorch output shape: {output_torch.shape}")
+    print(f"Results match: {np.allclose(output_manual, output_torch.numpy(), atol=1e-6)}")
+    
+    # Analyze computational complexity
+    input_elements = np.prod(X.shape)
+    weight_elements = np.prod(W.shape)
+    output_elements = np.prod(output_manual.shape)
+    
+    operations = output_elements * in_channels * kernel_size * kernel_size
+    
+    print(f"\nComputational Analysis:")
+    print(f"  Input elements: {input_elements:,}")
+    print(f"  Weight elements: {weight_elements:,}")
+    print(f"  Output elements: {output_elements:,}")
+    print(f"  Multiply-add operations: {operations:,}")
+    
+    return X, W, output_manual
+
+X_multi, W_multi, output_multi = multi_channel_convolution()
+```
+
+**1.3 Batch Processing and Vectorization:**
+```python
+def batch_processing_vectorization():
+    """Demonstrate batch processing and vectorization in CNNs"""
+    
+    print("\nBatch Processing and Vectorization:")
+    print("-" * 34)
+    
+    # Batch processing parameters
+    batch_sizes = [1, 8, 32, 128]
+    in_channels, out_channels = 64, 128
+    input_size = 32
+    kernel_size = 3
+    
+    # Create sample data
+    def create_batch_data(batch_size):
+        X = torch.randn(batch_size, in_channels, input_size, input_size)
+        W = torch.randn(out_channels, in_channels, kernel_size, kernel_size)
+        return X, W
+    
+    print("Batch Size | Time (ms) | Throughput (samples/s) | Memory (MB)")
+    print("-" * 65)
+    
+    timing_results = {}
+    
+    for batch_size in batch_sizes:
+        X, W = create_batch_data(batch_size)
+        
+        # Time the convolution
+        start_time = time.time()
+        
+        # Multiple runs for accurate timing
+        num_runs = 10
+        for _ in range(num_runs):
+            output = F.conv2d(X, W, padding=1)
+        
+        end_time = time.time()
+        
+        avg_time = (end_time - start_time) / num_runs * 1000  # ms
+        throughput = batch_size / (avg_time / 1000)  # samples per second
+        
+        # Estimate memory usage
+        input_memory = X.element_size() * X.nelement() / (1024**2)
+        weight_memory = W.element_size() * W.nelement() / (1024**2)
+        output_memory = output.element_size() * output.nelement() / (1024**2)
+        total_memory = input_memory + weight_memory + output_memory
+        
+        print(f"{batch_size:10d} | {avg_time:8.2f} | {throughput:17.1f} | {total_memory:10.1f}")
+        
+        timing_results[batch_size] = {
+            'time': avg_time,
+            'throughput': throughput,
+            'memory': total_memory
+        }
+    
+    # Analyze scaling
+    print(f"\nScaling Analysis:")
+    base_batch = batch_sizes[0]
+    for batch_size in batch_sizes[1:]:
+        theoretical_speedup = batch_size / base_batch
+        actual_speedup = timing_results[base_batch]['time'] / timing_results[batch_size]['time'] * batch_size
+        efficiency = actual_speedup / theoretical_speedup * 100
+        
+        print(f"  Batch {batch_size}: {efficiency:.1f}% efficiency vs theoretical")
+    
+    return timing_results
+
+timing_results = batch_processing_vectorization()
+```
+
+**2. Backpropagation and Gradient Computation:**
+
+**2.1 Gradient Flow through Convolution:**
+```python
+def convolution_gradients():
+    """Demonstrate gradient computation in convolutional layers"""
+    
+    print("\nGradient Computation in Convolution:")
+    print("-" * 35)
+    
+    # Simple example with small dimensions
+    batch_size, in_channels, height, width = 1, 1, 4, 4
+    out_channels = 1
+    kernel_size = 3
+    
+    # Create input and weight tensors with gradient tracking
+    X = torch.randn(batch_size, in_channels, height, width, requires_grad=True)
+    W = torch.randn(out_channels, in_channels, kernel_size, kernel_size, requires_grad=True)
+    b = torch.randn(out_channels, requires_grad=True)
+    
+    print(f"Input shape: {X.shape}")
+    print(f"Weight shape: {W.shape}")
+    print(f"Bias shape: {b.shape}")
+    
+    # Forward pass
+    output = F.conv2d(X, W, b)
+    print(f"Output shape: {output.shape}")
+    
+    # Create a simple loss (sum of all outputs)
+    loss = output.sum()
+    print(f"Loss: {loss.item():.4f}")
+    
+    # Backward pass
+    loss.backward()
+    
+    print(f"\nGradient shapes:")
+    print(f"  dL/dX: {X.grad.shape}")
+    print(f"  dL/dW: {W.grad.shape}")
+    print(f"  dL/db: {b.grad.shape}")
+    
+    # Manual gradient computation for verification
+    def manual_conv_gradient(input_tensor, weight, grad_output):
+        """Manual computation of convolution gradients"""
+        
+        # Gradient w.r.t. input (convolution with flipped kernel)
+        grad_input = F.conv_transpose2d(grad_output, weight)
+        
+        # Gradient w.r.t. weight (convolution of input with grad_output)
+        grad_weight = F.conv2d(
+            input_tensor.transpose(0, 1), 
+            grad_output.transpose(0, 1)
+        ).transpose(0, 1)
+        
+        # Gradient w.r.t. bias (sum over spatial dimensions)
+        grad_bias = grad_output.sum(dim=[0, 2, 3])
+        
+        return grad_input, grad_weight, grad_bias
+    
+    # Verify gradients manually
+    grad_output = torch.ones_like(output)
+    grad_input_manual, grad_weight_manual, grad_bias_manual = manual_conv_gradient(X, W, grad_output)
+    
+    print(f"\nGradient verification:")
+    print(f"  Input gradients match: {torch.allclose(X.grad, grad_input_manual[:, :, :X.shape[2], :X.shape[3]], atol=1e-6)}")
+    print(f"  Weight gradients match: {torch.allclose(W.grad, grad_weight_manual, atol=1e-6)}")
+    print(f"  Bias gradients match: {torch.allclose(b.grad, grad_bias_manual, atol=1e-6)}")
+    
+    return X, W, b, output
+
+X_grad, W_grad, b_grad, output_grad = convolution_gradients()
+```
+
+**2.2 Chain Rule in Deep Networks:**
+```python
+def chain_rule_deep_networks():
+    """Demonstrate chain rule application in deep networks"""
+    
+    print("\nChain Rule in Deep Networks:")
+    print("-" * 28)
+    
+    # Create a simple CNN architecture
+    class SimpleCNN(nn.Module):
+        def __init__(self):
+            super(SimpleCNN, self).__init__()
+            self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+            self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+            self.pool = nn.MaxPool2d(2, 2)
+            self.fc1 = nn.Linear(64 * 8 * 8, 128)
+            self.fc2 = nn.Linear(128, 10)
+            self.relu = nn.ReLU()
+            
+        def forward(self, x):
+            # Store intermediate activations for analysis
+            self.activations = {}
+            
+            x = self.conv1(x)
+            self.activations['conv1'] = x.clone()
+            x = self.relu(x)
+            x = self.pool(x)
+            
+            x = self.conv2(x)
+            self.activations['conv2'] = x.clone()
+            x = self.relu(x)
+            x = self.pool(x)
+            
+            x = x.view(x.size(0), -1)
+            x = self.fc1(x)
+            self.activations['fc1'] = x.clone()
+            x = self.relu(x)
+            
+            x = self.fc2(x)
+            self.activations['fc2'] = x.clone()
+            
+            return x
+    
+    # Create model and sample data
+    model = SimpleCNN()
+    X = torch.randn(4, 1, 32, 32, requires_grad=True)
+    target = torch.randint(0, 10, (4,))
+    
+    print(f"Input shape: {X.shape}")
+    print(f"Target shape: {target.shape}")
+    
+    # Forward pass
+    output = model(X)
+    print(f"Output shape: {output.shape}")
+    
+    # Compute loss
+    criterion = nn.CrossEntropyLoss()
+    loss = criterion(output, target)
+    print(f"Loss: {loss.item():.4f}")
+    
+    # Backward pass
+    loss.backward()
+    
+    # Analyze gradients at each layer
+    print(f"\nGradient Analysis:")
+    
+    layer_names = ['conv1', 'conv2', 'fc1', 'fc2']
+    
+    for name in layer_names:
+        layer = getattr(model, name)
+        
+        if hasattr(layer, 'weight') and layer.weight.grad is not None:
+            weight_grad_norm = torch.norm(layer.weight.grad).item()
+            weight_norm = torch.norm(layer.weight).item()
+            relative_grad = weight_grad_norm / weight_norm
+            
+            print(f"  {name}:")
+            print(f"    Weight gradient norm: {weight_grad_norm:.6f}")
+            print(f"    Weight norm: {weight_norm:.6f}")
+            print(f"    Relative gradient: {relative_grad:.6f}")
+    
+    # Gradient flow analysis
+    def analyze_gradient_flow():
+        """Analyze gradient magnitudes through the network"""
+        
+        gradients = []
+        layer_names = []
+        
+        for name, param in model.named_parameters():
+            if param.grad is not None:
+                gradients.append(param.grad.norm().item())
+                layer_names.append(name)
+        
+        return gradients, layer_names
+    
+    gradients, param_names = analyze_gradient_flow()
+    
+    print(f"\nGradient Flow Summary:")
+    for name, grad in zip(param_names, gradients):
+        print(f"  {name}: {grad:.6f}")
+    
+    # Check for vanishing/exploding gradients
+    grad_ratios = []
+    for i in range(1, len(gradients)):
+        ratio = gradients[i] / gradients[i-1]
+        grad_ratios.append(ratio)
+    
+    print(f"\nGradient Ratios (layer i+1 / layer i):")
+    for i, ratio in enumerate(grad_ratios):
+        print(f"  Layer {i+1}/{i}: {ratio:.4f}")
+    
+    return model, X, output, gradients
+
+model, X_cnn, output_cnn, gradients = chain_rule_deep_networks()
+```
+
+**3. Weight Updates and Optimization:**
+
+**3.1 Matrix-Based Optimization Algorithms:**
+```python
+def matrix_optimization_algorithms():
+    """Demonstrate matrix-based optimization algorithms"""
+    
+    print("\nMatrix-Based Optimization Algorithms:")
+    print("-" * 38)
+    
+    # Create a simple linear layer for demonstration
+    input_size, output_size = 100, 50
+    batch_size = 32
+    
+    # Initialize weights and biases
+    W = torch.randn(output_size, input_size, requires_grad=True) * 0.01
+    b = torch.zeros(output_size, requires_grad=True)
+    
+    # Generate sample data
+    X = torch.randn(batch_size, input_size)
+    y = torch.randn(batch_size, output_size)
+    
+    print(f"Weight matrix shape: {W.shape}")
+    print(f"Input batch shape: {X.shape}")
+    print(f"Target shape: {y.shape}")
+    
+    # Different optimization algorithms
+    optimizers = {
+        'SGD': torch.optim.SGD([W, b], lr=0.01),
+        'Adam': torch.optim.Adam([W, b], lr=0.001),
+        'RMSprop': torch.optim.RMSprop([W, b], lr=0.001),
+        'AdaGrad': torch.optim.Adagrad([W, b], lr=0.01)
+    }
+    
+    # Training loop for each optimizer
+    def train_with_optimizer(optimizer_name, optimizer, num_epochs=100):
+        """Train with specific optimizer"""
+        
+        losses = []
+        weight_norms = []
+        
+        # Reset weights
+        W.data = torch.randn(output_size, input_size) * 0.01
+        b.data = torch.zeros(output_size)
+        
+        for epoch in range(num_epochs):
+            # Forward pass
+            output = X @ W.T + b
+            loss = F.mse_loss(output, y)
+            
+            # Backward pass
+            optimizer.zero_grad()
+            loss.backward()
+            
+            # Update weights
+            optimizer.step()
+            
+            # Record metrics
+            losses.append(loss.item())
+            weight_norms.append(torch.norm(W).item())
+        
+        return losses, weight_norms
+    
+    # Train with different optimizers
+    results = {}
+    
+    for name, optimizer in optimizers.items():
+        print(f"\nTraining with {name}:")
+        losses, weight_norms = train_with_optimizer(name, optimizer)
+        
+        final_loss = losses[-1]
+        final_weight_norm = weight_norms[-1]
+        
+        print(f"  Final loss: {final_loss:.6f}")
+        print(f"  Final weight norm: {final_weight_norm:.6f}")
+        print(f"  Convergence rate: {(losses[0] - final_loss) / losses[0] * 100:.2f}%")
+        
+        results[name] = {
+            'losses': losses,
+            'weight_norms': weight_norms,
+            'final_loss': final_loss
+        }
+    
+    # Compare convergence
+    print(f"\nConvergence Comparison:")
+    sorted_optimizers = sorted(results.items(), key=lambda x: x[1]['final_loss'])
+    
+    for i, (name, metrics) in enumerate(sorted_optimizers):
+        print(f"  {i+1}. {name}: {metrics['final_loss']:.6f}")
+    
+    return results
+
+opt_results = matrix_optimization_algorithms()
+```
+
+**3.2 Second-Order Optimization Methods:**
+```python
+def second_order_optimization():
+    """Demonstrate second-order optimization methods"""
+    
+    print("\nSecond-Order Optimization Methods:")
+    print("-" * 33)
+    
+    # Simple quadratic function for demonstration
+    def quadratic_function(x):
+        """Quadratic function: f(x) = x^T A x + b^T x + c"""
+        A = torch.tensor([[2.0, 0.5], [0.5, 1.0]])
+        b = torch.tensor([1.0, -1.0])
+        c = 0.5
+        
+        return x.T @ A @ x + b.T @ x + c
+    
+    def quadratic_gradient(x):
+        """Gradient of quadratic function"""
+        A = torch.tensor([[2.0, 0.5], [0.5, 1.0]])
+        b = torch.tensor([1.0, -1.0])
+        
+        return 2 * A @ x + b
+    
+    def quadratic_hessian():
+        """Hessian of quadratic function"""
+        A = torch.tensor([[2.0, 0.5], [0.5, 1.0]])
+        return 2 * A
+    
+    # Starting point
+    x0 = torch.tensor([3.0, 2.0])
+    
+    print(f"Starting point: {x0}")
+    print(f"Initial function value: {quadratic_function(x0):.6f}")
+    
+    # 1. Gradient Descent
+    def gradient_descent(x_start, lr=0.1, num_steps=20):
+        """Standard gradient descent"""
+        x = x_start.clone()
+        trajectory = [x.clone()]
+        
+        for _ in range(num_steps):
+            grad = quadratic_gradient(x)
+            x = x - lr * grad
+            trajectory.append(x.clone())
+        
+        return x, trajectory
+    
+    x_gd, traj_gd = gradient_descent(x0)
+    
+    # 2. Newton's Method
+    def newton_method(x_start, num_steps=10):
+        """Newton's method using Hessian"""
+        x = x_start.clone()
+        trajectory = [x.clone()]
+        
+        H = quadratic_hessian()
+        H_inv = torch.inverse(H)
+        
+        for _ in range(num_steps):
+            grad = quadratic_gradient(x)
+            x = x - H_inv @ grad
+            trajectory.append(x.clone())
+        
+        return x, trajectory
+    
+    x_newton, traj_newton = newton_method(x0)
+    
+    # 3. Quasi-Newton (BFGS approximation)
+    def quasi_newton_bfgs(x_start, num_steps=15):
+        """Quasi-Newton method with BFGS approximation"""
+        x = x_start.clone()
+        trajectory = [x.clone()]
+        
+        # Initialize Hessian approximation as identity
+        H_inv = torch.eye(2)
+        
+        for i in range(num_steps):
+            grad = quadratic_gradient(x)
+            
+            # Update step
+            dx = -H_inv @ grad
+            x_new = x + 0.1 * dx  # Line search step size
+            
+            if i > 0:
+                # BFGS update
+                grad_new = quadratic_gradient(x_new)
+                s = x_new - x
+                y = grad_new - grad
+                
+                if torch.dot(s, y) > 1e-8:  # Check curvature condition
+                    rho = 1.0 / torch.dot(s, y)
+                    I = torch.eye(2)
+                    
+                    H_inv = (I - rho * torch.outer(s, y)) @ H_inv @ (I - rho * torch.outer(y, s)) + rho * torch.outer(s, s)
+            
+            x = x_new
+            trajectory.append(x.clone())
+        
+        return x, trajectory
+    
+    x_bfgs, traj_bfgs = quasi_newton_bfgs(x0)
+    
+    # Compare methods
+    methods = {
+        'Gradient Descent': (x_gd, traj_gd),
+        'Newton Method': (x_newton, traj_newton),
+        'Quasi-Newton (BFGS)': (x_bfgs, traj_bfgs)
+    }
+    
+    print(f"\nOptimization Results:")
+    for name, (x_final, trajectory) in methods.items():
+        final_value = quadratic_function(x_final)
+        steps = len(trajectory) - 1
+        
+        print(f"  {name}:")
+        print(f"    Final point: [{x_final[0]:.6f}, {x_final[1]:.6f}]")
+        print(f"    Final value: {final_value:.6f}")
+        print(f"    Steps: {steps}")
+    
+    # Theoretical optimum
+    H = quadratic_hessian()
+    b = torch.tensor([1.0, -1.0])
+    x_opt = -0.5 * torch.inverse(H) @ b
+    f_opt = quadratic_function(x_opt)
+    
+    print(f"\nTheoretical optimum:")
+    print(f"  Point: [{x_opt[0]:.6f}, {x_opt[1]:.6f}]")
+    print(f"  Value: {f_opt:.6f}")
+    
+    return methods, x_opt
+
+methods, x_opt = second_order_optimization()
+```
+
+**4. Specialized CNN Operations:**
+
+**4.1 Depthwise and Pointwise Convolutions:**
+```python
+def depthwise_pointwise_convolutions():
+    """Demonstrate depthwise and pointwise convolutions"""
+    
+    print("\nDepthwise and Pointwise Convolutions:")
+    print("-" * 37)
+    
+    # Input parameters
+    batch_size, in_channels, height, width = 1, 32, 64, 64
+    out_channels = 64
+    kernel_size = 3
+    
+    # Create input
+    X = torch.randn(batch_size, in_channels, height, width)
+    
+    print(f"Input shape: {X.shape}")
+    
+    # 1. Standard Convolution
+    conv_standard = nn.Conv2d(in_channels, out_channels, kernel_size, padding=1)
+    output_standard = conv_standard(X)
+    
+    # Count parameters
+    params_standard = sum(p.numel() for p in conv_standard.parameters())
+    
+    print(f"\nStandard Convolution:")
+    print(f"  Output shape: {output_standard.shape}")
+    print(f"  Parameters: {params_standard:,}")
+    
+    # 2. Depthwise Separable Convolution
+    class DepthwiseSeparableConv(nn.Module):
+        def __init__(self, in_channels, out_channels, kernel_size, padding=0):
+            super().__init__()
+            
+            # Depthwise convolution
+            self.depthwise = nn.Conv2d(
+                in_channels, in_channels, kernel_size, 
+                padding=padding, groups=in_channels
+            )
+            
+            # Pointwise convolution
+            self.pointwise = nn.Conv2d(in_channels, out_channels, 1)
+        
+        def forward(self, x):
+            x = self.depthwise(x)
+            x = self.pointwise(x)
+            return x
+    
+    conv_depthwise = DepthwiseSeparableConv(in_channels, out_channels, kernel_size, padding=1)
+    output_depthwise = conv_depthwise(X)
+    
+    # Count parameters
+    params_depthwise = sum(p.numel() for p in conv_depthwise.parameters())
+    
+    print(f"\nDepthwise Separable Convolution:")
+    print(f"  Output shape: {output_depthwise.shape}")
+    print(f"  Parameters: {params_depthwise:,}")
+    print(f"  Parameter reduction: {params_standard / params_depthwise:.2f}x")
+    
+    # 3. Computational complexity analysis
+    def compute_flops(input_shape, output_shape, kernel_size, in_channels, out_channels, conv_type='standard'):
+        """Compute FLOPs for different convolution types"""
+        
+        batch_size, _, out_h, out_w = output_shape
+        
+        if conv_type == 'standard':
+            # Standard convolution: output_elements * kernel_area * in_channels
+            flops = batch_size * out_h * out_w * kernel_size * kernel_size * in_channels * out_channels
+        
+        elif conv_type == 'depthwise_separable':
+            # Depthwise: output_elements * kernel_area * in_channels
+            depthwise_flops = batch_size * out_h * out_w * kernel_size * kernel_size * in_channels
+            
+            # Pointwise: output_elements * in_channels * out_channels
+            pointwise_flops = batch_size * out_h * out_w * in_channels * out_channels
+            
+            flops = depthwise_flops + pointwise_flops
+        
+        return flops
+    
+    flops_standard = compute_flops(X.shape, output_standard.shape, kernel_size, in_channels, out_channels, 'standard')
+    flops_depthwise = compute_flops(X.shape, output_depthwise.shape, kernel_size, in_channels, out_channels, 'depthwise_separable')
+    
+    print(f"\nComputational Complexity:")
+    print(f"  Standard convolution FLOPs: {flops_standard:,}")
+    print(f"  Depthwise separable FLOPs: {flops_depthwise:,}")
+    print(f"  FLOP reduction: {flops_standard / flops_depthwise:.2f}x")
+    
+    return conv_standard, conv_depthwise, params_standard, params_depthwise
+
+conv_std, conv_dw, params_std, params_dw = depthwise_pointwise_convolutions()
+```
+
+**4.2 Dilated Convolutions and Receptive Fields:**
+```python
+def dilated_convolutions():
+    """Demonstrate dilated convolutions and receptive field analysis"""
+    
+    print("\nDilated Convolutions and Receptive Fields:")
+    print("-" * 40)
+    
+    # Input parameters
+    batch_size, channels, height, width = 1, 1, 32, 32
+    X = torch.randn(batch_size, channels, height, width)
+    
+    print(f"Input shape: {X.shape}")
+    
+    # Different dilation rates
+    dilation_rates = [1, 2, 4, 8]
+    kernel_size = 3
+    
+    convolutions = {}
+    
+    for dilation in dilation_rates:
+        # Create dilated convolution
+        conv = nn.Conv2d(channels, channels, kernel_size, padding=dilation, dilation=dilation)
+        output = conv(X)
+        
+        convolutions[dilation] = {
+            'conv': conv,
+            'output': output,
+            'output_shape': output.shape
+        }
+        
+        print(f"\nDilation rate {dilation}:")
+        print(f"  Output shape: {output.shape}")
+        print(f"  Padding used: {dilation}")
+    
+    # Receptive field calculation
+    def calculate_receptive_field(layers):
+        """Calculate effective receptive field through network layers"""
+        
+        rf = 1  # Initial receptive field
+        stride_product = 1
+        
+        for layer in layers:
+            kernel_size, stride, dilation = layer
+            
+            # Update receptive field
+            rf = rf + (kernel_size - 1) * dilation * stride_product
+            stride_product *= stride
+        
+        return rf
+    
+    print(f"\nReceptive Field Analysis:")
+    
+    # Single layer receptive fields
+    for dilation in dilation_rates:
+        layers = [(kernel_size, 1, dilation)]
+        rf = calculate_receptive_field(layers)
+        
+        print(f"  Dilation {dilation}: Receptive field = {rf}x{rf}")
+    
+    # Multi-layer receptive field example
+    print(f"\nMulti-layer Examples:")
+    
+    # Stack of dilated convolutions
+    dilated_stack = [(3, 1, 1), (3, 1, 2), (3, 1, 4), (3, 1, 8)]
+    rf_dilated = calculate_receptive_field(dilated_stack)
+    
+    # Standard convolutions with pooling
+    standard_stack = [(3, 1, 1), (2, 2, 1), (3, 1, 1), (2, 2, 1), (3, 1, 1)]
+    rf_standard = calculate_receptive_field(standard_stack)
+    
+    print(f"  Dilated stack (1,2,4,8): RF = {rf_dilated}x{rf_dilated}")
+    print(f"  Standard + pooling: RF = {rf_standard}x{rf_standard}")
+    
+    # Parameter comparison
+    def count_dilated_params(num_layers, in_channels, out_channels, kernel_size):
+        """Count parameters in dilated convolution stack"""
+        return num_layers * in_channels * out_channels * kernel_size * kernel_size
+    
+    params_dilated = count_dilated_params(4, channels, channels, kernel_size)
+    params_standard = count_dilated_params(3, channels, channels, kernel_size)  # Excluding pooling layers
+    
+    print(f"\nParameter Comparison:")
+    print(f"  Dilated stack: {params_dilated} parameters")
+    print(f"  Standard stack: {params_standard} parameters")
+    print(f"  RF/param ratio (dilated): {rf_dilated / params_dilated:.4f}")
+    print(f"  RF/param ratio (standard): {rf_standard / params_standard:.4f}")
+    
+    return convolutions, rf_dilated, rf_standard
+
+convs_dilated, rf_dilated, rf_standard = dilated_convolutions()
+```
+
+**5. Memory Optimization and Efficient Training:**
+
+**5.1 Gradient Checkpointing:**
+```python
+def gradient_checkpointing():
+    """Demonstrate gradient checkpointing for memory optimization"""
+    
+    print("\nGradient Checkpointing for Memory Optimization:")
+    print("-" * 46)
+    
+    import torch.utils.checkpoint as checkpoint
+    
+    # Deep network for demonstration
+    class DeepNetwork(nn.Module):
+        def __init__(self, num_layers=20, hidden_size=1024):
+            super().__init__()
+            self.layers = nn.ModuleList([
+                nn.Linear(hidden_size, hidden_size) for _ in range(num_layers)
+            ])
+            self.relu = nn.ReLU()
+            
+        def forward(self, x, use_checkpointing=False):
+            if use_checkpointing:
+                # Use gradient checkpointing
+                for layer in self.layers:
+                    x = checkpoint.checkpoint(self._forward_layer, x, layer)
+            else:
+                # Normal forward pass
+                for layer in self.layers:
+                    x = self._forward_layer(x, layer)
+            
+            return x
+        
+        def _forward_layer(self, x, layer):
+            return self.relu(layer(x))
+    
+    # Create model and data
+    hidden_size = 1024
+    batch_size = 32
+    num_layers = 20
+    
+    model = DeepNetwork(num_layers, hidden_size)
+    X = torch.randn(batch_size, hidden_size, requires_grad=True)
+    target = torch.randn(batch_size, hidden_size)
+    
+    print(f"Model depth: {num_layers} layers")
+    print(f"Hidden size: {hidden_size}")
+    print(f"Batch size: {batch_size}")
+    
+    # Function to measure memory usage
+    def measure_memory_usage(model, x, target, use_checkpointing=False):
+        """Measure peak memory usage during forward/backward pass"""
+        
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None
+        
+        # Forward pass
+        output = model(x, use_checkpointing=use_checkpointing)
+        loss = F.mse_loss(output, target)
+        
+        # Measure memory before backward pass
+        if torch.cuda.is_available():
+            memory_before = torch.cuda.memory_allocated()
+        else:
+            memory_before = 0
+        
+        # Backward pass
+        loss.backward()
+        
+        # Measure peak memory
+        if torch.cuda.is_available():
+            peak_memory = torch.cuda.max_memory_allocated()
+            torch.cuda.reset_peak_memory_stats()
+        else:
+            peak_memory = 0
+        
+        return peak_memory, loss.item()
+    
+    # Compare memory usage
+    if torch.cuda.is_available():
+        model = model.cuda()
+        X = X.cuda()
+        target = target.cuda()
+        
+        print(f"\nMemory Usage Comparison (GPU):")
+        
+        # Without checkpointing
+        model.zero_grad()
+        memory_normal, loss_normal = measure_memory_usage(model, X, target, False)
+        
+        # With checkpointing
+        model.zero_grad()
+        memory_checkpoint, loss_checkpoint = measure_memory_usage(model, X, target, True)
+        
+        print(f"  Normal training: {memory_normal / 1024**2:.1f} MB")
+        print(f"  With checkpointing: {memory_checkpoint / 1024**2:.1f} MB")
+        print(f"  Memory savings: {memory_normal / memory_checkpoint:.2f}x")
+        print(f"  Loss difference: {abs(loss_normal - loss_checkpoint):.2e}")
+        
+    else:
+        print("  GPU not available for memory measurement")
+    
+    # Time comparison
+    def time_training(model, x, target, use_checkpointing=False, num_runs=5):
+        """Time the training process"""
+        
+        times = []
+        
+        for _ in range(num_runs):
+            model.zero_grad()
+            
+            start_time = time.time()
+            
+            output = model(x, use_checkpointing=use_checkpointing)
+            loss = F.mse_loss(output, target)
+            loss.backward()
+            
+            end_time = time.time()
+            times.append(end_time - start_time)
+        
+        return np.mean(times), np.std(times)
+    
+    print(f"\nTiming Comparison:")
+    
+    time_normal, std_normal = time_training(model, X, target, False)
+    time_checkpoint, std_checkpoint = time_training(model, X, target, True)
+    
+    print(f"  Normal training: {time_normal:.4f} ± {std_normal:.4f} seconds")
+    print(f"  With checkpointing: {time_checkpoint:.4f} ± {std_checkpoint:.4f} seconds")
+    print(f"  Time overhead: {time_checkpoint / time_normal:.2f}x")
+    
+    return model, time_normal, time_checkpoint
+
+model_checkpoint, time_normal, time_checkpoint = gradient_checkpointing()
+```
+
+**6. Advanced CNN Architectures and Linear Algebra:**
+
+```python
+def advanced_cnn_architectures():
+    """Demonstrate advanced CNN architectures using linear algebra"""
+    
+    print("\nAdvanced CNN Architectures:")
+    print("-" * 28)
+    
+    # 1. Residual Connections (ResNet-style)
+    class ResidualBlock(nn.Module):
+        def __init__(self, channels, stride=1):
+            super().__init__()
+            self.conv1 = nn.Conv2d(channels, channels, 3, stride=stride, padding=1)
+            self.bn1 = nn.BatchNorm2d(channels)
+            self.conv2 = nn.Conv2d(channels, channels, 3, stride=1, padding=1)
+            self.bn2 = nn.BatchNorm2d(channels)
+            self.relu = nn.ReLU(inplace=True)
+            
+            # Skip connection
+            if stride != 1:
+                self.skip = nn.Conv2d(channels, channels, 1, stride=stride)
+            else:
+                self.skip = nn.Identity()
+        
+        def forward(self, x):
+            identity = self.skip(x)
+            
+            out = self.conv1(x)
+            out = self.bn1(out)
+            out = self.relu(out)
+            
+            out = self.conv2(out)
+            out = self.bn2(out)
+            
+            # Residual connection
+            out += identity
+            out = self.relu(out)
+            
+            return out
+    
+    # 2. Attention Mechanism
+    class SpatialAttention(nn.Module):
+        def __init__(self, channels):
+            super().__init__()
+            self.query = nn.Conv2d(channels, channels // 8, 1)
+            self.key = nn.Conv2d(channels, channels // 8, 1)
+            self.value = nn.Conv2d(channels, channels, 1)
+            self.softmax = nn.Softmax(dim=-1)
+            self.gamma = nn.Parameter(torch.zeros(1))
+        
+        def forward(self, x):
+            batch_size, channels, height, width = x.shape
+            
+            # Generate query, key, value
+            q = self.query(x).view(batch_size, -1, width * height).permute(0, 2, 1)
+            k = self.key(x).view(batch_size, -1, width * height)
+            v = self.value(x).view(batch_size, -1, width * height)
+            
+            # Attention computation
+            attention = torch.bmm(q, k)
+            attention = self.softmax(attention)
+            
+            # Apply attention to values
+            out = torch.bmm(v, attention.permute(0, 2, 1))
+            out = out.view(batch_size, channels, height, width)
+            
+            # Residual connection with learnable weight
+            out = self.gamma * out + x
+            
+            return out
+    
+    # 3. Complete architecture combining techniques
+    class AdvancedCNN(nn.Module):
+        def __init__(self, num_classes=10):
+            super().__init__()
+            
+            # Initial convolution
+            self.conv1 = nn.Conv2d(3, 64, 7, stride=2, padding=3)
+            self.bn1 = nn.BatchNorm2d(64)
+            self.relu = nn.ReLU(inplace=True)
+            self.pool = nn.MaxPool2d(3, stride=2, padding=1)
+            
+            # Residual blocks
+            self.res_block1 = ResidualBlock(64)
+            self.res_block2 = ResidualBlock(64)
+            
+            # Attention module
+            self.attention = SpatialAttention(64)
+            
+            # Classification head
+            self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+            self.classifier = nn.Linear(64, num_classes)
+        
+        def forward(self, x):
+            # Initial processing
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.relu(x)
+            x = self.pool(x)
+            
+            # Residual processing
+            x = self.res_block1(x)
+            x = self.res_block2(x)
+            
+            # Attention
+            x = self.attention(x)
+            
+            # Classification
+            x = self.global_pool(x)
+            x = x.view(x.size(0), -1)
+            x = self.classifier(x)
+            
+            return x
+    
+    # Test the architecture
+    model = AdvancedCNN(num_classes=10)
+    x = torch.randn(4, 3, 224, 224)
+    
+    print(f"Input shape: {x.shape}")
+    
+    # Forward pass with intermediate analysis
+    with torch.no_grad():
+        # Initial conv
+        x1 = model.conv1(x)
+        x1 = model.bn1(x1)
+        x1 = model.relu(x1)
+        x1 = model.pool(x1)
+        
+        print(f"After initial processing: {x1.shape}")
+        
+        # Residual blocks
+        x2 = model.res_block1(x1)
+        print(f"After residual block 1: {x2.shape}")
+        
+        x3 = model.res_block2(x2)
+        print(f"After residual block 2: {x3.shape}")
+        
+        # Attention
+        x4 = model.attention(x3)
+        print(f"After attention: {x4.shape}")
+        
+        # Final classification
+        x5 = model.global_pool(x4)
+        x5 = x5.view(x5.size(0), -1)
+        output = model.classifier(x5)
+        
+        print(f"Final output: {output.shape}")
+    
+    # Parameter analysis
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    
+    print(f"\nModel Analysis:")
+    print(f"  Total parameters: {total_params:,}")
+    print(f"  Trainable parameters: {trainable_params:,}")
+    
+    # Memory and computation analysis
+    def analyze_model_complexity(model, input_shape):
+        """Analyze model computational complexity"""
+        
+        model.eval()
+        input_tensor = torch.randn(1, *input_shape[1:])
+        
+        # Count FLOPs (simplified estimation)
+        total_flops = 0
+        
+        def flop_count_hook(module, input, output):
+            nonlocal total_flops
+            
+            if isinstance(module, nn.Conv2d):
+                # Convolution FLOPs
+                batch_size, out_channels, out_h, out_w = output.shape
+                kernel_flops = module.kernel_size[0] * module.kernel_size[1] * module.in_channels
+                total_flops += batch_size * out_channels * out_h * out_w * kernel_flops
+            
+            elif isinstance(module, nn.Linear):
+                # Linear layer FLOPs
+                total_flops += input[0].numel() * module.out_features
+        
+        # Register hooks
+        hooks = []
+        for module in model.modules():
+            if isinstance(module, (nn.Conv2d, nn.Linear)):
+                hooks.append(module.register_forward_hook(flop_count_hook))
+        
+        # Forward pass
+        with torch.no_grad():
+            _ = model(input_tensor)
+        
+        # Remove hooks
+        for hook in hooks:
+            hook.remove()
+        
+        return total_flops
+    
+    flops = analyze_model_complexity(model, x.shape)
+    print(f"  Estimated FLOPs: {flops:,}")
+    print(f"  FLOPs per parameter: {flops / total_params:.2f}")
+    
+    return model, total_params, flops
+
+advanced_model, total_params, flops = advanced_cnn_architectures()
+```
+
+**Summary and Key Insights:**
+
+**Linear Algebra's Critical Role in Deep Learning and CNNs:**
+
+1. **Computational Foundation**: Matrix operations enable efficient parallel processing of convolutions, activations, and gradients
+2. **Memory Efficiency**: Techniques like gradient checkpointing and sparse representations optimize memory usage
+3. **Optimization**: Matrix-based optimizers (Adam, RMSprop) leverage second-order information for faster convergence
+4. **Architecture Innovation**: Advanced techniques like attention mechanisms and residual connections rely on linear algebraic principles
+5. **Scalability**: Vectorized operations and batch processing enable training on large datasets and models
+
+**Key Applications in Modern Deep Learning:**
+- **Transformer Architectures**: Attention mechanisms as matrix operations
+- **Computer Vision**: CNNs for object detection, segmentation, recognition
+- **Efficient Networks**: Depthwise separable convolutions, dilated convolutions
+- **Optimization**: Advanced gradient-based methods for training stability
+- **Memory Management**: Gradient checkpointing, mixed precision training
+
+The mathematical rigor of linear algebra provides both the theoretical foundation and computational efficiency necessary for modern deep learning systems.
 
 ---
 
