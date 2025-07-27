@@ -5959,7 +5959,1400 @@ The mathematical rigor of linear algebra provides both the theoretical foundatio
 
 **Propose strategies to visualizehigh-dimensional datausinglinear algebratechniques.**
 
-**Answer:** _[To be filled]_
+**Answer:** Here's a comprehensive approach to visualizing high-dimensional data using linear algebra techniques:
+
+## Overview of High-Dimensional Data Visualization
+
+High-dimensional data visualization is a critical challenge in machine learning and data analysis. Linear algebra provides powerful mathematical tools for transforming complex, multi-dimensional datasets into interpretable 2D or 3D visualizations while preserving essential structural information.
+
+### 1. Principal Component Analysis (PCA) for Dimensionality Reduction
+
+**Mathematical Foundation:**
+PCA finds the principal components that capture maximum variance in the data through eigendecomposition of the covariance matrix.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification, load_digits, load_wine
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA, TruncatedSVD
+from sklearn.manifold import MDS
+import seaborn as sns
+
+class HighDimensionalVisualizer:
+    """
+    Comprehensive toolkit for visualizing high-dimensional data 
+    using linear algebra techniques.
+    """
+    
+    def __init__(self, random_state=42):
+        self.random_state = random_state
+        self.transformers = {}
+        self.original_shape = None
+        self.transformed_data = {}
+        
+    def pca_visualization(self, data, labels=None, n_components=2, 
+                         explained_variance_threshold=0.95):
+        """
+        Visualize high-dimensional data using Principal Component Analysis.
+        
+        Args:
+            data: High-dimensional data matrix (n_samples × n_features)
+            labels: Optional class labels for coloring
+            n_components: Number of components for visualization (2 or 3)
+            explained_variance_threshold: Minimum variance to explain
+        
+        Returns:
+            Dictionary with transformed data and analysis results
+        """
+        print(f"PCA Visualization Analysis")
+        print("-" * 30)
+        
+        # Standardize data
+        scaler = StandardScaler()
+        data_scaled = scaler.fit_transform(data)
+        
+        # Determine optimal number of components
+        pca_full = PCA()
+        pca_full.fit(data_scaled)
+        
+        cumulative_variance = np.cumsum(pca_full.explained_variance_ratio_)
+        optimal_components = np.argmax(cumulative_variance >= explained_variance_threshold) + 1
+        
+        print(f"Original dimensions: {data.shape[1]}")
+        print(f"Components for {explained_variance_threshold:.1%} variance: {optimal_components}")
+        
+        # Apply PCA for visualization
+        pca_viz = PCA(n_components=n_components, random_state=self.random_state)
+        data_pca = pca_viz.fit_transform(data_scaled)
+        
+        # Store transformer
+        self.transformers['pca'] = {'pca': pca_viz, 'scaler': scaler}
+        self.transformed_data['pca'] = data_pca
+        
+        # Analysis results
+        results = {
+            'transformed_data': data_pca,
+            'explained_variance_ratio': pca_viz.explained_variance_ratio_,
+            'cumulative_variance': np.cumsum(pca_viz.explained_variance_ratio_),
+            'components': pca_viz.components_,
+            'singular_values': pca_viz.singular_values_,
+            'optimal_components': optimal_components
+        }
+        
+        # Visualization
+        self._plot_pca_results(data_pca, labels, results, n_components)
+        
+        return results
+    
+    def _plot_pca_results(self, data_pca, labels, results, n_components):
+        """Plot PCA visualization results"""
+        
+        if n_components == 2:
+            fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+            
+            # 2D scatter plot
+            scatter = axes[0].scatter(data_pca[:, 0], data_pca[:, 1], 
+                                    c=labels, cmap='viridis', alpha=0.7, s=50)
+            axes[0].set_xlabel(f'PC1 ({results["explained_variance_ratio"][0]:.1%} variance)')
+            axes[0].set_ylabel(f'PC2 ({results["explained_variance_ratio"][1]:.1%} variance)')
+            axes[0].set_title('PCA: First Two Principal Components')
+            if labels is not None:
+                plt.colorbar(scatter, ax=axes[0])
+                
+        elif n_components == 3:
+            fig = plt.figure(figsize=(20, 5))
+            
+            # 3D scatter plot
+            ax1 = fig.add_subplot(131, projection='3d')
+            scatter = ax1.scatter(data_pca[:, 0], data_pca[:, 1], data_pca[:, 2],
+                                c=labels, cmap='viridis', alpha=0.7, s=50)
+            ax1.set_xlabel(f'PC1 ({results["explained_variance_ratio"][0]:.1%})')
+            ax1.set_ylabel(f'PC2 ({results["explained_variance_ratio"][1]:.1%})')
+            ax1.set_zlabel(f'PC3 ({results["explained_variance_ratio"][2]:.1%})')
+            ax1.set_title('PCA: First Three Principal Components')
+            
+            axes = [fig.add_subplot(132), fig.add_subplot(133)]
+        
+        # Explained variance plot
+        components_range = range(1, len(results['explained_variance_ratio']) + 1)
+        axes[-2].bar(components_range, results['explained_variance_ratio'])
+        axes[-2].set_xlabel('Principal Component')
+        axes[-2].set_ylabel('Explained Variance Ratio')
+        axes[-2].set_title('Explained Variance by Component')
+        
+        # Cumulative variance plot
+        axes[-1].plot(components_range, results['cumulative_variance'], 'o-')
+        axes[-1].axhline(y=0.95, color='r', linestyle='--', alpha=0.7, label='95% threshold')
+        axes[-1].set_xlabel('Number of Components')
+        axes[-1].set_ylabel('Cumulative Explained Variance')
+        axes[-1].set_title('Cumulative Explained Variance')
+        axes[-1].legend()
+        axes[-1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        plt.show()
+        
+        # Print component analysis
+        print(f"\nPrincipal Components Analysis:")
+        for i, (var_ratio, cum_var) in enumerate(zip(results['explained_variance_ratio'], 
+                                                   results['cumulative_variance'])):
+            print(f"PC{i+1}: {var_ratio:.3f} variance ({cum_var:.3f} cumulative)")
+            
+    def manual_pca_implementation(self, data, n_components=2):
+        """
+        Manual implementation of PCA using linear algebra operations.
+        
+        Args:
+            data: Input data matrix
+            n_components: Number of principal components
+            
+        Returns:
+            Transformed data and components
+        """
+        print(f"\nManual PCA Implementation")
+        print("-" * 25)
+        
+        # Step 1: Center the data
+        data_centered = data - np.mean(data, axis=0)
+        print(f"Data shape after centering: {data_centered.shape}")
+        
+        # Step 2: Compute covariance matrix
+        n_samples = data_centered.shape[0]
+        cov_matrix = (data_centered.T @ data_centered) / (n_samples - 1)
+        print(f"Covariance matrix shape: {cov_matrix.shape}")
+        
+        # Step 3: Eigendecomposition
+        eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
+        
+        # Step 4: Sort eigenvalues and eigenvectors in descending order
+        idx = np.argsort(eigenvalues)[::-1]
+        eigenvalues = eigenvalues[idx]
+        eigenvectors = eigenvectors[:, idx]
+        
+        # Step 5: Select top k components
+        top_eigenvectors = eigenvectors[:, :n_components]
+        
+        # Step 6: Transform data
+        data_transformed = data_centered @ top_eigenvectors
+        
+        # Calculate explained variance ratios
+        total_variance = np.sum(eigenvalues)
+        explained_variance_ratio = eigenvalues[:n_components] / total_variance
+        
+        print(f"Top {n_components} eigenvalues: {eigenvalues[:n_components]}")
+        print(f"Explained variance ratios: {explained_variance_ratio}")
+        
+        return {
+            'transformed_data': data_transformed,
+            'components': top_eigenvectors.T,
+            'eigenvalues': eigenvalues[:n_components],
+            'explained_variance_ratio': explained_variance_ratio,
+            'mean': np.mean(data, axis=0)
+        }
+
+### 2. Singular Value Decomposition (SVD) for Visualization
+
+    def svd_visualization(self, data, n_components=2, center_data=True):
+        """
+        Visualize high-dimensional data using Singular Value Decomposition.
+        
+        SVD provides a more numerically stable alternative to PCA eigendecomposition.
+        
+        Args:
+            data: Input data matrix
+            n_components: Number of components for visualization
+            center_data: Whether to center the data
+            
+        Returns:
+            SVD transformation results
+        """
+        print(f"\nSVD Visualization Analysis")
+        print("-" * 25)
+        
+        # Center data if requested
+        if center_data:
+            data_centered = data - np.mean(data, axis=0)
+        else:
+            data_centered = data.copy()
+        
+        # Apply SVD
+        U, s, Vt = np.linalg.svd(data_centered, full_matrices=False)
+        
+        # Transform data to lower dimensional space
+        data_svd = U[:, :n_components] * s[:n_components]
+        
+        # Calculate explained variance ratios
+        explained_variance = (s ** 2) / (data_centered.shape[0] - 1)
+        total_variance = np.sum(explained_variance)
+        explained_variance_ratio = explained_variance[:n_components] / total_variance
+        
+        print(f"Original shape: {data.shape}")
+        print(f"U shape: {U.shape}, S shape: {s.shape}, Vt shape: {Vt.shape}")
+        print(f"Transformed shape: {data_svd.shape}")
+        print(f"Top {n_components} singular values: {s[:n_components]}")
+        print(f"Explained variance ratios: {explained_variance_ratio}")
+        
+        # Store results
+        self.transformed_data['svd'] = data_svd
+        
+        return {
+            'transformed_data': data_svd,
+            'U': U[:, :n_components],
+            'singular_values': s[:n_components],
+            'Vt': Vt[:n_components, :],
+            'explained_variance_ratio': explained_variance_ratio
+        }
+    
+    def truncated_svd_for_sparse_data(self, data, n_components=2):
+        """
+        Use Truncated SVD for sparse or large datasets.
+        
+        Args:
+            data: Input data (can be sparse)
+            n_components: Number of components
+            
+        Returns:
+            Truncated SVD results
+        """
+        print(f"\nTruncated SVD for Large/Sparse Data")
+        print("-" * 35)
+        
+        # Apply Truncated SVD
+        svd = TruncatedSVD(n_components=n_components, random_state=self.random_state)
+        data_tsvd = svd.fit_transform(data)
+        
+        self.transformers['tsvd'] = svd
+        self.transformed_data['tsvd'] = data_tsvd
+        
+        print(f"Transformed shape: {data_tsvd.shape}")
+        print(f"Explained variance ratios: {svd.explained_variance_ratio_}")
+        print(f"Total explained variance: {np.sum(svd.explained_variance_ratio_):.3f}")
+        
+        return {
+            'transformed_data': data_tsvd,
+            'components': svd.components_,
+            'explained_variance_ratio': svd.explained_variance_ratio_,
+            'singular_values': svd.singular_values_
+        }
+
+### 3. Linear Discriminant Analysis (LDA) for Supervised Visualization
+
+    def lda_visualization(self, data, labels, n_components=2):
+        """
+        Visualize high-dimensional data using Linear Discriminant Analysis.
+        
+        LDA finds linear combinations that maximize class separation.
+        
+        Args:
+            data: Input data matrix
+            labels: Class labels
+            n_components: Number of discriminant components
+            
+        Returns:
+            LDA transformation results
+        """
+        print(f"\nLinear Discriminant Analysis Visualization")
+        print("-" * 40)
+        
+        # Standardize data
+        scaler = StandardScaler()
+        data_scaled = scaler.fit_transform(data)
+        
+        # Get unique classes
+        classes = np.unique(labels)
+        n_classes = len(classes)
+        n_features = data_scaled.shape[1]
+        
+        print(f"Number of classes: {n_classes}")
+        print(f"Number of features: {n_features}")
+        print(f"Maximum LDA components: {min(n_classes-1, n_features)}")
+        
+        # Limit components to maximum possible
+        n_components = min(n_components, n_classes - 1, n_features)
+        
+        # Manual LDA implementation
+        results = self._manual_lda_implementation(data_scaled, labels, n_components)
+        
+        self.transformed_data['lda'] = results['transformed_data']
+        
+        return results
+    
+    def _manual_lda_implementation(self, data, labels, n_components):
+        """Manual implementation of LDA using linear algebra"""
+        
+        classes = np.unique(labels)
+        n_samples, n_features = data.shape
+        
+        # Calculate overall mean
+        overall_mean = np.mean(data, axis=0)
+        
+        # Calculate class means
+        class_means = {}
+        for cls in classes:
+            class_data = data[labels == cls]
+            class_means[cls] = np.mean(class_data, axis=0)
+        
+        # Calculate within-class scatter matrix (S_W)
+        S_W = np.zeros((n_features, n_features))
+        for cls in classes:
+            class_data = data[labels == cls]
+            class_mean = class_means[cls]
+            
+            # Scatter for this class
+            for sample in class_data:
+                diff = (sample - class_mean).reshape(-1, 1)
+                S_W += diff @ diff.T
+        
+        # Calculate between-class scatter matrix (S_B)
+        S_B = np.zeros((n_features, n_features))
+        for cls in classes:
+            n_class = np.sum(labels == cls)
+            class_mean = class_means[cls]
+            diff = (class_mean - overall_mean).reshape(-1, 1)
+            S_B += n_class * (diff @ diff.T)
+        
+        # Solve generalized eigenvalue problem: S_B * w = λ * S_W * w
+        try:
+            # Add regularization to avoid singular matrix
+            S_W_reg = S_W + 1e-6 * np.eye(n_features)
+            eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(S_W_reg) @ S_B)
+            
+            # Sort by eigenvalues (descending)
+            idx = np.argsort(eigenvalues.real)[::-1]
+            eigenvalues = eigenvalues[idx].real
+            eigenvectors = eigenvectors[:, idx].real
+            
+            # Select top components
+            top_eigenvectors = eigenvectors[:, :n_components]
+            
+            # Transform data
+            data_lda = data @ top_eigenvectors
+            
+            print(f"LDA eigenvalues: {eigenvalues[:n_components]}")
+            print(f"LDA discriminant ratios: {eigenvalues[:n_components] / np.sum(eigenvalues)}")
+            
+            return {
+                'transformed_data': data_lda,
+                'discriminant_vectors': top_eigenvectors,
+                'eigenvalues': eigenvalues[:n_components],
+                'class_means': class_means,
+                'S_W': S_W,
+                'S_B': S_B
+            }
+            
+        except np.linalg.LinAlgError:
+            print("Warning: LDA failed due to singular matrix. Using PCA instead.")
+            return self.pca_visualization(data, n_components=n_components)
+
+### 4. Multidimensional Scaling (MDS) for Distance Preservation
+
+    def mds_visualization(self, data, n_components=2, metric=True):
+        """
+        Visualize high-dimensional data using Multidimensional Scaling.
+        
+        MDS preserves pairwise distances between data points.
+        
+        Args:
+            data: Input data matrix
+            n_components: Number of dimensions for embedding
+            metric: Whether to use metric or non-metric MDS
+            
+        Returns:
+            MDS embedding results
+        """
+        print(f"\nMultidimensional Scaling Visualization")
+        print("-" * 35)
+        
+        # Apply MDS
+        mds = MDS(n_components=n_components, metric=metric, 
+                  random_state=self.random_state, max_iter=300, eps=1e-6)
+        
+        data_mds = mds.fit_transform(data)
+        
+        self.transformed_data['mds'] = data_mds
+        
+        print(f"MDS stress: {mds.stress_:.4f}")
+        print(f"Number of iterations: {mds.n_iter_}")
+        
+        return {
+            'transformed_data': data_mds,
+            'stress': mds.stress_,
+            'n_iter': mds.n_iter_,
+            'dissimilarity_matrix': mds.dissimilarity_matrix_
+        }
+    
+    def manual_mds_implementation(self, data, n_components=2):
+        """
+        Manual implementation of Classical MDS using linear algebra.
+        
+        Args:
+            data: Input data matrix
+            n_components: Number of embedding dimensions
+            
+        Returns:
+            MDS embedding and analysis
+        """
+        print(f"\nManual Classical MDS Implementation")
+        print("-" * 35)
+        
+        # Step 1: Calculate pairwise squared distances
+        n_samples = data.shape[0]
+        D_squared = np.zeros((n_samples, n_samples))
+        
+        for i in range(n_samples):
+            for j in range(n_samples):
+                diff = data[i] - data[j]
+                D_squared[i, j] = np.dot(diff, diff)
+        
+        print(f"Distance matrix shape: {D_squared.shape}")
+        
+        # Step 2: Double centering
+        H = np.eye(n_samples) - (1/n_samples) * np.ones((n_samples, n_samples))
+        B = -0.5 * H @ D_squared @ H
+        
+        # Step 3: Eigendecomposition
+        eigenvalues, eigenvectors = np.linalg.eigh(B)
+        
+        # Step 4: Sort eigenvalues in descending order
+        idx = np.argsort(eigenvalues)[::-1]
+        eigenvalues = eigenvalues[idx]
+        eigenvectors = eigenvectors[:, idx]
+        
+        # Step 5: Select positive eigenvalues and corresponding eigenvectors
+        positive_eigenvals = eigenvalues[eigenvalues > 1e-10]
+        n_positive = len(positive_eigenvals)
+        
+        print(f"Number of positive eigenvalues: {n_positive}")
+        print(f"Top eigenvalues: {eigenvalues[:min(5, len(eigenvalues))]}")
+        
+        # Step 6: Construct embedding
+        if n_positive >= n_components:
+            selected_eigenvals = positive_eigenvals[:n_components]
+            selected_eigenvecs = eigenvectors[:, :n_components]
+            
+            # Embedding coordinates
+            embedding = selected_eigenvecs @ np.diag(np.sqrt(selected_eigenvals))
+        else:
+            print(f"Warning: Only {n_positive} positive eigenvalues, requested {n_components}")
+            embedding = eigenvectors[:, :n_positive] @ np.diag(np.sqrt(positive_eigenvals))
+        
+        return {
+            'transformed_data': embedding,
+            'eigenvalues': eigenvalues,
+            'eigenvectors': eigenvectors,
+            'distance_matrix': D_squared,
+            'gram_matrix': B
+        }
+
+### 5. Feature Selection and Projection Techniques
+
+    def feature_selection_visualization(self, data, labels=None, method='variance', 
+                                      n_features=None, n_components=2):
+        """
+        Combine feature selection with dimensionality reduction for visualization.
+        
+        Args:
+            data: Input data matrix
+            labels: Optional class labels
+            method: Feature selection method ('variance', 'correlation', 'mutual_info')
+            n_features: Number of features to select
+            n_components: Final visualization dimensions
+            
+        Returns:
+            Feature selection and visualization results
+        """
+        print(f"\nFeature Selection + Visualization")
+        print("-" * 35)
+        
+        if n_features is None:
+            n_features = min(data.shape[1] // 2, 50)  # Select half features or max 50
+        
+        # Feature selection based on method
+        if method == 'variance':
+            selected_features = self._variance_based_selection(data, n_features)
+        elif method == 'correlation' and labels is not None:
+            selected_features = self._correlation_based_selection(data, labels, n_features)
+        elif method == 'pca_loading':
+            selected_features = self._pca_loading_selection(data, n_features)
+        else:
+            # Default: select first n_features
+            selected_features = list(range(min(n_features, data.shape[1])))
+        
+        # Apply feature selection
+        data_selected = data[:, selected_features]
+        
+        print(f"Selected {len(selected_features)} features from {data.shape[1]}")
+        print(f"Feature indices: {selected_features[:10]}{'...' if len(selected_features) > 10 else ''}")
+        
+        # Apply PCA to selected features
+        pca_results = self.pca_visualization(data_selected, labels, n_components)
+        
+        return {
+            'selected_features': selected_features,
+            'selected_data': data_selected,
+            'pca_results': pca_results,
+            'selection_method': method
+        }
+    
+    def _variance_based_selection(self, data, n_features):
+        """Select features based on variance"""
+        variances = np.var(data, axis=0)
+        feature_indices = np.argsort(variances)[::-1][:n_features]
+        return feature_indices.tolist()
+    
+    def _correlation_based_selection(self, data, labels, n_features):
+        """Select features based on correlation with labels"""
+        if labels is None:
+            return self._variance_based_selection(data, n_features)
+        
+        # Convert labels to numeric if needed
+        unique_labels = np.unique(labels)
+        label_map = {label: i for i, label in enumerate(unique_labels)}
+        numeric_labels = np.array([label_map[label] for label in labels])
+        
+        # Calculate correlation with labels
+        correlations = []
+        for i in range(data.shape[1]):
+            corr = np.corrcoef(data[:, i], numeric_labels)[0, 1]
+            correlations.append(abs(corr) if not np.isnan(corr) else 0)
+        
+        feature_indices = np.argsort(correlations)[::-1][:n_features]
+        return feature_indices.tolist()
+    
+    def _pca_loading_selection(self, data, n_features):
+        """Select features based on PCA loading magnitudes"""
+        scaler = StandardScaler()
+        data_scaled = scaler.fit_transform(data)
+        
+        pca = PCA(n_components=min(5, data.shape[1]))
+        pca.fit(data_scaled)
+        
+        # Calculate feature importance based on loadings
+        loadings = pca.components_
+        feature_importance = np.sum(np.abs(loadings), axis=0)
+        
+        feature_indices = np.argsort(feature_importance)[::-1][:n_features]
+        return feature_indices.tolist()
+
+### 6. Biplot Visualization for Feature Understanding
+
+    def biplot_visualization(self, data, labels=None, feature_names=None, 
+                           n_components=2, max_features_display=10):
+        """
+        Create biplot visualization showing both data points and feature vectors.
+        
+        Args:
+            data: Input data matrix
+            labels: Optional class labels
+            feature_names: Names of features
+            n_components: Number of components (2 for standard biplot)
+            max_features_display: Maximum number of feature vectors to display
+            
+        Returns:
+            Biplot data and visualization
+        """
+        print(f"\nBiplot Visualization")
+        print("-" * 20)
+        
+        # Apply PCA
+        scaler = StandardScaler()
+        data_scaled = scaler.fit_transform(data)
+        
+        pca = PCA(n_components=n_components)
+        data_pca = pca.fit_transform(data_scaled)
+        
+        # Get PCA components (loadings)
+        loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
+        
+        # Create biplot
+        fig, ax = plt.subplots(figsize=(12, 8))
+        
+        # Plot data points
+        scatter = ax.scatter(data_pca[:, 0], data_pca[:, 1], 
+                           c=labels, cmap='viridis', alpha=0.6, s=50)
+        
+        # Plot feature vectors
+        feature_indices = range(min(max_features_display, loadings.shape[0]))
+        for i in feature_indices:
+            ax.arrow(0, 0, loadings[i, 0], loadings[i, 1], 
+                    head_width=0.1, head_length=0.1, fc='red', ec='red', alpha=0.7)
+            
+            # Add feature labels
+            if feature_names is not None and i < len(feature_names):
+                label = feature_names[i]
+            else:
+                label = f'F{i}'
+            
+            ax.text(loadings[i, 0] * 1.1, loadings[i, 1] * 1.1, label, 
+                   fontsize=9, ha='center', va='center', 
+                   bbox=dict(boxstyle='round,pad=0.2', facecolor='white', alpha=0.7))
+        
+        ax.set_xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} variance)')
+        ax.set_ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%} variance)')
+        ax.set_title('PCA Biplot: Data Points and Feature Vectors')
+        ax.grid(True, alpha=0.3)
+        
+        if labels is not None:
+            plt.colorbar(scatter, ax=ax)
+        
+        plt.tight_layout()
+        plt.show()
+        
+        return {
+            'transformed_data': data_pca,
+            'loadings': loadings,
+            'explained_variance_ratio': pca.explained_variance_ratio_,
+            'feature_contributions': np.abs(loadings)
+        }
+
+### 7. Comprehensive Visualization Pipeline
+
+    def comprehensive_visualization_pipeline(self, data, labels=None, 
+                                          feature_names=None, dataset_name="Dataset"):
+        """
+        Complete pipeline for high-dimensional data visualization using multiple techniques.
+        
+        Args:
+            data: Input high-dimensional data
+            labels: Optional class labels
+            feature_names: Optional feature names
+            dataset_name: Name for the dataset
+            
+        Returns:
+            Comprehensive analysis results
+        """
+        print(f"\n{'='*60}")
+        print(f"COMPREHENSIVE VISUALIZATION PIPELINE: {dataset_name}")
+        print(f"{'='*60}")
+        
+        print(f"Dataset shape: {data.shape}")
+        print(f"Number of features: {data.shape[1]}")
+        print(f"Number of samples: {data.shape[0]}")
+        if labels is not None:
+            unique_labels = np.unique(labels)
+            print(f"Number of classes: {len(unique_labels)}")
+            print(f"Class distribution: {dict(zip(*np.unique(labels, return_counts=True)))}")
+        
+        results = {}
+        
+        # Store original data info
+        self.original_shape = data.shape
+        
+        # 1. PCA Analysis
+        print(f"\n" + "="*40)
+        pca_results = self.pca_visualization(data, labels, n_components=2)
+        results['pca'] = pca_results
+        
+        # 2. SVD Analysis
+        print(f"\n" + "="*40)
+        svd_results = self.svd_visualization(data, n_components=2)
+        results['svd'] = svd_results
+        
+        # 3. LDA Analysis (if labels provided)
+        if labels is not None:
+            print(f"\n" + "="*40)
+            lda_results = self.lda_visualization(data, labels, n_components=2)
+            results['lda'] = lda_results
+        
+        # 4. MDS Analysis (for smaller datasets)
+        if data.shape[0] <= 1000:  # MDS is computationally expensive
+            print(f"\n" + "="*40)
+            mds_results = self.mds_visualization(data, n_components=2)
+            results['mds'] = mds_results
+        
+        # 5. Feature Selection + Visualization
+        print(f"\n" + "="*40)
+        fs_results = self.feature_selection_visualization(data, labels, 
+                                                        method='variance', 
+                                                        n_features=min(50, data.shape[1]//2))
+        results['feature_selection'] = fs_results
+        
+        # 6. Biplot Analysis
+        if feature_names is not None or data.shape[1] <= 20:
+            print(f"\n" + "="*40)
+            biplot_results = self.biplot_visualization(data, labels, feature_names)
+            results['biplot'] = biplot_results
+        
+        # 7. Comparative Analysis
+        self._comparative_analysis(results)
+        
+        return results
+    
+    def _comparative_analysis(self, results):
+        """Compare different visualization methods"""
+        print(f"\n{'='*50}")
+        print("COMPARATIVE ANALYSIS OF VISUALIZATION METHODS")
+        print(f"{'='*50}")
+        
+        print(f"{'Method':<20} {'Variance Explained':<18} {'Computational Notes'}")
+        print("-" * 70)
+        
+        if 'pca' in results:
+            pca_var = np.sum(results['pca']['explained_variance_ratio'])
+            print(f"{'PCA':<20} {pca_var:.3f} ({pca_var:.1%})<8} {'Linear, global structure'}")
+        
+        if 'svd' in results:
+            svd_var = np.sum(results['svd']['explained_variance_ratio'])
+            print(f"{'SVD':<20} {svd_var:.3f} ({svd_var:.1%})<8} {'Numerically stable PCA'}")
+        
+        if 'lda' in results:
+            print(f"{'LDA':<20} {'Supervised':<18} {'Maximizes class separation'}")
+        
+        if 'mds' in results:
+            mds_stress = results['mds']['stress']
+            print(f"{'MDS':<20} {f'Stress: {mds_stress:.3f}':<18} {'Preserves pairwise distances'}")
+        
+        print(f"\nRecommendations:")
+        print(f"- Use PCA for general-purpose dimensionality reduction")
+        print(f"- Use LDA when class labels are available and separation is important")
+        print(f"- Use MDS when preserving distances is critical")
+        print(f"- Use SVD for large or sparse datasets")
+        print(f"- Combine feature selection with PCA for very high-dimensional data")
+
+
+# Example usage and demonstrations
+def demonstrate_high_dimensional_visualization():
+    """
+    Comprehensive demonstration of high-dimensional data visualization techniques.
+    """
+    print("="*80)
+    print("HIGH-DIMENSIONAL DATA VISUALIZATION DEMONSTRATION")
+    print("="*80)
+    
+    # Create visualizer
+    visualizer = HighDimensionalVisualizer(random_state=42)
+    
+    # Dataset 1: Synthetic high-dimensional data
+    print(f"\n1. SYNTHETIC HIGH-DIMENSIONAL DATASET")
+    print("-" * 50)
+    
+    # Generate synthetic data
+    X_synthetic, y_synthetic = make_classification(
+        n_samples=500, n_features=100, n_informative=20, 
+        n_redundant=10, n_clusters_per_class=2, 
+        class_sep=1.5, random_state=42
+    )
+    
+    # Apply comprehensive pipeline
+    synthetic_results = visualizer.comprehensive_visualization_pipeline(
+        X_synthetic, y_synthetic, dataset_name="Synthetic Classification"
+    )
+    
+    # Dataset 2: Real-world dataset (Digits)
+    print(f"\n2. REAL-WORLD DATASET: HANDWRITTEN DIGITS")
+    print("-" * 50)
+    
+    digits = load_digits()
+    X_digits, y_digits = digits.data, digits.target
+    
+    # Subsample for computational efficiency
+    n_samples = min(1000, X_digits.shape[0])
+    indices = np.random.choice(X_digits.shape[0], n_samples, replace=False)
+    X_digits_sample = X_digits[indices]
+    y_digits_sample = y_digits[indices]
+    
+    digits_results = visualizer.comprehensive_visualization_pipeline(
+        X_digits_sample, y_digits_sample, dataset_name="Handwritten Digits"
+    )
+    
+    # Dataset 3: Wine dataset (smaller, for detailed analysis)
+    print(f"\n3. DETAILED ANALYSIS: WINE CLASSIFICATION")
+    print("-" * 50)
+    
+    wine = load_wine()
+    X_wine, y_wine = wine.data, wine.target
+    feature_names_wine = wine.feature_names
+    
+    wine_results = visualizer.comprehensive_visualization_pipeline(
+        X_wine, y_wine, feature_names_wine, dataset_name="Wine Classification"
+    )
+    
+    return {
+        'synthetic': synthetic_results,
+        'digits': digits_results,
+        'wine': wine_results
+    }
+
+
+def advanced_visualization_techniques():
+    """
+    Demonstrate advanced visualization techniques for specific use cases.
+    """
+    print(f"\n{'='*80}")
+    print("ADVANCED VISUALIZATION TECHNIQUES")
+    print(f"{'='*80}")
+    
+    # 1. Visualization for Anomaly Detection
+    print(f"\n1. ANOMALY DETECTION VISUALIZATION")
+    print("-" * 40)
+    
+    # Generate data with anomalies
+    np.random.seed(42)
+    normal_data = np.random.multivariate_normal([0, 0], [[1, 0.5], [0.5, 1]], 400)
+    anomaly_data = np.random.multivariate_normal([3, 3], [[0.5, 0], [0, 0.5]], 20)
+    
+    # Add more dimensions
+    normal_extended = np.column_stack([
+        normal_data,
+        np.random.randn(400, 8)  # Additional 8 dimensions
+    ])
+    anomaly_extended = np.column_stack([
+        anomaly_data,
+        np.random.randn(20, 8) + 2  # Shifted additional dimensions
+    ])
+    
+    X_anomaly = np.vstack([normal_extended, anomaly_extended])
+    y_anomaly = np.array([0] * 400 + [1] * 20)  # 0: normal, 1: anomaly
+    
+    visualizer = HighDimensionalVisualizer()
+    
+    # Apply PCA to visualize anomalies
+    pca_anomaly = visualizer.pca_visualization(X_anomaly, y_anomaly, n_components=2)
+    
+    # Calculate reconstruction error for anomaly detection
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X_anomaly)
+    X_reconstructed = pca.inverse_transform(X_pca)
+    reconstruction_errors = np.sum((X_anomaly - X_reconstructed) ** 2, axis=1)
+    
+    print(f"Mean reconstruction error for normal data: {np.mean(reconstruction_errors[:400]):.3f}")
+    print(f"Mean reconstruction error for anomalies: {np.mean(reconstruction_errors[400:]):.3f}")
+    
+    # 2. Time Series Visualization using Embedding
+    print(f"\n2. TIME SERIES VISUALIZATION")
+    print("-" * 35)
+    
+    # Generate synthetic time series
+    t = np.linspace(0, 4*np.pi, 1000)
+    ts = np.sin(t) + 0.5*np.sin(3*t) + 0.3*np.sin(5*t) + 0.1*np.random.randn(1000)
+    
+    # Create embedding matrix (delay embedding)
+    def create_embedding_matrix(ts, embedding_dim=10, delay=1):
+        """Create time-delay embedding matrix"""
+        n = len(ts) - (embedding_dim - 1) * delay
+        embedding = np.zeros((n, embedding_dim))
+        
+        for i in range(embedding_dim):
+            embedding[:, i] = ts[i*delay:i*delay + n]
+        
+        return embedding
+    
+    ts_embedding = create_embedding_matrix(ts, embedding_dim=15, delay=2)
+    
+    print(f"Time series length: {len(ts)}")
+    print(f"Embedding matrix shape: {ts_embedding.shape}")
+    
+    # Apply PCA to embedded time series
+    ts_pca = visualizer.pca_visualization(ts_embedding, n_components=2)
+    
+    # 3. Feature Correlation Visualization
+    print(f"\n3. FEATURE CORRELATION VISUALIZATION")
+    print("-" * 40)
+    
+    # Load wine dataset for correlation analysis
+    wine = load_wine()
+    X_wine = wine.data
+    feature_names = wine.feature_names
+    
+    # Calculate correlation matrix
+    corr_matrix = np.corrcoef(X_wine.T)
+    
+    # Apply PCA to correlation matrix
+    pca_corr = PCA(n_components=2)
+    corr_pca = pca_corr.fit_transform(corr_matrix)
+    
+    print(f"Correlation matrix shape: {corr_matrix.shape}")
+    print(f"PCA of correlation matrix - explained variance: {pca_corr.explained_variance_ratio_}")
+    
+    # Visualize feature relationships
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+    
+    # Correlation heatmap
+    im1 = ax1.imshow(corr_matrix, cmap='coolwarm', aspect='auto', vmin=-1, vmax=1)
+    ax1.set_title('Feature Correlation Matrix')
+    ax1.set_xlabel('Features')
+    ax1.set_ylabel('Features')
+    plt.colorbar(im1, ax=ax1)
+    
+    # PCA of correlations
+    ax2.scatter(corr_pca[:, 0], corr_pca[:, 1], alpha=0.7)
+    ax2.set_xlabel(f'PC1 ({pca_corr.explained_variance_ratio_[0]:.1%})')
+    ax2.set_ylabel(f'PC2 ({pca_corr.explained_variance_ratio_[1]:.1%})')
+    ax2.set_title('PCA of Feature Correlations')
+    
+    # Add feature labels
+    for i, name in enumerate(feature_names):
+        ax2.annotate(name[:8], (corr_pca[i, 0], corr_pca[i, 1]), 
+                    fontsize=8, alpha=0.7)
+    
+    plt.tight_layout()
+    plt.show()
+
+
+def practical_applications_showcase():
+    """
+    Showcase practical applications of high-dimensional visualization.
+    """
+    print(f"\n{'='*80}")
+    print("PRACTICAL APPLICATIONS SHOWCASE")
+    print(f"{'='*80}")
+    
+    # Application 1: Customer Segmentation
+    print(f"\n1. CUSTOMER SEGMENTATION ANALYSIS")
+    print("-" * 40)
+    
+    # Simulate customer data
+    np.random.seed(42)
+    n_customers = 800
+    
+    # Customer features: age, income, spending_score, purchase_frequency, etc.
+    customer_data = np.random.randn(n_customers, 15)
+    
+    # Add some structure (customer segments)
+    segment_1 = customer_data[:200] + np.array([2, 1, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Young, high income
+    segment_2 = customer_data[200:400] + np.array([-1, -1, -0.5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Older, budget conscious
+    segment_3 = customer_data[400:600] + np.array([0, 0.5, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Middle-age, luxury
+    segment_4 = customer_data[600:] + np.array([1, -0.5, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Young professionals
+    
+    X_customers = np.vstack([segment_1, segment_2, segment_3, segment_4])
+    true_segments = np.array([0]*200 + [1]*200 + [2]*200 + [3]*200)
+    
+    feature_names_customers = [
+        'age', 'income', 'spending_score', 'purchase_frequency', 'online_engagement',
+        'loyalty_score', 'credit_score', 'family_size', 'education', 'location_urban',
+        'brand_preference', 'seasonal_buyer', 'discount_sensitivity', 'social_influence', 'tech_adoption'
+    ]
+    
+    visualizer = HighDimensionalVisualizer()
+    
+    customer_results = visualizer.comprehensive_visualization_pipeline(
+        X_customers, true_segments, feature_names_customers, 
+        dataset_name="Customer Segmentation"
+    )
+    
+    # Application 2: Gene Expression Analysis
+    print(f"\n2. GENE EXPRESSION ANALYSIS SIMULATION")
+    print("-" * 45)
+    
+    # Simulate gene expression data
+    n_samples = 200
+    n_genes = 500
+    
+    # Simulate two conditions: healthy vs disease
+    healthy_expression = np.random.lognormal(0, 1, (100, n_genes))
+    disease_expression = np.random.lognormal(0, 1, (100, n_genes))
+    
+    # Add differential expression for some genes
+    differential_genes = np.random.choice(n_genes, 50, replace=False)
+    disease_expression[:, differential_genes] *= 3  # Upregulated in disease
+    
+    X_genes = np.vstack([healthy_expression, disease_expression])
+    y_genes = np.array([0]*100 + [1]*100)  # 0: healthy, 1: disease
+    
+    gene_results = visualizer.comprehensive_visualization_pipeline(
+        X_genes, y_genes, dataset_name="Gene Expression"
+    )
+    
+    # Application 3: Financial Portfolio Analysis
+    print(f"\n3. FINANCIAL PORTFOLIO ANALYSIS")
+    print("-" * 35)
+    
+    # Simulate stock returns data
+    n_days = 500
+    n_stocks = 30
+    
+    # Generate correlated stock returns
+    base_returns = np.random.randn(n_days, 10) * 0.02  # Market factors
+    
+    # Stock-specific returns
+    stock_returns = np.zeros((n_days, n_stocks))
+    for i in range(n_stocks):
+        # Each stock is influenced by different market factors
+        factor_weights = np.random.randn(10) * 0.5
+        stock_returns[:, i] = (base_returns @ factor_weights + 
+                             np.random.randn(n_days) * 0.01)
+    
+    # Add sector effects
+    sector_labels = np.repeat([0, 1, 2], 10)  # 3 sectors, 10 stocks each
+    
+    portfolio_results = visualizer.comprehensive_visualization_pipeline(
+        stock_returns.T, sector_labels, dataset_name="Stock Portfolio"
+    )
+    
+    print(f"\nPortfolio Analysis Summary:")
+    if 'pca' in portfolio_results:
+        pca_var = np.sum(portfolio_results['pca']['explained_variance_ratio'])
+        print(f"- First 2 PCs explain {pca_var:.1%} of return variation")
+    print(f"- Visualization reveals sector clustering and diversification opportunities")
+    
+    return {
+        'customers': customer_results,
+        'genes': gene_results,
+        'portfolio': portfolio_results
+    }
+
+
+# Main execution and comprehensive testing
+if __name__ == "__main__":
+    print("STARTING HIGH-DIMENSIONAL DATA VISUALIZATION DEMONSTRATION")
+    print("="*80)
+    
+    # Run basic demonstrations
+    basic_results = demonstrate_high_dimensional_visualization()
+    
+    # Run advanced techniques
+    advanced_visualization_techniques()
+    
+    # Run practical applications
+    practical_results = practical_applications_showcase()
+    
+    # Summary and recommendations
+    print(f"\n{'='*80}")
+    print("SUMMARY AND BEST PRACTICES")
+    print(f"{'='*80}")
+    
+    print(f"\n1. METHOD SELECTION GUIDELINES:")
+    print(f"   - PCA: General-purpose, preserves global variance")
+    print(f"   - LDA: Supervised learning, maximizes class separation")
+    print(f"   - MDS: Preserves pairwise distances, good for similarity analysis")
+    print(f"   - SVD: Numerically stable, efficient for large datasets")
+    print(f"   - Feature Selection + Visualization: Very high-dimensional data")
+    
+    print(f"\n2. COMPUTATIONAL CONSIDERATIONS:")
+    print(f"   - PCA: O(min(n²p, np²)) - efficient for large datasets")
+    print(f"   - LDA: O(p³) for scatter matrix eigendecomposition")
+    print(f"   - MDS: O(n³) - expensive for large sample sizes")
+    print(f"   - SVD: O(min(mn², m²n)) - most stable numerically")
+    
+    print(f"\n3. INTERPRETATION GUIDELINES:")
+    print(f"   - Check explained variance ratios")
+    print(f"   - Examine component loadings for feature importance")
+    print(f"   - Use biplots to understand feature-sample relationships")
+    print(f"   - Validate with cross-validation for supervised methods")
+    
+    print(f"\n4. COMMON PITFALLS TO AVOID:")
+    print(f"   - Not standardizing data before analysis")
+    print(f"   - Ignoring explained variance ratios")
+    print(f"   - Over-interpreting 2D projections of high-dimensional data")
+    print(f"   - Using inappropriate methods for data type/size")
+    print(f"   - Not considering computational complexity for large datasets")
+
+
+class VisualizationBestPractices:
+    """
+    Collection of best practices for high-dimensional data visualization.
+    """
+    
+    @staticmethod
+    def preprocessing_checklist(data, labels=None):
+        """
+        Comprehensive preprocessing checklist for visualization.
+        
+        Args:
+            data: Input data matrix
+            labels: Optional class labels
+            
+        Returns:
+            Preprocessed data and recommendations
+        """
+        print("PREPROCESSING CHECKLIST:")
+        print("-" * 25)
+        
+        recommendations = []
+        
+        # 1. Check data shape and types
+        print(f"✓ Data shape: {data.shape}")
+        if data.shape[1] > data.shape[0]:
+            recommendations.append("Consider feature selection - more features than samples")
+        
+        # 2. Check for missing values
+        missing_count = np.sum(np.isnan(data))
+        print(f"✓ Missing values: {missing_count}")
+        if missing_count > 0:
+            recommendations.append("Handle missing values before visualization")
+        
+        # 3. Check data scale
+        feature_scales = np.std(data, axis=0)
+        scale_ratio = np.max(feature_scales) / np.min(feature_scales)
+        print(f"✓ Scale ratio (max/min std): {scale_ratio:.2f}")
+        if scale_ratio > 10:
+            recommendations.append("Standardize data - features have very different scales")
+        
+        # 4. Check for constant features
+        constant_features = np.sum(feature_scales < 1e-10)
+        print(f"✓ Constant features: {constant_features}")
+        if constant_features > 0:
+            recommendations.append("Remove constant features")
+        
+        # 5. Check class distribution (if supervised)
+        if labels is not None:
+            unique, counts = np.unique(labels, return_counts=True)
+            min_class_size = np.min(counts)
+            max_class_size = np.max(counts)
+            print(f"✓ Class sizes: min={min_class_size}, max={max_class_size}")
+            if max_class_size / min_class_size > 10:
+                recommendations.append("Highly imbalanced classes - consider stratified sampling")
+        
+        # 6. Correlation analysis
+        if data.shape[1] < 1000:  # Only for manageable number of features
+            corr_matrix = np.corrcoef(data.T)
+            high_corr_pairs = np.sum(np.abs(corr_matrix) > 0.9) - data.shape[1]  # Exclude diagonal
+            print(f"✓ Highly correlated feature pairs (>0.9): {high_corr_pairs // 2}")
+            if high_corr_pairs > data.shape[1] * 0.1:
+                recommendations.append("Many highly correlated features - consider PCA or feature selection")
+        
+        print(f"\nRECOMMENDATIONS:")
+        for i, rec in enumerate(recommendations, 1):
+            print(f"{i}. {rec}")
+        
+        # Apply basic preprocessing
+        processed_data = data.copy()
+        
+        # Remove constant features
+        non_constant = feature_scales > 1e-10
+        if np.sum(~non_constant) > 0:
+            processed_data = processed_data[:, non_constant]
+            print(f"\nRemoved {np.sum(~non_constant)} constant features")
+        
+        # Standardize if needed
+        if scale_ratio > 10:
+            scaler = StandardScaler()
+            processed_data = scaler.fit_transform(processed_data)
+            print(f"Applied standardization")
+        
+        return processed_data, recommendations
+    
+    @staticmethod
+    def method_selection_guide(data_shape, has_labels=False, computational_budget="medium"):
+        """
+        Guide for selecting appropriate visualization method.
+        
+        Args:
+            data_shape: Tuple of (n_samples, n_features)
+            has_labels: Whether class labels are available
+            computational_budget: "low", "medium", "high"
+            
+        Returns:
+            Recommended methods with explanations
+        """
+        n_samples, n_features = data_shape
+        
+        recommendations = []
+        
+        print(f"METHOD SELECTION GUIDE:")
+        print(f"-" * 22)
+        print(f"Data shape: {data_shape}")
+        print(f"Has labels: {has_labels}")
+        print(f"Computational budget: {computational_budget}")
+        
+        # Always recommend PCA as baseline
+        recommendations.append({
+            'method': 'PCA',
+            'priority': 'HIGH',
+            'reason': 'Standard method, preserves global variance structure'
+        })
+        
+        # SVD for large datasets
+        if n_features > 1000 or n_samples > 10000:
+            recommendations.append({
+                'method': 'Truncated SVD',
+                'priority': 'HIGH',
+                'reason': 'More efficient than PCA for large datasets'
+            })
+        
+        # LDA for supervised problems
+        if has_labels:
+            recommendations.append({
+                'method': 'LDA',
+                'priority': 'HIGH',
+                'reason': 'Supervised method, maximizes class separation'
+            })
+        
+        # MDS based on computational budget and size
+        if computational_budget == "high" and n_samples <= 1000:
+            recommendations.append({
+                'method': 'MDS',
+                'priority': 'MEDIUM',
+                'reason': 'Preserves pairwise distances, good for similarity analysis'
+            })
+        elif n_samples > 1000:
+            recommendations.append({
+                'method': 'MDS',
+                'priority': 'LOW',
+                'reason': 'Too computationally expensive for large datasets'
+            })
+        
+        # Feature selection for very high-dimensional data
+        if n_features > 1000:
+            recommendations.append({
+                'method': 'Feature Selection + PCA',
+                'priority': 'HIGH',
+                'reason': 'Reduces computational complexity and noise'
+            })
+        
+        # Biplot for interpretability
+        if n_features <= 50:
+            recommendations.append({
+                'method': 'Biplot',
+                'priority': 'MEDIUM',
+                'reason': 'Excellent for understanding feature contributions'
+            })
+        
+        print(f"\nRECOMMENDED METHODS:")
+        for rec in sorted(recommendations, key=lambda x: {'HIGH': 3, 'MEDIUM': 2, 'LOW': 1}[x['priority']], reverse=True):
+            print(f"  {rec['priority']:<8} {rec['method']:<20} - {rec['reason']}")
+        
+        return recommendations
+    
+    @staticmethod
+    def interpretation_guidelines():
+        """Provide guidelines for interpreting visualization results."""
+        
+        guidelines = {
+            'PCA': [
+                "Check explained variance ratio - aim for >80% with first few components",
+                "Examine component loadings to understand which features contribute most",
+                "Look for clusters or patterns in the score plot",
+                "Consider outliers as potential data quality issues or interesting cases"
+            ],
+            'LDA': [
+                "Perfect separation indicates potential overfitting",
+                "Check discriminant ratios to understand class separability",
+                "Examine misclassified points for data quality or edge cases",
+                "Consider feature importance based on discriminant vectors"
+            ],
+            'MDS': [
+                "Lower stress values indicate better distance preservation",
+                "Look for neighborhood preservation compared to original space",
+                "Interpret clustering patterns with caution in 2D",
+                "Check for horseshoe or spiral artifacts"
+            ],
+            'SVD': [
+                "Similar interpretation to PCA for centered data",
+                "Singular values indicate importance of each component",
+                "Can reveal hidden patterns in sparse or noisy data",
+                "Consider reconstruction error for dimensionality selection"
+            ]
+        }
+        
+        print(f"INTERPRETATION GUIDELINES:")
+        print(f"-" * 25)
+        
+        for method, guide_list in guidelines.items():
+            print(f"\n{method}:")
+            for i, guideline in enumerate(guide_list, 1):
+                print(f"  {i}. {guideline}")
+        
+        print(f"\nGENERAL WARNINGS:")
+        print(f"  • 2D/3D projections may not preserve all relationships")
+        print(f"  • Always validate insights with domain knowledge")
+        print(f"  • Consider multiple methods for robust understanding")
+        print(f"  • Be cautious about over-interpreting visual patterns")
+        
+        return guidelines
+
+
+# Final comprehensive demonstration
+def final_comprehensive_demo():
+    """Final comprehensive demonstration with all techniques."""
+    
+    print(f"\n{'='*80}")
+    print("FINAL COMPREHENSIVE DEMONSTRATION")
+    print(f"{'='*80}")
+    
+    # Create complex synthetic dataset
+    np.random.seed(42)
+    
+    # Multi-class, high-dimensional dataset with various challenges
+    X, y = make_classification(
+        n_samples=1000, n_features=200, n_informative=50,
+        n_redundant=50, n_clusters_per_class=3,
+        class_sep=0.8, flip_y=0.05, random_state=42
+    )
+    
+    # Add noise dimensions
+    noise_dims = np.random.randn(X.shape[0], 100) * 0.1
+    X_complex = np.column_stack([X, noise_dims])
+    
+    print(f"Created complex dataset: {X_complex.shape}")
+    print(f"Classes: {len(np.unique(y))}")
+    print(f"Class distribution: {dict(zip(*np.unique(y, return_counts=True)))}")
+    
+    # Apply preprocessing checklist
+    bp = VisualizationBestPractices()
+    X_processed, recommendations = bp.preprocessing_checklist(X_complex, y)
+    
+    # Get method recommendations
+    method_recs = bp.method_selection_guide(X_processed.shape, has_labels=True, 
+                                          computational_budget="high")
+    
+    # Apply comprehensive visualization
+    visualizer = HighDimensionalVisualizer()
+    results = visualizer.comprehensive_visualization_pipeline(
+        X_processed, y, dataset_name="Complex Synthetic Dataset"
+    )
+    
+    # Display interpretation guidelines
+    bp.interpretation_guidelines()
+    
+    print(f"\n{'='*80}")
+    print("DEMONSTRATION COMPLETE")
+    print(f"{'='*80}")
+    
+    return results
+
+
+if __name__ == "__main__":
+    # Run all demonstrations
+    print("Starting comprehensive high-dimensional visualization demonstration...")
+    
+    # Basic demonstrations
+    basic_results = demonstrate_high_dimensional_visualization()
+    
+    # Advanced techniques
+    advanced_visualization_techniques() 
+    
+    # Practical applications
+    practical_results = practical_applications_showcase()
+    
+    # Final comprehensive demo
+    final_results = final_comprehensive_demo()
+    
+    print("\nAll demonstrations completed successfully!")
+```
+
+## Key Strategies for High-Dimensional Data Visualization
+
+### **Linear Algebra Foundations:**
+1. **Matrix Decomposition**: SVD, eigendecomposition for finding principal directions
+2. **Projection Methods**: Linear transformations to lower-dimensional spaces
+3. **Distance Preservation**: Maintaining geometric relationships through linear operators
+4. **Optimization**: Finding optimal subspaces through matrix operations
+
+### **Method Selection Guide:**
+- **PCA**: General-purpose, preserves variance, computationally efficient
+- **LDA**: Supervised classification, maximizes class separation
+- **SVD**: Numerically stable, handles sparse/large data
+- **MDS**: Preserves distances, good for similarity analysis
+- **Feature Selection + PCA**: Very high-dimensional data with noise
+
+### **Best Practices:**
+- **Preprocessing**: Standardization, missing value handling, outlier detection
+- **Validation**: Cross-validation, explained variance analysis
+- **Interpretation**: Component loadings, biplot analysis, domain knowledge integration
+- **Computational**: Consider scalability, numerical stability, memory requirements
+
+### **Applications:**
+- **Customer Segmentation**: Market research, personalization
+- **Bioinformatics**: Gene expression analysis, protein folding
+- **Finance**: Portfolio optimization, risk analysis
+- **Computer Vision**: Image analysis, feature extraction
+- **Social Network Analysis**: Community detection, influence mapping
+
+This comprehensive approach provides mathematically rigorous, computationally efficient strategies for visualizing high-dimensional data while preserving essential structural information and enabling meaningful interpretation.
+
+---
 
 ---
 
@@ -5967,7 +7360,1521 @@ The mathematical rigor of linear algebra provides both the theoretical foundatio
 
 **Discuss an approach for optimizingmemory usageinmatrix computationsfor a large-scalemachine learning application.**
 
-**Answer:** _[To be filled]_
+**Answer:** Here's a comprehensive approach to optimizing memory usage in matrix computations for large-scale machine learning applications:
+
+## Overview of Memory Optimization in Large-Scale Matrix Computations
+
+Memory optimization is critical for large-scale machine learning applications where datasets can exceed available RAM. Linear algebra provides efficient mathematical frameworks for memory-conscious computation through clever algorithmic design, data structures, and mathematical properties.
+
+### 1. Memory-Efficient Data Structures and Storage
+
+**Sparse Matrix Representations:**
+Leverage sparsity patterns to dramatically reduce memory footprint.
+
+```python
+import numpy as np
+import scipy.sparse as sp
+from scipy.sparse import csr_matrix, csc_matrix, coo_matrix, lil_matrix
+from scipy.sparse.linalg import spsolve, svds
+import psutil
+import time
+from memory_profiler import profile
+import gc
+
+class MemoryOptimizedMatrixComputation:
+    """
+    Comprehensive toolkit for memory-efficient matrix computations
+    in large-scale machine learning applications.
+    """
+    
+    def __init__(self, memory_limit_gb=8):
+        self.memory_limit_bytes = memory_limit_gb * 1024**3
+        self.computation_history = []
+        self.sparse_threshold = 0.1  # Convert to sparse if >90% zeros
+        
+    def get_memory_usage(self):
+        """Get current memory usage in MB"""
+        process = psutil.Process()
+        return process.memory_info().rss / 1024**2
+    
+    def estimate_matrix_memory(self, shape, dtype=np.float64, sparse_ratio=None):
+        """
+        Estimate memory requirements for matrix storage.
+        
+        Args:
+            shape: Matrix dimensions (m, n)
+            dtype: Data type
+            sparse_ratio: Fraction of non-zero elements (if sparse)
+            
+        Returns:
+            Memory estimate in MB
+        """
+        m, n = shape
+        element_size = np.dtype(dtype).itemsize
+        
+        if sparse_ratio is None:
+            # Dense matrix
+            memory_mb = (m * n * element_size) / 1024**2
+            storage_type = "dense"
+        else:
+            # Sparse matrix (CSR format)
+            nnz = int(m * n * sparse_ratio)
+            # data + indices + indptr arrays
+            memory_mb = (nnz * element_size + nnz * 4 + (m + 1) * 4) / 1024**2
+            storage_type = "sparse"
+        
+        return {
+            'memory_mb': memory_mb,
+            'storage_type': storage_type,
+            'feasible': memory_mb < (self.memory_limit_bytes / 1024**2) * 0.8  # 80% safety margin
+        }
+    
+    def optimize_sparse_representation(self, matrix, format_preference='csr'):
+        """
+        Optimize sparse matrix representation based on usage pattern.
+        
+        Args:
+            matrix: Input matrix (dense or sparse)
+            format_preference: Preferred sparse format
+            
+        Returns:
+            Optimized sparse matrix and performance analysis
+        """
+        print(f"Sparse Matrix Optimization Analysis")
+        print("-" * 35)
+        
+        # Convert to dense if sparse for analysis
+        if sp.issparse(matrix):
+            if matrix.nnz / matrix.size < 0.01:  # Very sparse
+                density = matrix.nnz / matrix.size
+                original_format = type(matrix).__name__
+            else:
+                # Consider converting to dense if not very sparse
+                density = matrix.nnz / matrix.size
+                original_format = type(matrix).__name__
+        else:
+            # Analyze density of dense matrix
+            density = np.count_nonzero(matrix) / matrix.size
+            original_format = "dense"
+        
+        print(f"Original format: {original_format}")
+        print(f"Matrix shape: {matrix.shape}")
+        print(f"Density: {density:.4f} ({density*100:.2f}% non-zero)")
+        
+        # Memory analysis for different formats
+        formats_to_test = ['csr', 'csc', 'coo'] if density < self.sparse_threshold else ['dense']
+        
+        format_analysis = {}
+        
+        for fmt in formats_to_test:
+            try:
+                if fmt == 'dense':
+                    if sp.issparse(matrix):
+                        test_matrix = matrix.toarray()
+                    else:
+                        test_matrix = matrix
+                    memory_usage = test_matrix.nbytes / 1024**2
+                else:
+                    if sp.issparse(matrix):
+                        test_matrix = matrix.asformat(fmt)
+                    else:
+                        if fmt == 'csr':
+                            test_matrix = csr_matrix(matrix)
+                        elif fmt == 'csc':
+                            test_matrix = csc_matrix(matrix)
+                        else:  # coo
+                            test_matrix = coo_matrix(matrix)
+                    
+                    memory_usage = (test_matrix.data.nbytes + 
+                                  test_matrix.indices.nbytes + 
+                                  test_matrix.indptr.nbytes) / 1024**2
+                
+                format_analysis[fmt] = {
+                    'memory_mb': memory_usage,
+                    'matrix': test_matrix
+                }
+                
+            except Exception as e:
+                print(f"Error testing format {fmt}: {e}")
+        
+        # Select optimal format
+        optimal_format = min(format_analysis.keys(), 
+                           key=lambda x: format_analysis[x]['memory_mb'])
+        optimal_matrix = format_analysis[optimal_format]['matrix']
+        
+        print(f"\nFormat Analysis:")
+        for fmt, analysis in format_analysis.items():
+            marker = " ← OPTIMAL" if fmt == optimal_format else ""
+            print(f"  {fmt:8}: {analysis['memory_mb']:8.2f} MB{marker}")
+        
+        print(f"\nRecommendation: Use {optimal_format} format")
+        print(f"Memory savings: {format_analysis[list(format_analysis.keys())[0]]['memory_mb'] - format_analysis[optimal_format]['memory_mb']:.2f} MB")
+        
+        return optimal_matrix, {
+            'optimal_format': optimal_format,
+            'memory_savings': format_analysis,
+            'density': density
+        }
+
+### 2. Chunked Matrix Operations
+
+    def chunked_matrix_multiply(self, A, B, chunk_size=1000):
+        """
+        Perform matrix multiplication in chunks to reduce memory usage.
+        
+        Args:
+            A: Left matrix (m × k)
+            B: Right matrix (k × n)
+            chunk_size: Size of chunks for processing
+            
+        Returns:
+            Result matrix C = A @ B with memory usage tracking
+        """
+        print(f"Chunked Matrix Multiplication")
+        print("-" * 30)
+        
+        m, k = A.shape
+        k2, n = B.shape
+        
+        if k != k2:
+            raise ValueError(f"Matrix dimensions incompatible: {A.shape} × {B.shape}")
+        
+        print(f"Matrix shapes: {A.shape} × {B.shape} = ({m}, {n})")
+        
+        # Estimate memory requirements
+        full_memory = self.estimate_matrix_memory((m, n))
+        chunk_memory = self.estimate_matrix_memory((chunk_size, n))
+        
+        print(f"Full result memory: {full_memory['memory_mb']:.2f} MB")
+        print(f"Chunk memory: {chunk_memory['memory_mb']:.2f} MB")
+        
+        if full_memory['feasible']:
+            print("Using direct multiplication (sufficient memory)")
+            start_time = time.time()
+            if sp.issparse(A) or sp.issparse(B):
+                C = A @ B
+            else:
+                C = np.dot(A, B)
+            computation_time = time.time() - start_time
+            peak_memory = self.get_memory_usage()
+            
+        else:
+            print(f"Using chunked multiplication (chunk size: {chunk_size})")
+            
+            # Initialize result matrix
+            if sp.issparse(A) or sp.issparse(B):
+                C = sp.lil_matrix((m, n), dtype=A.dtype)
+            else:
+                C = np.zeros((m, n), dtype=A.dtype)
+            
+            start_time = time.time()
+            peak_memory = 0
+            
+            # Process in chunks
+            for i in range(0, m, chunk_size):
+                end_i = min(i + chunk_size, m)
+                
+                if sp.issparse(A):
+                    A_chunk = A[i:end_i, :]
+                else:
+                    A_chunk = A[i:end_i, :]
+                
+                # Compute chunk result
+                chunk_result = A_chunk @ B
+                
+                if sp.issparse(C):
+                    C[i:end_i, :] = chunk_result
+                else:
+                    C[i:end_i, :] = chunk_result
+                
+                # Track memory usage
+                current_memory = self.get_memory_usage()
+                peak_memory = max(peak_memory, current_memory)
+                
+                # Force garbage collection after each chunk
+                del A_chunk, chunk_result
+                gc.collect()
+                
+                print(f"  Processed rows {i:6d}-{end_i:6d}, Memory: {current_memory:6.1f} MB")
+            
+            computation_time = time.time() - start_time
+            
+            # Convert to appropriate final format
+            if sp.issparse(C) and isinstance(C, sp.lil_matrix):
+                C = C.tocsr()  # Convert to more efficient format
+        
+        results = {
+            'result_matrix': C,
+            'computation_time': computation_time,
+            'peak_memory_mb': peak_memory,
+            'method': 'direct' if full_memory['feasible'] else 'chunked'
+        }
+        
+        print(f"Computation time: {computation_time:.3f} seconds")
+        print(f"Peak memory usage: {peak_memory:.1f} MB")
+        
+        return results
+    
+    def chunked_svd(self, matrix, n_components=50, chunk_size=1000):
+        """
+        Perform SVD on large matrices using chunked processing.
+        
+        Args:
+            matrix: Input matrix
+            n_components: Number of singular values/vectors to compute
+            chunk_size: Chunk size for processing
+            
+        Returns:
+            SVD results with memory optimization
+        """
+        print(f"Chunked SVD Computation")
+        print("-" * 22)
+        
+        m, n = matrix.shape
+        print(f"Matrix shape: {matrix.shape}")
+        print(f"Computing top {n_components} singular values")
+        
+        # Check if we can fit the full matrix in memory
+        full_memory = self.estimate_matrix_memory(matrix.shape)
+        
+        if full_memory['feasible'] and not sp.issparse(matrix):
+            print("Using standard SVD (sufficient memory)")
+            start_time = time.time()
+            U, s, Vt = np.linalg.svd(matrix, full_matrices=False)
+            U_reduced = U[:, :n_components]
+            s_reduced = s[:n_components]
+            Vt_reduced = Vt[:n_components, :]
+            computation_time = time.time() - start_time
+            
+        else:
+            print("Using sparse/iterative SVD")
+            start_time = time.time()
+            
+            if not sp.issparse(matrix):
+                matrix_sparse = csr_matrix(matrix)
+            else:
+                matrix_sparse = matrix
+            
+            # Use iterative SVD for large/sparse matrices
+            U_reduced, s_reduced, Vt_reduced = svds(matrix_sparse, k=n_components)
+            
+            # Sort by singular values (descending)
+            idx = np.argsort(s_reduced)[::-1]
+            U_reduced = U_reduced[:, idx]
+            s_reduced = s_reduced[idx]
+            Vt_reduced = Vt_reduced[idx, :]
+            
+            computation_time = time.time() - start_time
+        
+        # Memory usage analysis
+        current_memory = self.get_memory_usage()
+        
+        results = {
+            'U': U_reduced,
+            's': s_reduced,
+            'Vt': Vt_reduced,
+            'computation_time': computation_time,
+            'memory_usage_mb': current_memory,
+            'explained_variance_ratio': s_reduced**2 / np.sum(s_reduced**2)
+        }
+        
+        print(f"Computation time: {computation_time:.3f} seconds")
+        print(f"Memory usage: {current_memory:.1f} MB")
+        print(f"Explained variance (top {n_components}): {np.sum(results['explained_variance_ratio']):.3f}")
+        
+        return results
+
+### 3. Out-of-Core Computing and Streaming Algorithms
+
+    def incremental_pca(self, data_generator, n_components=50, batch_size=100):
+        """
+        Perform incremental PCA for datasets that don't fit in memory.
+        
+        Args:
+            data_generator: Generator yielding data batches
+            n_components: Number of components to keep
+            batch_size: Size of each batch
+            
+        Returns:
+            Incremental PCA results
+        """
+        print(f"Incremental PCA Computation")
+        print("-" * 26)
+        
+        # Initialize incremental PCA state
+        mean_ = None
+        components_ = None
+        explained_variance_ = None
+        n_samples_seen_ = 0
+        
+        print(f"Target components: {n_components}")
+        print(f"Batch size: {batch_size}")
+        
+        batch_count = 0
+        start_time = time.time()
+        
+        for batch in data_generator:
+            batch_count += 1
+            batch_size_actual = batch.shape[0]
+            n_features = batch.shape[1]
+            
+            print(f"Processing batch {batch_count:3d}: {batch.shape}")
+            
+            if mean_ is None:
+                # Initialize with first batch
+                mean_ = np.mean(batch, axis=0)
+                centered_batch = batch - mean_
+                
+                # Compute initial covariance matrix
+                cov_matrix = (centered_batch.T @ centered_batch) / (batch_size_actual - 1)
+                
+                # Initial eigendecomposition
+                eigenvals, eigenvecs = np.linalg.eigh(cov_matrix)
+                
+                # Sort in descending order
+                idx = np.argsort(eigenvals)[::-1]
+                eigenvals = eigenvals[idx]
+                eigenvecs = eigenvecs[:, idx]
+                
+                # Keep top components
+                components_ = eigenvecs[:, :n_components].T
+                explained_variance_ = eigenvals[:n_components]
+                n_samples_seen_ = batch_size_actual
+                
+            else:
+                # Update incrementally
+                n_samples_seen_ += batch_size_actual
+                
+                # Update mean incrementally
+                batch_mean = np.mean(batch, axis=0)
+                total_mean = ((n_samples_seen_ - batch_size_actual) * mean_ + 
+                            batch_size_actual * batch_mean) / n_samples_seen_
+                
+                # Center current batch
+                centered_batch = batch - total_mean
+                
+                # Update components using incremental SVD approximation
+                # This is a simplified version - in practice, use more sophisticated algorithms
+                # like those in scikit-learn's IncrementalPCA
+                
+                # Project onto current components
+                projected = centered_batch @ components_.T
+                
+                # Compute residual
+                reconstructed = projected @ components_
+                residual = centered_batch - reconstructed
+                
+                # Update components with residual information
+                # (This is simplified - real incremental PCA is more complex)
+                
+                mean_ = total_mean
+            
+            # Memory cleanup
+            del batch, centered_batch
+            gc.collect()
+            
+            current_memory = self.get_memory_usage()
+            print(f"  Memory after batch {batch_count}: {current_memory:.1f} MB")
+        
+        computation_time = time.time() - start_time
+        
+        results = {
+            'components': components_,
+            'explained_variance': explained_variance_,
+            'mean': mean_,
+            'n_samples_seen': n_samples_seen_,
+            'computation_time': computation_time,
+            'n_batches_processed': batch_count
+        }
+        
+        print(f"\nIncremental PCA completed:")
+        print(f"  Total samples processed: {n_samples_seen_}")
+        print(f"  Batches processed: {batch_count}")
+        print(f"  Computation time: {computation_time:.3f} seconds")
+        print(f"  Final memory usage: {self.get_memory_usage():.1f} MB")
+        
+        return results
+    
+    def streaming_matrix_multiply(self, A_generator, B, chunk_size=1000):
+        """
+        Streaming matrix multiplication for very large matrices.
+        
+        Args:
+            A_generator: Generator yielding chunks of matrix A
+            B: Right matrix (must fit in memory)
+            chunk_size: Size of chunks from A
+            
+        Returns:
+            Generator yielding result chunks
+        """
+        print(f"Streaming Matrix Multiplication")
+        print("-" * 32)
+        
+        B_memory = self.estimate_matrix_memory(B.shape)
+        print(f"Right matrix B: {B.shape}, Memory: {B_memory['memory_mb']:.2f} MB")
+        
+        if not B_memory['feasible']:
+            raise ValueError("Right matrix B must fit in memory for streaming multiplication")
+        
+        chunk_count = 0
+        total_time = 0
+        
+        for A_chunk in A_generator:
+            chunk_count += 1
+            start_time = time.time()
+            
+            print(f"Processing chunk {chunk_count}: {A_chunk.shape}")
+            
+            # Multiply chunk with B
+            if sp.issparse(A_chunk) or sp.issparse(B):
+                result_chunk = A_chunk @ B
+            else:
+                result_chunk = np.dot(A_chunk, B)
+            
+            chunk_time = time.time() - start_time
+            total_time += chunk_time
+            
+            print(f"  Chunk computation time: {chunk_time:.3f}s")
+            print(f"  Current memory: {self.get_memory_usage():.1f} MB")
+            
+            yield result_chunk
+            
+            # Cleanup
+            del A_chunk, result_chunk
+            gc.collect()
+        
+        print(f"Streaming multiplication completed: {chunk_count} chunks, {total_time:.3f}s total")
+
+### 4. Memory-Efficient Gradient Computations
+
+    def memory_efficient_gradient_computation(self, X, y, weights, batch_size=1000):
+        """
+        Compute gradients efficiently for large datasets using mini-batches.
+        
+        Args:
+            X: Feature matrix (n_samples × n_features)
+            y: Target vector (n_samples,)
+            weights: Current model weights (n_features,)
+            batch_size: Mini-batch size
+            
+        Returns:
+            Gradient computation results with memory tracking
+        """
+        print(f"Memory-Efficient Gradient Computation")
+        print("-" * 38)
+        
+        n_samples, n_features = X.shape
+        print(f"Dataset: {n_samples} samples, {n_features} features")
+        print(f"Batch size: {batch_size}")
+        
+        # Check if full dataset fits in memory
+        full_memory = self.estimate_matrix_memory(X.shape)
+        print(f"Full dataset memory: {full_memory['memory_mb']:.2f} MB")
+        
+        if full_memory['feasible']:
+            print("Computing gradient on full dataset")
+            start_time = time.time()
+            
+            # Full batch gradient computation
+            predictions = X @ weights
+            errors = predictions - y
+            gradient = (X.T @ errors) / n_samples
+            
+            computation_time = time.time() - start_time
+            method = "full_batch"
+            
+        else:
+            print("Computing gradient using mini-batches")
+            start_time = time.time()
+            
+            # Initialize gradient accumulator
+            gradient = np.zeros_like(weights)
+            n_batches = 0
+            
+            # Process in mini-batches
+            for i in range(0, n_samples, batch_size):
+                end_idx = min(i + batch_size, n_samples)
+                
+                if sp.issparse(X):
+                    X_batch = X[i:end_idx, :]
+                else:
+                    X_batch = X[i:end_idx, :]
+                y_batch = y[i:end_idx]
+                
+                # Compute batch gradient
+                predictions_batch = X_batch @ weights
+                errors_batch = predictions_batch - y_batch
+                batch_gradient = (X_batch.T @ errors_batch) / len(y_batch)
+                
+                # Accumulate gradient
+                gradient += batch_gradient * len(y_batch) / n_samples
+                n_batches += 1
+                
+                # Memory cleanup
+                del X_batch, y_batch, predictions_batch, errors_batch, batch_gradient
+                gc.collect()
+                
+                if n_batches % 10 == 0:
+                    print(f"  Processed {n_batches} batches, Memory: {self.get_memory_usage():.1f} MB")
+            
+            computation_time = time.time() - start_time
+            method = "mini_batch"
+        
+        results = {
+            'gradient': gradient,
+            'computation_time': computation_time,
+            'method': method,
+            'memory_usage_mb': self.get_memory_usage(),
+            'n_batches': n_batches if method == "mini_batch" else 1
+        }
+        
+        print(f"Gradient computation completed:")
+        print(f"  Method: {method}")
+        print(f"  Time: {computation_time:.3f} seconds")
+        print(f"  Gradient norm: {np.linalg.norm(gradient):.6f}")
+        
+        return results
+
+### 5. Matrix-Free Operations and Implicit Representations
+
+    def matrix_free_linear_solve(self, A_matvec, b, n, method='cg', tol=1e-6, maxiter=None):
+        """
+        Solve linear system Ax = b without storing matrix A explicitly.
+        
+        Args:
+            A_matvec: Function that computes A @ x for given x
+            b: Right-hand side vector
+            n: Dimension of the system
+            method: Solver method ('cg', 'gmres')
+            tol: Convergence tolerance
+            maxiter: Maximum iterations
+            
+        Returns:
+            Solution vector and solver statistics
+        """
+        print(f"Matrix-Free Linear System Solver")
+        print("-" * 33)
+        
+        print(f"System size: {n}")
+        print(f"Method: {method}")
+        print(f"Tolerance: {tol}")
+        
+        # Estimate memory savings
+        dense_memory = self.estimate_matrix_memory((n, n))
+        vector_memory = n * 8 / 1024**2  # Assuming float64
+        
+        print(f"Dense matrix would require: {dense_memory['memory_mb']:.2f} MB")
+        print(f"Matrix-free approach uses: ~{vector_memory:.2f} MB")
+        print(f"Memory savings: {dense_memory['memory_mb'] - vector_memory:.2f} MB")
+        
+        if maxiter is None:
+            maxiter = n
+        
+        start_time = time.time()
+        
+        if method == 'cg':
+            # Conjugate Gradient implementation
+            x = np.zeros(n)
+            r = b - A_matvec(x)
+            p = r.copy()
+            rsold = np.dot(r, r)
+            
+            iteration_count = 0
+            residual_history = []
+            
+            for iteration in range(maxiter):
+                Ap = A_matvec(p)
+                alpha = rsold / np.dot(p, Ap)
+                x = x + alpha * p
+                r = r - alpha * Ap
+                rsnew = np.dot(r, r)
+                
+                residual_norm = np.sqrt(rsnew)
+                residual_history.append(residual_norm)
+                
+                if residual_norm < tol:
+                    iteration_count = iteration + 1
+                    print(f"Converged after {iteration_count} iterations")
+                    break
+                
+                beta = rsnew / rsold
+                p = r + beta * p
+                rsold = rsnew
+                
+                if iteration % 100 == 0:
+                    print(f"  Iteration {iteration:4d}: residual = {residual_norm:.2e}")
+            
+            else:
+                iteration_count = maxiter
+                print(f"Maximum iterations ({maxiter}) reached")
+        
+        elif method == 'gmres':
+            # Simplified GMRES implementation (basic version)
+            print("Using simplified GMRES (for demonstration)")
+            # In practice, use scipy.sparse.linalg.gmres
+            x = np.zeros(n)
+            iteration_count = 0
+            residual_history = []
+        
+        computation_time = time.time() - start_time
+        
+        results = {
+            'solution': x,
+            'iterations': iteration_count,
+            'computation_time': computation_time,
+            'residual_history': residual_history,
+            'final_residual': residual_history[-1] if residual_history else float('inf'),
+            'memory_savings_mb': dense_memory['memory_mb'] - vector_memory
+        }
+        
+        print(f"Solution completed:")
+        print(f"  Iterations: {iteration_count}")
+        print(f"  Time: {computation_time:.3f} seconds")
+        print(f"  Final residual: {results['final_residual']:.2e}")
+        
+        return results
+    
+    def implicit_matrix_operations(self, shape, operation_type='eigenvalues', n_components=10):
+        """
+        Demonstrate implicit matrix operations without storing full matrices.
+        
+        Args:
+            shape: Shape of the implicit matrix
+            operation_type: Type of operation ('eigenvalues', 'matrix_vector')
+            n_components: Number of components for eigenvalue problems
+            
+        Returns:
+            Results of implicit operations
+        """
+        print(f"Implicit Matrix Operations")
+        print("-" * 26)
+        
+        m, n = shape
+        print(f"Implicit matrix shape: {shape}")
+        print(f"Operation type: {operation_type}")
+        
+        # Define implicit matrix through its action
+        def implicit_matvec(x):
+            """Define action of matrix on vector (example: circulant matrix)"""
+            # Example: circulant matrix with first row [2, -1, 0, ..., 0, -1]
+            result = np.zeros_like(x)
+            result[0] = 2*x[0] - x[1] - x[-1]
+            for i in range(1, len(x)-1):
+                result[i] = 2*x[i] - x[i-1] - x[i+1]
+            result[-1] = 2*x[-1] - x[-2] - x[0]
+            return result
+        
+        if operation_type == 'eigenvalues':
+            print(f"Computing top {n_components} eigenvalues implicitly")
+            
+            start_time = time.time()
+            
+            # Use iterative eigenvalue solver
+            from scipy.sparse.linalg import LinearOperator, eigs
+            
+            # Create linear operator
+            A_op = LinearOperator(shape, matvec=implicit_matvec)
+            
+            # Compute eigenvalues
+            eigenvals, eigenvecs = eigs(A_op, k=n_components, which='LM')
+            
+            computation_time = time.time() - start_time
+            
+            results = {
+                'eigenvalues': eigenvals,
+                'eigenvectors': eigenvecs,
+                'computation_time': computation_time,
+                'memory_savings_mb': self.estimate_matrix_memory(shape)['memory_mb']
+            }
+            
+            print(f"Eigenvalue computation completed:")
+            print(f"  Time: {computation_time:.3f} seconds")
+            print(f"  Top 5 eigenvalues: {eigenvals[:5]}")
+            
+        elif operation_type == 'matrix_vector':
+            print("Demonstrating matrix-vector products")
+            
+            # Generate test vector
+            x = np.random.randn(n)
+            
+            start_time = time.time()
+            y = implicit_matvec(x)
+            computation_time = time.time() - start_time
+            
+            results = {
+                'input_vector': x,
+                'output_vector': y,
+                'computation_time': computation_time,
+                'vector_norm': np.linalg.norm(y)
+            }
+            
+            print(f"Matrix-vector product completed:")
+            print(f"  Time: {computation_time:.6f} seconds")
+            print(f"  Output norm: {results['vector_norm']:.6f}")
+        
+        return results
+
+### 6. Advanced Memory Optimization Techniques
+
+    def memory_mapped_operations(self, filename, shape, dtype=np.float64, operation='pca'):
+        """
+        Demonstrate memory-mapped file operations for very large datasets.
+        
+        Args:
+            filename: Path to memory-mapped file
+            shape: Shape of the data
+            dtype: Data type
+            operation: Operation to perform
+            
+        Returns:
+            Results of memory-mapped operations
+        """
+        print(f"Memory-Mapped Matrix Operations")
+        print("-" * 32)
+        
+        m, n = shape
+        print(f"Data shape: {shape}")
+        print(f"Data type: {dtype}")
+        
+        # Create or load memory-mapped array
+        try:
+            # Try to load existing file
+            mmap_array = np.memmap(filename, dtype=dtype, mode='r+', shape=shape)
+            print(f"Loaded existing memory-mapped file: {filename}")
+        except:
+            # Create new memory-mapped file with synthetic data
+            mmap_array = np.memmap(filename, dtype=dtype, mode='w+', shape=shape)
+            
+            print(f"Creating new memory-mapped file: {filename}")
+            print("Filling with synthetic data...")
+            
+            # Fill in chunks to avoid memory issues
+            chunk_size = min(1000, m)
+            for i in range(0, m, chunk_size):
+                end_i = min(i + chunk_size, m)
+                mmap_array[i:end_i, :] = np.random.randn(end_i - i, n).astype(dtype)
+                
+                if i % (chunk_size * 10) == 0:
+                    print(f"  Filled rows {i:6d}-{end_i:6d}")
+            
+            # Flush to disk
+            mmap_array.flush()
+        
+        print(f"Memory-mapped array created. Memory usage: {self.get_memory_usage():.1f} MB")
+        
+        if operation == 'pca':
+            # Perform PCA on memory-mapped data
+            print("Computing PCA on memory-mapped data...")
+            
+            # Compute mean in chunks
+            print("Computing mean...")
+            chunk_size = min(1000, m)
+            mean_accumulator = np.zeros(n, dtype=np.float64)
+            
+            for i in range(0, m, chunk_size):
+                end_i = min(i + chunk_size, m)
+                chunk = mmap_array[i:end_i, :]
+                mean_accumulator += np.sum(chunk, axis=0)
+            
+            data_mean = mean_accumulator / m
+            
+            # Compute covariance matrix in chunks
+            print("Computing covariance matrix...")
+            cov_accumulator = np.zeros((n, n), dtype=np.float64)
+            
+            for i in range(0, m, chunk_size):
+                end_i = min(i + chunk_size, m)
+                chunk = mmap_array[i:end_i, :] - data_mean
+                cov_accumulator += chunk.T @ chunk
+            
+            cov_matrix = cov_accumulator / (m - 1)
+            
+            # Eigendecomposition
+            print("Computing eigendecomposition...")
+            start_time = time.time()
+            eigenvals, eigenvecs = np.linalg.eigh(cov_matrix)
+            
+            # Sort in descending order
+            idx = np.argsort(eigenvals)[::-1]
+            eigenvals = eigenvals[idx]
+            eigenvecs = eigenvecs[:, idx]
+            
+            computation_time = time.time() - start_time
+            
+            results = {
+                'eigenvalues': eigenvals,
+                'eigenvectors': eigenvecs,
+                'mean': data_mean,
+                'computation_time': computation_time,
+                'data_shape': shape
+            }
+            
+            print(f"Memory-mapped PCA completed:")
+            print(f"  Computation time: {computation_time:.3f} seconds")
+            print(f"  Top 5 eigenvalues: {eigenvals[:5]}")
+            print(f"  Memory usage: {self.get_memory_usage():.1f} MB")
+        
+        # Cleanup
+        del mmap_array
+        
+        return results
+    
+    def adaptive_precision_computation(self, matrix, operation='svd', precision_levels=['float32', 'float64']):
+        """
+        Demonstrate adaptive precision computation for memory optimization.
+        
+        Args:
+            matrix: Input matrix
+            operation: Operation to perform
+            precision_levels: List of precision levels to test
+            
+        Returns:
+            Comparison of precision levels
+        """
+        print(f"Adaptive Precision Computation")
+        print("-" * 31)
+        
+        print(f"Original matrix shape: {matrix.shape}")
+        print(f"Original dtype: {matrix.dtype}")
+        
+        results = {}
+        
+        for precision in precision_levels:
+            print(f"\nTesting precision: {precision}")
+            
+            # Convert to target precision
+            matrix_converted = matrix.astype(precision)
+            
+            # Calculate memory usage
+            memory_mb = matrix_converted.nbytes / 1024**2
+            memory_ratio = matrix.nbytes / matrix_converted.nbytes
+            
+            print(f"  Memory usage: {memory_mb:.2f} MB (reduction: {memory_ratio:.2f}x)")
+            
+            if operation == 'svd':
+                start_time = time.time()
+                
+                try:
+                    if matrix_converted.shape[0] * matrix_converted.shape[1] > 10**6:
+                        # Use sparse SVD for large matrices
+                        from scipy.sparse.linalg import svds
+                        n_components = min(50, min(matrix_converted.shape) - 1)
+                        U, s, Vt = svds(matrix_converted, k=n_components)
+                    else:
+                        U, s, Vt = np.linalg.svd(matrix_converted, full_matrices=False)
+                    
+                    computation_time = time.time() - start_time
+                    
+                    # Compute reconstruction error (with original precision)
+                    if len(s) < min(matrix.shape):
+                        # Partial reconstruction
+                        reconstructed = (U @ np.diag(s) @ Vt).astype(matrix.dtype)
+                        reconstruction_error = np.linalg.norm(matrix[:U.shape[0], :Vt.shape[1]] - reconstructed, 'fro')
+                    else:
+                        # Full reconstruction
+                        reconstructed = (U @ np.diag(s) @ Vt).astype(matrix.dtype)
+                        reconstruction_error = np.linalg.norm(matrix - reconstructed, 'fro')
+                    
+                    results[precision] = {
+                        'memory_mb': memory_mb,
+                        'memory_reduction': memory_ratio,
+                        'computation_time': computation_time,
+                        'reconstruction_error': reconstruction_error,
+                        'singular_values': s[:10],  # Top 10
+                        'success': True
+                    }
+                    
+                    print(f"  Computation time: {computation_time:.3f} seconds")
+                    print(f"  Reconstruction error: {reconstruction_error:.2e}")
+                    print(f"  Top singular value: {s[0]:.6f}")
+                    
+                except Exception as e:
+                    print(f"  Error: {e}")
+                    results[precision] = {
+                        'memory_mb': memory_mb,
+                        'memory_reduction': memory_ratio,
+                        'success': False,
+                        'error': str(e)
+                    }
+        
+        # Recommend optimal precision
+        successful_results = {k: v for k, v in results.items() if v['success']}
+        
+        if successful_results:
+            # Balance between memory savings and accuracy
+            optimal_precision = min(successful_results.keys(), 
+                                  key=lambda x: successful_results[x]['reconstruction_error'])
+            
+            print(f"\nRecommendation: Use {optimal_precision}")
+            print(f"  Memory reduction: {successful_results[optimal_precision]['memory_reduction']:.2f}x")
+            print(f"  Reconstruction error: {successful_results[optimal_precision]['reconstruction_error']:.2e}")
+        
+        return results
+
+
+# Comprehensive demonstration and examples
+def demonstrate_memory_optimization():
+    """
+    Comprehensive demonstration of memory optimization techniques.
+    """
+    print("="*80)
+    print("MEMORY OPTIMIZATION FOR LARGE-SCALE MATRIX COMPUTATIONS")
+    print("="*80)
+    
+    # Initialize memory optimizer
+    optimizer = MemoryOptimizedMatrixComputation(memory_limit_gb=4)
+    
+    print(f"System memory limit: 4 GB")
+    print(f"Initial memory usage: {optimizer.get_memory_usage():.1f} MB")
+    
+    # 1. Sparse Matrix Optimization
+    print(f"\n1. SPARSE MATRIX OPTIMIZATION")
+    print("-" * 40)
+    
+    # Create sparse test matrix
+    np.random.seed(42)
+    sparse_data = np.random.randn(5000, 1000)
+    sparse_data[sparse_data < 1.5] = 0  # Make ~90% sparse
+    
+    print(f"Original dense matrix: {sparse_data.shape}")
+    print(f"Density: {np.count_nonzero(sparse_data) / sparse_data.size:.4f}")
+    
+    optimized_sparse, sparse_analysis = optimizer.optimize_sparse_representation(sparse_data)
+    
+    # 2. Chunked Matrix Operations
+    print(f"\n2. CHUNKED MATRIX OPERATIONS")
+    print("-" * 35)
+    
+    # Create large matrices for chunked operations
+    A_large = np.random.randn(3000, 2000)
+    B_large = np.random.randn(2000, 1500)
+    
+    print(f"Testing chunked multiplication: {A_large.shape} × {B_large.shape}")
+    
+    chunked_result = optimizer.chunked_matrix_multiply(A_large, B_large, chunk_size=500)
+    
+    # 3. Incremental Learning Demo
+    print(f"\n3. INCREMENTAL LEARNING DEMONSTRATION")
+    print("-" * 45)
+    
+    # Create data generator for incremental learning
+    def create_data_generator(n_batches=10, batch_size=200, n_features=100):
+        """Generate batches of synthetic data"""
+        for i in range(n_batches):
+            # Add some structure to make PCA meaningful
+            base_data = np.random.randn(batch_size, n_features)
+            structured_data = base_data @ np.random.randn(n_features, n_features) * 0.1
+            yield base_data + structured_data
+    
+    data_gen = create_data_generator()
+    incremental_result = optimizer.incremental_pca(data_gen, n_components=10, batch_size=200)
+    
+    # 4. Memory-Efficient Gradient Computation
+    print(f"\n4. MEMORY-EFFICIENT GRADIENT COMPUTATION")
+    print("-" * 47)
+    
+    # Create large dataset for gradient computation
+    X_large = np.random.randn(10000, 500)
+    true_weights = np.random.randn(500)
+    y_large = X_large @ true_weights + np.random.randn(10000) * 0.1
+    test_weights = np.random.randn(500)
+    
+    gradient_result = optimizer.memory_efficient_gradient_computation(
+        X_large, y_large, test_weights, batch_size=1000
+    )
+    
+    return {
+        'sparse_optimization': sparse_analysis,
+        'chunked_multiplication': chunked_result,
+        'incremental_pca': incremental_result,
+        'gradient_computation': gradient_result
+    }
+
+
+def advanced_memory_techniques_demo():
+    """
+    Demonstrate advanced memory optimization techniques.
+    """
+    print(f"\n{'='*80}")
+    print("ADVANCED MEMORY OPTIMIZATION TECHNIQUES")
+    print(f"{'='*80}")
+    
+    optimizer = MemoryOptimizedMatrixComputation(memory_limit_gb=4)
+    
+    # 1. Matrix-Free Operations
+    print(f"\n1. MATRIX-FREE LINEAR SYSTEM SOLVING")
+    print("-" * 45)
+    
+    # Define a large linear system implicitly
+    n = 5000
+    
+    def large_matrix_vector_product(x):
+        """
+        Implicit representation of a large sparse matrix.
+        Example: 3D discrete Laplacian operator
+        """
+        result = np.zeros_like(x)
+        # This represents a tridiagonal system: -x[i-1] + 2*x[i] - x[i+1] = b[i]
+        result[0] = 2*x[0] - x[1]
+        for i in range(1, len(x)-1):
+            result[i] = -x[i-1] + 2*x[i] - x[i+1]
+        result[-1] = -x[-2] + 2*x[-1]
+        return result
+    
+    # Create right-hand side
+    b = np.random.randn(n)
+    
+    # Solve system matrix-free
+    matrix_free_result = optimizer.matrix_free_linear_solve(
+        large_matrix_vector_product, b, n, method='cg', tol=1e-8
+    )
+    
+    # 2. Implicit Matrix Operations  
+    print(f"\n2. IMPLICIT MATRIX OPERATIONS")
+    print("-" * 35)
+    
+    # Demonstrate eigenvalue computation for large implicit matrix
+    implicit_result = optimizer.implicit_matrix_operations(
+        shape=(10000, 10000), operation_type='eigenvalues', n_components=10
+    )
+    
+    # 3. Adaptive Precision
+    print(f"\n3. ADAPTIVE PRECISION COMPUTATION")
+    print("-" * 37)
+    
+    # Create test matrix
+    test_matrix = np.random.randn(1000, 800).astype(np.float64)
+    
+    precision_result = optimizer.adaptive_precision_computation(
+        test_matrix, operation='svd', precision_levels=['float16', 'float32', 'float64']
+    )
+    
+    return {
+        'matrix_free_solve': matrix_free_result,
+        'implicit_operations': implicit_result,
+        'adaptive_precision': precision_result
+    }
+
+
+def real_world_applications_showcase():
+    """
+    Showcase real-world applications of memory optimization.
+    """
+    print(f"\n{'='*80}")
+    print("REAL-WORLD APPLICATIONS SHOWCASE")
+    print(f"{'='*80}")
+    
+    optimizer = MemoryOptimizedMatrixComputation(memory_limit_gb=4)
+    
+    # Application 1: Large-Scale Image Processing
+    print(f"\n1. LARGE-SCALE IMAGE PROCESSING")
+    print("-" * 35)
+    
+    # Simulate processing a large collection of images
+    n_images = 5000
+    image_height, image_width = 128, 128
+    n_pixels = image_height * image_width
+    
+    print(f"Processing {n_images} images of size {image_height}×{image_width}")
+    
+    # Simulate image data (flattened)
+    image_matrix = np.random.rand(n_images, n_pixels).astype(np.float32)
+    
+    # Apply PCA for dimensionality reduction
+    print("Applying PCA for feature extraction...")
+    
+    chunked_svd_result = optimizer.chunked_svd(image_matrix, n_components=50, chunk_size=500)
+    
+    print(f"Reduced {n_pixels} pixels to {50} principal components")
+    print(f"Compression ratio: {n_pixels / 50:.1f}:1")
+    
+    # Application 2: Recommendation System Matrix Factorization
+    print(f"\n2. RECOMMENDATION SYSTEM MATRIX FACTORIZATION")
+    print("-" * 52)
+    
+    # Simulate user-item interaction matrix (very sparse)
+    n_users = 100000
+    n_items = 50000
+    sparsity = 0.001  # 0.1% non-zero entries
+    
+    print(f"User-item matrix: {n_users} × {n_items} (sparsity: {sparsity:.3f})")
+    
+    # Create sparse interaction matrix
+    nnz = int(n_users * n_items * sparsity)
+    row_indices = np.random.choice(n_users, nnz)
+    col_indices = np.random.choice(n_items, nnz)
+    data = np.random.randint(1, 6, nnz).astype(np.float32)  # Ratings 1-5
+    
+    user_item_matrix = csr_matrix((data, (row_indices, col_indices)), 
+                                 shape=(n_users, n_items))
+    
+    print(f"Sparse matrix created: {user_item_matrix.nnz} non-zero entries")
+    print(f"Memory usage: {(user_item_matrix.data.nbytes + user_item_matrix.indices.nbytes + user_item_matrix.indptr.nbytes) / 1024**2:.2f} MB")
+    
+    # Apply truncated SVD for collaborative filtering
+    recommendation_svd = optimizer.chunked_svd(user_item_matrix, n_components=20)
+    
+    # Application 3: Scientific Computing - Climate Data Analysis
+    print(f"\n3. CLIMATE DATA ANALYSIS")
+    print("-" * 28)
+    
+    # Simulate climate data: temperature measurements over time and space
+    n_time_steps = 365 * 10  # 10 years daily data
+    n_spatial_locations = 10000  # Grid points
+    
+    print(f"Climate data: {n_time_steps} time steps × {n_spatial_locations} locations")
+    
+    # Simulate climate data with trends and patterns
+    time_basis = np.random.randn(n_time_steps, 10)  # 10 temporal patterns
+    spatial_basis = np.random.randn(10, n_spatial_locations)  # 10 spatial patterns
+    climate_data = (time_basis @ spatial_basis).T  # Locations × Time
+    
+    print(f"Data shape: {climate_data.shape}")
+    print(f"Memory requirement: {climate_data.nbytes / 1024**2:.2f} MB")
+    
+    # Use incremental PCA to find temporal patterns
+    def climate_data_generator(data, batch_size=500):
+        """Generate batches of climate data"""
+        n_locations = data.shape[0]
+        for i in range(0, n_locations, batch_size):
+            end_i = min(i + batch_size, n_locations)
+            yield data[i:end_i, :]
+    
+    climate_gen = climate_data_generator(climate_data, batch_size=1000)
+    climate_pca = optimizer.incremental_pca(climate_gen, n_components=20, batch_size=1000)
+    
+    print(f"Identified {20} principal temporal patterns in climate data")
+    
+    return {
+        'image_processing': chunked_svd_result,
+        'recommendation_system': recommendation_svd,
+        'climate_analysis': climate_pca
+    }
+
+
+# Best practices and guidelines
+class MemoryOptimizationBestPractices:
+    """
+    Collection of best practices for memory optimization in matrix computations.
+    """
+    
+    @staticmethod
+    def memory_profiling_guide():
+        """
+        Guide for profiling memory usage in matrix computations.
+        """
+        print("MEMORY PROFILING BEST PRACTICES")
+        print("-" * 35)
+        
+        guidelines = [
+            "1. Monitor peak memory usage during computation",
+            "2. Profile memory allocation patterns",
+            "3. Identify memory bottlenecks and leaks",
+            "4. Use memory profiling tools (memory_profiler, tracemalloc)",
+            "5. Track memory usage across different data sizes",
+            "6. Monitor swap usage for very large computations",
+            "7. Profile both RAM and GPU memory (if applicable)"
+        ]
+        
+        for guideline in guidelines:
+            print(f"  {guideline}")
+        
+        print(f"\nKey Metrics to Track:")
+        print(f"  • Peak memory usage")
+        print(f"  • Memory allocation rate")
+        print(f"  • Memory fragmentation")
+        print(f"  • Garbage collection frequency")
+        print(f"  • Cache hit/miss ratios")
+        
+    @staticmethod
+    def algorithm_selection_guide():
+        """
+        Guide for selecting memory-efficient algorithms.
+        """
+        print("\nALGORITHM SELECTION FOR MEMORY EFFICIENCY")
+        print("-" * 43)
+        
+        algorithm_guide = {
+            "Matrix Multiplication": {
+                "Small matrices (<1000×1000)": "Standard numpy.dot",
+                "Large dense matrices": "Chunked multiplication",
+                "Sparse matrices": "scipy.sparse operations",
+                "Very large matrices": "Streaming algorithms"
+            },
+            "Eigenvalue Decomposition": {
+                "Small matrices": "numpy.linalg.eigh",
+                "Large dense matrices": "Truncated eigenvalue methods",
+                "Sparse matrices": "scipy.sparse.linalg.eigs",
+                "Implicit matrices": "Matrix-free iterative methods"
+            },
+            "SVD Computation": {
+                "Small matrices": "numpy.linalg.svd",
+                "Large dense matrices": "Incremental SVD",
+                "Sparse matrices": "scipy.sparse.linalg.svds",
+                "Out-of-core": "Randomized SVD with chunking"
+            },
+            "Linear System Solving": {
+                "Dense systems": "LU decomposition with pivoting",
+                "Sparse systems": "Iterative methods (CG, GMRES)",
+                "Large systems": "Matrix-free iterative solvers",
+                "Multiple RHS": "Block iterative methods"
+            }
+        }
+        
+        for operation, methods in algorithm_guide.items():
+            print(f"\n{operation}:")
+            for scenario, method in methods.items():
+                print(f"  {scenario:<25}: {method}")
+    
+    @staticmethod
+    def data_structure_optimization():
+        """
+        Guide for optimizing data structures for memory efficiency.
+        """
+        print("\nDATA STRUCTURE OPTIMIZATION")
+        print("-" * 29)
+        
+        optimizations = {
+            "Sparse Matrices": [
+                "Use CSR format for row-wise operations",
+                "Use CSC format for column-wise operations", 
+                "Use COO format for matrix construction",
+                "Convert between formats as needed"
+            ],
+            "Dense Matrices": [
+                "Use appropriate data types (float32 vs float64)",
+                "Consider memory layout (C vs Fortran order)",
+                "Use memory-mapped files for very large data",
+                "Prefer contiguous arrays for cache efficiency"
+            ],
+            "Streaming Data": [
+                "Use generators for data loading",
+                "Implement lazy evaluation where possible",
+                "Buffer data in chunks",
+                "Use memory pools for frequent allocations"
+            ]
+        }
+        
+        for category, tips in optimizations.items():
+            print(f"\n{category}:")
+            for tip in tips:
+                print(f"  • {tip}")
+
+
+# Main demonstration and comprehensive testing
+def comprehensive_memory_optimization_demo():
+    """
+    Comprehensive demonstration of all memory optimization techniques.
+    """
+    print("="*80)
+    print("COMPREHENSIVE MEMORY OPTIMIZATION DEMONSTRATION")
+    print("="*80)
+    
+    # Run basic memory optimization techniques
+    print("\nPhase 1: Basic Memory Optimization Techniques")
+    basic_results = demonstrate_memory_optimization()
+    
+    # Run advanced techniques
+    print("\nPhase 2: Advanced Memory Optimization Techniques")
+    advanced_results = advanced_memory_techniques_demo()
+    
+    # Run real-world applications
+    print("\nPhase 3: Real-World Applications")
+    application_results = real_world_applications_showcase()
+    
+    # Best practices guidance
+    print("\nPhase 4: Best Practices and Guidelines")
+    bp = MemoryOptimizationBestPractices()
+    bp.memory_profiling_guide()
+    bp.algorithm_selection_guide()
+    bp.data_structure_optimization()
+    
+    # Summary and recommendations
+    print(f"\n{'='*80}")
+    print("SUMMARY AND RECOMMENDATIONS")
+    print(f"{'='*80}")
+    
+    print(f"\n1. MEMORY OPTIMIZATION STRATEGIES:")
+    print(f"   ✓ Sparse representations for low-density matrices")
+    print(f"   ✓ Chunked processing for large dense matrices") 
+    print(f"   ✓ Incremental algorithms for streaming data")
+    print(f"   ✓ Matrix-free methods for implicit operators")
+    print(f"   ✓ Adaptive precision for memory/accuracy trade-offs")
+    
+    print(f"\n2. COMPUTATIONAL COMPLEXITY CONSIDERATIONS:")
+    print(f"   • Dense matrix operations: O(n³) memory, O(n³) time")
+    print(f"   • Sparse matrix operations: O(nnz) memory, O(nnz) time")
+    print(f"   • Chunked operations: O(chunk_size²) memory")
+    print(f"   • Streaming algorithms: O(feature_size) memory")
+    print(f"   • Matrix-free methods: O(n) memory for n×n systems")
+    
+    print(f"\n3. PRACTICAL IMPLEMENTATION GUIDELINES:")
+    print(f"   • Profile memory usage before optimization")
+    print(f"   • Choose algorithms based on data characteristics")
+    print(f"   • Balance memory usage with computational speed")
+    print(f"   • Use appropriate data types and storage formats")
+    print(f"   • Implement error handling for memory constraints")
+    
+    print(f"\n4. SCALABILITY RECOMMENDATIONS:")
+    print(f"   • For n < 10³: Standard dense algorithms")
+    print(f"   • For 10³ < n < 10⁶: Sparse or chunked methods")
+    print(f"   • For n > 10⁶: Streaming or distributed algorithms")
+    print(f"   • For limited memory: Out-of-core or matrix-free methods")
+    
+    return {
+        'basic_optimization': basic_results,
+        'advanced_techniques': advanced_results,
+        'real_world_applications': application_results
+    }
+
+
+# Performance benchmarking
+def memory_optimization_benchmarks():
+    """
+    Benchmark different memory optimization approaches.
+    """
+    print(f"\n{'='*80}")
+    print("MEMORY OPTIMIZATION PERFORMANCE BENCHMARKS")
+    print(f"{'='*80}")
+    
+    optimizer = MemoryOptimizedMatrixComputation(memory_limit_gb=4)
+    
+    # Benchmark data sizes
+    test_sizes = [
+        (1000, 800),
+        (2000, 1500), 
+        (3000, 2000),
+        (5000, 3000)
+    ]
+    
+    methods = ['dense', 'sparse', 'chunked']
+    
+    benchmark_results = {}
+    
+    print(f"{'Size':<15} {'Method':<10} {'Memory (MB)':<12} {'Time (s)':<10} {'Status'}")
+    print("-" * 60)
+    
+    for size in test_sizes:
+        m, n = size
+        benchmark_results[size] = {}
+        
+        # Generate test matrix with varying sparsity
+        np.random.seed(42)
+        test_matrix = np.random.randn(m, n)
+        test_matrix[test_matrix < 1.0] = 0  # Make sparse
+        
+        for method in methods:
+            try:
+                start_memory = optimizer.get_memory_usage()
+                start_time = time.time()
+                
+                if method == 'dense':
+                    # Standard dense operation (SVD)
+                    if m * n < 10**7:  # Only for manageable sizes
+                        U, s, Vt = np.linalg.svd(test_matrix, full_matrices=False)
+                        success = True
+                    else:
+                        success = False
+                        
+                elif method == 'sparse':
+                    # Sparse representation
+                    sparse_matrix, _ = optimizer.optimize_sparse_representation(test_matrix)
+                    if hasattr(sparse_matrix, 'nnz'):
+                        # Sparse SVD
+                        n_components = min(20, min(sparse_matrix.shape) - 1)
+                        from scipy.sparse.linalg import svds
+                        U, s, Vt = svds(sparse_matrix, k=n_components)
+                    success = True
+                    
+                elif method == 'chunked':
+                    # Chunked SVD
+                    svd_result = optimizer.chunked_svd(test_matrix, n_components=20, chunk_size=500)
+                    success = True
+                
+                end_time = time.time()
+                peak_memory = optimizer.get_memory_usage()
+                
+                memory_used = peak_memory - start_memory
+                computation_time = end_time - start_time
+                
+                benchmark_results[size][method] = {
+                    'memory_mb': memory_used,
+                    'time_s': computation_time,
+                    'success': success
+                }
+                
+                status = "✓" if success else "✗"
+                print(f"{str(size):<15} {method:<10} {memory_used:<12.1f} {computation_time:<10.3f} {status}")
+                
+            except Exception as e:
+                benchmark_results[size][method] = {
+                    'memory_mb': float('inf'),
+                    'time_s': float('inf'),
+                    'success': False,
+                    'error': str(e)
+                }
+                print(f"{str(size):<15} {method:<10} {'ERROR':<12} {'ERROR':<10} ✗")
+        
+        print("")  # Empty line between sizes
+    
+    return benchmark_results
+
+
+if __name__ == "__main__":
+    print("Starting comprehensive memory optimization demonstration...")
+    
+    # Run comprehensive demonstration
+    demo_results = comprehensive_memory_optimization_demo()
+    
+    # Run performance benchmarks
+    benchmark_results = memory_optimization_benchmarks()
+    
+    print("\n" + "="*80)
+    print("MEMORY OPTIMIZATION DEMONSTRATION COMPLETED")
+    print("="*80)
+    
+    print("\nKey Takeaways:")
+    print("1. Memory optimization is crucial for large-scale machine learning")
+    print("2. Choose algorithms based on data characteristics and memory constraints")
+    print("3. Combine multiple techniques for optimal performance")
+    print("4. Profile and monitor memory usage throughout development")
+    print("5. Consider trade-offs between memory, accuracy, and computation time")
+```
+
+## Summary of Memory Optimization Strategies
+
+### **Core Approaches:**
+
+1. **Sparse Representations**: Leverage matrix sparsity to reduce memory footprint by orders of magnitude
+2. **Chunked Processing**: Break large computations into memory-manageable pieces
+3. **Incremental Algorithms**: Process streaming data without loading entire datasets
+4. **Matrix-Free Methods**: Represent large matrices implicitly through their action on vectors
+5. **Adaptive Precision**: Balance memory usage with numerical accuracy requirements
+
+### **Technical Implementation:**
+
+- **Data Structures**: CSR/CSC sparse formats, memory-mapped files, lazy evaluation
+- **Algorithms**: Iterative solvers, truncated decompositions, randomized methods
+- **Memory Management**: Garbage collection, chunk sizing, precision control
+- **Performance Monitoring**: Memory profiling, computational complexity analysis
+
+### **Scalability Guidelines:**
+
+- **Small Scale (n < 10³)**: Standard dense algorithms
+- **Medium Scale (10³ < n < 10⁶)**: Sparse or chunked methods  
+- **Large Scale (n > 10⁶)**: Streaming or distributed algorithms
+- **Memory-Constrained**: Out-of-core or matrix-free approaches
+
+### **Real-World Applications:**
+
+- **Image Processing**: PCA on large image collections with chunked SVD
+- **Recommendation Systems**: Sparse matrix factorization for user-item interactions
+- **Scientific Computing**: Climate data analysis with incremental PCA
+- **Deep Learning**: Memory-efficient gradient computations with mini-batching
+
+This comprehensive approach enables handling datasets that exceed available memory while maintaining computational efficiency and numerical accuracy through careful linear algebraic design and implementation strategies.
+
+---
 
 ---
 
