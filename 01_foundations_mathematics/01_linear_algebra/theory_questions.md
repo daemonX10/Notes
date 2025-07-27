@@ -515,33 +515,434 @@ print(f"Rotation determinant: {np.linalg.det(rotation_matrix):.6f}")  # = 1
 
 ## Question 9
 
-**Can you explain what aneigenvectorandeigenvalueare?**
+**Can you explain what an eigenvector and eigenvalue are?**
 
-**Answer:** _[To be filled]_
+**Answer:** Eigenvectors and eigenvalues are fundamental concepts in linear algebra that describe special directions and scaling factors for linear transformations. They reveal the intrinsic geometric properties of matrices and have profound applications across machine learning, data science, and engineering.
+
+**Mathematical Definition:**
+For a square matrix A and non-zero vector **v**, if:
+```
+A**v** = λ**v**
+```
+Then:
+- **v** is an **eigenvector** of A
+- λ (lambda) is the corresponding **eigenvalue**
+
+**Intuitive Understanding:**
+- **Eigenvector**: A direction that doesn't change when the matrix transformation is applied
+- **Eigenvalue**: The factor by which the eigenvector is scaled during transformation
+
+**Key Properties:**
+
+1. **Direction Preservation**: Eigenvectors maintain their direction under transformation
+2. **Scaling**: Eigenvalues determine how much the eigenvector is stretched/compressed
+3. **Multiple Eigenvectors**: An n×n matrix has up to n linearly independent eigenvectors
+4. **Complex Values**: Eigenvalues can be complex numbers (especially for rotation matrices)
+
+**Geometric Interpretation:**
+
+```
+Original vector:    v = [3, 1]
+After transformation Av:
+- If λ = 2: Result is [6, 2] (same direction, doubled magnitude)
+- If λ = -1: Result is [-3, -1] (opposite direction, same magnitude)
+- If λ = 0.5: Result is [1.5, 0.5] (same direction, halved magnitude)
+```
+
+**Finding Eigenvalues and Eigenvectors:**
+
+1. **Characteristic Equation**: det(A - λI) = 0
+2. **Solve for λ**: Roots give eigenvalues
+3. **For each λ**: Solve (A - λI)**v** = **0** for eigenvectors
+
+**Machine Learning Applications:**
+
+1. **Principal Component Analysis (PCA)**:
+   - **Eigenvectors**: Principal components (directions of maximum variance)
+   - **Eigenvalues**: Amount of variance explained by each component
+   - **Dimensionality reduction**: Keep top k eigenvectors
+
+2. **Spectral Clustering**:
+   - **Graph Laplacian**: Eigenvalues reveal cluster structure
+   - **Eigenvectors**: Used to embed data for clustering
+   - **Connectivity**: Second smallest eigenvalue (algebraic connectivity)
+
+3. **Google's PageRank Algorithm**:
+   - **Dominant eigenvector**: Represents page importance scores
+   - **Eigenvalue = 1**: Steady-state of random walk process
+   - **Web graph**: Matrix represents link structure
+
+4. **Neural Network Analysis**:
+   - **Weight matrices**: Eigenvalues indicate gradient flow properties
+   - **Stability analysis**: Eigenvalue magnitudes determine convergence
+   - **Activation landscapes**: Hessian eigenvalues for optimization
+
+5. **Markov Chains**:
+   - **Transition matrices**: Eigenvalue 1 corresponds to stationary distribution
+   - **Convergence rate**: Second largest eigenvalue determines mixing time
+   - **Steady state**: Dominant eigenvector gives long-term probabilities
+
+**Implementation Examples:**
+
+```python
+import numpy as np
+from scipy.linalg import eig
+import matplotlib.pyplot as plt
+
+# Basic eigenvalue/eigenvector computation
+A = np.array([[4, 2],
+              [1, 3]])
+
+eigenvalues, eigenvectors = np.linalg.eig(A)
+print("Eigenvalues:", eigenvalues)
+print("Eigenvectors:\n", eigenvectors)
+
+# Verify the eigenvalue equation
+for i, (λ, v) in enumerate(zip(eigenvalues, eigenvectors.T)):
+    Av = A @ v
+    λv = λ * v
+    print(f"λ{i+1}: {λ:.3f}")
+    print(f"Av = {Av}")
+    print(f"λv = {λv}")
+    print(f"Equal: {np.allclose(Av, λv)}\n")
+
+# PCA example
+def pca_eigendecomposition(data, n_components=2):
+    """Perform PCA using eigendecomposition"""
+    # Center the data
+    centered_data = data - np.mean(data, axis=0)
+    
+    # Compute covariance matrix
+    cov_matrix = np.cov(centered_data.T)
+    
+    # Eigendecomposition
+    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+    
+    # Sort by eigenvalues (descending)
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+    
+    # Select top components
+    principal_components = eigenvectors[:, :n_components]
+    explained_variance_ratio = eigenvalues[:n_components] / np.sum(eigenvalues)
+    
+    return principal_components, explained_variance_ratio
+
+# Power iteration for dominant eigenvalue
+def power_iteration(A, num_iterations=100):
+    """Find dominant eigenvalue using power iteration"""
+    # Random initial vector
+    v = np.random.rand(A.shape[0])
+    
+    for _ in range(num_iterations):
+        # Matrix-vector multiplication
+        v = A @ v
+        # Normalize
+        v = v / np.linalg.norm(v)
+    
+    # Compute eigenvalue
+    eigenvalue = v.T @ A @ v
+    return eigenvalue, v
+
+# Spectral analysis of graphs
+def graph_spectral_analysis(adjacency_matrix):
+    """Analyze graph using eigenvalues of Laplacian"""
+    # Degree matrix
+    D = np.diag(np.sum(adjacency_matrix, axis=1))
+    # Laplacian matrix
+    L = D - adjacency_matrix
+    
+    eigenvalues, eigenvectors = np.linalg.eig(L)
+    
+    # Sort eigenvalues
+    idx = np.argsort(eigenvalues)
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+    
+    # Algebraic connectivity (second smallest eigenvalue)
+    algebraic_connectivity = eigenvalues[1] if len(eigenvalues) > 1 else 0
+    
+    return eigenvalues, eigenvectors, algebraic_connectivity
+```
+
+**Special Cases:**
+
+1. **Symmetric Matrices**: Always have real eigenvalues and orthogonal eigenvectors
+2. **Positive Definite**: All eigenvalues are positive
+3. **Orthogonal Matrices**: All eigenvalues have magnitude 1
+4. **Diagonal Matrices**: Diagonal elements are eigenvalues
+5. **Identity Matrix**: All eigenvalues equal 1
+
+**Computational Considerations:**
+- **Time Complexity**: O(n³) for general matrices
+- **Iterative Methods**: Power iteration, Lanczos for large sparse matrices
+- **Numerical Stability**: Use specialized algorithms (QR, Jacobi) for better precision
+- **Memory**: O(n²) storage for dense matrices
+
+**Practical Tips:**
+- **Condition Number**: Ratio of largest to smallest eigenvalue indicates numerical stability
+- **Rank Deficiency**: Zero eigenvalues indicate singular matrix
+- **Clustering Applications**: Use eigenvector components as features for clustering
+- **Visualization**: Plot eigenvectors to understand transformation directions
 
 ---
 
 ## Question 10
 
-**How is thetraceof amatrixdefined and what is its relevance?**
+**How is the trace of a matrix defined and what is its relevance?**
 
-**Answer:** _[To be filled]_
+**Answer:** The trace of a matrix is the sum of its diagonal elements. Despite its simple definition, the trace is a fundamental invariant with important theoretical properties and practical applications in machine learning, optimization, and linear algebra.
+
+**Mathematical Definition:**
+For an n×n square matrix A:
+```
+tr(A) = a₁₁ + a₂₂ + a₃₃ + ... + aₙₙ = Σᵢ aᵢᵢ
+```
+
+**Example:**
+```
+A = [2  3  1]    →    tr(A) = 2 + 5 + 9 = 16
+    [4  5  6]
+    [7  8  9]
+```
+
+**Key Properties:**
+
+1. **Linearity**: tr(A + B) = tr(A) + tr(B)
+2. **Scalar multiplication**: tr(cA) = c·tr(A)
+3. **Transpose invariance**: tr(Aᵀ) = tr(A)
+4. **Cyclic property**: tr(ABC) = tr(BCA) = tr(CAB)
+5. **Similarity invariance**: tr(P⁻¹AP) = tr(A) for any invertible P
+
+**Eigenvalue Connection:**
+```
+tr(A) = λ₁ + λ₂ + ... + λₙ
+```
+The trace equals the sum of all eigenvalues (counting multiplicities).
+
+**Machine Learning Applications:**
+
+1. **Neural Network Regularization**:
+   - **Weight matrices**: tr(WᵀW) for Frobenius norm regularization
+   - **Nuclear norm**: Sum of singular values (related to trace)
+   - **Spectral regularization**: Control eigenvalue magnitudes
+
+2. **Covariance Analysis**:
+   - **Total variance**: tr(Σ) gives sum of variances across all dimensions
+   - **Data concentration**: Higher trace indicates more spread
+   - **Dimensionality assessment**: Compare traces of different covariance matrices
+
+3. **Optimization**:
+   - **Gradient computation**: tr(AᵀB) appears in matrix derivatives
+   - **Loss functions**: Many ML objectives involve trace operations
+   - **Hessian analysis**: tr(H) provides second-order information
+
+4. **Principal Component Analysis**:
+   - **Explained variance**: tr(Λ) where Λ is diagonal eigenvalue matrix
+   - **Compression ratio**: Ratio of retained to total trace
+   - **Quality metric**: Trace of reconstructed vs original covariance
+
+5. **Matrix Completion**:
+   - **Nuclear norm minimization**: Minimize sum of singular values
+   - **Low-rank approximation**: Trace-based constraints
+   - **Recommendation systems**: Matrix factorization with trace regularization
+
+**Implementation Examples:**
+
+```python
+import numpy as np
+
+# Basic trace calculation
+A = np.array([[2, 3, 1],
+              [4, 5, 6],
+              [7, 8, 9]])
+trace_A = np.trace(A)
+print(f"Trace of A: {trace_A}")  # Output: 16
+
+# Alternative calculation
+trace_manual = np.sum(np.diag(A))
+print(f"Manual trace: {trace_manual}")
+
+# Trace properties demonstration
+B = np.random.rand(3, 3)
+C = np.random.rand(3, 3)
+
+# Linearity
+print(f"tr(A+B) = {np.trace(A+B):.3f}")
+print(f"tr(A)+tr(B) = {np.trace(A)+np.trace(B):.3f}")
+
+# Cyclic property
+print(f"tr(ABC) = {np.trace(A @ B @ C):.3f}")
+print(f"tr(BCA) = {np.trace(B @ C @ A):.3f}")
+print(f"tr(CAB) = {np.trace(C @ A @ B):.3f}")
+
+# Eigenvalue connection
+eigenvalues = np.linalg.eigvals(A)
+sum_eigenvalues = np.sum(eigenvalues)
+print(f"tr(A) = {np.trace(A):.3f}")
+print(f"Sum of eigenvalues = {sum_eigenvalues:.3f}")
+
+# Covariance analysis
+def analyze_data_spread(data):
+    """Analyze data spread using trace of covariance matrix"""
+    cov_matrix = np.cov(data.T)
+    total_variance = np.trace(cov_matrix)
+    return total_variance, cov_matrix
+
+# PCA with trace analysis
+def pca_with_trace_analysis(data):
+    """PCA with trace-based variance analysis"""
+    # Center data
+    centered_data = data - np.mean(data, axis=0)
+    
+    # Covariance matrix
+    cov_matrix = np.cov(centered_data.T)
+    total_variance = np.trace(cov_matrix)
+    
+    # Eigendecomposition
+    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+    
+    # Sort by eigenvalues
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+    
+    # Cumulative explained variance
+    cumulative_variance = np.cumsum(eigenvalues)
+    explained_variance_ratio = cumulative_variance / total_variance
+    
+    return eigenvalues, eigenvectors, explained_variance_ratio, total_variance
+
+# Nuclear norm using trace
+def nuclear_norm(matrix):
+    """Compute nuclear norm (sum of singular values)"""
+    U, s, Vt = np.linalg.svd(matrix)
+    return np.sum(s)  # This is tr(sqrt(A^T A))
+
+# Frobenius norm using trace  
+def frobenius_norm_squared(matrix):
+    """Compute squared Frobenius norm using trace"""
+    return np.trace(matrix.T @ matrix)
+
+# Regularization example
+def ridge_regression_with_trace(X, y, lambda_reg):
+    """Ridge regression highlighting trace in regularization"""
+    # Normal equation with regularization
+    XtX = X.T @ X
+    regularization_term = lambda_reg * np.eye(X.shape[1])
+    
+    # The regularization adds lambda * tr(I) = lambda * n to the objective
+    coefficients = np.linalg.solve(XtX + regularization_term, X.T @ y)
+    
+    # Effective degrees of freedom (involves trace)
+    H = X @ np.linalg.solve(XtX + regularization_term, X.T)
+    effective_dof = np.trace(H)
+    
+    return coefficients, effective_dof
+
+# Matrix similarity and trace invariance
+def demonstrate_similarity_invariance():
+    """Show that trace is invariant under similarity transformations"""
+    A = np.random.rand(4, 4)
+    P = np.random.rand(4, 4)
+    
+    # Ensure P is invertible
+    while np.abs(np.linalg.det(P)) < 1e-10:
+        P = np.random.rand(4, 4)
+    
+    P_inv = np.linalg.inv(P)
+    similar_matrix = P_inv @ A @ P
+    
+    print(f"tr(A) = {np.trace(A):.6f}")
+    print(f"tr(P⁻¹AP) = {np.trace(similar_matrix):.6f}")
+    print(f"Difference: {abs(np.trace(A) - np.trace(similar_matrix)):.10f}")
+```
+
+**Special Cases:**
+
+1. **Identity Matrix**: tr(I) = n (dimension of matrix)
+2. **Zero Matrix**: tr(0) = 0
+3. **Diagonal Matrix**: tr(D) = sum of diagonal elements
+4. **Symmetric Matrix**: tr(A) = tr(Aᵀ) (always true, but eigenvalues are real)
+5. **Orthogonal Matrix**: tr(Q) can vary, but |tr(Q)| ≤ n
+
+**Advanced Applications:**
+
+1. **Spectral Learning**: Use trace to monitor eigenvalue distributions
+2. **Graph Analysis**: tr(Aᵏ) counts closed walks of length k
+3. **Quantum Computing**: Trace operations in density matrices
+4. **Signal Processing**: Trace of autocorrelation matrices
+5. **Optimization**: Trace-based constraints in semidefinite programming
+
+**Computational Efficiency:**
+- **Time Complexity**: O(n) for trace computation
+- **Memory**: No additional storage needed beyond matrix
+- **Numerical Stability**: Generally stable operation
+- **Parallelization**: Diagonal elements can be summed in parallel
+
+**Relationship to Other Concepts:**
+- **Determinant**: Both are matrix invariants, but trace is linear while determinant is multiplicative
+- **Norm**: Frobenius norm squared = tr(AᵀA)
+- **Rank**: No direct relationship, but both provide matrix information
+- **Condition Number**: Trace can help assess numerical conditioning
 
 ---
 
 ## Question 11
 
-**What is adiagonal matrixand how is it used inlinear algebra?**
+**What is a diagonal matrix and how is it used in linear algebra?**
 
-**Answer:** _[To be filled]_
+**Answer:** A diagonal matrix is a square matrix where all non-diagonal elements are zero. Only the main diagonal (from top-left to bottom-right) can contain non-zero values. It's one of the most computationally efficient and theoretically important matrix types.
+
+**Definition:**
+```
+D = [d₁  0   0  ]
+    [0   d₂  0  ]
+    [0   0   d₃ ]
+```
+
+**Key Properties:**
+- **Multiplication**: Very fast O(n) operations
+- **Inverse**: D⁻¹ has diagonal elements 1/dᵢ (if dᵢ ≠ 0)
+- **Powers**: Dᵏ has diagonal elements dᵢᵏ
+- **Eigenvalues**: Diagonal elements are the eigenvalues
+- **Determinant**: Product of diagonal elements
+
+**Applications:**
+- **Scaling transformations**: Each axis scaled independently
+- **Eigenvalue decomposition**: A = QDQ⁻¹ for symmetric matrices
+- **Principal Component Analysis**: Eigenvalue matrix in PCA
+- **Neural networks**: Efficient computation in certain layers
 
 ---
 
 ## Question 12
 
-**Explain the properties of anidentity matrix.**
+**Explain the properties of an identity matrix.**
 
-**Answer:** _[To be filled]_
+**Answer:** The identity matrix is a special diagonal matrix with all diagonal elements equal to 1. It serves as the multiplicative identity in matrix algebra, analogous to the number 1 in scalar arithmetic.
+
+**Definition:**
+```
+I₃ = [1  0  0]
+     [0  1  0]
+     [0  0  1]
+```
+
+**Key Properties:**
+- **Multiplicative identity**: AI = IA = A for any compatible matrix A
+- **Inverse**: I⁻¹ = I (self-inverse)
+- **Determinant**: det(I) = 1
+- **Trace**: tr(I) = n (matrix dimension)
+- **Eigenvalues**: All eigenvalues equal 1
+- **Rank**: rank(I) = n (full rank)
+
+**Applications:**
+- **System solving**: Converting Ax = b to x = A⁻¹b
+- **Regularization**: Ridge regression uses (XᵀX + λI)
+- **Initialization**: Neural network weight initialization
+- **Coordinate systems**: Standard basis representation
 
 ---
 
