@@ -10798,57 +10798,4907 @@ if __name__ == "__main__":
 
 ## Question 29
 
-**Explain how you would preprocess data to be used inlinear algebracomputations.**
+**Explain how you would preprocess data to be used in linear algebra computations.**
 
-**Answer:** _[To be filled]_
+**Answer:** Data preprocessing for linear algebra computations is crucial for ensuring numerical stability, computational efficiency, and meaningful results. Proper preprocessing transforms raw data into a format suitable for matrix operations while preserving essential information and preventing common pitfalls like numerical instability, scaling issues, and convergence problems.
+
+**Core Preprocessing Steps:**
+
+**1. Data Cleaning and Validation:**
+
+**Missing Value Handling:**
+- **Detection**: Identify NaN, null, or sentinel values
+- **Strategies**: 
+  - Mean/median imputation for numerical features
+  - Mode imputation for categorical features
+  - Forward/backward fill for time series
+  - Matrix completion techniques (iterative imputation)
+  - Deletion of samples/features with excessive missing values
+
+**Outlier Detection and Treatment:**
+- **Statistical methods**: Z-score, IQR-based detection
+- **Robust methods**: Modified Z-score, isolation forest
+- **Treatment options**: Winsorization, transformation, removal
+
+**Data Type Conversion:**
+- Ensure numerical data is in appropriate floating-point format
+- Handle categorical variables through encoding
+- Convert sparse representations when beneficial
+
+**2. Scaling and Normalization:**
+
+**Why Scaling Matters:**
+- Different feature scales can dominate computations
+- Gradient-based algorithms may converge poorly
+- Distance-based methods become biased
+- Matrix conditioning can deteriorate
+
+**Standardization (Z-score Normalization):**
+```
+x_scaled = (x - μ) / σ
+```
+- Mean μ = 0, standard deviation σ = 1
+- Preserves distribution shape
+- Handles outliers poorly
+
+**Min-Max Normalization:**
+```
+x_scaled = (x - x_min) / (x_max - x_min)
+```
+- Maps to [0, 1] range
+- Preserves relationships
+- Sensitive to outliers
+
+**Robust Scaling:**
+```
+x_scaled = (x - median) / IQR
+```
+- Uses median and interquartile range
+- Less sensitive to outliers
+- Better for skewed distributions
+
+**Unit Vector Scaling:**
+```
+x_scaled = x / ||x||₂
+```
+- Normalizes to unit length
+- Preserves direction
+- Useful for text data, sparse features
+
+**3. Dimensionality and Feature Engineering:**
+
+**Dimensionality Reduction:**
+- **PCA**: Remove correlated features, reduce noise
+- **Feature selection**: Remove irrelevant or redundant features
+- **Matrix rank analysis**: Identify linear dependencies
+
+**Feature Engineering:**
+- **Polynomial features**: Create interaction terms
+- **Basis functions**: Transform to more suitable space
+- **Domain-specific transforms**: Log, sqrt, Box-Cox transformations
+
+**4. Matrix Structure Optimization:**
+
+**Memory Layout:**
+- **Row-major vs column-major**: Optimize for access patterns
+- **Dense vs sparse**: Choose appropriate representation
+- **Data alignment**: Ensure proper memory alignment for SIMD operations
+
+**Numerical Conditioning:**
+- **Condition number analysis**: Check matrix invertibility
+- **Regularization**: Add small values to diagonal for stability
+- **Pivoting strategies**: Reorder for numerical stability
+
+**Categorical Data Handling:**
+
+**One-Hot Encoding:**
+```
+Original: [cat, dog, bird]
+Encoded: [[1,0,0], [0,1,0], [0,0,1]]
+```
+- Creates binary indicator variables
+- Increases dimensionality
+- Suitable for linear models
+
+**Label Encoding:**
+```
+Original: [cat, dog, bird]
+Encoded: [0, 1, 2]
+```
+- Maps to integers
+- Compact representation
+- May introduce artificial ordering
+
+**Target Encoding:**
+- Replace categories with target statistics
+- Useful for high-cardinality features
+- Requires cross-validation to prevent overfitting
+
+**Advanced Preprocessing Techniques:**
+
+**1. Whitening Transformations:**
+```
+x_whitened = Σ^(-1/2)(x - μ)
+```
+- Decorrelates features
+- Unit variance in all directions
+- Useful for optimization algorithms
+
+**2. Power Transformations:**
+- **Box-Cox**: Stabilize variance, normalize distribution
+- **Yeo-Johnson**: Handles negative values
+- **Quantile transforms**: Map to uniform/normal distribution
+
+**3. Temporal Preprocessing:**
+- **Detrending**: Remove systematic trends
+- **Seasonal adjustment**: Account for periodic patterns
+- **Stationarity**: Ensure statistical properties don't change over time
+
+**Implementation Examples:**
+
+```python
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.impute import SimpleImputer, IterativeImputer
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, f_classif
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+class LinearAlgebraPreprocessor:
+    """Comprehensive preprocessing pipeline for linear algebra computations"""
+    
+    def __init__(self, scaling_method='standard', handle_outliers=True, 
+                 dimensionality_reduction=None, categorical_encoding='onehot'):
+        """
+        Initialize preprocessor with specified methods
+        
+        Args:
+            scaling_method: 'standard', 'minmax', 'robust', 'unit'
+            handle_outliers: Whether to detect and handle outliers
+            dimensionality_reduction: None, 'pca', or 'select_k_best'
+            categorical_encoding: 'onehot', 'label', 'target'
+        """
+        self.scaling_method = scaling_method
+        self.handle_outliers = handle_outliers
+        self.dimensionality_reduction = dimensionality_reduction
+        self.categorical_encoding = categorical_encoding
+        
+        # Initialize components
+        self.scaler = None
+        self.imputer = None
+        self.outlier_detector = None
+        self.dim_reducer = None
+        self.categorical_encoder = None
+        
+        # Store preprocessing parameters
+        self.preprocessing_params = {}
+        
+    def detect_data_types(self, X):
+        """Detect and categorize data types"""
+        
+        if isinstance(X, pd.DataFrame):
+            numerical_cols = X.select_dtypes(include=[np.number]).columns.tolist()
+            categorical_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
+        else:
+            # Assume all numerical for numpy arrays
+            numerical_cols = list(range(X.shape[1]))
+            categorical_cols = []
+        
+        return numerical_cols, categorical_cols
+    
+    def handle_missing_values(self, X, strategy='mean', verbose=True):
+        """Handle missing values in the dataset"""
+        
+        if verbose:
+            print("Handling missing values...")
+        
+        if isinstance(X, pd.DataFrame):
+            missing_info = X.isnull().sum()
+            if missing_info.sum() > 0:
+                print(f"  Found missing values in {(missing_info > 0).sum()} columns")
+                print(f"  Total missing values: {missing_info.sum()}")
+        
+        # Choose imputation strategy
+        if strategy == 'iterative':
+            self.imputer = IterativeImputer(random_state=42, max_iter=10)
+        else:
+            self.imputer = SimpleImputer(strategy=strategy)
+        
+        # Fit and transform
+        if isinstance(X, pd.DataFrame):
+            numerical_cols, _ = self.detect_data_types(X)
+            if numerical_cols:
+                X_numerical = X[numerical_cols]
+                X_imputed_numerical = self.imputer.fit_transform(X_numerical)
+                
+                # Create result dataframe
+                X_result = X.copy()
+                X_result[numerical_cols] = X_imputed_numerical
+                
+                return X_result
+        else:
+            return self.imputer.fit_transform(X)
+        
+        return X
+    
+    def detect_outliers(self, X, method='iqr', threshold=1.5):
+        """Detect outliers using various methods"""
+        
+        outliers = np.zeros(X.shape[0], dtype=bool)
+        
+        if method == 'iqr':
+            for col in range(X.shape[1]):
+                Q1 = np.percentile(X[:, col], 25)
+                Q3 = np.percentile(X[:, col], 75)
+                IQR = Q3 - Q1
+                lower_bound = Q1 - threshold * IQR
+                upper_bound = Q3 + threshold * IQR
+                
+                col_outliers = (X[:, col] < lower_bound) | (X[:, col] > upper_bound)
+                outliers |= col_outliers
+        
+        elif method == 'zscore':
+            z_scores = np.abs((X - np.mean(X, axis=0)) / np.std(X, axis=0))
+            outliers = np.any(z_scores > threshold, axis=1)
+        
+        elif method == 'isolation_forest':
+            from sklearn.ensemble import IsolationForest
+            iso_forest = IsolationForest(contamination=0.1, random_state=42)
+            outliers = iso_forest.fit_predict(X) == -1
+        
+        return outliers
+    
+    def apply_scaling(self, X, verbose=True):
+        """Apply specified scaling method"""
+        
+        if verbose:
+            print(f"Applying {self.scaling_method} scaling...")
+        
+        if self.scaling_method == 'standard':
+            self.scaler = StandardScaler()
+        elif self.scaling_method == 'minmax':
+            self.scaler = MinMaxScaler()
+        elif self.scaling_method == 'robust':
+            self.scaler = RobustScaler()
+        elif self.scaling_method == 'unit':
+            from sklearn.preprocessing import normalize
+            # Unit scaling doesn't need fitting
+            X_scaled = normalize(X, norm='l2', axis=1)
+            return X_scaled
+        else:
+            print(f"Unknown scaling method: {self.scaling_method}")
+            return X
+        
+        X_scaled = self.scaler.fit_transform(X)
+        
+        if verbose:
+            print(f"  Original data range: [{np.min(X):.4f}, {np.max(X):.4f}]")
+            print(f"  Scaled data range: [{np.min(X_scaled):.4f}, {np.max(X_scaled):.4f}]")
+            print(f"  Scaled data mean: {np.mean(X_scaled):.4f}")
+            print(f"  Scaled data std: {np.std(X_scaled):.4f}")
+        
+        return X_scaled
+    
+    def encode_categorical(self, X, y=None, verbose=True):
+        """Encode categorical variables"""
+        
+        if isinstance(X, pd.DataFrame):
+            numerical_cols, categorical_cols = self.detect_data_types(X)
+            
+            if not categorical_cols:
+                return X
+            
+            if verbose:
+                print(f"Encoding {len(categorical_cols)} categorical columns...")
+            
+            X_result = X.copy()
+            
+            if self.categorical_encoding == 'onehot':
+                self.categorical_encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
+                
+                for col in categorical_cols:
+                    encoded = self.categorical_encoder.fit_transform(X[[col]])
+                    encoded_df = pd.DataFrame(
+                        encoded, 
+                        columns=[f"{col}_{cat}" for cat in self.categorical_encoder.categories_[0]],
+                        index=X.index
+                    )
+                    
+                    # Remove original column and add encoded columns
+                    X_result = X_result.drop(columns=[col])
+                    X_result = pd.concat([X_result, encoded_df], axis=1)
+            
+            elif self.categorical_encoding == 'label':
+                for col in categorical_cols:
+                    le = LabelEncoder()
+                    X_result[col] = le.fit_transform(X[col].astype(str))
+            
+            return X_result
+        
+        return X
+    
+    def apply_dimensionality_reduction(self, X, y=None, n_components=None, verbose=True):
+        """Apply dimensionality reduction techniques"""
+        
+        if self.dimensionality_reduction is None:
+            return X
+        
+        if verbose:
+            print(f"Applying {self.dimensionality_reduction} dimensionality reduction...")
+        
+        if self.dimensionality_reduction == 'pca':
+            if n_components is None:
+                # Use enough components to explain 95% of variance
+                n_components = min(X.shape[0], X.shape[1])
+            
+            self.dim_reducer = PCA(n_components=n_components)
+            X_reduced = self.dim_reducer.fit_transform(X)
+            
+            if verbose:
+                explained_var_ratio = self.dim_reducer.explained_variance_ratio_
+                cumulative_var = np.cumsum(explained_var_ratio)
+                
+                print(f"  Original dimensions: {X.shape[1]}")
+                print(f"  Reduced dimensions: {X_reduced.shape[1]}")
+                print(f"  Explained variance ratio: {explained_var_ratio[:5]}")
+                print(f"  Cumulative variance (first 10): {cumulative_var[:10]}")
+                
+                # Find components for 95% variance
+                n_95 = np.argmax(cumulative_var >= 0.95) + 1
+                print(f"  Components for 95% variance: {n_95}")
+        
+        elif self.dimensionality_reduction == 'select_k_best':
+            if n_components is None:
+                n_components = min(50, X.shape[1])  # Default to 50 features
+            
+            if y is not None:
+                self.dim_reducer = SelectKBest(f_classif, k=n_components)
+                X_reduced = self.dim_reducer.fit_transform(X, y)
+                
+                if verbose:
+                    scores = self.dim_reducer.scores_
+                    selected_features = self.dim_reducer.get_support()
+                    print(f"  Original dimensions: {X.shape[1]}")
+                    print(f"  Selected dimensions: {X_reduced.shape[1]}")
+                    print(f"  Average score of selected features: {np.mean(scores[selected_features]):.4f}")
+            else:
+                print("  Warning: SelectKBest requires target variable y")
+                return X
+        
+        return X_reduced
+    
+    def fit_transform(self, X, y=None, verbose=True):
+        """Complete preprocessing pipeline"""
+        
+        if verbose:
+            print("="*60)
+            print("LINEAR ALGEBRA DATA PREPROCESSING PIPELINE")
+            print("="*60)
+            print(f"Input data shape: {X.shape}")
+            if isinstance(X, pd.DataFrame):
+                print(f"Data types: {X.dtypes.value_counts().to_dict()}")
+        
+        # Step 1: Handle missing values
+        X_processed = self.handle_missing_values(X, verbose=verbose)
+        
+        # Step 2: Encode categorical variables
+        X_processed = self.encode_categorical(X_processed, y, verbose=verbose)
+        
+        # Convert to numpy array for numerical operations
+        if isinstance(X_processed, pd.DataFrame):
+            X_processed = X_processed.select_dtypes(include=[np.number]).values
+        
+        # Step 3: Handle outliers
+        if self.handle_outliers and verbose:
+            outliers = self.detect_outliers(X_processed)
+            print(f"Detected {np.sum(outliers)} outliers ({np.mean(outliers):.1%} of data)")
+            # For demonstration, we'll keep outliers but flag them
+        
+        # Step 4: Apply scaling
+        X_processed = self.apply_scaling(X_processed, verbose=verbose)
+        
+        # Step 5: Dimensionality reduction
+        X_processed = self.apply_dimensionality_reduction(X_processed, y, verbose=verbose)
+        
+        # Step 6: Final validation
+        if verbose:
+            print(f"\nFinal preprocessing results:")
+            print(f"  Output shape: {X_processed.shape}")
+            print(f"  Data type: {X_processed.dtype}")
+            print(f"  Memory usage: {X_processed.nbytes / 1024:.1f} KB")
+            print(f"  No NaN values: {not np.isnan(X_processed).any()}")
+            print(f"  No infinite values: {not np.isinf(X_processed).any()}")
+            
+            # Matrix properties
+            if X_processed.shape[1] <= X_processed.shape[0]:
+                try:
+                    cond_num = np.linalg.cond(X_processed.T @ X_processed)
+                    print(f"  Condition number of X^T X: {cond_num:.2e}")
+                except:
+                    print(f"  Could not compute condition number")
+        
+        return X_processed
+    
+    def transform(self, X):
+        """Transform new data using fitted preprocessors"""
+        
+        # Apply same transformations in same order
+        X_processed = X.copy()
+        
+        # Handle missing values
+        if self.imputer is not None:
+            X_processed = self.imputer.transform(X_processed)
+        
+        # Apply scaling
+        if self.scaler is not None:
+            X_processed = self.scaler.transform(X_processed)
+        
+        # Apply dimensionality reduction
+        if self.dim_reducer is not None:
+            X_processed = self.dim_reducer.transform(X_processed)
+        
+        return X_processed
+
+def demonstrate_preprocessing_effects():
+    """Demonstrate effects of different preprocessing choices"""
+    
+    print("PREPROCESSING EFFECTS DEMONSTRATION")
+    print("=" * 50)
+    
+    # Generate synthetic dataset with various challenges
+    np.random.seed(42)
+    n_samples = 1000
+    
+    # Feature 1: Normal distribution
+    feature1 = np.random.normal(100, 15, n_samples)
+    
+    # Feature 2: Exponential distribution (skewed)
+    feature2 = np.random.exponential(2, n_samples)
+    
+    # Feature 3: Uniform distribution with large scale
+    feature3 = np.random.uniform(1000, 5000, n_samples)
+    
+    # Feature 4: Binary feature
+    feature4 = np.random.binomial(1, 0.3, n_samples)
+    
+    # Add some missing values and outliers
+    feature1[np.random.choice(n_samples, 50, replace=False)] = np.nan
+    feature2[np.random.choice(n_samples, 20, replace=False)] *= 10  # Outliers
+    
+    # Create dataset
+    X = np.column_stack([feature1, feature2, feature3, feature4])
+    
+    # Create target variable
+    y = (0.5 * feature1 + 2 * feature2 + 0.001 * feature3 + 10 * feature4 + 
+         np.random.normal(0, 10, n_samples))
+    
+    print(f"Original dataset:")
+    print(f"  Shape: {X.shape}")
+    print(f"  Missing values: {np.isnan(X).sum()}")
+    print(f"  Feature ranges:")
+    for i in range(X.shape[1]):
+        valid_data = X[~np.isnan(X[:, i]), i]
+        print(f"    Feature {i+1}: [{np.min(valid_data):.2f}, {np.max(valid_data):.2f}]")
+    
+    # Test different preprocessing approaches
+    preprocessing_methods = [
+        ('No Preprocessing', {'scaling_method': None}),
+        ('Standard Scaling', {'scaling_method': 'standard'}),
+        ('Min-Max Scaling', {'scaling_method': 'minmax'}),
+        ('Robust Scaling', {'scaling_method': 'robust'}),
+        ('Standard + PCA', {'scaling_method': 'standard', 'dimensionality_reduction': 'pca'})
+    ]
+    
+    results = {}
+    
+    for method_name, params in preprocessing_methods:
+        print(f"\n{method_name}:")
+        print("-" * 30)
+        
+        if params['scaling_method'] is None:
+            # Handle missing values only
+            from sklearn.impute import SimpleImputer
+            imputer = SimpleImputer(strategy='mean')
+            X_processed = imputer.fit_transform(X)
+        else:
+            preprocessor = LinearAlgebraPreprocessor(**params)
+            X_processed = preprocessor.fit_transform(X, y, verbose=False)
+        
+        # Analyze results
+        print(f"  Processed shape: {X_processed.shape}")
+        print(f"  Mean: {np.mean(X_processed, axis=0)}")
+        print(f"  Std: {np.std(X_processed, axis=0)}")
+        
+        # Compute condition number if possible
+        try:
+            if X_processed.shape[1] <= X_processed.shape[0]:
+                cond_num = np.linalg.cond(X_processed.T @ X_processed)
+                print(f"  Condition number: {cond_num:.2e}")
+        except:
+            print(f"  Could not compute condition number")
+        
+        results[method_name] = X_processed
+    
+    return X, y, results
+
+def matrix_conditioning_analysis():
+    """Analyze how preprocessing affects matrix conditioning"""
+    
+    print(f"\nMATRIX CONDITIONING ANALYSIS")
+    print("=" * 40)
+    
+    # Create ill-conditioned matrix
+    np.random.seed(42)
+    n = 100
+    
+    # Generate data with high correlation
+    base_feature = np.random.randn(n)
+    
+    X_ill_conditioned = np.column_stack([
+        base_feature,
+        base_feature + 0.01 * np.random.randn(n),  # Highly correlated
+        base_feature * 2 + 0.02 * np.random.randn(n),  # Linear combination
+        np.random.randn(n) * 1000,  # Large scale
+        np.random.randn(n) * 0.001  # Small scale
+    ])
+    
+    print(f"Original matrix:")
+    print(f"  Shape: {X_ill_conditioned.shape}")
+    
+    # Compute condition number
+    XtX_original = X_ill_conditioned.T @ X_ill_conditioned
+    cond_original = np.linalg.cond(XtX_original)
+    print(f"  Condition number: {cond_original:.2e}")
+    
+    # Apply different preprocessing
+    preprocessing_effects = {}
+    
+    # Standard scaling
+    scaler = StandardScaler()
+    X_standard = scaler.fit_transform(X_ill_conditioned)
+    XtX_standard = X_standard.T @ X_standard
+    cond_standard = np.linalg.cond(XtX_standard)
+    preprocessing_effects['Standard Scaling'] = cond_standard
+    
+    # PCA
+    pca = PCA(n_components=4)  # Remove one component
+    X_pca = pca.fit_transform(X_standard)
+    XtX_pca = X_pca.T @ X_pca
+    cond_pca = np.linalg.cond(XtX_pca)
+    preprocessing_effects['PCA (4 components)'] = cond_pca
+    
+    # Regularization (add small value to diagonal)
+    regularization = 1e-6
+    XtX_regularized = XtX_standard + regularization * np.eye(XtX_standard.shape[0])
+    cond_regularized = np.linalg.cond(XtX_regularized)
+    preprocessing_effects['Regularization'] = cond_regularized
+    
+    print(f"\nConditioning effects:")
+    print(f"  Original: {cond_original:.2e}")
+    for method, cond_num in preprocessing_effects.items():
+        improvement = cond_original / cond_num
+        print(f"  {method}: {cond_num:.2e} (improvement: {improvement:.1f}x)")
+
+def sparse_data_preprocessing():
+    """Demonstrate preprocessing for sparse data"""
+    
+    print(f"\nSPARSE DATA PREPROCESSING")
+    print("=" * 35)
+    
+    # Create sparse data (e.g., text features, user-item interactions)
+    from scipy.sparse import random as sparse_random
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    
+    # Simulate sparse matrix (e.g., TF-IDF features)
+    n_samples, n_features = 1000, 5000
+    density = 0.01  # 1% non-zero values
+    
+    X_sparse = sparse_random(n_samples, n_features, density=density, random_state=42)
+    X_dense = X_sparse.toarray()
+    
+    print(f"Sparse data characteristics:")
+    print(f"  Shape: {X_sparse.shape}")
+    print(f"  Density: {X_sparse.nnz / (X_sparse.shape[0] * X_sparse.shape[1]):.1%}")
+    print(f"  Memory (sparse): {X_sparse.data.nbytes + X_sparse.indices.nbytes + X_sparse.indptr.nbytes} bytes")
+    print(f"  Memory (dense): {X_dense.nbytes} bytes")
+    print(f"  Memory ratio: {X_dense.nbytes / (X_sparse.data.nbytes + X_sparse.indices.nbytes + X_sparse.indptr.nbytes):.1f}x")
+    
+    # Preprocessing considerations for sparse data
+    print(f"\nSparse data preprocessing considerations:")
+    print(f"  1. Scaling can destroy sparsity")
+    print(f"  2. Mean centering makes all values non-zero")
+    print(f"  3. Use appropriate sparse-aware algorithms")
+    print(f"  4. Consider L2 normalization (preserves sparsity)")
+    
+    # Demonstrate L2 normalization (preserves sparsity)
+    from sklearn.preprocessing import normalize
+    X_normalized = normalize(X_sparse, norm='l2', axis=1)
+    
+    print(f"  After L2 normalization:")
+    print(f"    Still sparse: {hasattr(X_normalized, 'nnz')}")
+    print(f"    Density preserved: {X_normalized.nnz / (X_normalized.shape[0] * X_normalized.shape[1]):.1%}")
+
+def create_preprocessing_visualization():
+    """Create visualizations showing preprocessing effects"""
+    
+    # Generate sample data
+    np.random.seed(42)
+    n_samples = 300
+    
+    # Create data with different distributions
+    normal_data = np.random.normal(100, 20, n_samples)
+    exponential_data = np.random.exponential(5, n_samples)
+    uniform_data = np.random.uniform(0, 1000, n_samples)
+    
+    # Add outliers
+    outlier_indices = np.random.choice(n_samples, 20, replace=False)
+    exponential_data[outlier_indices] *= 5
+    
+    data = np.column_stack([normal_data, exponential_data, uniform_data])
+    
+    # Apply different scaling methods
+    scalers = {
+        'Original': None,
+        'Standard': StandardScaler(),
+        'MinMax': MinMaxScaler(),
+        'Robust': RobustScaler()
+    }
+    
+    fig, axes = plt.subplots(len(scalers), 3, figsize=(15, 12))
+    
+    for i, (scaler_name, scaler) in enumerate(scalers.items()):
+        if scaler is None:
+            scaled_data = data
+        else:
+            scaled_data = scaler.fit_transform(data)
+        
+        for j in range(3):
+            ax = axes[i, j]
+            
+            # Plot histogram
+            ax.hist(scaled_data[:, j], bins=30, alpha=0.7, density=True)
+            ax.set_title(f'{scaler_name} - Feature {j+1}')
+            ax.grid(True, alpha=0.3)
+            
+            # Add statistics
+            mean_val = np.mean(scaled_data[:, j])
+            std_val = np.std(scaled_data[:, j])
+            ax.axvline(mean_val, color='red', linestyle='--', alpha=0.8, label=f'Mean: {mean_val:.2f}')
+            ax.axvline(mean_val + std_val, color='orange', linestyle='--', alpha=0.8, label=f'±1σ')
+            ax.axvline(mean_val - std_val, color='orange', linestyle='--', alpha=0.8)
+            
+            if i == 0:  # Only show legend for first row
+                ax.legend()
+    
+    plt.tight_layout()
+    plt.savefig('preprocessing_effects.png', dpi=150, bbox_inches='tight')
+    plt.show()
+
+if __name__ == "__main__":
+    # Run demonstrations
+    X_original, y, preprocessing_results = demonstrate_preprocessing_effects()
+    matrix_conditioning_analysis()
+    sparse_data_preprocessing()
+    create_preprocessing_visualization()
+    
+    print(f"\n{'='*60}")
+    print("DATA PREPROCESSING SUMMARY")
+    print(f"{'='*60}")
+    
+    print("\nEssential Steps:")
+    print("• Data cleaning: Handle missing values, outliers, data types")
+    print("• Scaling: Standardize feature ranges for stable computation")
+    print("• Encoding: Transform categorical variables to numerical")
+    print("• Dimensionality: Reduce features to prevent overfitting")
+    
+    print("\nScaling Methods:")
+    print("• Standard: Mean=0, Std=1 (assumes normal distribution)")
+    print("• Min-Max: Scale to [0,1] range (preserves relationships)")
+    print("• Robust: Use median/IQR (less sensitive to outliers)")
+    print("• Unit: Normalize to unit length (for directional data)")
+    
+    print("\nNumerical Considerations:")
+    print("• Condition number: Lower is better for stability")
+    print("• Memory layout: Row vs column major for cache efficiency")
+    print("• Sparse representation: Preserve sparsity when possible")
+    print("• Data types: Use appropriate precision (float32 vs float64)")
+    
+    print("\nCommon Pitfalls:")
+    print("• Scaling destroys sparsity in sparse matrices")
+    print("• Data leakage: Using future information in time series")
+    print("• Inconsistent preprocessing between train/test sets")
+    print("• Ignoring domain-specific requirements")
+    
+    print("\nBest Practices:")
+    print("• Validate preprocessing pipeline on holdout data")
+    print("• Monitor numerical stability (condition numbers)")
+    print("• Document preprocessing steps for reproducibility")
+    print("• Consider computational efficiency for large datasets")
+```
+
+**Domain-Specific Considerations:**
+
+**1. Time Series Data:**
+- **Temporal ordering**: Preserve chronological sequence
+- **Stationarity**: Remove trends and seasonal patterns
+- **Lagged features**: Create autoregressive terms
+- **Missing values**: Forward fill or interpolation
+
+**2. Text Data:**
+- **Tokenization**: Convert text to numerical vectors
+- **TF-IDF**: Weight terms by frequency and rarity
+- **Dimensionality**: Use techniques like LSA or word embeddings
+- **Sparsity**: Maintain sparse representations
+
+**3. Image Data:**
+- **Normalization**: Scale pixel values to [0,1] or [-1,1]
+- **Augmentation**: Geometric transformations for robustness
+- **Channel ordering**: RGB vs BGR considerations
+- **Memory efficiency**: Batch processing for large images
+
+**4. Graph Data:**
+- **Adjacency matrices**: Handle different graph sizes
+- **Node features**: Normalize across nodes
+- **Spectral features**: Use graph Laplacian eigenvalues
+- **Sparse representation**: Efficient storage for large graphs
+
+**Computational Efficiency Tips:**
+- Use appropriate data types (float32 vs float64)
+- Leverage vectorized operations (NumPy, BLAS)
+- Consider memory vs computation trade-offs
+- Profile preprocessing pipelines for bottlenecks
+- Use parallel processing for independent operations
 
 ---
 
 ## Question 30
 
-**Describe ways to find therankof amatrixeffectively.**
+**Describe ways to find the rank of a matrix effectively.**
 
-**Answer:** _[To be filled]_
+**Answer:** The rank of a matrix is one of the most fundamental concepts in linear algebra, representing the dimension of the column space (or equivalently, the row space) of the matrix. Finding the rank effectively is crucial for understanding linear systems, matrix invertibility, dimensionality reduction, and many machine learning applications. Various methods exist, each with different computational complexities and numerical considerations.
+
+**Mathematical Definition:**
+
+The **rank** of an m×n matrix A is:
+- rank(A) = dimension of column space = dimension of row space
+- rank(A) = number of linearly independent columns = number of linearly independent rows
+- rank(A) = number of non-zero singular values
+- rank(A) ≤ min(m, n)
+
+**Properties:**
+- rank(A) = rank(Aᵀ) (rank is preserved under transpose)
+- rank(AB) ≤ min(rank(A), rank(B))
+- rank(A + B) ≤ rank(A) + rank(B)
+- For invertible matrices P, Q: rank(PAQ) = rank(A)
+
+**Methods for Computing Matrix Rank:**
+
+**1. Row Echelon Form (Gaussian Elimination):**
+
+**Algorithm:**
+1. Use elementary row operations to transform matrix to row echelon form
+2. Count number of non-zero rows
+3. This equals the rank
+
+**Advantages:**
+- Conceptually simple and exact for rational entries
+- Provides insight into linear dependencies
+- Can be done by hand for small matrices
+
+**Disadvantages:**
+- O(mn·min(m,n)) complexity
+- Numerically unstable due to round-off errors
+- Sensitive to pivot selection
+
+**Implementation:**
+```python
+def gaussian_elimination_rank(A, tolerance=1e-10):
+    """Compute rank using Gaussian elimination with partial pivoting"""
+    
+    A = A.astype(float)  # Work with floating point
+    m, n = A.shape
+    rank = 0
+    
+    for col in range(min(m, n)):
+        # Find pivot row
+        pivot_row = np.argmax(np.abs(A[rank:m, col])) + rank
+        
+        # Check if pivot is non-zero
+        if abs(A[pivot_row, col]) < tolerance:
+            continue  # Skip this column
+        
+        # Swap rows if needed
+        if pivot_row != rank:
+            A[[rank, pivot_row]] = A[[pivot_row, rank]]
+        
+        # Eliminate below pivot
+        for row in range(rank + 1, m):
+            factor = A[row, col] / A[rank, col]
+            A[row, col:] -= factor * A[rank, col:]
+        
+        rank += 1
+    
+    return rank
+```
+
+**2. Singular Value Decomposition (SVD):**
+
+**Method:**
+- Compute A = UΣVᵀ
+- Count non-zero singular values in Σ
+- Use numerical tolerance for "effectively zero" values
+
+**Mathematical Foundation:**
+```
+rank(A) = number of σᵢ > tolerance
+where σ₁ ≥ σ₂ ≥ ... ≥ σₘᵢₙ ≥ 0
+```
+
+**Advantages:**
+- Numerically most stable method
+- Provides singular values for condition number analysis
+- Robust to round-off errors
+- Industry standard for numerical rank computation
+
+**Disadvantages:**
+- O(mn²) complexity for m ≥ n, O(m²n) for m < n
+- More computationally expensive than QR
+- Requires choosing appropriate tolerance
+
+**3. QR Decomposition with Column Pivoting:**
+
+**Method:**
+- Compute AΠ = QR where Π is permutation matrix
+- Rank equals number of diagonal elements in R above tolerance
+- Column pivoting ensures largest elements appear first on diagonal
+
+**Algorithm:**
+```
+AP = QR where P is permutation matrix
+rank(A) = number of |Rᵢᵢ| > tolerance
+```
+
+**Advantages:**
+- O(mn²) complexity
+- Faster than SVD
+- Naturally reveals column dependencies
+- Good numerical stability with pivoting
+
+**Disadvantages:**
+- Less numerically stable than SVD
+- May miss some rank deficiencies without pivoting
+
+**4. LU Decomposition with Pivoting:**
+
+**Method:**
+- Compute PA = LU with partial or complete pivoting
+- Count non-zero diagonal elements in U
+- Use tolerance for numerical considerations
+
+**Advantages:**
+- O(mn²) complexity
+- Can reuse factorization for multiple rank queries
+- Provides factorization useful for other computations
+
+**Disadvantages:**
+- Less stable than QR or SVD for rank computation
+- Sensitive to pivot strategy
+
+**5. Eigenvalue Decomposition (Square Matrices Only):**
+
+**Method:**
+- For square matrix A, compute eigenvalues λᵢ
+- For symmetric matrices: rank(A) = number of non-zero eigenvalues
+- For general matrices: use A*A or AA* (which are symmetric positive semidefinite)
+
+**Comprehensive Implementation:**
+
+```python
+import numpy as np
+import scipy.linalg as la
+import matplotlib.pyplot as plt
+from time import time
+
+class MatrixRankComputer:
+    """Comprehensive matrix rank computation with multiple methods"""
+    
+    def __init__(self, tolerance=1e-10):
+        """Initialize with numerical tolerance for zero detection"""
+        self.tolerance = tolerance
+        self.timing_results = {}
+        
+    def rank_gaussian_elimination(self, A):
+        """Rank via Gaussian elimination with partial pivoting"""
+        start_time = time()
+        
+        A_work = A.astype(float).copy()
+        m, n = A_work.shape
+        rank = 0
+        
+        for col in range(min(m, n)):
+            # Find best pivot
+            pivot_candidates = A_work[rank:m, col]
+            if len(pivot_candidates) == 0:
+                break
+                
+            best_pivot_idx = np.argmax(np.abs(pivot_candidates))
+            pivot_row = best_pivot_idx + rank
+            
+            # Check if pivot is significant
+            if abs(A_work[pivot_row, col]) < self.tolerance:
+                continue
+            
+            # Swap rows
+            if pivot_row != rank:
+                A_work[[rank, pivot_row]] = A_work[[pivot_row, rank]]
+            
+            # Eliminate
+            pivot = A_work[rank, col]
+            for row in range(rank + 1, m):
+                if abs(A_work[row, col]) > self.tolerance:
+                    factor = A_work[row, col] / pivot
+                    A_work[row, col:] -= factor * A_work[rank, col:]
+            
+            rank += 1
+        
+        self.timing_results['gaussian'] = time() - start_time
+        return rank
+    
+    def rank_svd(self, A):
+        """Rank via Singular Value Decomposition"""
+        start_time = time()
+        
+        try:
+            # Compute SVD
+            U, s, Vt = np.linalg.svd(A, full_matrices=False)
+            
+            # Count significant singular values
+            rank = np.sum(s > self.tolerance)
+            
+            self.timing_results['svd'] = time() - start_time
+            return rank, s  # Return singular values for analysis
+            
+        except np.linalg.LinAlgError:
+            self.timing_results['svd'] = time() - start_time
+            return 0, np.array([])
+    
+    def rank_qr_pivoting(self, A):
+        """Rank via QR decomposition with column pivoting"""
+        start_time = time()
+        
+        try:
+            # QR with column pivoting
+            Q, R, P = la.qr(A, pivoting=True)
+            
+            # Count significant diagonal elements
+            diag_R = np.abs(np.diag(R))
+            rank = np.sum(diag_R > self.tolerance)
+            
+            self.timing_results['qr'] = time() - start_time
+            return rank, diag_R
+            
+        except la.LinAlgError:
+            self.timing_results['qr'] = time() - start_time
+            return 0, np.array([])
+    
+    def rank_lu(self, A):
+        """Rank via LU decomposition with pivoting"""
+        start_time = time()
+        
+        try:
+            # LU with partial pivoting
+            P, L, U = la.lu(A)
+            
+            # Count significant diagonal elements in U
+            diag_U = np.abs(np.diag(U))
+            rank = np.sum(diag_U > self.tolerance)
+            
+            self.timing_results['lu'] = time() - start_time
+            return rank, diag_U
+            
+        except la.LinAlgError:
+            self.timing_results['lu'] = time() - start_time
+            return 0, np.array([])
+    
+    def rank_eigenvalue(self, A):
+        """Rank via eigenvalue decomposition (square matrices)"""
+        start_time = time()
+        
+        if A.shape[0] != A.shape[1]:
+            # For non-square matrices, use A.T @ A
+            ATA = A.T @ A
+            eigenvals = np.linalg.eigvals(ATA)
+        else:
+            # Check if symmetric
+            if np.allclose(A, A.T):
+                eigenvals = np.linalg.eigvals(A)
+            else:
+                # Use A.T @ A for general matrices
+                ATA = A.T @ A
+                eigenvals = np.linalg.eigvals(ATA)
+        
+        # Count positive eigenvalues
+        rank = np.sum(np.real(eigenvals) > self.tolerance)
+        
+        self.timing_results['eigenvalue'] = time() - start_time
+        return rank, eigenvals
+    
+    def rank_numpy_builtin(self, A):
+        """Use NumPy's built-in rank function for comparison"""
+        start_time = time()
+        
+        rank = np.linalg.matrix_rank(A, tol=self.tolerance)
+        
+        self.timing_results['numpy'] = time() - start_time
+        return rank
+    
+    def comprehensive_rank_analysis(self, A, verbose=True):
+        """Perform comprehensive rank analysis using all methods"""
+        
+        if verbose:
+            print(f"COMPREHENSIVE RANK ANALYSIS")
+            print(f"Matrix shape: {A.shape}")
+            print(f"Tolerance: {self.tolerance}")
+            print("=" * 50)
+        
+        results = {}
+        
+        # Method 1: Gaussian Elimination
+        try:
+            rank_gauss = self.rank_gaussian_elimination(A)
+            results['Gaussian Elimination'] = rank_gauss
+            if verbose:
+                print(f"Gaussian Elimination: {rank_gauss}")
+        except Exception as e:
+            if verbose:
+                print(f"Gaussian Elimination: Failed ({e})")
+        
+        # Method 2: SVD
+        try:
+            rank_svd, singular_values = self.rank_svd(A)
+            results['SVD'] = rank_svd
+            if verbose:
+                print(f"SVD: {rank_svd}")
+                if len(singular_values) > 0:
+                    print(f"  Singular values: {singular_values[:5]}")  # Show first 5
+                    if len(singular_values) > 5:
+                        print(f"  (showing first 5 of {len(singular_values)})")
+        except Exception as e:
+            if verbose:
+                print(f"SVD: Failed ({e})")
+        
+        # Method 3: QR with pivoting
+        try:
+            rank_qr, diag_R = self.rank_qr_pivoting(A)
+            results['QR Pivoting'] = rank_qr
+            if verbose:
+                print(f"QR with Pivoting: {rank_qr}")
+                if len(diag_R) > 0:
+                    print(f"  |R_ii|: {diag_R[:5]}")
+        except Exception as e:
+            if verbose:
+                print(f"QR with Pivoting: Failed ({e})")
+        
+        # Method 4: LU decomposition
+        try:
+            rank_lu, diag_U = self.rank_lu(A)
+            results['LU'] = rank_lu
+            if verbose:
+                print(f"LU Decomposition: {rank_lu}")
+                if len(diag_U) > 0:
+                    print(f"  |U_ii|: {diag_U[:5]}")
+        except Exception as e:
+            if verbose:
+                print(f"LU Decomposition: Failed ({e})")
+        
+        # Method 5: Eigenvalue method
+        try:
+            rank_eigen, eigenvals = self.rank_eigenvalue(A)
+            results['Eigenvalue'] = rank_eigen
+            if verbose:
+                print(f"Eigenvalue Method: {rank_eigen}")
+                if len(eigenvals) > 0:
+                    print(f"  Eigenvalues: {np.real(eigenvals[:5])}")
+        except Exception as e:
+            if verbose:
+                print(f"Eigenvalue Method: Failed ({e})")
+        
+        # Method 6: NumPy built-in
+        try:
+            rank_numpy = self.rank_numpy_builtin(A)
+            results['NumPy Built-in'] = rank_numpy
+            if verbose:
+                print(f"NumPy Built-in: {rank_numpy}")
+        except Exception as e:
+            if verbose:
+                print(f"NumPy Built-in: Failed ({e})")
+        
+        # Timing comparison
+        if verbose:
+            print(f"\nTiming Comparison:")
+            for method, time_taken in self.timing_results.items():
+                print(f"  {method}: {time_taken:.6f} seconds")
+        
+        # Consistency check
+        if verbose:
+            ranks = list(results.values())
+            if len(set(ranks)) == 1:
+                print(f"\n✓ All methods agree: rank = {ranks[0]}")
+            else:
+                print(f"\n⚠ Methods disagree: {results}")
+                print("This may indicate numerical issues or method limitations")
+        
+        return results
+
+def create_test_matrices():
+    """Create test matrices with known ranks for validation"""
+    
+    test_matrices = {}
+    
+    # Full rank matrix
+    np.random.seed(42)
+    A_full = np.random.randn(5, 5)
+    test_matrices['Full Rank 5x5'] = (A_full, 5)
+    
+    # Rank deficient square matrix
+    A_rank3 = np.random.randn(5, 3) @ np.random.randn(3, 5)
+    test_matrices['Rank 3 (5x5)'] = (A_rank3, 3)
+    
+    # Rectangular matrices
+    A_rect1 = np.random.randn(3, 5)  # Should have rank 3
+    test_matrices['Rectangular 3x5'] = (A_rect1, 3)
+    
+    A_rect2 = np.random.randn(5, 3)  # Should have rank 3
+    test_matrices['Rectangular 5x3'] = (A_rect2, 3)
+    
+    # Very low rank matrix
+    u = np.random.randn(4, 1)
+    v = np.random.randn(1, 6)
+    A_rank1 = u @ v
+    test_matrices['Rank 1 (4x6)'] = (A_rank1, 1)
+    
+    # Nearly singular matrix
+    A_near_singular = np.array([
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9 + 1e-12]  # Almost rank 2
+    ])
+    test_matrices['Nearly Singular'] = (A_near_singular, 2)
+    
+    # Zero matrix
+    A_zero = np.zeros((3, 4))
+    test_matrices['Zero Matrix'] = (A_zero, 0)
+    
+    return test_matrices
+
+def numerical_stability_analysis():
+    """Analyze numerical stability of different rank computation methods"""
+    
+    print(f"\nNUMERICAL STABILITY ANALYSIS")
+    print("=" * 40)
+    
+    # Create ill-conditioned matrix
+    n = 10
+    condition_numbers = [1e2, 1e6, 1e10, 1e14]
+    
+    computer = MatrixRankComputer()
+    
+    for cond_num in condition_numbers:
+        print(f"\nCondition number ≈ {cond_num:.0e}:")
+        
+        # Create matrix with specified condition number
+        U, _ = np.linalg.qr(np.random.randn(n, n))
+        V, _ = np.linalg.qr(np.random.randn(n, n))
+        s = np.logspace(0, -np.log10(cond_num), n)  # Geometric decay
+        A = U @ np.diag(s) @ V.T
+        
+        actual_cond = np.linalg.cond(A)
+        print(f"  Actual condition number: {actual_cond:.2e}")
+        
+        # Test different tolerances
+        tolerances = [1e-10, 1e-12, 1e-14, 1e-16]
+        
+        for tol in tolerances:
+            computer.tolerance = tol
+            rank_svd, _ = computer.rank_svd(A)
+            rank_qr, _ = computer.rank_qr_pivoting(A)
+            
+            print(f"    Tolerance {tol:.0e}: SVD={rank_svd}, QR={rank_qr}")
+
+def performance_comparison():
+    """Compare performance of different methods"""
+    
+    print(f"\nPERFORMANCE COMPARISON")
+    print("=" * 30)
+    
+    sizes = [50, 100, 200, 500]
+    computer = MatrixRankComputer()
+    
+    results = {method: [] for method in ['gaussian', 'svd', 'qr', 'lu', 'numpy']}
+    
+    for size in sizes:
+        print(f"\nMatrix size: {size}x{size}")
+        
+        # Create random full-rank matrix
+        np.random.seed(42)
+        A = np.random.randn(size, size)
+        
+        # Run each method
+        computer.rank_gaussian_elimination(A)
+        computer.rank_svd(A)
+        computer.rank_qr_pivoting(A)
+        computer.rank_lu(A)
+        computer.rank_numpy_builtin(A)
+        
+        # Store timing results
+        for method in results.keys():
+            if method in computer.timing_results:
+                results[method].append(computer.timing_results[method])
+                print(f"  {method}: {computer.timing_results[method]:.4f}s")
+            else:
+                results[method].append(np.nan)
+    
+    return sizes, results
+
+def demonstrate_rank_applications():
+    """Demonstrate applications of matrix rank"""
+    
+    print(f"\nRANK APPLICATIONS IN MACHINE LEARNING")
+    print("=" * 45)
+    
+    # 1. Linear system solvability
+    print("1. Linear System Solvability:")
+    A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    b = np.array([1, 2, 3])
+    
+    rank_A = np.linalg.matrix_rank(A)
+    rank_Ab = np.linalg.matrix_rank(np.column_stack([A, b]))
+    
+    print(f"   System: Ax = b")
+    print(f"   rank(A) = {rank_A}")
+    print(f"   rank([A|b]) = {rank_Ab}")
+    
+    if rank_A == rank_Ab:
+        if rank_A == A.shape[1]:
+            print(f"   → Unique solution exists")
+        else:
+            print(f"   → Infinite solutions exist")
+    else:
+        print(f"   → No solution exists")
+    
+    # 2. PCA and dimensionality reduction
+    print(f"\n2. PCA and Effective Dimensionality:")
+    
+    # Create data with intrinsic low-dimensional structure
+    np.random.seed(42)
+    true_dim = 3
+    ambient_dim = 10
+    n_samples = 100
+    
+    # Generate low-rank data
+    W_true = np.random.randn(ambient_dim, true_dim)
+    Z = np.random.randn(n_samples, true_dim)
+    X = Z @ W_true.T + 0.01 * np.random.randn(n_samples, ambient_dim)  # Add noise
+    
+    # Compute rank
+    rank_X = np.linalg.matrix_rank(X, tol=0.1)  # Use larger tolerance for noisy data
+    
+    print(f"   Data shape: {X.shape}")
+    print(f"   True intrinsic dimension: {true_dim}")
+    print(f"   Estimated rank: {rank_X}")
+    
+    # SVD analysis
+    U, s, Vt = np.linalg.svd(X, full_matrices=False)
+    
+    # Compute explained variance
+    explained_var_ratio = s**2 / np.sum(s**2)
+    cumulative_var = np.cumsum(explained_var_ratio)
+    
+    print(f"   Singular values: {s[:5]}")
+    print(f"   Explained variance (first 5): {explained_var_ratio[:5]}")
+    
+    # Find effective rank for 95% variance
+    effective_rank = np.argmax(cumulative_var >= 0.95) + 1
+    print(f"   Effective rank (95% variance): {effective_rank}")
+
+if __name__ == "__main__":
+    # Initialize rank computer
+    computer = MatrixRankComputer(tolerance=1e-10)
+    
+    print("MATRIX RANK COMPUTATION METHODS")
+    print("=" * 50)
+    
+    # Test on various matrices
+    test_matrices = create_test_matrices()
+    
+    for name, (matrix, expected_rank) in test_matrices.items():
+        print(f"\nTesting: {name}")
+        print(f"Expected rank: {expected_rank}")
+        print("-" * 30)
+        
+        results = computer.comprehensive_rank_analysis(matrix, verbose=False)
+        
+        # Check consistency
+        ranks = list(results.values())
+        consistent = len(set(ranks)) == 1
+        
+        print(f"Results: {results}")
+        print(f"Consistent: {'Yes' if consistent else 'No'}")
+        
+        if consistent and ranks[0] == expected_rank:
+            print(f"✓ Correct rank computed")
+        else:
+            print(f"⚠ Issues detected")
+    
+    # Numerical stability analysis
+    numerical_stability_analysis()
+    
+    # Performance comparison
+    sizes, timing_results = performance_comparison()
+    
+    # Applications
+    demonstrate_rank_applications()
+    
+    print(f"\n{'='*50}")
+    print("RANK COMPUTATION SUMMARY")
+    print(f"{'='*50}")
+    
+    print("\nMethods Comparison:")
+    print("• Gaussian Elimination: O(mn²), exact for rational, unstable for floating point")
+    print("• SVD: O(mn²), most numerically stable, expensive but reliable")
+    print("• QR with pivoting: O(mn²), good balance of speed and stability")
+    print("• LU decomposition: O(mn²), fast but less stable for rank")
+    print("• Eigenvalue method: O(n³) for square matrices, uses A^T A")
+    
+    print("\nNumerical Considerations:")
+    print("• Choose tolerance based on machine precision and condition number")
+    print("• SVD is gold standard for numerical rank computation")
+    print("• QR with pivoting is good compromise for speed vs accuracy")
+    print("• Always validate with multiple methods for critical applications")
+    
+    print("\nApplications:")
+    print("• Linear system solvability: rank(A) vs rank([A|b])")
+    print("• PCA: Effective dimensionality from singular value decay")
+    print("• Matrix completion: Exploiting low-rank structure")
+    print("• Feature selection: Identifying linear dependencies")
+```
+
+**Advanced Considerations:**
+
+**1. Numerical Tolerance Selection:**
+```
+tolerance = max(m, n) × machine_epsilon × ||A||
+```
+Where machine_epsilon ≈ 2.22 × 10⁻¹⁶ for double precision.
+
+**2. Condition Number Impact:**
+For matrices with condition number κ:
+- Expect to lose log₁₀(κ) decimal digits of accuracy
+- Use SVD for κ > 10¹²
+- Consider regularization for very ill-conditioned matrices
+
+**3. Specialized Cases:**
+- **Sparse matrices**: Use iterative methods or sparse-aware factorizations
+- **Structured matrices**: Exploit structure (Toeplitz, circulant, etc.)
+- **Streaming data**: Randomized algorithms for large-scale problems
+
+**Best Practices:**
+- Use SVD for critical numerical accuracy
+- Use QR with pivoting for good speed-accuracy balance  
+- Validate results with multiple methods
+- Consider problem context when choosing tolerance
+- Profile for performance-critical applications
 
 ---
 
 ## Question 31
 
-**Explain how you would uselinear algebrato clean and preprocess adataset.**
+**Explain how you would use linear algebra to clean and preprocess a dataset.**
 
-**Answer:** _[To be filled]_
+**Answer:** Linear algebra provides powerful mathematical frameworks for dataset cleaning and preprocessing through matrix operations, transformations, and decompositions. These techniques can handle missing values, outliers, feature scaling, dimensionality reduction, and structural data issues efficiently and systematically. Understanding linear algebra applications in data preprocessing is essential for building robust machine learning pipelines.
+
+**Core Linear Algebra Concepts for Data Preprocessing:**
+
+**1. Matrix Representation of Data:**
+```
+X ∈ ℝⁿˣᵖ where:
+- n = number of samples (rows)
+- p = number of features (columns)
+- Xᵢⱼ = value of feature j for sample i
+```
+
+**2. Vector Operations for Feature Processing:**
+- **Centering**: x_centered = x - μ (where μ is mean vector)
+- **Scaling**: x_scaled = (x - μ) / σ (element-wise division)
+- **Normalization**: x_norm = x / ||x||₂ (unit length vectors)
+
+**3. Matrix Operations for Batch Processing:**
+- Vectorized operations process entire dataset simultaneously
+- Broadcasting enables efficient computation across samples
+- Matrix multiplications implement linear transformations
+
+**Major Preprocessing Applications:**
+
+**1. Missing Value Imputation:**
+
+**Mean/Median Imputation (Matrix Completion):**
+```python
+# Replace missing values with column means
+X_filled = X.copy()
+for j in range(p):
+    missing_mask = np.isnan(X[:, j])
+    if np.any(missing_mask):
+        X_filled[missing_mask, j] = np.nanmean(X[:, j])
+```
+
+**Matrix Factorization Imputation:**
+Use low-rank matrix approximation to fill missing values:
+```
+X ≈ UV^T where U ∈ ℝⁿˣʳ, V ∈ ℝᵖˣʳ, r << min(n,p)
+```
+
+**Iterative Imputation (Matrix-based):**
+- Initialize missing values with means
+- Fit regression model using complete features
+- Update missing values iteratively
+- Converge to stable solution
+
+**2. Outlier Detection and Treatment:**
+
+**Mahalanobis Distance:**
+```
+d²(x) = (x - μ)^T Σ⁻¹ (x - μ)
+```
+Where Σ is the covariance matrix.
+
+**Principal Component Analysis (PCA) for Outlier Detection:**
+- Project data to principal components
+- Identify samples with large reconstruction errors
+- Remove or downweight outliers
+
+**Robust Covariance Estimation:**
+- Use robust estimators less sensitive to outliers
+- Minimum Covariance Determinant (MCD)
+- Robust PCA using iterative methods
+
+**3. Feature Scaling and Normalization:**
+
+**Standardization (Z-score):**
+```
+X_standardized = (X - μ) / σ
+```
+Matrix form: X_std = X @ D⁻¹ - μ₁ᵀ @ D⁻¹
+where D = diag(σ₁, σ₂, ..., σₚ)
+
+**Min-Max Scaling:**
+```
+X_minmax = (X - X_min) / (X_max - X_min)
+```
+
+**Unit Vector Scaling:**
+```
+X_unit = X / ||X||₂ (row-wise normalization)
+```
+
+**4. Dimensionality Reduction:**
+
+**Principal Component Analysis (PCA):**
+```
+X_centered = X - μ₁ᵀ
+C = (1/(n-1)) X_centered^T X_centered
+C = VΛV^T (eigendecomposition)
+X_pca = X_centered V[:,:k] (first k components)
+```
+
+**Singular Value Decomposition (SVD):**
+```
+X = UΣV^T
+X_reduced = U[:,:k] Σ[:k,:k] (reduced representation)
+```
+
+**5. Feature Engineering through Linear Transformations:**
+
+**Polynomial Features:**
+Create interaction terms and higher-order features through Kronecker products and outer products.
+
+**Basis Transformations:**
+Transform features to different basis (Fourier, wavelet, etc.) using matrix multiplications.
+
+**Comprehensive Implementation:**
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.impute import IterativeImputer
+from sklearn.covariance import EllipticEnvelope
+from sklearn.decomposition import PCA, TruncatedSVD
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from scipy import linalg
+import warnings
+warnings.filterwarnings('ignore')
+
+class LinearAlgebraDataPreprocessor:
+    """Comprehensive data preprocessing using linear algebra techniques"""
+    
+    def __init__(self, missing_strategy='iterative', outlier_method='mahalanobis',
+                 scaling_method='standard', dim_reduction=None):
+        """
+        Initialize preprocessor with linear algebra-based methods
+        
+        Args:
+            missing_strategy: 'mean', 'median', 'iterative', 'matrix_factorization'
+            outlier_method: 'mahalanobis', 'pca_reconstruction', 'robust_covariance'
+            scaling_method: 'standard', 'minmax', 'robust', 'unit_vector'
+            dim_reduction: None, 'pca', 'svd', 'ica'
+        """
+        self.missing_strategy = missing_strategy
+        self.outlier_method = outlier_method
+        self.scaling_method = scaling_method
+        self.dim_reduction = dim_reduction
+        
+        # Store fitted parameters
+        self.fitted_params = {}
+        self.preprocessing_stats = {}
+        
+    def handle_missing_values(self, X, verbose=True):
+        """Handle missing values using various linear algebra approaches"""
+        
+        if verbose:
+            print("MISSING VALUE IMPUTATION")
+            print("=" * 30)
+            print(f"Strategy: {self.missing_strategy}")
+        
+        X = np.array(X, dtype=float)
+        n_samples, n_features = X.shape
+        missing_mask = np.isnan(X)
+        missing_count = np.sum(missing_mask)
+        
+        if missing_count == 0:
+            if verbose:
+                print("No missing values found")
+            return X
+        
+        if verbose:
+            print(f"Missing values: {missing_count} ({missing_count/(n_samples*n_features)*100:.1f}%)")
+            print(f"Features with missing values: {np.sum(np.any(missing_mask, axis=0))}")
+        
+        if self.missing_strategy == 'mean':
+            # Simple mean imputation
+            X_imputed = X.copy()
+            for j in range(n_features):
+                if np.any(missing_mask[:, j]):
+                    mean_val = np.nanmean(X[:, j])
+                    X_imputed[missing_mask[:, j], j] = mean_val
+            
+            if verbose:
+                print("Applied column-wise mean imputation")
+        
+        elif self.missing_strategy == 'median':
+            # Median imputation (more robust to outliers)
+            X_imputed = X.copy()
+            for j in range(n_features):
+                if np.any(missing_mask[:, j]):
+                    median_val = np.nanmedian(X[:, j])
+                    X_imputed[missing_mask[:, j], j] = median_val
+            
+            if verbose:
+                print("Applied column-wise median imputation")
+        
+        elif self.missing_strategy == 'iterative':
+            # Iterative imputation using regression
+            imputer = IterativeImputer(max_iter=10, random_state=42)
+            X_imputed = imputer.fit_transform(X)
+            
+            self.fitted_params['imputer'] = imputer
+            
+            if verbose:
+                print("Applied iterative imputation using regression")
+        
+        elif self.missing_strategy == 'matrix_factorization':
+            # Low-rank matrix completion
+            X_imputed = self._matrix_completion_svd(X, missing_mask, rank=min(10, min(n_samples, n_features)//2))
+            
+            if verbose:
+                print("Applied matrix factorization imputation")
+        
+        # Store statistics
+        self.preprocessing_stats['missing_imputed'] = missing_count
+        
+        return X_imputed
+    
+    def _matrix_completion_svd(self, X, missing_mask, rank=5, max_iter=100, tol=1e-4):
+        """Matrix completion using SVD (simplified version)"""
+        
+        X_filled = X.copy()
+        
+        # Initialize missing values with column means
+        for j in range(X.shape[1]):
+            if np.any(missing_mask[:, j]):
+                X_filled[missing_mask[:, j], j] = np.nanmean(X[:, j])
+        
+        # Iterative SVD imputation
+        for iteration in range(max_iter):
+            X_old = X_filled.copy()
+            
+            # SVD decomposition
+            try:
+                U, s, Vt = np.linalg.svd(X_filled, full_matrices=False)
+                
+                # Keep only top rank components
+                if rank < len(s):
+                    U = U[:, :rank]
+                    s = s[:rank]
+                    Vt = Vt[:rank, :]
+                
+                # Reconstruct matrix
+                X_reconstructed = U @ np.diag(s) @ Vt
+                
+                # Update only missing values
+                X_filled[missing_mask] = X_reconstructed[missing_mask]
+                
+                # Check convergence
+                diff = np.linalg.norm(X_filled - X_old, 'fro')
+                if diff < tol:
+                    break
+                    
+            except np.linalg.LinAlgError:
+                print("SVD failed, using simple mean imputation")
+                break
+        
+        return X_filled
+    
+    def detect_outliers(self, X, contamination=0.1, verbose=True):
+        """Detect outliers using linear algebra methods"""
+        
+        if verbose:
+            print(f"\nOUTLIER DETECTION")
+            print("=" * 20)
+            print(f"Method: {self.outlier_method}")
+        
+        n_samples = X.shape[0]
+        outlier_mask = np.zeros(n_samples, dtype=bool)
+        
+        if self.outlier_method == 'mahalanobis':
+            # Mahalanobis distance
+            mean = np.mean(X, axis=0)
+            cov = np.cov(X.T)
+            
+            # Handle singular covariance matrix
+            try:
+                cov_inv = np.linalg.inv(cov)
+            except np.linalg.LinAlgError:
+                # Use pseudo-inverse for singular matrices
+                cov_inv = np.linalg.pinv(cov)
+            
+            # Compute Mahalanobis distances
+            diff = X - mean
+            mahal_dist = np.sqrt(np.sum((diff @ cov_inv) * diff, axis=1))
+            
+            # Use threshold based on chi-square distribution
+            threshold = np.percentile(mahal_dist, (1 - contamination) * 100)
+            outlier_mask = mahal_dist > threshold
+            
+            if verbose:
+                print(f"Mahalanobis distance threshold: {threshold:.3f}")
+                print(f"Mean distance: {np.mean(mahal_dist):.3f}")
+        
+        elif self.outlier_method == 'pca_reconstruction':
+            # PCA reconstruction error
+            pca = PCA(n_components=min(10, X.shape[1]))
+            X_pca = pca.fit_transform(X)
+            X_reconstructed = pca.inverse_transform(X_pca)
+            
+            # Reconstruction error
+            reconstruction_errors = np.linalg.norm(X - X_reconstructed, axis=1)
+            threshold = np.percentile(reconstruction_errors, (1 - contamination) * 100)
+            outlier_mask = reconstruction_errors > threshold
+            
+            if verbose:
+                print(f"PCA reconstruction error threshold: {threshold:.3f}")
+                print(f"Explained variance ratio: {np.sum(pca.explained_variance_ratio_):.3f}")
+        
+        elif self.outlier_method == 'robust_covariance':
+            # Robust covariance estimation
+            robust_cov = EllipticEnvelope(contamination=contamination, random_state=42)
+            outlier_predictions = robust_cov.fit_predict(X)
+            outlier_mask = outlier_predictions == -1
+        
+        if verbose:
+            print(f"Detected {np.sum(outlier_mask)} outliers ({np.mean(outlier_mask)*100:.1f}%)")
+        
+        self.preprocessing_stats['outliers_detected'] = np.sum(outlier_mask)
+        return outlier_mask
+    
+    def apply_scaling(self, X, verbose=True):
+        """Apply scaling using linear algebra operations"""
+        
+        if verbose:
+            print(f"\nFEATURE SCALING")
+            print("=" * 20)
+            print(f"Method: {self.scaling_method}")
+        
+        if self.scaling_method == 'standard':
+            # Z-score standardization: (X - μ) / σ
+            mean = np.mean(X, axis=0)
+            std = np.std(X, axis=0, ddof=1)
+            
+            # Handle zero variance features
+            std[std == 0] = 1
+            
+            X_scaled = (X - mean) / std
+            
+            self.fitted_params['scaler_mean'] = mean
+            self.fitted_params['scaler_std'] = std
+            
+            if verbose:
+                print(f"Standardized to mean=0, std=1")
+                print(f"Original range: [{np.min(X):.3f}, {np.max(X):.3f}]")
+                print(f"Scaled range: [{np.min(X_scaled):.3f}, {np.max(X_scaled):.3f}]")
+        
+        elif self.scaling_method == 'minmax':
+            # Min-max scaling: (X - min) / (max - min)
+            X_min = np.min(X, axis=0)
+            X_max = np.max(X, axis=0)
+            
+            # Handle constant features
+            range_vals = X_max - X_min
+            range_vals[range_vals == 0] = 1
+            
+            X_scaled = (X - X_min) / range_vals
+            
+            self.fitted_params['scaler_min'] = X_min
+            self.fitted_params['scaler_range'] = range_vals
+        
+        elif self.scaling_method == 'robust':
+            # Robust scaling using median and IQR
+            median = np.median(X, axis=0)
+            q75 = np.percentile(X, 75, axis=0)
+            q25 = np.percentile(X, 25, axis=0)
+            iqr = q75 - q25
+            
+            # Handle zero IQR
+            iqr[iqr == 0] = 1
+            
+            X_scaled = (X - median) / iqr
+            
+            self.fitted_params['scaler_median'] = median
+            self.fitted_params['scaler_iqr'] = iqr
+        
+        elif self.scaling_method == 'unit_vector':
+            # Unit vector scaling (L2 normalization)
+            norms = np.linalg.norm(X, axis=1, keepdims=True)
+            norms[norms == 0] = 1  # Handle zero vectors
+            X_scaled = X / norms
+        
+        return X_scaled
+    
+    def apply_dimensionality_reduction(self, X, n_components=None, verbose=True):
+        """Apply dimensionality reduction using linear algebra"""
+        
+        if self.dim_reduction is None:
+            return X
+        
+        if verbose:
+            print(f"\nDIMENSIONALITY REDUCTION")
+            print("=" * 25)
+            print(f"Method: {self.dim_reduction}")
+        
+        if n_components is None:
+            n_components = min(50, X.shape[1] // 2)
+        
+        if self.dim_reduction == 'pca':
+            # Principal Component Analysis
+            pca = PCA(n_components=n_components, random_state=42)
+            X_reduced = pca.fit_transform(X)
+            
+            self.fitted_params['pca'] = pca
+            
+            if verbose:
+                print(f"Reduced from {X.shape[1]} to {X_reduced.shape[1]} dimensions")
+                print(f"Explained variance ratio: {np.sum(pca.explained_variance_ratio_):.3f}")
+                print(f"Individual ratios: {pca.explained_variance_ratio_[:5]}")
+        
+        elif self.dim_reduction == 'svd':
+            # Truncated SVD
+            svd = TruncatedSVD(n_components=n_components, random_state=42)
+            X_reduced = svd.fit_transform(X)
+            
+            self.fitted_params['svd'] = svd
+            
+            if verbose:
+                print(f"Reduced from {X.shape[1]} to {X_reduced.shape[1]} dimensions")
+                print(f"Explained variance ratio: {np.sum(svd.explained_variance_ratio_):.3f}")
+        
+        return X_reduced
+    
+    def remove_linear_dependencies(self, X, tolerance=1e-10, verbose=True):
+        """Remove linearly dependent features using matrix rank analysis"""
+        
+        if verbose:
+            print(f"\nLINEAR DEPENDENCY REMOVAL")
+            print("=" * 30)
+        
+        # Compute QR decomposition with column pivoting
+        Q, R, P = linalg.qr(X.T, pivoting=True)
+        
+        # Find rank by counting significant diagonal elements
+        rank = np.sum(np.abs(np.diag(R)) > tolerance)
+        
+        if rank < X.shape[1]:
+            # Select linearly independent columns
+            independent_cols = P[:rank]
+            X_independent = X[:, independent_cols]
+            
+            self.fitted_params['independent_features'] = independent_cols
+            
+            if verbose:
+                print(f"Removed {X.shape[1] - rank} linearly dependent features")
+                print(f"Kept {rank} independent features")
+                print(f"Feature indices kept: {independent_cols[:10]}...")  # Show first 10
+            
+            return X_independent
+        else:
+            if verbose:
+                print("No linear dependencies found")
+            return X
+    
+    def detect_feature_correlations(self, X, threshold=0.95, verbose=True):
+        """Detect and handle highly correlated features"""
+        
+        if verbose:
+            print(f"\nCORRELATION ANALYSIS")
+            print("=" * 25)
+        
+        # Compute correlation matrix
+        corr_matrix = np.corrcoef(X.T)
+        
+        # Find highly correlated pairs
+        high_corr_pairs = []
+        n_features = X.shape[1]
+        
+        for i in range(n_features):
+            for j in range(i+1, n_features):
+                if abs(corr_matrix[i, j]) > threshold:
+                    high_corr_pairs.append((i, j, corr_matrix[i, j]))
+        
+        if verbose:
+            print(f"Found {len(high_corr_pairs)} highly correlated pairs (|r| > {threshold})")
+            if high_corr_pairs:
+                print("Top correlations:")
+                for i, j, corr in sorted(high_corr_pairs, key=lambda x: abs(x[2]), reverse=True)[:5]:
+                    print(f"  Features {i}-{j}: r = {corr:.3f}")
+        
+        # Remove one feature from each highly correlated pair
+        features_to_remove = set()
+        for i, j, corr in high_corr_pairs:
+            if i not in features_to_remove and j not in features_to_remove:
+                # Remove the feature with higher index (arbitrary choice)
+                features_to_remove.add(max(i, j))
+        
+        if features_to_remove:
+            features_to_keep = [i for i in range(n_features) if i not in features_to_remove]
+            X_decorr = X[:, features_to_keep]
+            
+            self.fitted_params['decorrelated_features'] = features_to_keep
+            
+            if verbose:
+                print(f"Removed {len(features_to_remove)} correlated features")
+            
+            return X_decorr
+        else:
+            return X
+    
+    def fit_transform(self, X, remove_outliers=True, verbose=True):
+        """Complete preprocessing pipeline"""
+        
+        if verbose:
+            print("LINEAR ALGEBRA DATA PREPROCESSING PIPELINE")
+            print("=" * 50)
+            print(f"Input shape: {X.shape}")
+        
+        # Convert to numpy array
+        if isinstance(X, pd.DataFrame):
+            feature_names = X.columns.tolist()
+            X = X.values
+        else:
+            feature_names = [f"feature_{i}" for i in range(X.shape[1])]
+        
+        X = X.astype(float)
+        
+        # Step 1: Handle missing values
+        X_processed = self.handle_missing_values(X, verbose=verbose)
+        
+        # Step 2: Detect outliers
+        outlier_mask = self.detect_outliers(X_processed, verbose=verbose)
+        
+        if remove_outliers and np.any(outlier_mask):
+            X_processed = X_processed[~outlier_mask]
+            if verbose:
+                print(f"Removed {np.sum(outlier_mask)} outlier samples")
+        
+        # Step 3: Remove linear dependencies
+        X_processed = self.remove_linear_dependencies(X_processed, verbose=verbose)
+        
+        # Step 4: Handle feature correlations
+        X_processed = self.detect_feature_correlations(X_processed, verbose=verbose)
+        
+        # Step 5: Apply scaling
+        X_processed = self.apply_scaling(X_processed, verbose=verbose)
+        
+        # Step 6: Dimensionality reduction
+        X_processed = self.apply_dimensionality_reduction(X_processed, verbose=verbose)
+        
+        # Final statistics
+        if verbose:
+            print(f"\nFINAL RESULTS:")
+            print(f"  Output shape: {X_processed.shape}")
+            print(f"  Data type: {X_processed.dtype}")
+            print(f"  Memory usage: {X_processed.nbytes / 1024:.1f} KB")
+            print(f"  No missing values: {not np.isnan(X_processed).any()}")
+            print(f"  No infinite values: {not np.isinf(X_processed).any()}")
+            
+            # Matrix condition number
+            if X_processed.shape[1] <= X_processed.shape[0]:
+                try:
+                    cond_num = np.linalg.cond(X_processed.T @ X_processed)
+                    print(f"  Condition number: {cond_num:.2e}")
+                except:
+                    pass
+        
+        return X_processed
+
+def demonstrate_preprocessing_pipeline():
+    """Demonstrate comprehensive preprocessing with synthetic data"""
+    
+    print("PREPROCESSING DEMONSTRATION")
+    print("=" * 40)
+    
+    # Create synthetic dataset with various issues
+    np.random.seed(42)
+    n_samples = 1000
+    n_features = 20
+    
+    # Base data
+    X_base = np.random.randn(n_samples, n_features)
+    
+    # Add some structure and problems
+    # 1. Add linear dependencies
+    X_base[:, 5] = 2 * X_base[:, 0] + 0.1 * np.random.randn(n_samples)  # Almost linearly dependent
+    X_base[:, 10] = X_base[:, 1] + X_base[:, 2]  # Exactly linearly dependent
+    
+    # 2. Add high correlations
+    X_base[:, 15] = 0.98 * X_base[:, 3] + 0.02 * np.random.randn(n_samples)  # High correlation
+    
+    # 3. Add different scales
+    X_base[:, 8] *= 1000  # Large scale
+    X_base[:, 12] *= 0.001  # Small scale
+    
+    # 4. Add missing values
+    missing_indices = np.random.choice(n_samples * n_features, 
+                                     size=int(0.05 * n_samples * n_features), 
+                                     replace=False)
+    X_flat = X_base.flatten()
+    X_flat[missing_indices] = np.nan
+    X_with_missing = X_flat.reshape(n_samples, n_features)
+    
+    # 5. Add outliers
+    outlier_indices = np.random.choice(n_samples, size=50, replace=False)
+    X_with_missing[outlier_indices] *= 5  # Scale outliers
+    
+    print(f"Created synthetic dataset with issues:")
+    print(f"  Shape: {X_with_missing.shape}")
+    print(f"  Missing values: {np.sum(np.isnan(X_with_missing))}")
+    print(f"  Value range: [{np.nanmin(X_with_missing):.1f}, {np.nanmax(X_with_missing):.1f}]")
+    
+    # Apply different preprocessing strategies
+    strategies = [
+        ('Conservative', {
+            'missing_strategy': 'mean',
+            'outlier_method': 'mahalanobis',
+            'scaling_method': 'robust',
+            'dim_reduction': None
+        }),
+        ('Aggressive', {
+            'missing_strategy': 'iterative',
+            'outlier_method': 'pca_reconstruction',
+            'scaling_method': 'standard',
+            'dim_reduction': 'pca'
+        }),
+        ('Matrix-based', {
+            'missing_strategy': 'matrix_factorization',
+            'outlier_method': 'robust_covariance',
+            'scaling_method': 'unit_vector',
+            'dim_reduction': 'svd'
+        })
+    ]
+    
+    results = {}
+    
+    for strategy_name, params in strategies:
+        print(f"\n{'='*50}")
+        print(f"STRATEGY: {strategy_name.upper()}")
+        print(f"{'='*50}")
+        
+        preprocessor = LinearAlgebraDataPreprocessor(**params)
+        X_processed = preprocessor.fit_transform(X_with_missing, verbose=True)
+        
+        results[strategy_name] = {
+            'processed_data': X_processed,
+            'stats': preprocessor.preprocessing_stats,
+            'params': preprocessor.fitted_params
+        }
+    
+    return X_with_missing, results
+
+def create_preprocessing_visualizations(X_original, results):
+    """Create visualizations showing preprocessing effects"""
+    
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+    
+    # 1. Missing value pattern
+    ax = axes[0, 0]
+    missing_pattern = np.isnan(X_original)
+    ax.imshow(missing_pattern[:100, :], cmap='Reds', aspect='auto')
+    ax.set_title('Missing Value Pattern\n(First 100 samples)')
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Samples')
+    
+    # 2. Feature correlations
+    ax = axes[0, 1]
+    # Handle missing values for correlation
+    X_temp = X_original.copy()
+    for j in range(X_temp.shape[1]):
+        X_temp[np.isnan(X_temp[:, j]), j] = np.nanmean(X_temp[:, j])
+    
+    corr_matrix = np.corrcoef(X_temp.T)
+    im = ax.imshow(corr_matrix, cmap='RdBu_r', vmin=-1, vmax=1)
+    ax.set_title('Feature Correlation Matrix')
+    plt.colorbar(im, ax=ax)
+    
+    # 3. Feature scales (before preprocessing)
+    ax = axes[0, 2]
+    feature_stds = []
+    for j in range(X_temp.shape[1]):
+        feature_stds.append(np.std(X_temp[:, j]))
+    
+    ax.bar(range(len(feature_stds)), feature_stds)
+    ax.set_title('Feature Standard Deviations\n(Before Preprocessing)')
+    ax.set_xlabel('Feature Index')
+    ax.set_ylabel('Standard Deviation')
+    ax.set_yscale('log')
+    
+    # 4. Compare processed data distributions
+    ax = axes[1, 0]
+    for i, (strategy, result) in enumerate(results.items()):
+        X_processed = result['processed_data']
+        # Plot first feature distribution
+        ax.hist(X_processed[:, 0], alpha=0.6, label=strategy, bins=30)
+    ax.set_title('First Feature Distribution\n(After Preprocessing)')
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    ax.legend()
+    
+    # 5. Dimensionality comparison
+    ax = axes[1, 1]
+    strategies = list(results.keys())
+    dimensions = [results[s]['processed_data'].shape[1] for s in strategies]
+    original_dim = X_original.shape[1]
+    
+    bars = ax.bar(['Original'] + strategies, [original_dim] + dimensions)
+    bars[0].set_color('red')  # Highlight original
+    ax.set_title('Dimensionality Comparison')
+    ax.set_ylabel('Number of Features')
+    
+    # 6. Processing statistics
+    ax = axes[1, 2]
+    stats_to_plot = ['missing_imputed', 'outliers_detected']
+    x_pos = np.arange(len(strategies))
+    
+    for i, stat in enumerate(stats_to_plot):
+        values = [results[s]['stats'].get(stat, 0) for s in strategies]
+        ax.bar(x_pos + i*0.35, values, 0.35, label=stat.replace('_', ' ').title())
+    
+    ax.set_xlabel('Strategy')
+    ax.set_ylabel('Count')
+    ax.set_title('Preprocessing Statistics')
+    ax.set_xticks(x_pos + 0.175)
+    ax.set_xticklabels(strategies)
+    ax.legend()
+    
+    plt.tight_layout()
+    plt.savefig('linear_algebra_preprocessing.png', dpi=150, bbox_inches='tight')
+    plt.show()
+
+if __name__ == "__main__":
+    # Run demonstration
+    X_original, preprocessing_results = demonstrate_preprocessing_pipeline()
+    
+    # Create visualizations
+    create_preprocessing_visualizations(X_original, preprocessing_results)
+    
+    print(f"\n{'='*60}")
+    print("LINEAR ALGEBRA PREPROCESSING SUMMARY")
+    print(f"{'='*60}")
+    
+    print("\nKey Linear Algebra Applications:")
+    print("• Matrix operations for vectorized computation")
+    print("• SVD/PCA for dimensionality reduction and missing value imputation")
+    print("• QR decomposition for linear dependency detection")
+    print("• Eigenvalue decomposition for outlier detection (Mahalanobis distance)")
+    print("• Matrix norms for scaling and normalization")
+    
+    print("\nComputational Advantages:")
+    print("• Vectorized operations are much faster than loops")
+    print("• BLAS/LAPACK optimizations for matrix operations")
+    print("• Parallel processing capabilities")
+    print("• Memory-efficient operations")
+    
+    print("\nBest Practices:")
+    print("• Choose appropriate numerical tolerances")
+    print("• Handle singular/ill-conditioned matrices")
+    print("• Validate preprocessing steps with multiple methods")
+    print("• Monitor condition numbers for numerical stability")
+    print("• Use robust methods for outlier-prone data")
+    
+    print("\nCommon Pitfalls:")
+    print("• Data leakage: Don't use test set statistics for preprocessing")
+    print("• Scaling after splitting: Fit on training, transform on test")
+    print("• Ignoring numerical precision and overflow issues")
+    print("• Over-preprocessing: Removing too much information")
+```
+
+**Advanced Linear Algebra Techniques:**
+
+**1. Robust Principal Component Analysis (RPCA):**
+Decomposes matrix as: X = L + S + N
+- L: Low-rank component (main structure)
+- S: Sparse component (outliers/anomalies)  
+- N: Noise component
+
+**2. Matrix Completion with Nuclear Norm:**
+Minimize: ||X||* subject to constraints
+Where ||X||* is the nuclear norm (sum of singular values)
+
+**3. Independent Component Analysis (ICA):**
+Find linear transformation: S = WX
+Where S has independent components (non-Gaussian)
+
+**4. Canonical Correlation Analysis (CCA):**
+Find linear combinations maximizing correlation between datasets
+
+**Key Insights:**
+- Linear algebra provides the mathematical foundation for systematic data preprocessing
+- Matrix decompositions reveal data structure and enable principled cleaning approaches
+- Vectorized operations ensure computational efficiency for large datasets
+- Understanding the mathematical properties helps choose appropriate methods and parameters
 
 ---
 
 ## Question 32
 
-**Describe a scenario where linear algebra could be used to improvemodel accuracy.**
+**Describe a scenario where linear algebra could be used to improve model accuracy.**
 
-**Answer:** _[To be filled]_
+**Answer:** Linear algebra provides powerful tools that can significantly improve model accuracy through feature engineering, regularization, optimization, and architectural improvements. One compelling scenario is using linear algebra techniques to enhance the performance of a recommendation system for an e-commerce platform, where accuracy improvements directly translate to better user experience and increased revenue.
+
+**Scenario: E-commerce Recommendation System Enhancement**
+
+**Initial Challenge:**
+A large e-commerce platform has a recommendation system with suboptimal performance:
+- **Current accuracy**: 65% precision@10 for product recommendations
+- **User engagement**: Low click-through rates (2.1%)
+- **Business impact**: Poor conversion rates and customer satisfaction
+- **Technical issues**: Cold start problem, sparse user-item interactions, scalability concerns
+
+**Linear Algebra Solutions for Accuracy Improvement:**
+
+**1. Matrix Factorization Enhancement:**
+
+**Problem**: Basic collaborative filtering yields poor recommendations due to sparsity.
+
+**Linear Algebra Solution**: Advanced matrix factorization with regularization and bias terms.
+
+**Mathematical Framework:**
+```
+R ≈ U V^T + μ + b_u + b_i
+```
+Where:
+- R: User-item rating matrix
+- U ∈ ℝ^(m×k): User latent factors
+- V ∈ ℝ^(n×k): Item latent factors  
+- μ: Global bias
+- b_u: User bias vector
+- b_i: Item bias vector
+
+**Optimization with Regularization:**
+```
+min_{U,V,b} ||R - UV^T - μ1^T - b_u1^T - 1b_i^T||_F^2 + λ(||U||_F^2 + ||V||_F^2 + ||b_u||^2 + ||b_i||^2)
+```
+
+**Implementation:**
+
+```python
+import numpy as np
+import scipy.sparse as sp
+from scipy.sparse.linalg import svds
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+import pandas as pd
+
+class AdvancedMatrixFactorization:
+    """Advanced matrix factorization for recommendation systems"""
+    
+    def __init__(self, n_factors=50, learning_rate=0.01, reg_lambda=0.01, 
+                 n_epochs=100, use_bias=True, use_temporal=False):
+        """
+        Initialize advanced matrix factorization model
+        
+        Args:
+            n_factors: Number of latent factors
+            learning_rate: Learning rate for SGD
+            reg_lambda: Regularization parameter
+            n_epochs: Number of training epochs
+            use_bias: Whether to include bias terms
+            use_temporal: Whether to include temporal dynamics
+        """
+        self.n_factors = n_factors
+        self.learning_rate = learning_rate
+        self.reg_lambda = reg_lambda
+        self.n_epochs = n_epochs
+        self.use_bias = use_bias
+        self.use_temporal = use_temporal
+        
+        # Model parameters
+        self.U = None  # User factors
+        self.V = None  # Item factors
+        self.mu = None  # Global mean
+        self.b_u = None  # User biases
+        self.b_i = None  # Item biases
+        
+        # Training history
+        self.train_losses = []
+        self.val_losses = []
+        
+    def initialize_parameters(self, n_users, n_items):
+        """Initialize model parameters"""
+        
+        # Xavier initialization for factors
+        self.U = np.random.normal(0, 0.1, (n_users, self.n_factors))
+        self.V = np.random.normal(0, 0.1, (n_items, self.n_factors))
+        
+        if self.use_bias:
+            self.b_u = np.zeros(n_users)
+            self.b_i = np.zeros(n_items)
+        
+        self.mu = 0.0
+    
+    def predict_rating(self, user_id, item_id, timestamp=None):
+        """Predict rating for user-item pair"""
+        
+        prediction = self.mu + np.dot(self.U[user_id], self.V[item_id])
+        
+        if self.use_bias:
+            prediction += self.b_u[user_id] + self.b_i[item_id]
+        
+        # Add temporal dynamics if enabled
+        if self.use_temporal and timestamp is not None:
+            # Simplified temporal factor
+            temporal_factor = 1.0 + 0.01 * np.sin(timestamp / 86400)  # Daily pattern
+            prediction *= temporal_factor
+        
+        return prediction
+    
+    def compute_loss(self, rating_matrix, mask_matrix):
+        """Compute total loss including regularization"""
+        
+        # Reconstruction loss
+        predictions = self.U @ self.V.T
+        if self.use_bias:
+            predictions += self.mu + self.b_u[:, np.newaxis] + self.b_i[np.newaxis, :]
+        
+        mse_loss = np.sum(mask_matrix * (rating_matrix - predictions)**2)
+        
+        # Regularization loss
+        reg_loss = self.reg_lambda * (
+            np.sum(self.U**2) + np.sum(self.V**2)
+        )
+        
+        if self.use_bias:
+            reg_loss += self.reg_lambda * (np.sum(self.b_u**2) + np.sum(self.b_i**2))
+        
+        return mse_loss + reg_loss
+    
+    def fit(self, rating_matrix, validation_data=None, verbose=True):
+        """Train the matrix factorization model"""
+        
+        if verbose:
+            print("Training Advanced Matrix Factorization")
+            print("=" * 45)
+        
+        # Convert to dense if sparse
+        if sp.issparse(rating_matrix):
+            rating_matrix = rating_matrix.toarray()
+        
+        n_users, n_items = rating_matrix.shape
+        
+        # Create mask for observed ratings
+        mask_matrix = (rating_matrix > 0).astype(float)
+        
+        # Compute global mean
+        self.mu = np.sum(rating_matrix) / np.sum(mask_matrix)
+        
+        # Initialize parameters
+        self.initialize_parameters(n_users, n_items)
+        
+        # Get list of observed ratings for SGD
+        user_ids, item_ids = np.where(mask_matrix)
+        ratings = rating_matrix[user_ids, item_ids]
+        
+        if verbose:
+            print(f"Dataset statistics:")
+            print(f"  Users: {n_users}")
+            print(f"  Items: {n_items}")
+            print(f"  Ratings: {len(ratings)}")
+            print(f"  Sparsity: {1 - len(ratings)/(n_users*n_items):.3f}")
+            print(f"  Global mean: {self.mu:.3f}")
+        
+        # Training loop
+        for epoch in range(self.n_epochs):
+            # Shuffle training data
+            indices = np.random.permutation(len(ratings))
+            epoch_loss = 0
+            
+            for idx in indices:
+                u = user_ids[idx]
+                i = item_ids[idx]
+                r_ui = ratings[idx]
+                
+                # Predict rating
+                prediction = self.predict_rating(u, i)
+                error = r_ui - prediction
+                
+                # Update parameters using gradient descent
+                # User factors
+                u_factors = self.U[u].copy()
+                self.U[u] += self.learning_rate * (
+                    error * self.V[i] - self.reg_lambda * self.U[u]
+                )
+                
+                # Item factors
+                self.V[i] += self.learning_rate * (
+                    error * u_factors - self.reg_lambda * self.V[i]
+                )
+                
+                # Biases
+                if self.use_bias:
+                    self.b_u[u] += self.learning_rate * (
+                        error - self.reg_lambda * self.b_u[u]
+                    )
+                    self.b_i[i] += self.learning_rate * (
+                        error - self.reg_lambda * self.b_i[i]
+                    )
+                
+                epoch_loss += error**2
+            
+            # Compute full loss
+            total_loss = self.compute_loss(rating_matrix, mask_matrix)
+            self.train_losses.append(total_loss)
+            
+            # Validation loss
+            if validation_data is not None:
+                val_loss = self.evaluate(validation_data['matrix'], validation_data['mask'])
+                self.val_losses.append(val_loss)
+            
+            # Print progress
+            if verbose and (epoch + 1) % 20 == 0:
+                if validation_data is not None:
+                    print(f"Epoch {epoch+1:3d}: Train Loss = {total_loss:.4f}, "
+                          f"Val Loss = {val_loss:.4f}")
+                else:
+                    print(f"Epoch {epoch+1:3d}: Train Loss = {total_loss:.4f}")
+        
+        if verbose:
+            print("Training completed!")
+    
+    def evaluate(self, test_matrix, test_mask):
+        """Evaluate model on test data"""
+        
+        predictions = self.U @ self.V.T
+        if self.use_bias:
+            predictions += self.mu + self.b_u[:, np.newaxis] + self.b_i[np.newaxis, :]
+        
+        # Compute RMSE on test set
+        test_predictions = predictions[test_mask > 0]
+        test_actuals = test_matrix[test_mask > 0]
+        
+        rmse = np.sqrt(mean_squared_error(test_actuals, test_predictions))
+        return rmse
+    
+    def recommend_items(self, user_id, n_recommendations=10, exclude_rated=True):
+        """Generate top-N recommendations for a user"""
+        
+        if user_id >= self.U.shape[0]:
+            return []
+        
+        # Predict all items for user
+        user_predictions = self.U[user_id] @ self.V.T
+        
+        if self.use_bias:
+            user_predictions += self.mu + self.b_u[user_id] + self.b_i
+        
+        # Get top items
+        if exclude_rated:
+            # This would need the original rating matrix to exclude rated items
+            # For simplicity, we'll return top predictions
+            pass
+        
+        top_items = np.argsort(user_predictions)[::-1][:n_recommendations]
+        top_scores = user_predictions[top_items]
+        
+        return list(zip(top_items, top_scores))
+
+def create_synthetic_recommendation_data():
+    """Create synthetic recommendation dataset"""
+    
+    np.random.seed(42)
+    
+    n_users = 1000
+    n_items = 500
+    n_factors_true = 10
+    sparsity = 0.95  # 95% sparse
+    
+    # Generate true user and item factors
+    U_true = np.random.normal(0, 1, (n_users, n_factors_true))
+    V_true = np.random.normal(0, 1, (n_items, n_factors_true))
+    
+    # Generate ratings with noise
+    R_true = U_true @ V_true.T
+    
+    # Add user and item biases
+    user_bias = np.random.normal(0, 0.5, n_users)
+    item_bias = np.random.normal(0, 0.5, n_items)
+    global_mean = 3.5
+    
+    R_true += global_mean + user_bias[:, np.newaxis] + item_bias[np.newaxis, :]
+    
+    # Add noise
+    R_true += np.random.normal(0, 0.1, (n_users, n_items))
+    
+    # Create sparse observation mask
+    mask = np.random.random((n_users, n_items)) > sparsity
+    R_observed = R_true * mask
+    
+    # Scale ratings to 1-5 range
+    R_observed = np.clip(R_observed, 1, 5)
+    
+    return R_observed, mask, R_true
+
+def demonstrate_accuracy_improvement():
+    """Demonstrate accuracy improvement using linear algebra"""
+    
+    print("LINEAR ALGEBRA FOR MODEL ACCURACY IMPROVEMENT")
+    print("=" * 55)
+    
+    # Create synthetic data
+    R_observed, mask, R_true = create_synthetic_recommendation_data()
+    
+    print(f"Dataset created:")
+    print(f"  Users: {R_observed.shape[0]}")
+    print(f"  Items: {R_observed.shape[1]}")
+    print(f"  Observed ratings: {np.sum(mask)}")
+    print(f"  Sparsity: {1 - np.sum(mask)/mask.size:.3f}")
+    
+    # Split into train/test
+    train_mask = mask.copy()
+    test_indices = np.random.choice(np.sum(mask), size=int(0.2 * np.sum(mask)), replace=False)
+    
+    # Convert to coordinate format for easier manipulation
+    user_ids, item_ids = np.where(mask)
+    test_users = user_ids[test_indices]
+    test_items = item_ids[test_indices]
+    
+    # Remove test ratings from training set
+    for u, i in zip(test_users, test_items):
+        train_mask[u, i] = False
+    
+    # Create test mask
+    test_mask = np.zeros_like(mask, dtype=bool)
+    for u, i in zip(test_users, test_items):
+        test_mask[u, i] = True
+    
+    print(f"Train/test split:")
+    print(f"  Training ratings: {np.sum(train_mask)}")
+    print(f"  Test ratings: {np.sum(test_mask)}")
+    
+    # Baseline: Simple mean prediction
+    global_mean = np.sum(R_observed * train_mask) / np.sum(train_mask)
+    baseline_predictions = np.full_like(R_observed, global_mean)
+    baseline_rmse = np.sqrt(mean_squared_error(
+        R_observed[test_mask], baseline_predictions[test_mask]
+    ))
+    
+    print(f"\nBaseline Results:")
+    print(f"  Global mean: {global_mean:.3f}")
+    print(f"  RMSE: {baseline_rmse:.4f}")
+    
+    # Method 1: Basic SVD
+    print(f"\nMethod 1: Basic SVD")
+    print("-" * 25)
+    
+    # Fill missing values with global mean for SVD
+    R_filled = R_observed.copy()
+    R_filled[~train_mask] = global_mean
+    
+    # Perform SVD
+    k = 20  # Number of factors
+    U, s, Vt = svds(R_filled, k=k)
+    
+    # Reconstruct matrix
+    R_svd = U @ np.diag(s) @ Vt
+    
+    svd_rmse = np.sqrt(mean_squared_error(R_observed[test_mask], R_svd[test_mask]))
+    print(f"  SVD RMSE: {svd_rmse:.4f}")
+    print(f"  Improvement: {(baseline_rmse - svd_rmse)/baseline_rmse*100:.1f}%")
+    
+    # Method 2: Advanced Matrix Factorization
+    print(f"\nMethod 2: Advanced Matrix Factorization")
+    print("-" * 40)
+    
+    # Prepare validation data
+    val_data = {
+        'matrix': R_observed,
+        'mask': test_mask
+    }
+    
+    # Train advanced model
+    advanced_mf = AdvancedMatrixFactorization(
+        n_factors=50,
+        learning_rate=0.01,
+        reg_lambda=0.001,
+        n_epochs=100,
+        use_bias=True
+    )
+    
+    R_train = R_observed * train_mask.astype(float)
+    advanced_mf.fit(R_train, validation_data=val_data, verbose=False)
+    
+    # Evaluate
+    advanced_rmse = advanced_mf.evaluate(R_observed, test_mask)
+    print(f"  Advanced MF RMSE: {advanced_rmse:.4f}")
+    print(f"  Improvement over baseline: {(baseline_rmse - advanced_rmse)/baseline_rmse*100:.1f}%")
+    print(f"  Improvement over SVD: {(svd_rmse - advanced_rmse)/svd_rmse*100:.1f}%")
+    
+    return {
+        'baseline_rmse': baseline_rmse,
+        'svd_rmse': svd_rmse,
+        'advanced_rmse': advanced_rmse,
+        'model': advanced_mf
+    }
+
+def demonstrate_feature_engineering_improvement():
+    """Show how linear algebra improves feature engineering"""
+    
+    print(f"\nFEATURE ENGINEERING WITH LINEAR ALGEBRA")
+    print("=" * 45)
+    
+    # Create high-dimensional feature data
+    np.random.seed(42)
+    n_samples = 1000
+    n_features = 100
+    
+    # Generate data with latent structure
+    n_latent = 5
+    W_true = np.random.randn(n_features, n_latent)
+    Z = np.random.randn(n_samples, n_latent)
+    X = Z @ W_true.T + 0.1 * np.random.randn(n_samples, n_features)
+    
+    # Create target with complex interactions
+    y = (np.sum(Z[:, :3], axis=1) + 
+         0.5 * np.prod(Z[:, :2], axis=1) + 
+         np.random.randn(n_samples) * 0.1)
+    
+    print(f"Original data: {X.shape}")
+    print(f"True latent dimensions: {n_latent}")
+    
+    # Baseline: Linear regression on raw features
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import r2_score
+    from sklearn.model_selection import train_test_split
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    baseline_model = LinearRegression()
+    baseline_model.fit(X_train, y_train)
+    baseline_score = r2_score(y_test, baseline_model.predict(X_test))
+    
+    print(f"Baseline R²: {baseline_score:.4f}")
+    
+    # Improvement 1: PCA feature extraction
+    from sklearn.decomposition import PCA
+    
+    pca = PCA(n_components=n_latent)
+    X_pca_train = pca.fit_transform(X_train)
+    X_pca_test = pca.transform(X_test)
+    
+    pca_model = LinearRegression()
+    pca_model.fit(X_pca_train, y_train)
+    pca_score = r2_score(y_test, pca_model.predict(X_pca_test))
+    
+    print(f"PCA R²: {pca_score:.4f}")
+    print(f"Improvement: {(pca_score - baseline_score)/baseline_score*100:.1f}%")
+    
+    # Improvement 2: Feature interactions via tensor products
+    def create_interaction_features(X, degree=2):
+        """Create polynomial interaction features"""
+        from itertools import combinations_with_replacement
+        
+        n_samples, n_features = X.shape
+        interaction_features = []
+        
+        # Add original features
+        interaction_features.append(X)
+        
+        # Add degree-2 interactions
+        if degree >= 2:
+            interactions = []
+            for i, j in combinations_with_replacement(range(n_features), 2):
+                interactions.append((X[:, i] * X[:, j]).reshape(-1, 1))
+            
+            if interactions:
+                interaction_features.append(np.hstack(interactions))
+        
+        return np.hstack(interaction_features)
+    
+    # Apply to PCA features only (to keep dimensionality manageable)
+    X_pca_interact_train = create_interaction_features(X_pca_train, degree=2)
+    X_pca_interact_test = create_interaction_features(X_pca_test, degree=2)
+    
+    interact_model = LinearRegression()
+    interact_model.fit(X_pca_interact_train, y_train)
+    interact_score = r2_score(y_test, interact_model.predict(X_pca_interact_test))
+    
+    print(f"PCA + Interactions R²: {interact_score:.4f}")
+    print(f"Total improvement: {(interact_score - baseline_score)/baseline_score*100:.1f}%")
+
+def visualize_accuracy_improvements(results):
+    """Create visualization of accuracy improvements"""
+    
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    
+    # 1. RMSE comparison
+    ax = axes[0]
+    methods = ['Baseline\n(Global Mean)', 'SVD', 'Advanced MF']
+    rmse_values = [results['baseline_rmse'], results['svd_rmse'], results['advanced_rmse']]
+    
+    bars = ax.bar(methods, rmse_values, color=['red', 'orange', 'green'])
+    ax.set_ylabel('RMSE')
+    ax.set_title('Recommendation Accuracy Improvement')
+    
+    # Add value labels on bars
+    for bar, value in zip(bars, rmse_values):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                f'{value:.3f}', ha='center', va='bottom')
+    
+    # 2. Training progress
+    ax = axes[1]
+    model = results['model']
+    epochs = range(1, len(model.train_losses) + 1)
+    
+    ax.plot(epochs, model.train_losses, label='Training Loss', color='blue')
+    if model.val_losses:
+        ax.plot(epochs, model.val_losses, label='Validation Loss', color='red')
+    
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title('Training Progress')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('accuracy_improvement_demo.png', dpi=150, bbox_inches='tight')
+    plt.show()
+
+if __name__ == "__main__":
+    
+    print("SCENARIO: E-COMMERCE RECOMMENDATION SYSTEM IMPROVEMENT")
+    print("=" * 65)
+    
+    # Main demonstration
+    results = demonstrate_accuracy_improvement()
+    
+    # Feature engineering demonstration
+    demonstrate_feature_engineering_improvement()
+    
+    # Visualizations
+    visualize_accuracy_improvements(results)
+    
+    print(f"\n{'='*65}")
+    print("ACCURACY IMPROVEMENT SUMMARY")
+    print(f"{'='*65}")
+    
+    # Calculate improvements
+    baseline_rmse = results['baseline_rmse']
+    advanced_rmse = results['advanced_rmse']
+    improvement = (baseline_rmse - advanced_rmse) / baseline_rmse * 100
+    
+    print(f"\nKey Results:")
+    print(f"• Baseline RMSE: {baseline_rmse:.4f}")
+    print(f"• Advanced Matrix Factorization RMSE: {advanced_rmse:.4f}")
+    print(f"• Total improvement: {improvement:.1f}%")
+    
+    print(f"\nLinear Algebra Techniques Used:")
+    print("• Matrix factorization (SVD, NMF)")
+    print("• Regularized optimization (Ridge, Lasso)")
+    print("• Principal Component Analysis (PCA)")
+    print("• Bias correction through matrix operations")
+    print("• Feature interactions via tensor products")
+    print("• Gradient-based optimization")
+    
+    print(f"\nBusiness Impact:")
+    print("• Improved recommendation accuracy → Higher click-through rates")
+    print("• Better user experience → Increased customer satisfaction")
+    print("• More relevant suggestions → Higher conversion rates")
+    print("• Reduced computational complexity → Lower operational costs")
+    
+    print(f"\nTechnical Benefits:")
+    print("• Handles sparse data effectively")
+    print("• Scalable to large datasets")
+    print("• Incorporates multiple signal types")
+    print("• Provides interpretable latent factors")
+    print("• Enables online learning and updates")
+```
+
+**Additional Accuracy Improvement Scenarios:**
+
+**2. Computer Vision - Image Classification Enhancement:**
+- **Technique**: Convolutional kernels as learnable linear transformations
+- **Improvement**: Data augmentation through affine transformations
+- **Result**: 15-25% accuracy boost through geometric invariance
+
+**3. Natural Language Processing - Embedding Optimization:**
+- **Technique**: Linear transformations in embedding spaces
+- **Improvement**: Cross-lingual alignment using Procrustes analysis
+- **Result**: 20-30% improvement in multilingual tasks
+
+**4. Time Series Forecasting - State Space Models:**
+- **Technique**: Kalman filtering with linear algebra
+- **Improvement**: Optimal state estimation under noise
+- **Result**: 10-40% reduction in forecasting error
+
+**Key Principles for Accuracy Improvement:**
+1. **Dimensionality Reduction**: Remove noise, keep signal
+2. **Regularization**: Prevent overfitting through constraint optimization
+3. **Feature Engineering**: Create meaningful representations via linear transformations
+4. **Optimization**: Use gradient-based methods for parameter learning
+5. **Ensemble Methods**: Combine models through weighted linear combinations
 
 ---
 
 ## Question 33
 
-**What aresparse matricesand how are they efficiently represented and used?**
+**What are sparse matrices and how are they efficiently represented and used?**
 
-**Answer:** _[To be filled]_
+**Answer:** Sparse matrices are matrices where most elements are zero, making them memory-inefficient to store in dense format. They arise naturally in many machine learning applications including text processing, graph analysis, collaborative filtering, and scientific computing. Efficient representation and operations on sparse matrices are crucial for scalability and performance in large-scale applications.
+
+**Definition and Characteristics:**
+
+A matrix is considered **sparse** when:
+- **Sparsity ratio**: (number of zeros) / (total elements) > 0.95
+- **Density**: (number of non-zeros) / (total elements) < 0.05
+- **Storage consideration**: Storing only non-zero elements saves significant memory
+
+**Mathematical Properties:**
+- **Addition**: A + B remains sparse if both A and B are sparse
+- **Multiplication**: A × B may become dense even if A and B are sparse
+- **Transpose**: Sparsity pattern changes but remains sparse
+- **Factorization**: May produce dense factors requiring special algorithms
+
+**Efficient Storage Formats:**
+
+**1. Coordinate List (COO) Format:**
+Stores triplets (row, column, value) for each non-zero element.
+
+```
+Structure: (row_indices, col_indices, data)
+Memory: O(nnz) where nnz = number of non-zeros
+```
+
+**Advantages**: Simple to construct and understand
+**Disadvantages**: Inefficient for arithmetic operations
+
+**2. Compressed Sparse Row (CSR) Format:**
+Compresses row information using indirection.
+
+```
+Structure: (data, indices, indptr)
+- data[i]: value of i-th non-zero element
+- indices[i]: column index of i-th non-zero element  
+- indptr[i]: index in data where row i starts
+```
+
+**3. Compressed Sparse Column (CSC) Format:**
+Similar to CSR but compresses column information.
+
+**4. Dictionary of Keys (DOK) Format:**
+Uses dictionary mapping (row, col) → value.
+
+**5. Block Sparse Row (BSR) Format:**
+Optimized for matrices with dense sub-blocks.
+
+**Comprehensive Implementation:**
+
+```python
+import numpy as np
+import scipy.sparse as sp
+from scipy.sparse.linalg import spsolve, eigsh
+import matplotlib.pyplot as plt
+import seaborn as sns
+from time import time
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.datasets import fetch_20newsgroups
+
+class SparseMatrixAnalyzer:
+    """Comprehensive sparse matrix analysis and operations"""
+    
+    def __init__(self):
+        """Initialize sparse matrix analyzer"""
+        self.timing_results = {}
+        
+    def demonstrate_storage_formats(self):
+        """Demonstrate different sparse storage formats"""
+        
+        print("SPARSE MATRIX STORAGE FORMATS")
+        print("=" * 40)
+        
+        # Create example sparse matrix
+        np.random.seed(42)
+        n_rows, n_cols = 1000, 800
+        density = 0.01  # 1% non-zero elements
+        
+        # Generate sparse matrix
+        nnz = int(n_rows * n_cols * density)
+        rows = np.random.randint(0, n_rows, nnz)
+        cols = np.random.randint(0, n_cols, nnz)
+        data = np.random.randn(nnz)
+        
+        print(f"Example matrix: {n_rows}×{n_cols}, density={density:.1%}")
+        print(f"Non-zero elements: {nnz}")
+        print(f"Memory if dense: {n_rows * n_cols * 8 / 1024**2:.1f} MB")
+        
+        # Create matrices in different formats
+        formats = {}
+        
+        # COO format
+        coo_matrix = sp.coo_matrix((data, (rows, cols)), shape=(n_rows, n_cols))
+        formats['COO'] = coo_matrix
+        
+        # CSR format
+        csr_matrix = coo_matrix.tocsr()
+        formats['CSR'] = csr_matrix
+        
+        # CSC format  
+        csc_matrix = coo_matrix.tocsc()
+        formats['CSC'] = csc_matrix
+        
+        # DOK format
+        dok_matrix = coo_matrix.todok()
+        formats['DOK'] = dok_matrix
+        
+        # Analyze storage efficiency
+        print(f"\nStorage Format Comparison:")
+        print(f"{'Format':<6} {'Memory (KB)':<12} {'Efficiency':<12} {'Best For':<30}")
+        print("-" * 70)
+        
+        format_info = {
+            'COO': {'memory': coo_matrix.data.nbytes + coo_matrix.row.nbytes + coo_matrix.col.nbytes,
+                   'best_for': 'Construction, conversion'},
+            'CSR': {'memory': csr_matrix.data.nbytes + csr_matrix.indices.nbytes + csr_matrix.indptr.nbytes,
+                   'best_for': 'Row operations, matrix-vector mult'},
+            'CSC': {'memory': csc_matrix.data.nbytes + csc_matrix.indices.nbytes + csc_matrix.indptr.nbytes,
+                   'best_for': 'Column operations, decomposition'},
+            'DOK': {'memory': len(dok_matrix.keys()) * (3 * 8),  # Approximate
+                   'best_for': 'Incremental construction'}
+        }
+        
+        for fmt_name, matrix in formats.items():
+            memory_kb = format_info[fmt_name]['memory'] / 1024
+            efficiency = memory_kb / (n_rows * n_cols * 8 / 1024) * 100
+            best_for = format_info[fmt_name]['best_for']
+            
+            print(f"{fmt_name:<6} {memory_kb:<12.1f} {efficiency:<12.1f}% {best_for:<30}")
+        
+        return formats
+    
+    def benchmark_operations(self, formats):
+        """Benchmark operations across different formats"""
+        
+        print(f"\nOPERATION PERFORMANCE COMPARISON")
+        print("=" * 40)
+        
+        n_tests = 5
+        operations = ['matrix_vector', 'matrix_matrix', 'transpose', 'element_access']
+        
+        # Create test vectors and matrices
+        n_rows, n_cols = formats['CSR'].shape
+        vector = np.random.randn(n_cols)
+        small_matrix = np.random.randn(n_cols, 50)
+        
+        benchmark_results = {}
+        
+        for fmt_name, matrix in formats.items():
+            if fmt_name not in benchmark_results:
+                benchmark_results[fmt_name] = {}
+            
+            print(f"\nBenchmarking {fmt_name} format:")
+            
+            # 1. Matrix-vector multiplication
+            if hasattr(matrix, 'dot'):
+                times = []
+                for _ in range(n_tests):
+                    start_time = time()
+                    result = matrix.dot(vector)
+                    times.append(time() - start_time)
+                
+                avg_time = np.mean(times)
+                benchmark_results[fmt_name]['matrix_vector'] = avg_time
+                print(f"  Matrix-vector: {avg_time:.4f}s")
+            
+            # 2. Matrix-matrix multiplication
+            if hasattr(matrix, 'dot') and fmt_name != 'DOK':  # DOK is too slow for this
+                times = []
+                for _ in range(n_tests):
+                    start_time = time()
+                    result = matrix.dot(small_matrix)
+                    times.append(time() - start_time)
+                
+                avg_time = np.mean(times)
+                benchmark_results[fmt_name]['matrix_matrix'] = avg_time
+                print(f"  Matrix-matrix: {avg_time:.4f}s")
+            
+            # 3. Transpose
+            times = []
+            for _ in range(n_tests):
+                start_time = time()
+                result = matrix.T
+                times.append(time() - start_time)
+            
+            avg_time = np.mean(times)
+            benchmark_results[fmt_name]['transpose'] = avg_time
+            print(f"  Transpose: {avg_time:.4f}s")
+            
+            # 4. Element access (for formats that support it efficiently)
+            if fmt_name in ['CSR', 'CSC', 'DOK']:
+                times = []
+                test_indices = [(100, 100), (500, 300), (800, 600)]
+                
+                for _ in range(n_tests):
+                    start_time = time()
+                    for i, j in test_indices:
+                        val = matrix[i, j]
+                    times.append(time() - start_time)
+                
+                avg_time = np.mean(times)
+                benchmark_results[fmt_name]['element_access'] = avg_time
+                print(f"  Element access: {avg_time:.4f}s")
+        
+        return benchmark_results
+    
+    def demonstrate_sparse_algorithms(self):
+        """Demonstrate algorithms optimized for sparse matrices"""
+        
+        print(f"\nSPARSE-OPTIMIZED ALGORITHMS")
+        print("=" * 35)
+        
+        # Create sparse test matrix
+        np.random.seed(42)
+        n = 1000
+        density = 0.005
+        
+        # Create symmetric positive definite sparse matrix
+        A_dense = np.random.randn(n, n) * 0.1
+        A_dense = A_dense + A_dense.T + n * np.eye(n)  # Make SPD
+        
+        # Sparsify
+        mask = np.random.random((n, n)) < density
+        mask = mask | mask.T  # Keep symmetry
+        np.fill_diagonal(mask, True)  # Keep diagonal
+        
+        A_sparse = sp.csr_matrix(A_dense * mask)
+        
+        print(f"Test matrix: {n}×{n}, density={A_sparse.nnz/(n*n):.1%}")
+        print(f"Non-zeros: {A_sparse.nnz}")
+        
+        # 1. Sparse linear system solving
+        print(f"\n1. Linear System Solving:")
+        b = np.random.randn(n)
+        
+        start_time = time()
+        x_sparse = spsolve(A_sparse, b)
+        sparse_solve_time = time() - start_time
+        
+        print(f"   Sparse solver time: {sparse_solve_time:.4f}s")
+        print(f"   Solution norm: {np.linalg.norm(x_sparse):.4f}")
+        print(f"   Residual norm: {np.linalg.norm(A_sparse @ x_sparse - b):.2e}")
+        
+        # 2. Eigenvalue computation
+        print(f"\n2. Eigenvalue Computation:")
+        k = 5  # Number of eigenvalues
+        
+        start_time = time()
+        eigenvals, eigenvecs = eigsh(A_sparse, k=k, which='LM')
+        sparse_eigen_time = time() - start_time
+        
+        print(f"   Sparse eigenvalue time: {sparse_eigen_time:.4f}s")
+        print(f"   Largest eigenvalues: {eigenvals}")
+        
+        return A_sparse, x_sparse, eigenvals, eigenvecs
+    
+    def text_analysis_example(self):
+        """Real-world example: Text analysis with sparse matrices"""
+        
+        print(f"\nREAL-WORLD EXAMPLE: TEXT ANALYSIS")
+        print("=" * 40)
+        
+        # Load text dataset
+        print("Loading 20 newsgroups dataset...")
+        categories = ['alt.atheism', 'comp.graphics', 'sci.med', 'soc.religion.christian']
+        newsgroups = fetch_20newsgroups(subset='train', categories=categories, 
+                                       remove=('headers', 'footers', 'quotes'))
+        
+        print(f"Documents: {len(newsgroups.data)}")
+        print(f"Categories: {len(categories)}")
+        
+        # Create TF-IDF matrix (naturally sparse)
+        print("\nCreating TF-IDF matrix...")
+        vectorizer = TfidfVectorizer(max_features=10000, stop_words='english',
+                                   min_df=2, max_df=0.95)
+        
+        start_time = time()
+        X_tfidf = vectorizer.fit_transform(newsgroups.data)
+        vectorization_time = time() - start_time
+        
+        print(f"TF-IDF matrix shape: {X_tfidf.shape}")
+        print(f"Sparsity: {1 - X_tfidf.nnz / (X_tfidf.shape[0] * X_tfidf.shape[1]):.3f}")
+        print(f"Non-zero elements: {X_tfidf.nnz}")
+        print(f"Vectorization time: {vectorization_time:.2f}s")
+        
+        # Memory comparison
+        dense_memory = X_tfidf.shape[0] * X_tfidf.shape[1] * 8 / 1024**2
+        sparse_memory = (X_tfidf.data.nbytes + X_tfidf.indices.nbytes + 
+                        X_tfidf.indptr.nbytes) / 1024**2
+        
+        print(f"\nMemory usage:")
+        print(f"  Dense representation: {dense_memory:.1f} MB")
+        print(f"  Sparse representation: {sparse_memory:.1f} MB")
+        print(f"  Memory savings: {(1 - sparse_memory/dense_memory)*100:.1f}%")
+        
+        # Demonstrate sparse operations
+        print(f"\nSparse matrix operations:")
+        
+        # Document similarity (cosine similarity via dot product)
+        start_time = time()
+        doc_similarities = X_tfidf @ X_tfidf.T
+        similarity_time = time() - start_time
+        
+        print(f"  Document similarity computation: {similarity_time:.4f}s")
+        print(f"  Similarity matrix shape: {doc_similarities.shape}")
+        print(f"  Similarity matrix sparsity: {1 - doc_similarities.nnz / (doc_similarities.shape[0] * doc_similarities.shape[1]):.3f}")
+        
+        # Feature selection via variance
+        feature_variances = np.array(X_tfidf.multiply(X_tfidf).mean(axis=0)).flatten()
+        top_features_idx = np.argsort(feature_variances)[-20:]
+        feature_names = vectorizer.get_feature_names_out()
+        top_features = [feature_names[i] for i in top_features_idx]
+        
+        print(f"  Top 10 features by variance: {top_features[-10:]}")
+        
+        return X_tfidf, newsgroups, vectorizer
+    
+    def graph_analysis_example(self):
+        """Demonstrate sparse matrices in graph analysis"""
+        
+        print(f"\nGRAPH ANALYSIS WITH SPARSE MATRICES")
+        print("=" * 40)
+        
+        # Create random graph
+        np.random.seed(42)
+        n_nodes = 1000
+        edge_prob = 0.01  # 1% edge probability
+        
+        # Generate adjacency matrix
+        adj_matrix_dense = (np.random.random((n_nodes, n_nodes)) < edge_prob).astype(float)
+        
+        # Make symmetric (undirected graph)
+        adj_matrix_dense = (adj_matrix_dense + adj_matrix_dense.T) > 0
+        np.fill_diagonal(adj_matrix_dense, 0)  # No self-loops
+        
+        # Convert to sparse
+        adj_matrix = sp.csr_matrix(adj_matrix_dense.astype(float))
+        
+        print(f"Graph with {n_nodes} nodes")
+        print(f"Edges: {adj_matrix.nnz // 2}")  # Divide by 2 for undirected
+        print(f"Density: {adj_matrix.nnz / (n_nodes * n_nodes):.4f}")
+        
+        # Graph algorithms using sparse operations
+        print(f"\nGraph algorithms:")
+        
+        # 1. Degree centrality
+        degrees = np.array(adj_matrix.sum(axis=1)).flatten()
+        max_degree_node = np.argmax(degrees)
+        
+        print(f"  Max degree: {degrees[max_degree_node]} (node {max_degree_node})")
+        print(f"  Average degree: {np.mean(degrees):.2f}")
+        
+        # 2. PageRank (power iteration with sparse matrix)
+        def sparse_pagerank(adj_matrix, damping=0.85, max_iter=100, tol=1e-6):
+            """Compute PageRank using sparse matrix operations"""
+            
+            n_nodes = adj_matrix.shape[0]
+            
+            # Normalize adjacency matrix (transition matrix)
+            out_degrees = np.array(adj_matrix.sum(axis=1)).flatten()
+            out_degrees[out_degrees == 0] = 1  # Avoid division by zero
+            
+            # Create transition matrix
+            D_inv = sp.diags(1.0 / out_degrees)
+            transition_matrix = adj_matrix.T @ D_inv
+            
+            # Initialize PageRank vector
+            pagerank = np.ones(n_nodes) / n_nodes
+            
+            for iteration in range(max_iter):
+                old_pagerank = pagerank.copy()
+                
+                # PageRank update: PR = (1-d)/N + d * M * PR
+                pagerank = ((1 - damping) / n_nodes + 
+                           damping * transition_matrix @ pagerank)
+                
+                # Check convergence
+                if np.linalg.norm(pagerank - old_pagerank) < tol:
+                    break
+            
+            return pagerank
+        
+        start_time = time()
+        pagerank_scores = sparse_pagerank(adj_matrix)
+        pagerank_time = time() - start_time
+        
+        top_pagerank_nodes = np.argsort(pagerank_scores)[-5:]
+        
+        print(f"  PageRank computation time: {pagerank_time:.4f}s")
+        print(f"  Top 5 PageRank nodes: {top_pagerank_nodes}")
+        print(f"  Their PageRank scores: {pagerank_scores[top_pagerank_nodes]}")
+        
+        return adj_matrix, pagerank_scores
+    
+    def sparse_machine_learning_example(self):
+        """Demonstrate sparse matrices in machine learning"""
+        
+        print(f"\nSPARSE MATRICES IN MACHINE LEARNING")
+        print("=" * 40)
+        
+        # Create sparse feature matrix (e.g., one-hot encoded categorical features)
+        np.random.seed(42)
+        n_samples = 5000
+        n_categories = [100, 50, 200, 75]  # Different categorical features
+        
+        # Generate sparse one-hot encoded features
+        sparse_features = []
+        
+        for i, n_cat in enumerate(n_categories):
+            # Random categorical assignments
+            categories = np.random.randint(0, n_cat, n_samples)
+            
+            # One-hot encoding
+            one_hot = sp.csr_matrix((np.ones(n_samples), 
+                                   (np.arange(n_samples), categories)),
+                                  shape=(n_samples, n_cat))
+            sparse_features.append(one_hot)
+        
+        # Combine all features
+        X_sparse = sp.hstack(sparse_features)
+        
+        # Generate target
+        # Create some meaningful relationships with sparse features
+        true_weights = np.random.randn(X_sparse.shape[1]) * 0.1
+        y = X_sparse @ true_weights + np.random.randn(n_samples) * 0.1
+        
+        print(f"Feature matrix shape: {X_sparse.shape}")
+        print(f"Sparsity: {1 - X_sparse.nnz / (X_sparse.shape[0] * X_sparse.shape[1]):.3f}")
+        print(f"Memory usage: {(X_sparse.data.nbytes + X_sparse.indices.nbytes + X_sparse.indptr.nbytes) / 1024**2:.1f} MB")
+        
+        # Train sparse linear regression
+        from sklearn.linear_model import Ridge
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import r2_score
+        
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_sparse, y, test_size=0.2, random_state=42
+        )
+        
+        # Ridge regression (handles sparse matrices efficiently)
+        print(f"\nTraining Ridge regression...")
+        start_time = time()
+        
+        ridge = Ridge(alpha=1.0)
+        ridge.fit(X_train, y_train)
+        
+        training_time = time() - start_time
+        
+        # Predict
+        train_score = ridge.score(X_train, y_train)
+        test_score = ridge.score(X_test, y_test)
+        
+        print(f"  Training time: {training_time:.4f}s")
+        print(f"  Training R²: {train_score:.4f}")
+        print(f"  Test R²: {test_score:.4f}")
+        
+        # Feature importance analysis
+        feature_importance = np.abs(ridge.coef_)
+        top_features = np.argsort(feature_importance)[-10:]
+        
+        print(f"  Top 10 feature weights: {feature_importance[top_features]}")
+        
+        return X_sparse, y, ridge
+
+def create_sparse_visualizations():
+    """Create visualizations for sparse matrix concepts"""
+    
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    
+    # 1. Sparsity pattern visualization
+    ax = axes[0, 0]
+    np.random.seed(42)
+    n = 50
+    density = 0.1
+    
+    sparse_matrix = sp.random(n, n, density=density, format='coo')
+    
+    ax.spy(sparse_matrix, markersize=2)
+    ax.set_title(f'Sparse Matrix Pattern\n({n}×{n}, density={density:.1%})')
+    ax.set_xlabel('Column Index')
+    ax.set_ylabel('Row Index')
+    
+    # 2. Memory usage comparison
+    ax = axes[0, 1]
+    matrix_sizes = [100, 500, 1000, 2000, 5000]
+    densities = [0.01, 0.05, 0.1]
+    
+    for density in densities:
+        sparse_memory = []
+        dense_memory = []
+        
+        for size in matrix_sizes:
+            # Estimate memory usage
+            nnz = int(size * size * density)
+            
+            # Sparse (CSR): data + indices + indptr
+            sparse_mem = nnz * 8 + nnz * 4 + (size + 1) * 4  # bytes
+            
+            # Dense
+            dense_mem = size * size * 8  # bytes
+            
+            sparse_memory.append(sparse_mem / 1024**2)  # MB
+            dense_memory.append(dense_mem / 1024**2)  # MB
+        
+        ax.plot(matrix_sizes, sparse_memory, 'o-', label=f'Sparse (density={density:.0%})')
+        
+    # Dense line
+    ax.plot(matrix_sizes, dense_memory, 's-', color='red', linewidth=2, label='Dense')
+    
+    ax.set_xlabel('Matrix Size (n×n)')
+    ax.set_ylabel('Memory Usage (MB)')
+    ax.set_title('Memory Usage: Sparse vs Dense')
+    ax.set_yscale('log')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 3. Operation performance comparison
+    ax = axes[1, 0]
+    operations = ['Matrix-Vector', 'Matrix-Matrix', 'Transpose', 'Element Access']
+    sparse_times = [0.002, 0.15, 0.001, 0.0001]  # Example times
+    dense_times = [0.01, 0.8, 0.05, 0.00001]  # Example times
+    
+    x = np.arange(len(operations))
+    width = 0.35
+    
+    bars1 = ax.bar(x - width/2, sparse_times, width, label='Sparse', alpha=0.8)
+    bars2 = ax.bar(x + width/2, dense_times, width, label='Dense', alpha=0.8)
+    
+    ax.set_ylabel('Time (seconds)')
+    ax.set_title('Operation Performance Comparison')
+    ax.set_xticks(x)
+    ax.set_xticklabels(operations, rotation=45)
+    ax.legend()
+    ax.set_yscale('log')
+    
+    # 4. Sparsity in different domains
+    ax = axes[1, 1]
+    domains = ['Text (TF-IDF)', 'Social Networks', 'Recommender\nSystems', 'Scientific\nComputing']
+    typical_sparsity = [0.99, 0.95, 0.999, 0.9]
+    
+    bars = ax.bar(domains, typical_sparsity, color=['skyblue', 'lightgreen', 'coral', 'plum'])
+    ax.set_ylabel('Typical Sparsity')
+    ax.set_title('Sparsity Across Domains')
+    ax.set_ylim(0.8, 1.0)
+    
+    # Add percentage labels
+    for bar, sparsity in zip(bars, typical_sparsity):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height + 0.005,
+                f'{sparsity:.1%}', ha='center', va='bottom')
+    
+    plt.tight_layout()
+    plt.savefig('sparse_matrix_analysis.png', dpi=150, bbox_inches='tight')
+    plt.show()
+
+if __name__ == "__main__":
+    
+    analyzer = SparseMatrixAnalyzer()
+    
+    print("SPARSE MATRICES: REPRESENTATION AND USAGE")
+    print("=" * 50)
+    
+    # 1. Storage format demonstration
+    formats = analyzer.demonstrate_storage_formats()
+    
+    # 2. Performance benchmarking
+    benchmark_results = analyzer.benchmark_operations(formats)
+    
+    # 3. Sparse algorithms
+    sparse_demo_results = analyzer.demonstrate_sparse_algorithms()
+    
+    # 4. Real-world examples
+    text_results = analyzer.text_analysis_example()
+    graph_results = analyzer.graph_analysis_example()
+    ml_results = analyzer.sparse_machine_learning_example()
+    
+    # 5. Visualizations
+    create_sparse_visualizations()
+    
+    print(f"\n{'='*50}")
+    print("SPARSE MATRIX SUMMARY")
+    print(f"{'='*50}")
+    
+    print("\nKey Storage Formats:")
+    print("• COO (Coordinate): Simple triplets, good for construction")
+    print("• CSR (Compressed Sparse Row): Efficient row operations")
+    print("• CSC (Compressed Sparse Column): Efficient column operations") 
+    print("• DOK (Dictionary of Keys): Efficient incremental construction")
+    print("• BSR (Block Sparse Row): Optimized for block-structured matrices")
+    
+    print("\nComputational Advantages:")
+    print("• Memory: 10-1000x reduction in memory usage")
+    print("• Speed: Faster operations when properly optimized")
+    print("• Scalability: Enables processing of massive datasets")
+    print("• Numerical: Better numerical stability in some algorithms")
+    
+    print("\nCommon Applications:")
+    print("• Text processing: TF-IDF matrices, word embeddings")
+    print("• Graph analysis: Adjacency matrices, Laplacian matrices")
+    print("• Recommender systems: User-item interaction matrices")
+    print("• Scientific computing: Finite element methods, PDEs")
+    print("• Machine learning: Categorical features, high-dimensional data")
+    
+    print("\nBest Practices:")
+    print("• Choose format based on primary operations needed")
+    print("• Use specialized sparse algorithms when available")
+    print("• Monitor fill-in during matrix factorizations")
+    print("• Consider hybrid dense-sparse approaches for partially sparse data")
+    print("• Profile memory and compute performance for your specific use case")
+    
+    print("\nLimitations:")
+    print("• Matrix multiplication can destroy sparsity")
+    print("• Some algorithms don't have efficient sparse versions")
+    print("• Overhead of indirection can hurt performance on small matrices")
+    print("• Format conversion costs can be significant")
+```
+
+**Advanced Sparse Matrix Techniques:**
+
+**1. Sparse Matrix Factorizations:**
+- **LU with pivoting**: Minimize fill-in through careful pivot selection
+- **Cholesky**: Specialized for symmetric positive definite matrices
+- **QR**: Orthogonal factorization preserving sparsity patterns
+- **SVD**: Truncated SVD for large sparse matrices using iterative methods
+
+**2. Preconditioning for Iterative Solvers:**
+- **Incomplete factorizations**: ILU, IC preconditioners
+- **Multigrid methods**: Hierarchical approaches for structured sparsity
+- **Algebraic multigrid**: For unstructured sparse matrices
+
+**3. Graph-Based Ordering:**
+- **Cuthill-McKee**: Reduce bandwidth of sparse matrices
+- **Nested dissection**: Minimize fill-in during factorization
+- **Metis partitioning**: For parallel sparse computations
+
+**Key Insights:**
+- Choose storage format based on access patterns and operations
+- Sparsity enables processing of problems otherwise intractable
+- Many linear algebra algorithms have specialized sparse versions
+- Memory access patterns are crucial for performance optimization
 
 ---
 
 ## Question 34
 
-**Explain howtensor operationsare vital in algorithms working with higher-dimensional data.**
+**Explain how tensor operations are vital in algorithms working with higher-dimensional data.**
 
-**Answer:** _[To be filled]_
+**Answer:** Tensor operations are fundamental to modern machine learning and data science, providing the mathematical framework for efficiently processing higher-dimensional data. Tensors generalize scalars (0-dimensional), vectors (1-dimensional), and matrices (2-dimensional) to arbitrary dimensions, enabling representation and manipulation of complex data structures like images, videos, neural network parameters, and multidimensional time series.
+
+**Mathematical Foundation:**
+
+**Tensor Definition:**
+A tensor is a multidimensional array with a consistent data type:
+- **Rank/Order**: Number of dimensions (axes)
+- **Shape**: Size along each dimension
+- **Elements**: Accessed via multiple indices T[i₁, i₂, ..., iₙ]
+
+**Tensor Hierarchy:**
+```
+Rank 0: Scalar                    → 5
+Rank 1: Vector                    → [1, 2, 3]
+Rank 2: Matrix                    → [[1, 2], [3, 4]]
+Rank 3: 3D Tensor                 → [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+Rank n: n-dimensional tensor
+```
+
+**Key Tensor Operations:**
+
+**1. Element-wise Operations:**
+```
+Addition:     C = A + B  (broadcast compatible)
+Multiplication: C = A ⊙ B  (Hadamard product)
+Functions:    C = f(A)   (apply f element-wise)
+```
+
+**2. Tensor Contraction (Generalized Matrix Multiplication):**
+```
+C[i,k] = Σⱼ A[i,j] × B[j,k]  (matrix multiplication)
+C[i,k,m] = Σⱼ A[i,j,m] × B[j,k]  (tensor contraction)
+```
+
+**3. Tensor Reduction:**
+```
+Sum:     s = Σᵢ₁,ᵢ₂,...,ᵢₙ T[i₁, i₂, ..., iₙ]
+Mean:    μ = (1/N) × Σ T
+Max:     m = max(T)
+```
+
+**4. Tensor Reshape and Transpose:**
+```
+Reshape:   T(2,3,4) → T(6,4) or T(24,)
+Transpose: T[i,j,k] → T[k,i,j] (permute axes)
+```
+
+**Comprehensive Implementation:**
+
+```python
+import numpy as np
+import tensorflow as tf
+import torch
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import seaborn as sns
+from time import time
+import pandas as pd
+
+class TensorOperationsAnalyzer:
+    """Comprehensive analysis of tensor operations in higher-dimensional data"""
+    
+    def __init__(self):
+        """Initialize tensor operations analyzer"""
+        self.timing_results = {}
+        
+    def demonstrate_tensor_basics(self):
+        """Demonstrate basic tensor concepts and operations"""
+        
+        print("TENSOR FUNDAMENTALS")
+        print("=" * 25)
+        
+        # Create tensors of different ranks
+        print("Tensor Examples:")
+        
+        # Rank 0: Scalar
+        scalar = np.array(42)
+        print(f"Rank 0 (Scalar): {scalar}, shape: {scalar.shape}")
+        
+        # Rank 1: Vector
+        vector = np.array([1, 2, 3, 4])
+        print(f"Rank 1 (Vector): {vector}, shape: {vector.shape}")
+        
+        # Rank 2: Matrix
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+        print(f"Rank 2 (Matrix): \n{matrix}, shape: {matrix.shape}")
+        
+        # Rank 3: 3D Tensor
+        tensor_3d = np.random.randn(2, 3, 4)
+        print(f"Rank 3 (3D Tensor): shape {tensor_3d.shape}")
+        print(f"Sample slice [0,:,:]: \n{tensor_3d[0,:,:]}")
+        
+        # Rank 4: 4D Tensor (common in deep learning)
+        tensor_4d = np.random.randn(2, 3, 4, 5)  # batch, height, width, channels
+        print(f"Rank 4 (4D Tensor): shape {tensor_4d.shape}")
+        
+        # Basic operations
+        print(f"\nBasic Tensor Operations:")
+        
+        # Element-wise operations
+        A = np.random.randn(2, 3, 4)
+        B = np.random.randn(2, 3, 4)
+        
+        C_add = A + B
+        C_mult = A * B
+        C_func = np.tanh(A)
+        
+        print(f"Element-wise addition: {A.shape} + {B.shape} = {C_add.shape}")
+        print(f"Element-wise multiplication: {A.shape} * {B.shape} = {C_mult.shape}")
+        print(f"Element-wise function: tanh({A.shape}) = {C_func.shape}")
+        
+        # Broadcasting
+        vector_broadcast = np.array([1, 2, 4])  # shape (3,)
+        C_broadcast = A + vector_broadcast  # Broadcasts to (2, 3, 4)
+        print(f"Broadcasting: {A.shape} + {vector_broadcast.shape} = {C_broadcast.shape}")
+        
+        return A, B, tensor_3d, tensor_4d
+    
+    def demonstrate_tensor_contractions(self):
+        """Demonstrate tensor contraction operations"""
+        
+        print(f"\nTENSOR CONTRACTIONS")
+        print("=" * 25)
+        
+        # Matrix multiplication as tensor contraction
+        A = np.random.randn(3, 4)
+        B = np.random.randn(4, 5)
+        C_matmul = A @ B
+        
+        print(f"Matrix multiplication: ({A.shape}) @ ({B.shape}) = {C_matmul.shape}")
+        
+        # 3D tensor contractions
+        T1 = np.random.randn(2, 3, 4)
+        T2 = np.random.randn(4, 5)
+        
+        # Contract along last axis of T1 and first axis of T2
+        T3 = np.tensordot(T1, T2, axes=([2], [0]))
+        print(f"3D contraction: ({T1.shape}) contract ({T2.shape}) = {T3.shape}")
+        
+        # Multiple axis contraction
+        T4 = np.random.randn(2, 3, 4, 5)
+        T5 = np.random.randn(3, 4, 6)
+        
+        T6 = np.tensordot(T4, T5, axes=([1, 2], [0, 1]))
+        print(f"Multi-axis contraction: ({T4.shape}) contract ({T5.shape}) = {T6.shape}")
+        
+        # Einstein summation notation
+        print(f"\nEinstein Summation Examples:")
+        
+        # Matrix multiplication
+        A = np.random.randn(3, 4)
+        B = np.random.randn(4, 5)
+        C_einsum = np.einsum('ij,jk->ik', A, B)
+        print(f"Matrix mult (einsum): 'ij,jk->ik' {A.shape}, {B.shape} = {C_einsum.shape}")
+        
+        # Batch matrix multiplication
+        batch_A = np.random.randn(10, 3, 4)
+        batch_B = np.random.randn(10, 4, 5)
+        batch_C = np.einsum('bij,bjk->bik', batch_A, batch_B)
+        print(f"Batch matmul: 'bij,bjk->bik' {batch_A.shape}, {batch_B.shape} = {batch_C.shape}")
+        
+        # Tensor trace
+        T = np.random.randn(3, 4, 3)
+        trace = np.einsum('iji->j', T)
+        print(f"Tensor trace: 'iji->j' {T.shape} = {trace.shape}")
+        
+        return T1, T2, T3, batch_A, batch_B, batch_C
+    
+    def image_processing_example(self):
+        """Demonstrate tensor operations in image processing"""
+        
+        print(f"\nIMAGE PROCESSING WITH TENSORS")
+        print("=" * 35)
+        
+        # Create synthetic image batch
+        batch_size = 32
+        height, width = 64, 64
+        channels = 3
+        
+        # Image tensor: (batch, height, width, channels)
+        images = np.random.randint(0, 256, (batch_size, height, width, channels), dtype=np.uint8)
+        
+        print(f"Image batch tensor: {images.shape}")
+        print(f"  Batch size: {batch_size}")
+        print(f"  Image dimensions: {height}×{width}")
+        print(f"  Channels: {channels}")
+        print(f"  Data type: {images.dtype}")
+        print(f"  Memory usage: {images.nbytes / 1024**2:.1f} MB")
+        
+        # Convert to float for processing
+        images_float = images.astype(np.float32) / 255.0
+        
+        # Tensor operations for image processing
+        print(f"\nImage Processing Operations:")
+        
+        # 1. Channel-wise mean (global average pooling)
+        channel_means = np.mean(images_float, axis=(1, 2))  # Average over H, W
+        print(f"Channel means shape: {channel_means.shape}")
+        
+        # 2. Batch normalization (simplified)
+        batch_mean = np.mean(images_float, axis=0, keepdims=True)  # Mean over batch
+        batch_std = np.std(images_float, axis=0, keepdims=True)   # Std over batch
+        normalized_images = (images_float - batch_mean) / (batch_std + 1e-8)
+        
+        print(f"Batch normalized images shape: {normalized_images.shape}")
+        print(f"New mean (should be ~0): {np.mean(normalized_images):.6f}")
+        print(f"New std (should be ~1): {np.std(normalized_images):.6f}")
+        
+        # 3. Convolution operation (simplified)
+        def simple_conv2d(images, kernel):
+            """Simplified 2D convolution using tensor operations"""
+            
+            batch, h, w, c_in = images.shape
+            kh, kw, c_in_k, c_out = kernel.shape
+            
+            assert c_in == c_in_k, "Input channels must match"
+            
+            # Output dimensions
+            out_h = h - kh + 1
+            out_w = w - kw + 1
+            
+            # Initialize output
+            output = np.zeros((batch, out_h, out_w, c_out))
+            
+            # Convolution loop (not optimized, for demonstration)
+            for b in range(batch):
+                for oh in range(out_h):
+                    for ow in range(out_w):
+                        # Extract patch
+                        patch = images[b, oh:oh+kh, ow:ow+kw, :]  # (kh, kw, c_in)
+                        
+                        # Apply kernels using einsum
+                        output[b, oh, ow, :] = np.einsum('hwi,hwio->o', patch, kernel)
+            
+            return output
+        
+        # Create random convolution kernels
+        kernel_size = 3
+        input_channels = 3
+        output_channels = 16
+        
+        conv_kernel = np.random.randn(kernel_size, kernel_size, input_channels, output_channels) * 0.1
+        
+        print(f"\nConvolution example:")
+        print(f"  Input: {images_float.shape}")
+        print(f"  Kernel: {conv_kernel.shape}")
+        
+        # Apply convolution to small batch for demonstration
+        start_time = time()
+        conv_output = simple_conv2d(images_float[:4], conv_kernel)  # Only 4 images
+        conv_time = time() - start_time
+        
+        print(f"  Output: {conv_output.shape}")
+        print(f"  Computation time: {conv_time:.4f}s")
+        
+        return images_float, conv_kernel, conv_output
+    
+    def neural_network_tensors(self):
+        """Demonstrate tensor operations in neural networks"""
+        
+        print(f"\nNEURAL NETWORK TENSOR OPERATIONS")
+        print("=" * 40)
+        
+        # Simulate a simple neural network forward pass
+        batch_size = 128
+        input_dim = 784  # 28x28 flattened images
+        hidden_dim = 256
+        output_dim = 10
+        
+        # Input data
+        X = np.random.randn(batch_size, input_dim)
+        
+        # Network parameters (weights and biases)
+        W1 = np.random.randn(input_dim, hidden_dim) * 0.01
+        b1 = np.zeros((1, hidden_dim))
+        W2 = np.random.randn(hidden_dim, output_dim) * 0.01
+        b2 = np.zeros((1, output_dim))
+        
+        print(f"Network architecture:")
+        print(f"  Input: {X.shape}")
+        print(f"  W1: {W1.shape}, b1: {b1.shape}")
+        print(f"  W2: {W2.shape}, b2: {b2.shape}")
+        
+        # Forward pass using tensor operations
+        def relu(x):
+            return np.maximum(0, x)
+        
+        def softmax(x):
+            exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
+            return exp_x / np.sum(exp_x, axis=1, keepdims=True)
+        
+        print(f"\nForward pass:")
+        
+        # Layer 1: Linear transformation + activation
+        start_time = time()
+        Z1 = X @ W1 + b1  # Broadcasting adds bias
+        A1 = relu(Z1)
+        layer1_time = time() - start_time
+        
+        print(f"  Layer 1: {X.shape} @ {W1.shape} + {b1.shape} = {Z1.shape}")
+        print(f"  After ReLU: {A1.shape}")
+        print(f"  Computation time: {layer1_time:.4f}s")
+        
+        # Layer 2: Linear transformation + softmax
+        start_time = time()
+        Z2 = A1 @ W2 + b2
+        A2 = softmax(Z2)
+        layer2_time = time() - start_time
+        
+        print(f"  Layer 2: {A1.shape} @ {W2.shape} + {b2.shape} = {Z2.shape}")
+        print(f"  After Softmax: {A2.shape}")
+        print(f"  Computation time: {layer2_time:.4f}s")
+        
+        # Demonstrate backpropagation (gradient computation)
+        print(f"\nBackpropagation (gradient computation):")
+        
+        # Dummy target (one-hot encoded)
+        y_true = np.eye(output_dim)[np.random.randint(0, output_dim, batch_size)]
+        
+        # Loss computation (cross-entropy)
+        epsilon = 1e-15
+        loss = -np.mean(np.sum(y_true * np.log(A2 + epsilon), axis=1))
+        print(f"  Cross-entropy loss: {loss:.4f}")
+        
+        # Gradient computation using tensor operations
+        dA2 = (A2 - y_true) / batch_size  # Gradient w.r.t. output
+        
+        # Gradients for layer 2
+        dW2 = A1.T @ dA2
+        db2 = np.sum(dA2, axis=0, keepdims=True)
+        dA1 = dA2 @ W2.T
+        
+        # Gradients for layer 1 (through ReLU)
+        dZ1 = dA1 * (Z1 > 0)  # ReLU derivative
+        dW1 = X.T @ dZ1
+        db1 = np.sum(dZ1, axis=0, keepdims=True)
+        
+        print(f"  Gradient shapes:")
+        print(f"    dW2: {dW2.shape}, db2: {db2.shape}")
+        print(f"    dW1: {dW1.shape}, db1: {db1.shape}")
+        
+        return X, A1, A2, dW1, dW2
+    
+    def tensor_decomposition_example(self):
+        """Demonstrate tensor decomposition methods"""
+        
+        print(f"\nTENSOR DECOMPOSITION")
+        print("=" * 25)
+        
+        # Create a 3D tensor with known low-rank structure
+        np.random.seed(42)
+        rank = 5
+        I, J, K = 50, 40, 30
+        
+        # Generate rank-r tensor using CP decomposition structure
+        A = np.random.randn(I, rank)
+        B = np.random.randn(J, rank)
+        C = np.random.randn(K, rank)
+        
+        # Construct tensor using outer products
+        X = np.zeros((I, J, K))
+        for r in range(rank):
+            X += np.outer(A[:, r], np.outer(B[:, r], C[:, r])).reshape(I, J, K)
+        
+        # Add noise
+        noise_level = 0.1
+        X += noise_level * np.random.randn(I, J, K)
+        
+        print(f"Original tensor shape: {X.shape}")
+        print(f"True rank: {rank}")
+        print(f"Noise level: {noise_level}")
+        
+        # Tensor matricization (unfolding)
+        print(f"\nTensor matricization:")
+        
+        # Mode-1 matricization
+        X_1 = X.reshape(I, J*K)
+        print(f"  Mode-1: {X.shape} → {X_1.shape}")
+        
+        # Mode-2 matricization
+        X_2 = np.transpose(X, (1, 0, 2)).reshape(J, I*K)
+        print(f"  Mode-2: {X.shape} → {X_2.shape}")
+        
+        # Mode-3 matricization
+        X_3 = np.transpose(X, (2, 0, 1)).reshape(K, I*J)
+        print(f"  Mode-3: {X.shape} → {X_3.shape}")
+        
+        # SVD of matricized tensors
+        print(f"\nSVD analysis of matricizations:")
+        
+        U1, s1, V1 = np.linalg.svd(X_1, full_matrices=False)
+        U2, s2, V2 = np.linalg.svd(X_2, full_matrices=False)
+        U3, s3, V3 = np.linalg.svd(X_3, full_matrices=False)
+        
+        print(f"  Mode-1 singular values (top 10): {s1[:10]}")
+        print(f"  Mode-2 singular values (top 10): {s2[:10]}")
+        print(f"  Mode-3 singular values (top 10): {s3[:10]}")
+        
+        # Estimate rank from singular value decay
+        def estimate_rank(singular_values, threshold=0.01):
+            normalized_sv = singular_values / singular_values[0]
+            return np.sum(normalized_sv > threshold)
+        
+        estimated_ranks = [
+            estimate_rank(s1),
+            estimate_rank(s2),
+            estimate_rank(s3)
+        ]
+        
+        print(f"  Estimated ranks: {estimated_ranks}")
+        print(f"  True rank: {rank}")
+        
+        return X, X_1, X_2, X_3, s1, s2, s3
+    
+    def time_series_tensor_analysis(self):
+        """Demonstrate tensor operations in time series analysis"""
+        
+        print(f"\nTIME SERIES TENSOR ANALYSIS")
+        print("=" * 35)
+        
+        # Create multivariate time series data
+        np.random.seed(42)
+        n_series = 10  # Number of time series
+        n_timepoints = 1000  # Length of each series
+        n_features = 5  # Number of features per timepoint
+        
+        # Generate synthetic time series with seasonal patterns
+        t = np.linspace(0, 4*np.pi, n_timepoints)
+        
+        time_series_tensor = np.zeros((n_series, n_timepoints, n_features))
+        
+        for s in range(n_series):
+            for f in range(n_features):
+                # Base trend
+                trend = 0.1 * t
+                
+                # Seasonal component
+                seasonal_freq = np.random.uniform(0.5, 2.0)
+                seasonal = np.sin(seasonal_freq * t + np.random.uniform(0, 2*np.pi))
+                
+                # Noise
+                noise = 0.2 * np.random.randn(n_timepoints)
+                
+                time_series_tensor[s, :, f] = trend + seasonal + noise
+        
+        print(f"Time series tensor shape: {time_series_tensor.shape}")
+        print(f"  Number of series: {n_series}")
+        print(f"  Time points: {n_timepoints}")
+        print(f"  Features per timepoint: {n_features}")
+        
+        # Tensor operations for time series analysis
+        print(f"\nTime series tensor operations:")
+        
+        # 1. Cross-series correlation
+        series_correlations = np.zeros((n_series, n_series))
+        for i in range(n_series):
+            for j in range(n_series):
+                # Compute correlation between multivariate series
+                series_i = time_series_tensor[i, :, :].flatten()
+                series_j = time_series_tensor[j, :, :].flatten()
+                series_correlations[i, j] = np.corrcoef(series_i, series_j)[0, 1]
+        
+        print(f"  Cross-series correlation matrix: {series_correlations.shape}")
+        print(f"  Average correlation: {np.mean(series_correlations[np.triu_indices(n_series, k=1)]):.3f}")
+        
+        # 2. Feature correlation across time
+        feature_correlations = np.zeros((n_features, n_features))
+        for f1 in range(n_features):
+            for f2 in range(n_features):
+                # Aggregate across series and time
+                feat1_data = time_series_tensor[:, :, f1].flatten()
+                feat2_data = time_series_tensor[:, :, f2].flatten()
+                feature_correlations[f1, f2] = np.corrcoef(feat1_data, feat2_data)[0, 1]
+        
+        print(f"  Feature correlation matrix: {feature_correlations.shape}")
+        
+        # 3. Temporal patterns using tensor slicing
+        # Compute moving averages using tensor operations
+        window_size = 50
+        moving_averages = np.zeros((n_series, n_timepoints - window_size + 1, n_features))
+        
+        for i in range(n_timepoints - window_size + 1):
+            moving_averages[:, i, :] = np.mean(
+                time_series_tensor[:, i:i+window_size, :], axis=1
+            )
+        
+        print(f"  Moving averages tensor: {moving_averages.shape}")
+        
+        # 4. Principal tensor analysis (simplified PCA on flattened data)
+        flattened_data = time_series_tensor.reshape(n_series, -1)  # (series, time*features)
+        
+        # Compute covariance and eigendecomposition
+        cov_matrix = np.cov(flattened_data)
+        eigenvals, eigenvecs = np.linalg.eig(cov_matrix)
+        
+        # Sort by eigenvalue magnitude
+        idx = np.argsort(eigenvals)[::-1]
+        eigenvals = eigenvals[idx]
+        eigenvecs = eigenvecs[:, idx]
+        
+        print(f"  Principal component eigenvalues (top 5): {eigenvals[:5]}")
+        print(f"  Explained variance ratio: {eigenvals[:3] / np.sum(eigenvals)}")
+        
+        return time_series_tensor, series_correlations, feature_correlations, moving_averages
+
+def create_tensor_visualizations():
+    """Create visualizations for tensor operations"""
+    
+    fig = plt.figure(figsize=(20, 15))
+    
+    # 1. Tensor shapes and operations
+    ax1 = plt.subplot(3, 3, 1)
+    
+    # Visualize tensor dimensions
+    tensor_info = [
+        ('Scalar', 0, [1]),
+        ('Vector', 1, [4]),
+        ('Matrix', 2, [3, 4]),
+        ('3D Tensor', 3, [2, 3, 4]),
+        ('4D Tensor', 4, [2, 3, 4, 5])
+    ]
+    
+    names = [info[0] for info in tensor_info]
+    ranks = [info[1] for info in tensor_info]
+    
+    bars = ax1.bar(names, ranks, color=['red', 'orange', 'yellow', 'green', 'blue'])
+    ax1.set_ylabel('Tensor Rank')
+    ax1.set_title('Tensor Hierarchy')
+    ax1.tick_params(axis='x', rotation=45)
+    
+    # Add shape annotations
+    for bar, info in zip(bars, tensor_info):
+        height = bar.get_height()
+        shape_str = '×'.join(map(str, info[2]))
+        ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                f'({shape_str})', ha='center', va='bottom', fontsize=8)
+    
+    # 2. Memory usage comparison
+    ax2 = plt.subplot(3, 3, 2)
+    
+    sizes = [10, 50, 100, 200]
+    dimensions = [2, 3, 4, 5]
+    
+    memory_usage = []
+    for dim in dimensions:
+        memory_dim = []
+        for size in sizes:
+            total_elements = size ** dim
+            memory_mb = total_elements * 8 / 1024**2  # 8 bytes per float64
+            memory_dim.append(memory_mb)
+        memory_usage.append(memory_dim)
+    
+    for i, dim in enumerate(dimensions):
+        ax2.plot(sizes, memory_usage[i], 'o-', label=f'{dim}D Tensor')
+    
+    ax2.set_xlabel('Size per Dimension')
+    ax2.set_ylabel('Memory Usage (MB)')
+    ax2.set_title('Memory Usage vs Tensor Dimensions')
+    ax2.set_yscale('log')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+    
+    # 3. Operation complexity
+    ax3 = plt.subplot(3, 3, 3)
+    
+    operations = ['Element-wise', 'Matrix Mult', 'Tensor Contract', 'SVD', 'Eigendecomp']
+    complexities = ['O(n)', 'O(n³)', 'O(n⁴)', 'O(n³)', 'O(n³)']
+    complexity_values = [1, 3, 4, 3, 3]  # Exponents for visualization
+    
+    bars = ax3.bar(operations, complexity_values, 
+                   color=['green', 'orange', 'red', 'purple', 'brown'])
+    ax3.set_ylabel('Complexity Exponent')
+    ax3.set_title('Computational Complexity')
+    ax3.tick_params(axis='x', rotation=45)
+    
+    # Add complexity labels
+    for bar, complexity in zip(bars, complexities):
+        height = bar.get_height()
+        ax3.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                complexity, ha='center', va='bottom', fontsize=9)
+    
+    # 4. 3D tensor visualization
+    ax4 = plt.subplot(3, 3, 4, projection='3d')
+    
+    # Create a simple 3D tensor visualization
+    x = np.arange(4)
+    y = np.arange(3)
+    z = np.arange(2)
+    
+    X, Y, Z = np.meshgrid(x, y, z)
+    
+    # Flatten for scatter plot
+    X_flat = X.flatten()
+    Y_flat = Y.flatten()
+    Z_flat = Z.flatten()
+    
+    # Color by sum of coordinates
+    colors = X_flat + Y_flat + Z_flat
+    
+    scatter = ax4.scatter(X_flat, Y_flat, Z_flat, c=colors, cmap='viridis', s=100)
+    ax4.set_xlabel('X (dim 0)')
+    ax4.set_ylabel('Y (dim 1)')
+    ax4.set_zlabel('Z (dim 2)')
+    ax4.set_title('3D Tensor Structure\n(4×3×2)')
+    
+    # 5. Convolution operation visualization
+    ax5 = plt.subplot(3, 3, 5)
+    
+    # Simulate convolution
+    input_size = 8
+    kernel_size = 3
+    output_size = input_size - kernel_size + 1
+    
+    # Create input and kernel
+    input_img = np.random.rand(input_size, input_size)
+    kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])  # Edge detection
+    
+    im = ax5.imshow(input_img, cmap='gray')
+    ax5.set_title(f'Input Image ({input_size}×{input_size})')
+    ax5.set_xticks([])
+    ax5.set_yticks([])
+    
+    # 6. Kernel visualization
+    ax6 = plt.subplot(3, 3, 6)
+    im_kernel = ax6.imshow(kernel, cmap='RdBu_r')
+    ax6.set_title(f'Convolution Kernel ({kernel_size}×{kernel_size})')
+    plt.colorbar(im_kernel, ax=ax6)
+    
+    # Add kernel values as text
+    for i in range(kernel_size):
+        for j in range(kernel_size):
+            ax6.text(j, i, f'{kernel[i, j]}', ha='center', va='center',
+                    color='white' if abs(kernel[i, j]) > 4 else 'black')
+    
+    # 7. Time series tensor
+    ax7 = plt.subplot(3, 3, 7)
+    
+    # Generate sample time series
+    t = np.linspace(0, 4*np.pi, 100)
+    n_series = 5
+    
+    for i in range(n_series):
+        freq = 0.5 + 0.3 * i
+        series = np.sin(freq * t) + 0.1 * np.random.randn(len(t))
+        ax7.plot(t, series + i, label=f'Series {i+1}', alpha=0.8)
+    
+    ax7.set_xlabel('Time')
+    ax7.set_ylabel('Series (offset)')
+    ax7.set_title('Multivariate Time Series\n(Tensor: series × time × features)')
+    ax7.legend(fontsize=8)
+    ax7.grid(True, alpha=0.3)
+    
+    # 8. Tensor decomposition illustration
+    ax8 = plt.subplot(3, 3, 8)
+    
+    # Show CP decomposition concept
+    rank = 3
+    I, J, K = 6, 5, 4
+    
+    # Create factor matrices
+    A_factor = np.random.rand(I, rank)
+    B_factor = np.random.rand(J, rank)
+    C_factor = np.random.rand(K, rank)
+    
+    # Show first factor
+    im_factor = ax8.imshow(A_factor, cmap='viridis', aspect='auto')
+    ax8.set_title(f'Factor Matrix A\n({I}×{rank})')
+    ax8.set_xlabel('Rank')
+    ax8.set_ylabel('Mode 1')
+    plt.colorbar(im_factor, ax=ax8)
+    
+    # 9. Performance comparison
+    ax9 = plt.subplot(3, 3, 9)
+    
+    # Simulated performance data
+    frameworks = ['NumPy', 'TensorFlow', 'PyTorch', 'JAX']
+    operations = ['Element-wise', 'MatMul', 'Convolution']
+    
+    # Performance data (higher is better)
+    performance_data = np.array([
+        [1.0, 2.5, 3.2, 3.8],  # Element-wise
+        [1.0, 4.2, 4.0, 4.5],  # MatMul
+        [0.5, 5.0, 4.8, 5.2]   # Convolution
+    ])
+    
+    x = np.arange(len(frameworks))
+    width = 0.25
+    
+    for i, op in enumerate(operations):
+        ax9.bar(x + i*width, performance_data[i], width, 
+               label=op, alpha=0.8)
+    
+    ax9.set_xlabel('Framework')
+    ax9.set_ylabel('Relative Performance')
+    ax9.set_title('Tensor Operations Performance')
+    ax9.set_xticks(x + width)
+    ax9.set_xticklabels(frameworks)
+    ax9.legend()
+    
+    plt.tight_layout()
+    plt.savefig('tensor_operations_comprehensive.png', dpi=150, bbox_inches='tight')
+    plt.show()
+
+if __name__ == "__main__":
+    
+    analyzer = TensorOperationsAnalyzer()
+    
+    print("TENSOR OPERATIONS IN HIGHER-DIMENSIONAL DATA")
+    print("=" * 55)
+    
+    # 1. Basic tensor concepts
+    basic_results = analyzer.demonstrate_tensor_basics()
+    
+    # 2. Tensor contractions
+    contraction_results = analyzer.demonstrate_tensor_contractions()
+    
+    # 3. Image processing example
+    image_results = analyzer.image_processing_example()
+    
+    # 4. Neural network operations
+    nn_results = analyzer.neural_network_tensors()
+    
+    # 5. Tensor decomposition
+    decomposition_results = analyzer.tensor_decomposition_example()
+    
+    # 6. Time series analysis
+    timeseries_results = analyzer.time_series_tensor_analysis()
+    
+    # 7. Visualizations
+    create_tensor_visualizations()
+    
+    print(f"\n{'='*55}")
+    print("TENSOR OPERATIONS SUMMARY")
+    print(f"{'='*55}")
+    
+    print("\nKey Tensor Operations:")
+    print("• Element-wise: Broadcasting, arithmetic, function application")
+    print("• Contraction: Generalized matrix multiplication, inner products")
+    print("• Reduction: Sum, mean, max along specified axes")
+    print("• Reshaping: Tensor flattening, dimension permutation")
+    print("• Slicing: Extracting subtensors, temporal windows")
+    
+    print("\nCritical Applications:")
+    print("• Deep Learning: Forward/backward propagation, convolutions")
+    print("• Computer Vision: Image/video processing, feature extraction")
+    print("• NLP: Attention mechanisms, transformer architectures")
+    print("• Time Series: Multivariate analysis, temporal patterns")
+    print("• Scientific Computing: Multidimensional simulations")
+    
+    print("\nComputational Advantages:")
+    print("• Vectorization: Parallel execution of operations")
+    print("• Memory Efficiency: Optimal data layout and access patterns")
+    print("• GPU Acceleration: Natural fit for parallel architectures")
+    print("• Automatic Differentiation: Efficient gradient computation")
+    print("• Optimized Libraries: BLAS, cuDNN, specialized kernels")
+    
+    print("\nFramework Capabilities:")
+    print("• NumPy: CPU-based, fundamental tensor operations")
+    print("• TensorFlow: Production ML, static/dynamic graphs")
+    print("• PyTorch: Research-friendly, dynamic computation graphs")
+    print("• JAX: Functional programming, JIT compilation, auto-diff")
+    
+    print("\nBest Practices:")
+    print("• Choose appropriate tensor shapes for memory efficiency")
+    print("• Use broadcasting to avoid explicit loops")
+    print("• Profile memory usage and computational bottlenecks")
+    print("• Leverage framework-specific optimizations")
+    print("• Consider sparse representations for high-dimensional sparse data")
+```
+
+**Advanced Tensor Concepts:**
+
+**1. Tensor Networks:**
+- **Representation**: Efficient factorization of high-order tensors
+- **Applications**: Quantum computing, compressed sensing
+- **Examples**: Matrix Product States (MPS), Tensor Ring decomposition
+
+**2. Automatic Differentiation:**
+- **Forward mode**: Computes derivatives alongside function evaluation
+- **Reverse mode**: Backpropagation for efficient gradient computation
+- **Higher-order**: Computing Hessians and higher derivatives
+
+**3. Tensor Compression:**
+- **CP decomposition**: Sum of rank-1 tensors
+- **Tucker decomposition**: Higher-order SVD
+- **Tensor Train**: Chain of low-rank matrices
+
+**4. Distributed Tensor Operations:**
+- **Data parallelism**: Distribute samples across devices
+- **Model parallelism**: Distribute tensor operations across devices
+- **Pipeline parallelism**: Temporal distribution of computation
+
+**Key Insights:**
+- Tensors provide natural representation for multidimensional data
+- Efficient tensor operations are crucial for scalable machine learning
+- Modern frameworks optimize tensor computations for parallel hardware
+- Understanding tensor operations is essential for deep learning architecture design
 
 ---
 
 ## Question 35
 
-**What is the role oflinear algebraintime series analysis?**
+**What is the role of linear algebra in time series analysis?**
 
-**Answer:** _[To be filled]_
+**Answer:** Linear algebra forms the mathematical backbone of modern time series analysis, providing the fundamental framework for representing, transforming, and analyzing temporal data. From basic autoregressive models to advanced state-space methods and machine learning approaches, linear algebra enables efficient computation, pattern recognition, and forecasting in time series. Understanding these linear algebraic foundations is essential for developing robust time series models and algorithms.
+
+**Core Linear Algebra Concepts in Time Series:**
+
+**1. Vector and Matrix Representation of Time Series:**
+
+**Time Series as Vectors:**
+```
+x = [x₁, x₂, ..., xₜ]ᵀ ∈ ℝᵀ
+```
+Where each element represents a value at a specific time point.
+
+**Multivariate Time Series as Matrices:**
+```
+X = [x₁, x₂, ..., xₜ] ∈ ℝⁿˣᵀ
+```
+Where n is the number of variables and T is the number of time points.
+
+**Embedding Matrices (Hankel Matrices):**
+```
+H = [x₁   x₂   ...  xₜ₋ₘ₊₁]
+    [x₂   x₃   ...  xₜ₋ₘ₊₂]
+    [⋮    ⋮    ⋱   ⋮     ]
+    [xₘ   xₘ₊₁ ...  xₜ    ]
+```
+Used in singular spectrum analysis and trajectory matrix methods.
+
+**2. Linear Time Series Models:**
+
+**Autoregressive (AR) Models:**
+```
+xₜ = φ₁xₜ₋₁ + φ₂xₜ₋₂ + ... + φₚxₜ₋ₚ + εₜ
+```
+Matrix form: **x** = **Φx**₋₁ + **ε** where Φ is the coefficient matrix.
+
+**Vector Autoregression (VAR):**
+```
+Xₜ = Φ₁Xₜ₋₁ + Φ₂Xₜ₋₂ + ... + ΦₚXₜ₋ₚ + εₜ
+```
+Where Xₜ ∈ ℝⁿ is a vector of variables and Φᵢ ∈ ℝⁿˣⁿ are coefficient matrices.
+
+**State-Space Models:**
+```
+State equation:     xₜ = Axₜ₋₁ + Buₜ + wₜ
+Observation equation: yₜ = Cxₜ + Duₜ + vₜ
+```
+
+**Major Linear Algebra Applications:**
+
+**1. Spectral Analysis and Frequency Domain:**
+
+**Discrete Fourier Transform (DFT) as Matrix Multiplication:**
+```
+Y = Fx where F is the DFT matrix
+F_jk = e^(-2πijk/N) / √N
+```
+
+**Power Spectral Density through Covariance:**
+```
+Γ(τ) = E[xₜxₜ₋τ] (autocovariance function)
+S(ω) = Σ Γ(τ)e^(-iωτ) (spectral density)
+```
+
+**2. Singular Value Decomposition (SVD) in Time Series:**
+
+**Singular Spectrum Analysis (SSA):**
+- Decompose trajectory matrix: H = UΣVᵀ
+- Extract trends, seasonality, and noise components
+- Reconstruct time series from selected eigentriples
+
+**Principal Component Analysis:**
+- Identify dominant patterns in multivariate time series
+- Dimensionality reduction for high-dimensional temporal data
+
+**3. Kalman Filtering and State Estimation:**
+
+**Prediction Step:**
+```
+x̂ₜ|ₜ₋₁ = Ax̂ₜ₋₁|ₜ₋₁ + Buₜ
+Pₜ|ₜ₋₁ = APₜ₋₁|ₜ₋₁Aᵀ + Q
+```
+
+**Update Step:**
+```
+Kₜ = Pₜ|ₜ₋₁Cᵀ(CPₜ|ₜ₋₁Cᵀ + R)⁻¹
+x̂ₜ|ₜ = x̂ₜ|ₜ₋₁ + Kₜ(yₜ - Cx̂ₜ|ₜ₋₁)
+```
+
+**Comprehensive Implementation:**
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.linalg import hankel, svd, solve, inv
+from scipy.signal import periodogram, welch
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import warnings
+warnings.filterwarnings('ignore')
+
+class TimeSeriesLinearAlgebra:
+    """Comprehensive linear algebra tools for time series analysis"""
+    
+    def __init__(self):
+        """Initialize time series linear algebra analyzer"""
+        self.models = {}
+        self.results = {}
+        
+    def generate_synthetic_data(self, n_samples=1000, n_series=5):
+        """Generate synthetic multivariate time series data"""
+        
+        np.random.seed(42)
+        t = np.linspace(0, 4*np.pi, n_samples)
+        
+        # Create multivariate time series with different patterns
+        ts_data = np.zeros((n_samples, n_series))
+        
+        for i in range(n_series):
+            # Trend component
+            trend = 0.02 * i * t
+            
+            # Seasonal components
+            seasonal1 = 2 * np.sin(2 * t + i * np.pi/4)
+            seasonal2 = 1.5 * np.cos(4 * t + i * np.pi/6)
+            
+            # AR(2) component
+            ar_coeff = [0.7 - 0.1*i, 0.2 + 0.05*i]
+            ar_noise = np.random.normal(0, 0.5, n_samples)
+            ar_component = np.zeros(n_samples)
+            
+            for j in range(2, n_samples):
+                ar_component[j] = (ar_coeff[0] * ar_component[j-1] + 
+                                 ar_coeff[1] * ar_component[j-2] + 
+                                 ar_noise[j])
+            
+            # Combine components
+            ts_data[:, i] = trend + seasonal1 + seasonal2 + ar_component + np.random.normal(0, 0.2, n_samples)
+        
+        return ts_data, t
+    
+    def demonstrate_matrix_representations(self, ts_data):
+        """Demonstrate various matrix representations of time series"""
+        
+        print("MATRIX REPRESENTATIONS OF TIME SERIES")
+        print("=" * 45)
+        
+        n_samples, n_series = ts_data.shape
+        print(f"Time series data shape: {ts_data.shape}")
+        
+        # 1. Basic matrix representation
+        print(f"\n1. Basic Matrix Representation:")
+        print(f"   X ∈ ℝ^{n_samples}×{n_series} (time × variables)")
+        print(f"   Each column represents one time series")
+        print(f"   Each row represents values at one time point")
+        
+        # 2. Lagged embedding (Hankel matrix)
+        print(f"\n2. Lagged Embedding (Hankel Matrix):")
+        embedding_dim = 20
+        
+        # Create Hankel matrix for first time series
+        ts_single = ts_data[:, 0]
+        hankel_matrix = hankel(ts_single[:embedding_dim], 
+                              ts_single[embedding_dim-1:])
+        
+        print(f"   Hankel matrix shape: {hankel_matrix.shape}")
+        print(f"   Embedding dimension: {embedding_dim}")
+        print(f"   Used for SSA and nonlinear dynamics analysis")
+        
+        # 3. Difference matrix
+        print(f"\n3. Difference Matrix:")
+        diff_matrix = np.diff(ts_data, axis=0)
+        print(f"   First differences shape: {diff_matrix.shape}")
+        print(f"   Removes trends, focuses on changes")
+        
+        # 4. Covariance matrix
+        print(f"\n4. Covariance Matrix:")
+        cov_matrix = np.cov(ts_data.T)
+        print(f"   Covariance matrix shape: {cov_matrix.shape}")
+        print(f"   Captures linear relationships between series")
+        
+        eigenvals, eigenvecs = np.linalg.eig(cov_matrix)
+        print(f"   Eigenvalues: {eigenvals}")
+        print(f"   Condition number: {np.max(eigenvals)/np.min(eigenvals):.2f}")
+        
+        return {
+            'hankel_matrix': hankel_matrix,
+            'diff_matrix': diff_matrix,
+            'cov_matrix': cov_matrix,
+            'eigenvals': eigenvals,
+            'eigenvecs': eigenvecs
+        }
+    
+    def singular_value_decomposition_analysis(self, ts_data):
+        """Demonstrate SVD applications in time series analysis"""
+        
+        print("\n\nSVD IN TIME SERIES ANALYSIS")
+        print("=" * 35)
+        
+        # Center the data
+        ts_centered = ts_data - np.mean(ts_data, axis=0)
+        
+        # Perform SVD
+        U, s, Vt = svd(ts_centered, full_matrices=False)
+        
+        print(f"SVD decomposition:")
+        print(f"  U (left singular vectors): {U.shape}")
+        print(f"  s (singular values): {s.shape}")
+        print(f"  Vt (right singular vectors): {Vt.shape}")
+        
+        # Analyze singular values
+        cumsum_variance = np.cumsum(s**2) / np.sum(s**2)
+        
+        print(f"\nVariance explained:")
+        for i in range(min(5, len(s))):
+            print(f"  Component {i+1}: {s[i]**2/np.sum(s**2):.3f} ({cumsum_variance[i]:.3f} cumulative)")
+        
+        # Reconstruct with first k components
+        k = 3
+        ts_reconstructed = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+        
+        reconstruction_error = np.linalg.norm(ts_centered - ts_reconstructed, 'fro')
+        print(f"\nReconstruction with {k} components:")
+        print(f"  Reconstruction error: {reconstruction_error:.4f}")
+        print(f"  Variance preserved: {cumsum_variance[k-1]:.3f}")
+        
+        return {
+            'U': U,
+            's': s,
+            'Vt': Vt,
+            'reconstructed': ts_reconstructed,
+            'cumsum_variance': cumsum_variance
+        }
+    
+    def vector_autoregression_analysis(self, ts_data):
+        """Demonstrate Vector Autoregression using linear algebra"""
+        
+        print("\n\nVECTOR AUTOREGRESSION (VAR) MODEL")
+        print("=" * 40)
+        
+        # Prepare data for VAR
+        p = 3  # lag order
+        n_samples, n_series = ts_data.shape
+        
+        # Create lagged data matrix
+        Y = ts_data[p:, :]  # dependent variables
+        X = np.ones((n_samples - p, 1))  # intercept
+        
+        # Add lagged variables
+        for lag in range(1, p + 1):
+            X = np.hstack([X, ts_data[p-lag:-lag, :]])
+        
+        print(f"VAR({p}) model setup:")
+        print(f"  Y (dependent): {Y.shape}")
+        print(f"  X (predictors): {X.shape}")
+        print(f"  Number of parameters per equation: {X.shape[1]}")
+        
+        # Estimate coefficients using OLS: B = (X'X)^(-1)X'Y
+        XtX = X.T @ X
+        XtY = X.T @ Y
+        
+        # Check for numerical stability
+        cond_number = np.linalg.cond(XtX)
+        print(f"  Design matrix condition number: {cond_number:.2e}")
+        
+        if cond_number > 1e12:
+            print("  Warning: Ill-conditioned design matrix, using regularization")
+            # Add ridge regularization
+            ridge_lambda = 0.01
+            B = solve(XtX + ridge_lambda * np.eye(XtX.shape[0]), XtY)
+        else:
+            B = solve(XtX, XtY)
+        
+        print(f"  Coefficient matrix B: {B.shape}")
+        
+        # Make predictions
+        Y_pred = X @ B
+        
+        # Calculate residuals and statistics
+        residuals = Y - Y_pred
+        mse = np.mean(residuals**2, axis=0)
+        r_squared = 1 - np.var(residuals, axis=0) / np.var(Y, axis=0)
+        
+        print(f"\nModel performance:")
+        for i in range(n_series):
+            print(f"  Series {i+1}: R² = {r_squared[i]:.3f}, MSE = {mse[i]:.4f}")
+        
+        # Granger causality test (simplified)
+        print(f"\nGranger causality analysis:")
+        print("  Testing if series i Granger-causes series j")
+        
+        causality_matrix = np.zeros((n_series, n_series))
+        
+        for i in range(n_series):
+            for j in range(n_series):
+                if i != j:
+                    # Restricted model (without series i)
+                    X_restricted = np.ones((n_samples - p, 1))
+                    for lag in range(1, p + 1):
+                        X_restricted = np.hstack([X_restricted, 
+                                                np.delete(ts_data[p-lag:-lag, :], i, axis=1)])
+                    
+                    # Full model residuals for series j
+                    res_full = residuals[:, j]
+                    
+                    # Restricted model estimation
+                    try:
+                        B_restricted = solve(X_restricted.T @ X_restricted, X_restricted.T @ Y[:, j])
+                        Y_pred_restricted = X_restricted @ B_restricted
+                        res_restricted = Y[:, j] - Y_pred_restricted
+                        
+                        # F-statistic for Granger causality
+                        rss_restricted = np.sum(res_restricted**2)
+                        rss_full = np.sum(res_full**2)
+                        
+                        f_stat = ((rss_restricted - rss_full) / p) / (rss_full / (len(res_full) - X.shape[1]))
+                        causality_matrix[i, j] = f_stat
+                        
+                    except np.linalg.LinAlgError:
+                        causality_matrix[i, j] = 0
+        
+        print(f"  Causality F-statistics matrix:")
+        for i in range(n_series):
+            print(f"    {causality_matrix[i, :]}")
+        
+        return {
+            'B': B,
+            'Y_pred': Y_pred,
+            'residuals': residuals,
+            'r_squared': r_squared,
+            'causality_matrix': causality_matrix
+        }
+    
+    def kalman_filter_example(self, ts_data):
+        """Demonstrate Kalman filtering for time series"""
+        
+        print("\n\nKALMAN FILTERING")
+        print("=" * 20)
+        
+        # Use first time series for univariate Kalman filter
+        y = ts_data[:, 0]
+        n = len(y)
+        
+        # State-space model: local level model
+        # State equation: x_t = x_{t-1} + w_t, w_t ~ N(0, Q)
+        # Observation equation: y_t = x_t + v_t, v_t ~ N(0, R)
+        
+        # Model parameters
+        Q = 0.1  # process noise variance
+        R = 1.0  # observation noise variance
+        
+        # Initialize
+        x_pred = np.zeros(n)  # predicted state
+        x_filt = np.zeros(n)  # filtered state
+        P_pred = np.zeros(n)  # predicted covariance
+        P_filt = np.zeros(n)  # filtered covariance
+        
+        # Initial conditions
+        x_filt[0] = y[0]
+        P_filt[0] = 1.0
+        
+        print(f"Local level model:")
+        print(f"  Process noise variance (Q): {Q}")
+        print(f"  Observation noise variance (R): {R}")
+        print(f"  Time series length: {n}")
+        
+        # Kalman filter recursions
+        for t in range(1, n):
+            # Prediction step
+            x_pred[t] = x_filt[t-1]  # A = 1 for random walk
+            P_pred[t] = P_filt[t-1] + Q
+            
+            # Update step
+            K = P_pred[t] / (P_pred[t] + R)  # Kalman gain
+            x_filt[t] = x_pred[t] + K * (y[t] - x_pred[t])
+            P_filt[t] = (1 - K) * P_pred[t]
+        
+        # Calculate innovation sequence
+        innovations = y[1:] - x_pred[1:]
+        
+        print(f"\nKalman filter results:")
+        print(f"  Mean absolute prediction error: {np.mean(np.abs(innovations)):.4f}")
+        print(f"  Innovation variance: {np.var(innovations):.4f}")
+        print(f"  Final state estimate: {x_filt[-1]:.4f}")
+        print(f"  Final covariance: {P_filt[-1]:.4f}")
+        
+        return {
+            'x_filt': x_filt,
+            'x_pred': x_pred,
+            'P_filt': P_filt,
+            'innovations': innovations
+        }
+    
+    def spectral_analysis(self, ts_data, t):
+        """Demonstrate spectral analysis using linear algebra"""
+        
+        print("\n\nSPECTRAL ANALYSIS")
+        print("=" * 20)
+        
+        # Use first time series
+        x = ts_data[:, 0]
+        n = len(x)
+        
+        # 1. Discrete Fourier Transform
+        print(f"Discrete Fourier Transform:")
+        
+        # Manual DFT matrix construction (for educational purposes)
+        # For efficiency, use FFT in practice
+        frequencies = np.fft.fftfreq(n, d=t[1]-t[0])
+        X_fft = np.fft.fft(x)
+        
+        # Power spectral density
+        psd = np.abs(X_fft)**2 / n
+        
+        print(f"  Time series length: {n}")
+        print(f"  Frequency resolution: {frequencies[1] - frequencies[0]:.4f}")
+        print(f"  Nyquist frequency: {np.max(frequencies):.4f}")
+        
+        # Find dominant frequencies
+        dominant_indices = np.argsort(psd[:n//2])[-5:]  # Top 5 frequencies
+        dominant_freqs = frequencies[dominant_indices]
+        dominant_powers = psd[dominant_indices]
+        
+        print(f"  Dominant frequencies:")
+        for i, (freq, power) in enumerate(zip(dominant_freqs, dominant_powers)):
+            print(f"    {i+1}: f = {freq:.4f}, power = {power:.2f}")
+        
+        # 2. Autocovariance function
+        print(f"\nAutocovariance Analysis:")
+        
+        # Compute autocovariance using convolution
+        x_centered = x - np.mean(x)
+        autocov = np.correlate(x_centered, x_centered, mode='full')
+        autocov = autocov[autocov.size // 2:] / n
+        
+        # Theoretical spectral density via autocorrelation
+        max_lag = min(50, len(autocov) - 1)
+        lags = np.arange(max_lag + 1)
+        
+        print(f"  Autocovariance at lag 0: {autocov[0]:.4f}")
+        print(f"  Autocovariance at lag 1: {autocov[1]:.4f}")
+        print(f"  Autocovariance at lag 5: {autocov[5]:.4f}")
+        
+        return {
+            'frequencies': frequencies,
+            'psd': psd,
+            'dominant_freqs': dominant_freqs,
+            'autocov': autocov[:max_lag+1],
+            'lags': lags
+        }
+
+def create_comprehensive_visualizations(analyzer, ts_data, t, results):
+    """Create comprehensive visualizations for time series linear algebra"""
+    
+    fig, axes = plt.subplots(3, 3, figsize=(20, 15))
+    
+    # 1. Original time series
+    ax = axes[0, 0]
+    for i in range(ts_data.shape[1]):
+        ax.plot(t, ts_data[:, i], label=f'Series {i+1}', alpha=0.8)
+    ax.set_title('Original Multivariate Time Series')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Value')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 2. SVD decomposition
+    ax = axes[0, 1]
+    svd_results = results['svd']
+    ax.plot(svd_results['s']**2 / np.sum(svd_results['s']**2), 'o-')
+    ax.set_title('SVD: Explained Variance by Component')
+    ax.set_xlabel('Component')
+    ax.set_ylabel('Variance Explained')
+    ax.set_yscale('log')
+    ax.grid(True, alpha=0.3)
+    
+    # 3. SVD reconstruction
+    ax = axes[0, 2]
+    ax.plot(t, ts_data[:, 0], label='Original', alpha=0.7)
+    ax.plot(t, svd_results['reconstructed'][:, 0] + np.mean(ts_data[:, 0]), 
+            label='Reconstructed (3 components)', linestyle='--')
+    ax.set_title('SVD Reconstruction')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Value')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 4. Covariance matrix
+    ax = axes[1, 0]
+    matrix_results = results['matrix']
+    im = ax.imshow(matrix_results['cov_matrix'], cmap='RdBu_r', vmin=-1, vmax=1)
+    ax.set_title('Cross-Series Covariance Matrix')
+    ax.set_xlabel('Series')
+    ax.set_ylabel('Series')
+    plt.colorbar(im, ax=ax)
+    
+    # 5. VAR residuals
+    ax = axes[1, 1]
+    var_results = results['var']
+    residuals = var_results['residuals']
+    ax.plot(residuals[:, 0], label='Series 1', alpha=0.7)
+    ax.plot(residuals[:, 1], label='Series 2', alpha=0.7)
+    ax.set_title('VAR Model Residuals')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Residual')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 6. Granger causality matrix
+    ax = axes[1, 2]
+    causality = var_results['causality_matrix']
+    im = ax.imshow(causality, cmap='Reds')
+    ax.set_title('Granger Causality F-Statistics')
+    ax.set_xlabel('Caused Series')
+    ax.set_ylabel('Causing Series')
+    plt.colorbar(im, ax=ax)
+    
+    # Add text annotations
+    for i in range(causality.shape[0]):
+        for j in range(causality.shape[1]):
+            if i != j:
+                ax.text(j, i, f'{causality[i, j]:.1f}', 
+                       ha='center', va='center', color='white' if causality[i, j] > np.max(causality)/2 else 'black')
+    
+    # 7. Kalman filter results
+    ax = axes[2, 0]
+    kalman_results = results['kalman']
+    ax.plot(t, ts_data[:, 0], label='Observed', alpha=0.7)
+    ax.plot(t, kalman_results['x_filt'], label='Filtered', linestyle='--')
+    ax.fill_between(t, 
+                    kalman_results['x_filt'] - 2*np.sqrt(kalman_results['P_filt']),
+                    kalman_results['x_filt'] + 2*np.sqrt(kalman_results['P_filt']),
+                    alpha=0.3, label='95% Confidence')
+    ax.set_title('Kalman Filter State Estimation')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Value')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 8. Power spectral density
+    ax = axes[2, 1]
+    spectral_results = results['spectral']
+    freqs = spectral_results['frequencies']
+    psd = spectral_results['psd']
+    
+    # Plot only positive frequencies
+    n_half = len(freqs) // 2
+    ax.loglog(freqs[1:n_half], psd[1:n_half])
+    ax.set_title('Power Spectral Density')
+    ax.set_xlabel('Frequency')
+    ax.set_ylabel('Power')
+    ax.grid(True, alpha=0.3)
+    
+    # 9. Autocovariance function
+    ax = axes[2, 2]
+    autocov = spectral_results['autocov']
+    lags = spectral_results['lags']
+    ax.plot(lags, autocov, 'o-')
+    ax.axhline(y=0, color='black', linestyle='--', alpha=0.5)
+    ax.set_title('Autocovariance Function')
+    ax.set_xlabel('Lag')
+    ax.set_ylabel('Autocovariance')
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('time_series_linear_algebra.png', dpi=150, bbox_inches='tight')
+    plt.show()
+
+if __name__ == "__main__":
+    
+    analyzer = TimeSeriesLinearAlgebra()
+    
+    print("LINEAR ALGEBRA IN TIME SERIES ANALYSIS")
+    print("=" * 50)
+    
+    # Generate synthetic data
+    ts_data, t = analyzer.generate_synthetic_data()
+    
+    # Demonstrate various linear algebra applications
+    matrix_results = analyzer.demonstrate_matrix_representations(ts_data)
+    svd_results = analyzer.singular_value_decomposition_analysis(ts_data)
+    var_results = analyzer.vector_autoregression_analysis(ts_data)
+    kalman_results = analyzer.kalman_filter_example(ts_data)
+    spectral_results = analyzer.spectral_analysis(ts_data, t)
+    
+    # Collect all results
+    results = {
+        'matrix': matrix_results,
+        'svd': svd_results,
+        'var': var_results,
+        'kalman': kalman_results,
+        'spectral': spectral_results
+    }
+    
+    # Create visualizations
+    create_comprehensive_visualizations(analyzer, ts_data, t, results)
+    
+    print(f"\n{'='*50}")
+    print("LINEAR ALGEBRA IN TIME SERIES SUMMARY")
+    print(f"{'='*50}")
+    
+    print("\nCore Applications:")
+    print("• Matrix Representation: Organizing temporal data efficiently")
+    print("• SVD/PCA: Dimensionality reduction and noise filtering")
+    print("• State-Space Models: Kalman filtering for optimal estimation")
+    print("• Vector Autoregression: Modeling multivariate dependencies")
+    print("• Spectral Analysis: Frequency domain analysis via DFT")
+    print("• Cointegration: Long-run equilibrium relationships")
+    
+    print("\nKey Mathematical Tools:")
+    print("• Eigendecomposition: Stability analysis, spectral methods")
+    print("• Matrix factorizations: LU, QR, Cholesky for efficient computation")
+    print("• Least squares: Parameter estimation in linear models")
+    print("• Hankel matrices: Embedding for nonlinear dynamics")
+    print("• Toeplitz matrices: Stationary process representations")
+    
+    print("\nComputational Benefits:")
+    print("• Vectorization: Efficient batch processing of time series")
+    print("• Parallel computation: Matrix operations leverage BLAS libraries")
+    print("• Numerical stability: Well-conditioned formulations")
+    print("• Memory efficiency: Sparse representations when applicable")
+    print("• Scalability: Algorithms scale with modern linear algebra libraries")
+    
+    print("\nAdvanced Techniques:")
+    print("• Dynamic Factor Models: Common trends in high-dimensional data")
+    print("• Regime-Switching Models: Time-varying parameters via filtering")
+    print("• Long Memory Models: Fractional integration and cointegration")
+    print("• Multiresolution Analysis: Wavelets and filter banks")
+    print("• Tensor Methods: Higher-order patterns in panel data")
+    
+    print("\nPractical Considerations:")
+    print("• Choose model order using information criteria")
+    print("• Check stationarity and cointegration properties")
+    print("• Validate models using out-of-sample forecasting")
+    print("• Handle missing data through EM algorithm or Kalman smoothing")
+    print("• Regularization for high-dimensional time series")
+
+```
+
+**Advanced Linear Algebra Techniques in Time Series:**
+
+**1. Cointegration Analysis:**
+Uses eigendecomposition to find long-run equilibrium relationships:
+```
+Johansen test: Π = αβ' where β contains cointegrating vectors
+```
+
+**2. Dynamic Factor Models:**
+Extract common factors using principal components:
+```
+xₜ = Λfₜ + εₜ where fₜ are latent factors
+```
+
+**3. Wavelets and Multiresolution:**
+Matrix-based filter banks for time-frequency analysis.
+
+**4. Tensor Methods:**
+Higher-order decompositions for panel time series data.
+
+**Key Insights:**
+- Linear algebra provides the computational foundation for time series analysis
+- Matrix decompositions reveal hidden structures and patterns
+- Efficient algorithms enable real-time processing of high-dimensional temporal data
+- Understanding the mathematical foundations leads to better model selection and interpretation
 
 ---
 
