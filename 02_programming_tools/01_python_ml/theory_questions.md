@@ -73,7 +73,7 @@
 
 ## Question 2
 
-**How doesPythonmanagememory?**
+**How does Python manage memory?**
 
 **Answer:**
 
@@ -830,7 +830,7 @@ def performance_comparison():
 
 ## Question 5
 
-**What islist comprehensionand give an example of its use?**
+**What is list comprehension and give an example of its use?**
 
 **Answer:**
 
@@ -13461,49 +13461,4090 @@ Context managers provide several benefits for ML applications:
 
 ## Question 33
 
-**What are slots in Python classes and how could they be useful in machine learning applications?**
+**What are the key differences between Python 2 and Python 3 that affect machine learning workflows?**
 
-**Answer:** _[To be filled]_
+### Theory
+
+Python 2 reached end-of-life in January 2020, but understanding the differences between Python 2 and Python 3 is important for maintaining legacy ML codebases and ensuring compatibility when migrating projects. The changes affect data handling, string processing, and iteration patterns commonly used in machine learning applications.
+
+### Code Example
+
+```python
+import numpy as np
+import pandas as pd
+import sys
+from io import StringIO, BytesIO
+
+class Python2vs3MLWorkflows:
+    """Demonstrate Python 2 vs 3 differences in ML contexts"""
+    
+    def __init__(self):
+        self.python_version = sys.version_info.major
+        
+    def data_handling_differences(self):
+        """Demonstrate data loading and string handling differences"""
+        
+        print("=== DATA HANDLING DIFFERENCES ===")
+        
+        # String and Unicode handling
+        if self.python_version == 3:
+            # Python 3 - All strings are Unicode by default
+            sample_text = "Machine Learning with émojis 🤖"
+            print(f"Python 3 string: {sample_text}")
+            print(f"String type: {type(sample_text)}")
+            
+            # File reading with explicit encoding
+            sample_csv_data = "feature1,feature2,target\n1.0,2.0,0\n3.0,4.0,1"
+            
+            # Python 3 approach - encoding handled automatically
+            data = pd.read_csv(StringIO(sample_csv_data), encoding='utf-8')
+            print("Python 3 CSV reading - automatic encoding handling")
+            
+        else:
+            # Python 2 would require explicit unicode handling
+            print("Python 2 would require:")
+            print("# sample_text = u'Machine Learning with émojis'")
+            print("# with open('data.csv', 'rb') as f:")
+            print("#     data = f.read().decode('utf-8')")
+    
+    def iteration_differences(self):
+        """Demonstrate dictionary iteration differences"""
+        
+        print("\n=== DICTIONARY ITERATION DIFFERENCES ===")
+        
+        # Hyperparameter dictionary
+        hyperparams = {
+            'learning_rate': 0.01,
+            'epochs': 100,
+            'batch_size': 32,
+            'dropout_rate': 0.2
+        }
+        
+        print("Python 3 approach:")
+        # Python 3 - .items(), .keys(), .values() return dictionary views
+        for param, value in hyperparams.items():
+            print(f"  {param}: {value}")
+        
+        print("\nPython 2 would use:")
+        print("# for param, value in hyperparams.iteritems():")
+        print("#     print param, value")
+        
+        # Memory efficiency demonstration
+        print(f"\nDictionary keys type in Python 3: {type(hyperparams.keys())}")
+        print("Python 2 would return a list, Python 3 returns a view (more memory efficient)")
+    
+    def division_differences(self):
+        """Demonstrate division behavior differences"""
+        
+        print("\n=== DIVISION DIFFERENCES ===")
+        
+        # Sample calculation: learning rate decay
+        initial_lr = 1
+        decay_steps = 3
+        
+        # Python 3 - True division by default
+        decayed_lr = initial_lr / decay_steps
+        print(f"Python 3 division (1/3): {decayed_lr} (type: {type(decayed_lr)})")
+        
+        # Floor division (same in both versions)
+        floor_division = initial_lr // decay_steps
+        print(f"Floor division (1//3): {floor_division}")
+        
+        print("Python 2 would give: 1/3 = 0 (integer division)")
+        print("Python 2 would need: from __future__ import division")
+    
+    def print_function_differences(self):
+        """Demonstrate print statement vs function differences"""
+        
+        print("\n=== PRINT DIFFERENCES ===")
+        
+        metrics = {'accuracy': 0.95, 'precision': 0.92, 'recall': 0.88}
+        
+        # Python 3 - print is a function
+        print("Python 3 - print function:")
+        for metric, value in metrics.items():
+            print(f"  {metric}: {value:.3f}", end=' | ')
+        print()  # New line
+        
+        print("\nPython 2 would use:")
+        print("# print 'accuracy:', 0.95")
+        print("# from __future__ import print_function  # for compatibility")
+    
+    def range_differences(self):
+        """Demonstrate range vs xrange differences"""
+        
+        print("\n=== RANGE DIFFERENCES ===")
+        
+        # Training epochs example
+        num_epochs = 5
+        
+        # Python 3 - range returns iterator
+        epoch_range = range(num_epochs)
+        print(f"Python 3 range type: {type(epoch_range)}")
+        print(f"Range object: {epoch_range}")
+        
+        # Convert to list to show values
+        print(f"Range values: {list(epoch_range)}")
+        
+        print("\nPython 2 differences:")
+        print("# range(5) returns [0, 1, 2, 3, 4] (list)")
+        print("# xrange(5) returns iterator (Python 2's equivalent to Python 3's range)")
+    
+    def input_differences(self):
+        """Demonstrate input function differences"""
+        
+        print("\n=== INPUT FUNCTION DIFFERENCES ===")
+        
+        print("Python 3 - input() always returns string:")
+        print("# user_input = input('Enter learning rate: ')")
+        print("# learning_rate = float(user_input)")
+        
+        print("\nPython 2 differences:")
+        print("# raw_input() returns string")
+        print("# input() evaluates the input as Python code (dangerous!)")
+    
+    def exception_handling_differences(self):
+        """Demonstrate exception handling syntax differences"""
+        
+        print("\n=== EXCEPTION HANDLING DIFFERENCES ===")
+        
+        try:
+            # Simulate a model training error
+            result = 1 / 0
+        except ZeroDivisionError as e:
+            print(f"Python 3 exception handling: {e}")
+        
+        print("\nPython 2 would also accept:")
+        print("# except ZeroDivisionError, e:")
+        print("#     print 'Error:', e")
+    
+    def migration_best_practices(self):
+        """Provide migration guidelines for ML projects"""
+        
+        print("\n=== MIGRATION BEST PRACTICES ===")
+        
+        practices = [
+            "Use `from __future__ import` statements for gradual migration",
+            "Use `six` library for cross-compatibility",
+            "Test with both Python versions during transition",
+            "Update string handling for Unicode support",
+            "Modernize dictionary iteration patterns",
+            "Use `2to3` tool for automated conversion",
+            "Update dependency versions for Python 3 compatibility"
+        ]
+        
+        for i, practice in enumerate(practices, 1):
+            print(f"{i}. {practice}")
+
+# Data handling differences example
+def load_data_py2_vs_py3():
+    """Example of data loading differences"""
+    
+    # Python 2 approach (legacy)
+    # with open('data.csv', 'rb') as f:
+    #     data = f.read().decode('utf-8')
+    
+    # Python 3 approach (modern)
+    # Simulate CSV data
+    sample_data = """feature1,feature2,feature3,target
+1.5,2.3,0.8,0
+2.1,1.9,1.2,1
+0.9,3.1,0.5,0
+1.8,2.7,1.1,1"""
+    
+    # Python 3 - built-in Unicode support
+    data = pd.read_csv(StringIO(sample_data), encoding='utf-8')
+    return data
+
+def iterate_hyperparameters():
+    """Example of hyperparameter iteration differences"""
+    
+    params = {
+        'learning_rate': 0.01, 
+        'epochs': 100, 
+        'batch_size': 32,
+        'dropout_rate': 0.2,
+        'l2_regularization': 0.001
+    }
+    
+    # Python 2 - .iteritems(), .iterkeys(), .itervalues() (deprecated)
+    # for key, value in params.iteritems():
+    #     print key, value
+    
+    # Python 3 - .items(), .keys(), .values() return views
+    print("Hyperparameter optimization:")
+    for key, value in params.items():
+        print(f"Parameter: {key}, Value: {value}")
+    
+    # Memory-efficient iteration in Python 3
+    print(f"\nTotal parameters: {len(params.keys())}")
+    print(f"Parameter names: {list(params.keys())}")
+
+def compatibility_example():
+    """Example showing Python 2/3 compatibility techniques"""
+    
+    # Using __future__ imports for backward compatibility
+    from __future__ import print_function, division, unicode_literals
+    
+    # Cross-compatible code
+    import sys
+    
+    if sys.version_info[0] == 3:
+        string_types = str
+        integer_types = int
+        text_type = str
+        binary_type = bytes
+    else:
+        string_types = str, unicode
+        integer_types = int, long
+        text_type = unicode
+        binary_type = str
+    
+    def process_ml_data(data):
+        """Process data in a version-agnostic way"""
+        if isinstance(data, string_types):
+            return f"Processing text data: {data}"
+        elif isinstance(data, integer_types):
+            return f"Processing numeric data: {data}"
+        else:
+            return f"Processing other data type: {type(data)}"
+
+# Example usage
+if __name__ == "__main__":
+    # Demonstrate differences
+    demo = Python2vs3MLWorkflows()
+    
+    demo.data_handling_differences()
+    demo.iteration_differences()
+    demo.division_differences()
+    demo.print_function_differences()
+    demo.range_differences()
+    demo.input_differences()
+    demo.exception_handling_differences()
+    demo.migration_best_practices()
+    
+    print("\n" + "="*60)
+    print("PRACTICAL EXAMPLES")
+    print("="*60)
+    
+    # Load data example
+    data = load_data_py2_vs_py3()
+    print(f"Loaded data shape: {data.shape}")
+    print(data.head())
+    
+    print("\n")
+    # Hyperparameter iteration example
+    iterate_hyperparameters()
+```
+
+### Explanation
+
+Key differences affecting ML workflows:
+
+1. **String Handling**: Python 3's Unicode-by-default approach simplifies text processing
+2. **Dictionary Iteration**: Python 3's dictionary views are more memory-efficient
+3. **Division**: Python 3's true division prevents integer division bugs
+4. **Print Function**: Python 3's print function enables more flexible formatting
+5. **Range**: Python 3's range is memory-efficient like Python 2's xrange
+6. **Exception Handling**: Python 3 requires 'as' keyword for exception binding
+
+### Use Cases
+
+- **Legacy Code Migration**: Updating existing ML pipelines to Python 3
+- **Cross-Platform Compatibility**: Ensuring code works across different environments
+- **Data Processing**: Handling text data and file I/O correctly
+- **Performance Optimization**: Leveraging Python 3's efficiency improvements
+- **Team Collaboration**: Maintaining consistent code standards
+
+### Best Practices
+
+- **Future Imports**: Use `from __future__ import` for gradual migration
+- **Six Library**: Use compatibility libraries for cross-version code
+- **Encoding Specification**: Always specify encoding for file operations
+- **Testing**: Test with both versions during migration period
+- **Dependencies**: Update libraries to Python 3 compatible versions
+
+### Pitfalls
+
+- **Silent Failures**: Integer division changes can cause subtle bugs
+- **String Encoding**: Unicode handling differences can break text processing
+- **Dictionary Iteration**: Assuming lists instead of views in Python 3
+- **Print Statements**: Syntax errors when mixing print styles
+- **Input Evaluation**: Security issues with Python 2's input() function
+
+### Debugging
+
+- **Version Checking**: Use `sys.version_info` to handle version-specific code
+- **Encoding Issues**: Debug Unicode/byte string conflicts
+- **Performance Monitoring**: Compare memory usage between versions
+- **Compatibility Testing**: Use tox for multi-version testing
+
+### Optimization
+
+- **Memory Efficiency**: Leverage Python 3's iterator-based approaches
+- **String Operations**: Use f-strings for better performance in Python 3.6+
+- **Dictionary Views**: Take advantage of memory-efficient dictionary operations
+- **Async Support**: Utilize Python 3's async/await for concurrent ML tasks
 
 ---
 
 ## Question 34
 
-**Explain the concept of microservices architecture in deploying machine learning models.**
+**What are slots in Python classes and how could they be useful in machine learning applications?**
 
-**Answer:** _[To be filled]_
+### Theory
+
+Python `__slots__` is a class-level attribute that restricts the creation of instance attributes and provides memory optimization by storing attributes in a fixed-size array instead of a dictionary. This is particularly valuable in machine learning applications where memory efficiency and performance are crucial.
+
+### Code Example
+
+```python
+import sys
+import time
+import numpy as np
+from dataclasses import dataclass
+from typing import List, Optional
+import tracemalloc
+
+class DataPointWithSlots:
+    """Memory-efficient data point class using __slots__"""
+    
+    __slots__ = ['features', 'label', 'weight', 'metadata', '_cached_norm']
+    
+    def __init__(self, features: List[float], label: int, weight: float = 1.0, metadata: Optional[dict] = None):
+        self.features = features
+        self.label = label
+        self.weight = weight
+        self.metadata = metadata or {}
+        self._cached_norm = None
+    
+    def get_norm(self):
+        """Cached computation of feature vector norm"""
+        if self._cached_norm is None:
+            self._cached_norm = np.linalg.norm(self.features)
+        return self._cached_norm
+    
+    def distance_to(self, other):
+        """Calculate distance to another data point"""
+        return np.linalg.norm(np.array(self.features) - np.array(other.features))
+    
+    def __repr__(self):
+        return f"DataPoint(features={len(self.features)}, label={self.label}, weight={self.weight})"
+
+class DataPointWithoutSlots:
+    """Regular class without __slots__ for comparison"""
+    
+    def __init__(self, features: List[float], label: int, weight: float = 1.0, metadata: Optional[dict] = None):
+        self.features = features
+        self.label = label
+        self.weight = weight
+        self.metadata = metadata or {}
+        self._cached_norm = None
+    
+    def get_norm(self):
+        if self._cached_norm is None:
+            self._cached_norm = np.linalg.norm(self.features)
+        return self._cached_norm
+    
+    def distance_to(self, other):
+        return np.linalg.norm(np.array(self.features) - np.array(other.features))
+    
+    def __repr__(self):
+        return f"DataPoint(features={len(self.features)}, label={self.label}, weight={self.weight})"
+
+class NeuralNetworkLayer:
+    """Memory-efficient neural network layer using __slots__"""
+    
+    __slots__ = ['weights', 'biases', 'activation', 'input_size', 'output_size', '_last_input', '_last_output']
+    
+    def __init__(self, input_size: int, output_size: int, activation: str = 'relu'):
+        self.input_size = input_size
+        self.output_size = output_size
+        self.activation = activation
+        self.weights = np.random.randn(input_size, output_size) * 0.1
+        self.biases = np.zeros(output_size)
+        self._last_input = None
+        self._last_output = None
+    
+    def forward(self, x: np.ndarray) -> np.ndarray:
+        """Forward pass through the layer"""
+        self._last_input = x
+        z = np.dot(x, self.weights) + self.biases
+        
+        if self.activation == 'relu':
+            self._last_output = np.maximum(0, z)
+        elif self.activation == 'sigmoid':
+            self._last_output = 1 / (1 + np.exp(-np.clip(z, -500, 500)))
+        elif self.activation == 'tanh':
+            self._last_output = np.tanh(z)
+        else:
+            self._last_output = z
+            
+        return self._last_output
+    
+    def backward(self, grad_output: np.ndarray) -> np.ndarray:
+        """Backward pass through the layer"""
+        if self._last_input is None or self._last_output is None:
+            raise ValueError("Must call forward() before backward()")
+        
+        # Activation gradient
+        if self.activation == 'relu':
+            grad_activation = (self._last_output > 0).astype(float)
+        elif self.activation == 'sigmoid':
+            grad_activation = self._last_output * (1 - self._last_output)
+        elif self.activation == 'tanh':
+            grad_activation = 1 - self._last_output ** 2
+        else:
+            grad_activation = np.ones_like(self._last_output)
+        
+        grad_z = grad_output * grad_activation
+        
+        # Gradients
+        grad_weights = np.dot(self._last_input.T, grad_z)
+        grad_biases = np.sum(grad_z, axis=0)
+        grad_input = np.dot(grad_z, self.weights.T)
+        
+        return grad_input, grad_weights, grad_biases
+    
+    def update_weights(self, grad_weights: np.ndarray, grad_biases: np.ndarray, learning_rate: float):
+        """Update layer parameters"""
+        self.weights -= learning_rate * grad_weights
+        self.biases -= learning_rate * grad_biases
+
+class MLDatasetWithSlots:
+    """Memory-efficient dataset class for large ML datasets"""
+    
+    __slots__ = ['data_points', 'batch_size', '_current_index', '_shuffled_indices']
+    
+    def __init__(self, batch_size: int = 32):
+        self.data_points: List[DataPointWithSlots] = []
+        self.batch_size = batch_size
+        self._current_index = 0
+        self._shuffled_indices = None
+    
+    def add_data_point(self, features: List[float], label: int, weight: float = 1.0):
+        """Add a data point to the dataset"""
+        self.data_points.append(DataPointWithSlots(features, label, weight))
+    
+    def shuffle(self):
+        """Shuffle the dataset"""
+        self._shuffled_indices = np.random.permutation(len(self.data_points))
+        self._current_index = 0
+    
+    def get_batch(self):
+        """Get the next batch of data"""
+        if self._shuffled_indices is None:
+            self.shuffle()
+        
+        if self._current_index >= len(self.data_points):
+            return None
+        
+        end_index = min(self._current_index + self.batch_size, len(self.data_points))
+        batch_indices = self._shuffled_indices[self._current_index:end_index]
+        
+        batch_data = [self.data_points[i] for i in batch_indices]
+        self._current_index = end_index
+        
+        return batch_data
+    
+    def __len__(self):
+        return len(self.data_points)
+
+def memory_performance_comparison():
+    """Compare memory usage between slots and non-slots classes"""
+    
+    print("=== MEMORY PERFORMANCE COMPARISON ===")
+    
+    # Start memory tracking
+    tracemalloc.start()
+    
+    # Create data with slots
+    n_samples = 10000
+    feature_dim = 100
+    
+    print(f"Creating {n_samples} data points with {feature_dim} features each...")
+    
+    # With slots
+    start_snapshot = tracemalloc.take_snapshot()
+    
+    data_with_slots = []
+    for i in range(n_samples):
+        features = np.random.randn(feature_dim).tolist()
+        label = np.random.randint(0, 2)
+        data_with_slots.append(DataPointWithSlots(features, label))
+    
+    slots_snapshot = tracemalloc.take_snapshot()
+    
+    # Without slots
+    data_without_slots = []
+    for i in range(n_samples):
+        features = np.random.randn(feature_dim).tolist()
+        label = np.random.randint(0, 2)
+        data_without_slots.append(DataPointWithoutSlots(features, label))
+    
+    final_snapshot = tracemalloc.take_snapshot()
+    
+    # Calculate memory usage
+    slots_stats = slots_snapshot.compare_to(start_snapshot, 'lineno')
+    no_slots_stats = final_snapshot.compare_to(slots_snapshot, 'lineno')
+    
+    slots_memory = sum(stat.size for stat in slots_stats) / 1024 / 1024  # MB
+    no_slots_memory = sum(stat.size for stat in no_slots_stats) / 1024 / 1024  # MB
+    
+    print(f"Memory usage with __slots__: {slots_memory:.2f} MB")
+    print(f"Memory usage without __slots__: {no_slots_memory:.2f} MB")
+    print(f"Memory savings: {((no_slots_memory - slots_memory) / no_slots_memory * 100):.1f}%")
+    
+    # Attribute access speed comparison
+    print("\n=== ATTRIBUTE ACCESS SPEED COMPARISON ===")
+    
+    test_object_slots = data_with_slots[0]
+    test_object_no_slots = data_without_slots[0]
+    
+    # Time attribute access
+    iterations = 100000
+    
+    # With slots
+    start_time = time.time()
+    for _ in range(iterations):
+        _ = test_object_slots.features
+        _ = test_object_slots.label
+        _ = test_object_slots.weight
+    slots_time = time.time() - start_time
+    
+    # Without slots
+    start_time = time.time()
+    for _ in range(iterations):
+        _ = test_object_no_slots.features
+        _ = test_object_no_slots.label
+        _ = test_object_no_slots.weight
+    no_slots_time = time.time() - start_time
+    
+    print(f"Attribute access time with __slots__: {slots_time:.4f} seconds")
+    print(f"Attribute access time without __slots__: {no_slots_time:.4f} seconds")
+    print(f"Speed improvement: {((no_slots_time - slots_time) / no_slots_time * 100):.1f}%")
+    
+    tracemalloc.stop()
+
+def neural_network_example():
+    """Example of using slots in neural network implementation"""
+    
+    print("\n=== NEURAL NETWORK WITH SLOTS ===")
+    
+    # Create a simple network
+    layers = [
+        NeuralNetworkLayer(10, 20, 'relu'),
+        NeuralNetworkLayer(20, 10, 'relu'),
+        NeuralNetworkLayer(10, 1, 'sigmoid')
+    ]
+    
+    # Generate sample data
+    X = np.random.randn(100, 10)
+    y = (np.sum(X, axis=1) > 0).astype(float).reshape(-1, 1)
+    
+    # Training loop
+    learning_rate = 0.01
+    epochs = 100
+    
+    for epoch in range(epochs):
+        # Forward pass
+        current_input = X
+        for layer in layers:
+            current_input = layer.forward(current_input)
+        
+        # Calculate loss
+        predictions = current_input
+        loss = np.mean((predictions - y) ** 2)
+        
+        # Backward pass
+        grad_output = 2 * (predictions - y) / len(y)
+        
+        for layer in reversed(layers):
+            grad_input, grad_weights, grad_biases = layer.backward(grad_output)
+            layer.update_weights(grad_weights, grad_biases, learning_rate)
+            grad_output = grad_input
+        
+        if epoch % 20 == 0:
+            print(f"Epoch {epoch}, Loss: {loss:.4f}")
+    
+    print(f"Final loss: {loss:.4f}")
+    return layers
+
+def dataset_example():
+    """Example of using slots in dataset management"""
+    
+    print("\n=== DATASET MANAGEMENT WITH SLOTS ===")
+    
+    # Create dataset
+    dataset = MLDatasetWithSlots(batch_size=32)
+    
+    # Add sample data
+    for i in range(1000):
+        features = np.random.randn(50).tolist()
+        label = np.random.randint(0, 3)
+        weight = np.random.uniform(0.5, 1.5)
+        dataset.add_data_point(features, label, weight)
+    
+    print(f"Dataset size: {len(dataset)} samples")
+    
+    # Shuffle and iterate through batches
+    dataset.shuffle()
+    batch_count = 0
+    
+    while True:
+        batch = dataset.get_batch()
+        if batch is None:
+            break
+        
+        batch_count += 1
+        features_batch = np.array([point.features for point in batch])
+        labels_batch = np.array([point.label for point in batch])
+        weights_batch = np.array([point.weight for point in batch])
+        
+        if batch_count <= 3:  # Show first 3 batches
+            print(f"Batch {batch_count}: {features_batch.shape}, labels: {np.unique(labels_batch)}")
+    
+    print(f"Total batches: {batch_count}")
+
+# Example usage and demonstration
+if __name__ == "__main__":
+    # Run memory comparison
+    memory_performance_comparison()
+    
+    # Run neural network example
+    neural_network_example()
+    
+    # Run dataset example
+    dataset_example()
+    
+    # Demonstrate slots restrictions
+    print("\n=== SLOTS RESTRICTIONS DEMO ===")
+    
+    try:
+        point = DataPointWithSlots([1, 2, 3], 1)
+        point.new_attribute = "This will fail"  # This will raise AttributeError
+    except AttributeError as e:
+        print(f"Slots restriction: {e}")
+    
+    # Show memory usage per instance
+    point_with_slots = DataPointWithSlots([1, 2, 3], 1)
+    point_without_slots = DataPointWithoutSlots([1, 2, 3], 1)
+    
+    print(f"Instance with slots size: {sys.getsizeof(point_with_slots)} bytes")
+    print(f"Instance without slots size: {sys.getsizeof(point_without_slots)} bytes")
+    
+    # Show attribute access
+    print(f"Slots object attributes: {point_with_slots.__slots__}")
+    print(f"Regular object __dict__: {hasattr(point_without_slots, '__dict__')}")
+```
+
+### Explanation
+
+**How __slots__ Works:**
+
+1. **Memory Structure**: Replaces instance `__dict__` with a fixed-size array
+2. **Attribute Restriction**: Only allows predefined attributes, preventing dynamic addition
+3. **Performance**: Faster attribute access and reduced memory overhead
+4. **Inheritance**: Slots are inherited but can be extended in subclasses
+
+**Key Benefits for ML:**
+
+1. **Memory Efficiency**: 20-40% memory reduction for data-heavy objects
+2. **Faster Access**: Attribute access is faster due to array-based storage
+3. **Cache Locality**: Better CPU cache performance with fixed memory layout
+4. **Error Prevention**: Prevents accidental attribute creation
+
+### Use Cases
+
+- **Large Datasets**: When handling millions of data points in memory
+- **Neural Network Layers**: For memory-efficient layer implementations
+- **Feature Vectors**: Storing high-dimensional feature representations
+- **Real-time Systems**: Where memory usage and speed are critical
+- **Embedded ML**: Resource-constrained environments
+
+### Best Practices
+
+- **Use for Data Classes**: Apply to frequently instantiated data containers
+- **Include Private Attributes**: Reserve slots for cached computations (`_cached_norm`)
+- **Careful Inheritance**: Consider slots when designing class hierarchies
+- **Profile First**: Measure actual memory/performance benefits
+- **Balance Flexibility**: Use only when memory/speed benefits outweigh flexibility loss
+
+### Pitfalls
+
+- **No Dynamic Attributes**: Cannot add attributes at runtime
+- **Inheritance Complexity**: Mixing slots and non-slots classes can be tricky
+- **Debugging Difficulty**: Less introspection compared to `__dict__`-based objects
+- **Pickling Issues**: May require special handling for serialization
+- **Weak References**: Need `__weakref__` slot for weak reference support
+
+### Debugging
+
+- **Memory Profiling**: Use `tracemalloc` to measure actual memory savings
+- **Attribute Errors**: Handle `AttributeError` for dynamic attribute attempts
+- **Inheritance Issues**: Check MRO (Method Resolution Order) for slots conflicts
+- **Performance Benchmarking**: Measure attribute access speed improvements
+
+### Optimization
+
+- **Selective Usage**: Apply slots only to frequently instantiated classes
+- **Memory Alignment**: Order slots by size for better memory alignment
+- **Minimal Slots**: Include only necessary attributes to maximize savings
+- **Caching Strategy**: Use slots for both data and computed cached values
 
 ---
 
 ## Question 35
 
-**What are the considerations for scaling a machine learning application with Python?**
+**Explain the concept of microservices architecture in deploying machine learning models.**
 
-**Answer:** _[To be filled]_
+### Theory
+
+Microservices architecture breaks down ML model deployment into small, independent services that communicate over well-defined APIs. This approach enables better scalability, maintainability, and team autonomy compared to monolithic deployments. Each service can be developed, deployed, and scaled independently.
+
+### Code Example
+
+```python
+import os
+import json
+import asyncio
+import uvicorn
+import numpy as np
+import pandas as pd
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+import joblib
+import redis
+import httpx
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+import logging
+from contextlib import asynccontextmanager
+
+# ============================================================================
+# SHARED MODELS AND SCHEMAS
+# ============================================================================
+
+class PredictionRequest(BaseModel):
+    """Request schema for model predictions"""
+    features: List[float] = Field(..., description="Input features for prediction")
+    model_version: Optional[str] = Field("latest", description="Model version to use")
+    explanation_required: bool = Field(False, description="Whether to include explanation")
+
+class PredictionResponse(BaseModel):
+    """Response schema for model predictions"""
+    prediction: float
+    confidence: float
+    model_version: str
+    timestamp: datetime
+    explanation: Optional[Dict[str, Any]] = None
+    request_id: str
+
+class ModelMetrics(BaseModel):
+    """Model performance metrics"""
+    accuracy: float
+    precision: float
+    recall: float
+    f1_score: float
+    model_version: str
+    evaluation_date: datetime
+
+# ============================================================================
+# DATABASE MODELS
+# ============================================================================
+
+Base = declarative_base()
+
+class PredictionLog(Base):
+    __tablename__ = "predictions"
+    
+    id = Column(Integer, primary_key=True)
+    request_id = Column(String, unique=True)
+    model_version = Column(String)
+    prediction = Column(Float)
+    confidence = Column(Float)
+    timestamp = Column(DateTime)
+    features = Column(String)  # JSON string
+
+# ============================================================================
+# MODEL SERVICE
+# ============================================================================
+
+class ModelService:
+    """Core model serving microservice"""
+    
+    def __init__(self):
+        self.models = {}
+        self.model_metadata = {}
+        self.load_models()
+    
+    def load_models(self):
+        """Load all available model versions"""
+        model_dir = "models/"
+        if os.path.exists(model_dir):
+            for version in os.listdir(model_dir):
+                model_path = os.path.join(model_dir, version, "model.pkl")
+                if os.path.exists(model_path):
+                    self.models[version] = joblib.load(model_path)
+                    
+                    # Load metadata
+                    metadata_path = os.path.join(model_dir, version, "metadata.json")
+                    if os.path.exists(metadata_path):
+                        with open(metadata_path, 'r') as f:
+                            self.model_metadata[version] = json.load(f)
+    
+    async def predict(self, request: PredictionRequest) -> PredictionResponse:
+        """Make prediction using specified model version"""
+        
+        # Get model
+        model_version = request.model_version
+        if model_version == "latest":
+            model_version = max(self.models.keys()) if self.models else None
+        
+        if model_version not in self.models:
+            raise HTTPException(status_code=404, detail=f"Model version {model_version} not found")
+        
+        model = self.models[model_version]
+        
+        # Make prediction
+        features = np.array(request.features).reshape(1, -1)
+        prediction = model.predict(features)[0]
+        
+        # Get prediction confidence (if available)
+        confidence = 0.95  # Default confidence
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(features)[0]
+            confidence = float(np.max(proba))
+        
+        # Generate explanation if requested
+        explanation = None
+        if request.explanation_required:
+            explanation = await self._generate_explanation(features, model, model_version)
+        
+        return PredictionResponse(
+            prediction=float(prediction),
+            confidence=confidence,
+            model_version=model_version,
+            timestamp=datetime.now(),
+            explanation=explanation,
+            request_id=f"pred_{datetime.now().timestamp()}"
+        )
+    
+    async def _generate_explanation(self, features: np.ndarray, model, version: str) -> Dict[str, Any]:
+        """Generate model explanation (simplified SHAP-like explanation)"""
+        
+        # Simple feature importance explanation
+        if hasattr(model, "feature_importances_"):
+            feature_importance = model.feature_importances_
+            feature_contributions = features[0] * feature_importance
+            
+            return {
+                "feature_importances": feature_importance.tolist(),
+                "feature_contributions": feature_contributions.tolist(),
+                "explanation_method": "feature_importance",
+                "model_type": type(model).__name__
+            }
+        
+        return {"explanation": "Not available for this model type"}
+
+# ============================================================================
+# MONITORING SERVICE
+# ============================================================================
+
+class MonitoringService:
+    """Model monitoring and metrics microservice"""
+    
+    def __init__(self):
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        self.metrics_cache = {}
+    
+    async def log_prediction(self, prediction_response: PredictionResponse, features: List[float]):
+        """Log prediction for monitoring"""
+        
+        # Store in Redis for real-time monitoring
+        log_data = {
+            "request_id": prediction_response.request_id,
+            "model_version": prediction_response.model_version,
+            "prediction": prediction_response.prediction,
+            "confidence": prediction_response.confidence,
+            "timestamp": prediction_response.timestamp.isoformat(),
+            "features": features
+        }
+        
+        self.redis_client.setex(
+            f"prediction:{prediction_response.request_id}",
+            3600,  # 1 hour TTL
+            json.dumps(log_data, default=str)
+        )
+        
+        # Update counters
+        self.redis_client.incr(f"predictions_count:{prediction_response.model_version}")
+        
+        # Store in database for long-term analysis
+        await self._store_prediction_db(prediction_response, features)
+    
+    async def _store_prediction_db(self, prediction_response: PredictionResponse, features: List[float]):
+        """Store prediction in database"""
+        # Database storage implementation would go here
+        pass
+    
+    async def get_model_metrics(self, model_version: str) -> Dict[str, Any]:
+        """Get real-time model metrics"""
+        
+        prediction_count = self.redis_client.get(f"predictions_count:{model_version}")
+        prediction_count = int(prediction_count) if prediction_count else 0
+        
+        # Get recent predictions for analysis
+        recent_predictions = []
+        for key in self.redis_client.scan_iter(f"prediction:*"):
+            data = self.redis_client.get(key)
+            if data:
+                pred_data = json.loads(data)
+                if pred_data["model_version"] == model_version:
+                    recent_predictions.append(pred_data)
+        
+        # Calculate basic metrics
+        avg_confidence = np.mean([p["confidence"] for p in recent_predictions]) if recent_predictions else 0
+        
+        return {
+            "model_version": model_version,
+            "prediction_count": prediction_count,
+            "average_confidence": float(avg_confidence),
+            "recent_predictions": len(recent_predictions),
+            "status": "healthy" if avg_confidence > 0.7 else "warning"
+        }
+
+# ============================================================================
+# DATA PREPROCESSING SERVICE
+# ============================================================================
+
+class PreprocessingService:
+    """Data preprocessing microservice"""
+    
+    def __init__(self):
+        self.preprocessors = {}
+        self.load_preprocessors()
+    
+    def load_preprocessors(self):
+        """Load preprocessing pipelines"""
+        # Load scalers, encoders, etc.
+        self.preprocessors["scaler"] = joblib.load("preprocessors/scaler.pkl") if os.path.exists("preprocessors/scaler.pkl") else None
+    
+    async def preprocess_features(self, raw_features: List[float], preprocessing_config: Dict[str, Any]) -> List[float]:
+        """Preprocess raw features"""
+        
+        features = np.array(raw_features).reshape(1, -1)
+        
+        # Apply scaling if configured
+        if preprocessing_config.get("scale", False) and self.preprocessors.get("scaler"):
+            features = self.preprocessors["scaler"].transform(features)
+        
+        # Apply normalization if configured
+        if preprocessing_config.get("normalize", False):
+            features = features / np.linalg.norm(features, axis=1, keepdims=True)
+        
+        return features.flatten().tolist()
+
+# ============================================================================
+# API GATEWAY / ORCHESTRATOR SERVICE
+# ============================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan management"""
+    # Startup
+    app.state.model_service = ModelService()
+    app.state.monitoring_service = MonitoringService()
+    app.state.preprocessing_service = PreprocessingService()
+    yield
+    # Shutdown
+    # Clean up resources if needed
+
+app = FastAPI(
+    title="ML Microservices API",
+    description="Microservices architecture for ML model deployment",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Dependency injection
+def get_model_service() -> ModelService:
+    return app.state.model_service
+
+def get_monitoring_service() -> MonitoringService:
+    return app.state.monitoring_service
+
+def get_preprocessing_service() -> PreprocessingService:
+    return app.state.preprocessing_service
+
+# ============================================================================
+# API ENDPOINTS
+# ============================================================================
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy", "timestamp": datetime.now()}
+
+@app.post("/predict", response_model=PredictionResponse)
+async def predict(
+    request: PredictionRequest,
+    background_tasks: BackgroundTasks,
+    model_service: ModelService = Depends(get_model_service),
+    monitoring_service: MonitoringService = Depends(get_monitoring_service),
+    preprocessing_service: PreprocessingService = Depends(get_preprocessing_service)
+):
+    """Main prediction endpoint"""
+    
+    try:
+        # Preprocess features
+        preprocessing_config = {"scale": True, "normalize": False}
+        processed_features = await preprocessing_service.preprocess_features(
+            request.features, preprocessing_config
+        )
+        
+        # Update request with processed features
+        processed_request = PredictionRequest(
+            features=processed_features,
+            model_version=request.model_version,
+            explanation_required=request.explanation_required
+        )
+        
+        # Make prediction
+        prediction_response = await model_service.predict(processed_request)
+        
+        # Log prediction asynchronously
+        background_tasks.add_task(
+            monitoring_service.log_prediction,
+            prediction_response,
+            request.features
+        )
+        
+        return prediction_response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
+@app.get("/models")
+async def list_models(model_service: ModelService = Depends(get_model_service)):
+    """List available models"""
+    return {
+        "models": list(model_service.models.keys()),
+        "metadata": model_service.model_metadata
+    }
+
+@app.get("/metrics/{model_version}")
+async def get_metrics(
+    model_version: str,
+    monitoring_service: MonitoringService = Depends(get_monitoring_service)
+):
+    """Get model performance metrics"""
+    return await monitoring_service.get_model_metrics(model_version)
+
+@app.post("/batch_predict")
+async def batch_predict(
+    requests: List[PredictionRequest],
+    model_service: ModelService = Depends(get_model_service)
+):
+    """Batch prediction endpoint"""
+    
+    results = []
+    for request in requests:
+        try:
+            result = await model_service.predict(request)
+            results.append(result)
+        except Exception as e:
+            results.append({"error": str(e), "request": request.dict()})
+    
+    return {"predictions": results, "count": len(results)}
+
+# ============================================================================
+# SEPARATE MICROSERVICES RUNNERS
+# ============================================================================
+
+class ModelServiceRunner:
+    """Standalone model service runner"""
+    
+    def __init__(self, port: int = 8001):
+        self.port = port
+        self.app = FastAPI(title="Model Service")
+        self.setup_routes()
+    
+    def setup_routes(self):
+        model_service = ModelService()
+        
+        @self.app.post("/predict")
+        async def predict(request: PredictionRequest):
+            return await model_service.predict(request)
+        
+        @self.app.get("/models")
+        async def list_models():
+            return {"models": list(model_service.models.keys())}
+    
+    def run(self):
+        uvicorn.run(self.app, host="0.0.0.0", port=self.port)
+
+class MonitoringServiceRunner:
+    """Standalone monitoring service runner"""
+    
+    def __init__(self, port: int = 8002):
+        self.port = port
+        self.app = FastAPI(title="Monitoring Service")
+        self.setup_routes()
+    
+    def setup_routes(self):
+        monitoring_service = MonitoringService()
+        
+        @self.app.get("/metrics/{model_version}")
+        async def get_metrics(model_version: str):
+            return await monitoring_service.get_model_metrics(model_version)
+        
+        @self.app.post("/log")
+        async def log_prediction(data: Dict[str, Any]):
+            # Log prediction data
+            return {"status": "logged"}
+    
+    def run(self):
+        uvicorn.run(self.app, host="0.0.0.0", port=self.port)
+
+# ============================================================================
+# DOCKER COMPOSE CONFIGURATION
+# ============================================================================
+
+docker_compose_yaml = """
+version: '3.8'
+
+services:
+  api-gateway:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVICE_NAME=api-gateway
+    depends_on:
+      - redis
+      - postgres
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  model-service:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVICE_NAME=model-service
+    volumes:
+      - ./models:/app/models
+    command: python -c "from main import ModelServiceRunner; ModelServiceRunner(8001).run()"
+
+  monitoring-service:
+    build: .
+    ports:
+      - "8002:8002"
+    environment:
+      - SERVICE_NAME=monitoring-service
+    depends_on:
+      - redis
+      - postgres
+    command: python -c "from main import MonitoringServiceRunner; MonitoringServiceRunner(8002).run()"
+
+  preprocessing-service:
+    build: .
+    ports:
+      - "8003:8003"
+    environment:
+      - SERVICE_NAME=preprocessing-service
+    volumes:
+      - ./preprocessors:/app/preprocessors
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ml_logs
+      POSTGRES_USER: ml_user
+      POSTGRES_PASSWORD: ml_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+"""
+
+# ============================================================================
+# CLIENT EXAMPLE
+# ============================================================================
+
+class MLMicroservicesClient:
+    """Client for interacting with ML microservices"""
+    
+    def __init__(self, base_url: str = "http://localhost:8000"):
+        self.base_url = base_url
+        self.session = httpx.AsyncClient()
+    
+    async def predict(self, features: List[float], model_version: str = "latest") -> Dict[str, Any]:
+        """Make a prediction request"""
+        
+        request_data = {
+            "features": features,
+            "model_version": model_version,
+            "explanation_required": True
+        }
+        
+        response = await self.session.post(
+            f"{self.base_url}/predict",
+            json=request_data
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"Prediction failed: {response.text}")
+    
+    async def get_metrics(self, model_version: str) -> Dict[str, Any]:
+        """Get model metrics"""
+        
+        response = await self.session.get(f"{self.base_url}/metrics/{model_version}")
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"Failed to get metrics: {response.text}")
+    
+    async def close(self):
+        await self.session.aclose()
+
+# ============================================================================
+# EXAMPLE USAGE
+# ============================================================================
+
+async def example_usage():
+    """Example of using the microservices system"""
+    
+    client = MLMicroservicesClient()
+    
+    try:
+        # Make a prediction
+        features = [1.2, 3.4, 2.1, 0.8, 1.5, 2.7, 0.9, 1.1, 2.3, 1.8]
+        result = await client.predict(features, "v1.0")
+        
+        print("Prediction Result:")
+        print(f"Prediction: {result['prediction']}")
+        print(f"Confidence: {result['confidence']}")
+        print(f"Model Version: {result['model_version']}")
+        
+        # Get metrics
+        metrics = await client.get_metrics("v1.0")
+        print("\nModel Metrics:")
+        print(f"Prediction Count: {metrics['prediction_count']}")
+        print(f"Average Confidence: {metrics['average_confidence']}")
+        print(f"Status: {metrics['status']}")
+        
+    finally:
+        await client.close()
+
+if __name__ == "__main__":
+    # Run the main API gateway
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # To run individual services:
+    # ModelServiceRunner(8001).run()
+    # MonitoringServiceRunner(8002).run()
+    
+    # To test the client:
+    # asyncio.run(example_usage())
+```
+
+### Explanation
+
+**Microservices Components:**
+
+1. **API Gateway**: Central entry point routing requests to appropriate services
+2. **Model Service**: Core prediction logic and model management
+3. **Monitoring Service**: Performance tracking and logging
+4. **Preprocessing Service**: Data transformation and feature engineering
+5. **Database Services**: Redis for caching, PostgreSQL for persistence
+
+**Communication Patterns:**
+
+1. **Synchronous**: HTTP/REST APIs for real-time predictions
+2. **Asynchronous**: Background tasks for logging and monitoring
+3. **Event-driven**: Message queues for service coordination
+4. **Load Balancing**: Multiple instances of each service
+
+### Use Cases
+
+- **High-Traffic ML APIs**: Scale individual components based on demand
+- **A/B Testing**: Deploy multiple model versions simultaneously
+- **Multi-Model Systems**: Different services for different model types
+- **Team Independence**: Different teams can own different services
+- **Continuous Deployment**: Update services independently
+
+### Best Practices
+
+- **Service Isolation**: Each service should have single responsibility
+- **API Versioning**: Version APIs to maintain backward compatibility
+- **Health Checks**: Implement comprehensive health monitoring
+- **Circuit Breakers**: Handle service failures gracefully
+- **Container Orchestration**: Use Kubernetes or Docker Swarm
+
+### Pitfalls
+
+- **Network Latency**: Multiple service calls increase response time
+- **Service Dependencies**: Complex dependency graphs can be fragile
+- **Data Consistency**: Maintaining consistency across services
+- **Debugging Complexity**: Distributed tracing becomes essential
+- **Operational Overhead**: More services mean more operational complexity
+
+### Debugging
+
+- **Distributed Tracing**: Use tools like Jaeger or Zipkin
+- **Centralized Logging**: Aggregate logs from all services
+- **Service Mesh**: Implement with Istio for observability
+- **Performance Monitoring**: Track service-to-service communication
+- **Error Correlation**: Link errors across service boundaries
+
+### Optimization
+
+- **Caching Strategy**: Cache predictions and preprocessed data
+- **Async Processing**: Use async/await for I/O operations
+- **Connection Pooling**: Reuse database and HTTP connections
+- **Load Balancing**: Distribute load across service instances
+- **Auto-scaling**: Scale services based on metrics and demand
 
 ---
 
 ## Question 36
 
-**What is model versioning, and how can it be managed in a real-world application?**
+**What are the considerations for scaling a machine learning application with Python?**
 
-**Answer:** _[To be filled]_
+### Theory
+
+Scaling ML applications involves handling increased data volume, user load, and computational demands. Python-specific scaling considerations include GIL limitations, memory management, distributed computing, and leveraging appropriate frameworks and infrastructure patterns.
+
+### Code Example
+
+```python
+import asyncio
+import multiprocessing as mp
+import threading
+import time
+import numpy as np
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from typing import List, Dict, Any, Optional
+import joblib
+import ray
+import dask
+from dask.distributed import Client
+import redis
+import psycopg2
+from sqlalchemy import create_engine
+import boto3
+from kubernetes import client, config
+import docker
+from dataclasses import dataclass
+import logging
+from contextlib import contextmanager
+
+# ============================================================================
+# SCALING STRATEGIES DEMONSTRATION
+# ============================================================================
+
+@dataclass
+class ScalingMetrics:
+    """Metrics for monitoring scaling performance"""
+    throughput: float  # requests per second
+    latency: float     # average response time
+    memory_usage: float  # MB
+    cpu_usage: float    # percentage
+    error_rate: float   # percentage
+
+class MLWorkload:
+    """Simulated ML workload for scaling tests"""
+    
+    def __init__(self, complexity: int = 1000):
+        self.complexity = complexity
+        self.model = self._create_dummy_model()
+    
+    def _create_dummy_model(self):
+        """Create a computationally intensive dummy model"""
+        return {
+            'weights': np.random.randn(self.complexity, self.complexity),
+            'bias': np.random.randn(self.complexity)
+        }
+    
+    def predict(self, data: np.ndarray) -> np.ndarray:
+        """Simulate ML prediction with computation"""
+        # Simulate heavy computation
+        result = np.dot(data, self.model['weights']) + self.model['bias']
+        return np.tanh(result)  # Activation function
+    
+    def batch_predict(self, batch_data: List[np.ndarray]) -> List[np.ndarray]:
+        """Batch prediction processing"""
+        return [self.predict(data) for data in batch_data]
+
+# ============================================================================
+# 1. CONCURRENCY SCALING
+# ============================================================================
+
+class ConcurrencyScaler:
+    """Demonstrate different concurrency approaches"""
+    
+    def __init__(self, workload: MLWorkload):
+        self.workload = workload
+    
+    def sequential_processing(self, data_batches: List[np.ndarray]) -> ScalingMetrics:
+        """Baseline sequential processing"""
+        start_time = time.time()
+        start_memory = self._get_memory_usage()
+        
+        results = []
+        for batch in data_batches:
+            results.append(self.workload.predict(batch))
+        
+        end_time = time.time()
+        end_memory = self._get_memory_usage()
+        
+        return ScalingMetrics(
+            throughput=len(data_batches) / (end_time - start_time),
+            latency=(end_time - start_time) / len(data_batches),
+            memory_usage=end_memory - start_memory,
+            cpu_usage=100.0,  # Assuming full CPU usage
+            error_rate=0.0
+        )
+    
+    def thread_based_scaling(self, data_batches: List[np.ndarray], max_workers: int = 4) -> ScalingMetrics:
+        """Thread-based concurrency (I/O bound tasks)"""
+        start_time = time.time()
+        start_memory = self._get_memory_usage()
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(self.workload.predict, batch) for batch in data_batches]
+            results = [future.result() for future in futures]
+        
+        end_time = time.time()
+        end_memory = self._get_memory_usage()
+        
+        return ScalingMetrics(
+            throughput=len(data_batches) / (end_time - start_time),
+            latency=(end_time - start_time) / len(data_batches),
+            memory_usage=end_memory - start_memory,
+            cpu_usage=100.0 / max_workers,  # Distributed across threads
+            error_rate=0.0
+        )
+    
+    def process_based_scaling(self, data_batches: List[np.ndarray], max_workers: int = None) -> ScalingMetrics:
+        """Process-based concurrency (CPU bound tasks)"""
+        if max_workers is None:
+            max_workers = mp.cpu_count()
+        
+        start_time = time.time()
+        start_memory = self._get_memory_usage()
+        
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(self.workload.predict, batch) for batch in data_batches]
+            results = [future.result() for future in futures]
+        
+        end_time = time.time()
+        end_memory = self._get_memory_usage()
+        
+        return ScalingMetrics(
+            throughput=len(data_batches) / (end_time - start_time),
+            latency=(end_time - start_time) / len(data_batches),
+            memory_usage=end_memory - start_memory,
+            cpu_usage=100.0,  # Multiple processes can use multiple cores
+            error_rate=0.0
+        )
+    
+    async def async_processing(self, data_batches: List[np.ndarray]) -> ScalingMetrics:
+        """Async processing for I/O bound ML tasks"""
+        start_time = time.time()
+        start_memory = self._get_memory_usage()
+        
+        async def async_predict(batch):
+            # Simulate async I/O (e.g., remote model calls)
+            await asyncio.sleep(0.001)  # Simulate I/O latency
+            return self.workload.predict(batch)
+        
+        tasks = [async_predict(batch) for batch in data_batches]
+        results = await asyncio.gather(*tasks)
+        
+        end_time = time.time()
+        end_memory = self._get_memory_usage()
+        
+        return ScalingMetrics(
+            throughput=len(data_batches) / (end_time - start_time),
+            latency=(end_time - start_time) / len(data_batches),
+            memory_usage=end_memory - start_memory,
+            cpu_usage=25.0,  # Lower CPU usage due to I/O waiting
+            error_rate=0.0
+        )
+    
+    def _get_memory_usage(self) -> float:
+        """Get current memory usage (simplified)"""
+        import psutil
+        process = psutil.Process()
+        return process.memory_info().rss / 1024 / 1024  # MB
+
+# ============================================================================
+# 2. DISTRIBUTED COMPUTING SCALING
+# ============================================================================
+
+class DistributedScaler:
+    """Demonstrate distributed computing for ML scaling"""
+    
+    def __init__(self):
+        self.ray_initialized = False
+        self.dask_client = None
+    
+    def ray_scaling(self, data_batches: List[np.ndarray]) -> ScalingMetrics:
+        """Scale using Ray for distributed computing"""
+        
+        if not self.ray_initialized:
+            ray.init(ignore_reinit_error=True)
+            self.ray_initialized = True
+        
+        @ray.remote
+        class RayMLWorker:
+            def __init__(self):
+                self.workload = MLWorkload()
+            
+            def predict(self, batch):
+                return self.workload.predict(batch)
+        
+        start_time = time.time()
+        
+        # Create remote workers
+        num_workers = 4
+        workers = [RayMLWorker.remote() for _ in range(num_workers)]
+        
+        # Distribute work
+        futures = []
+        for i, batch in enumerate(data_batches):
+            worker = workers[i % num_workers]
+            futures.append(worker.predict.remote(batch))
+        
+        # Collect results
+        results = ray.get(futures)
+        
+        end_time = time.time()
+        
+        return ScalingMetrics(
+            throughput=len(data_batches) / (end_time - start_time),
+            latency=(end_time - start_time) / len(data_batches),
+            memory_usage=0.0,  # Distributed across nodes
+            cpu_usage=100.0 / num_workers,
+            error_rate=0.0
+        )
+    
+    def dask_scaling(self, data_batches: List[np.ndarray]) -> ScalingMetrics:
+        """Scale using Dask for distributed computing"""
+        
+        if self.dask_client is None:
+            self.dask_client = Client('localhost:8786', processes=False)
+        
+        def dask_predict(batch):
+            workload = MLWorkload()
+            return workload.predict(batch)
+        
+        start_time = time.time()
+        
+        # Convert to dask operations
+        futures = [self.dask_client.submit(dask_predict, batch) for batch in data_batches]
+        results = self.dask_client.gather(futures)
+        
+        end_time = time.time()
+        
+        return ScalingMetrics(
+            throughput=len(data_batches) / (end_time - start_time),
+            latency=(end_time - start_time) / len(data_batches),
+            memory_usage=0.0,  # Distributed across workers
+            cpu_usage=75.0,
+            error_rate=0.0
+        )
+
+# ============================================================================
+# 3. DATA SCALING STRATEGIES
+# ============================================================================
+
+class DataScaler:
+    """Strategies for scaling data processing"""
+    
+    def __init__(self):
+        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
+    
+    def chunked_processing(self, large_dataset: pd.DataFrame, chunk_size: int = 10000) -> ScalingMetrics:
+        """Process large datasets in chunks"""
+        start_time = time.time()
+        start_memory = self._get_memory_usage()
+        
+        workload = MLWorkload(complexity=100)  # Smaller model for demo
+        results = []
+        
+        for chunk in pd.read_csv('large_dataset.csv', chunksize=chunk_size):
+            # Process chunk
+            chunk_array = chunk.values
+            result = workload.predict(chunk_array)
+            results.append(result)
+            
+            # Optional: Save intermediate results
+            self._save_chunk_result(result)
+        
+        end_time = time.time()
+        end_memory = self._get_memory_usage()
+        
+        return ScalingMetrics(
+            throughput=len(large_dataset) / (end_time - start_time),
+            latency=(end_time - start_time),
+            memory_usage=end_memory - start_memory,
+            cpu_usage=80.0,
+            error_rate=0.0
+        )
+    
+    def streaming_processing(self, data_stream) -> ScalingMetrics:
+        """Process streaming data with backpressure handling"""
+        start_time = time.time()
+        processed_count = 0
+        buffer = []
+        buffer_size = 100
+        
+        workload = MLWorkload(complexity=50)
+        
+        for data_point in data_stream:
+            buffer.append(data_point)
+            
+            if len(buffer) >= buffer_size:
+                # Process batch
+                batch_array = np.array(buffer)
+                result = workload.predict(batch_array)
+                
+                # Clear buffer
+                buffer = []
+                processed_count += buffer_size
+                
+                # Implement backpressure
+                if processed_count % 1000 == 0:
+                    time.sleep(0.01)  # Brief pause to prevent overflow
+        
+        # Process remaining data in buffer
+        if buffer:
+            batch_array = np.array(buffer)
+            result = workload.predict(batch_array)
+            processed_count += len(buffer)
+        
+        end_time = time.time()
+        
+        return ScalingMetrics(
+            throughput=processed_count / (end_time - start_time),
+            latency=0.01,  # Average processing time per item
+            memory_usage=50.0,  # Constant memory usage
+            cpu_usage=70.0,
+            error_rate=0.0
+        )
+    
+    def caching_strategy(self, requests: List[Dict[str, Any]]) -> ScalingMetrics:
+        """Implement caching for repeated ML requests"""
+        start_time = time.time()
+        cache_hits = 0
+        cache_misses = 0
+        
+        workload = MLWorkload(complexity=200)
+        
+        for request in requests:
+            # Create cache key
+            cache_key = self._create_cache_key(request)
+            
+            # Check cache
+            cached_result = self.redis_client.get(cache_key)
+            
+            if cached_result:
+                cache_hits += 1
+                result = joblib.loads(cached_result)
+            else:
+                cache_misses += 1
+                # Compute result
+                data = np.array(request['features'])
+                result = workload.predict(data)
+                
+                # Cache result
+                self.redis_client.setex(
+                    cache_key, 
+                    3600,  # 1 hour TTL
+                    joblib.dumps(result)
+                )
+        
+        end_time = time.time()
+        cache_hit_rate = cache_hits / len(requests) if requests else 0
+        
+        return ScalingMetrics(
+            throughput=len(requests) / (end_time - start_time),
+            latency=(end_time - start_time) / len(requests),
+            memory_usage=20.0,  # Lower due to caching
+            cpu_usage=100.0 * (1 - cache_hit_rate),  # Reduced CPU for cache hits
+            error_rate=0.0
+        )
+    
+    def _get_memory_usage(self) -> float:
+        import psutil
+        process = psutil.Process()
+        return process.memory_info().rss / 1024 / 1024
+    
+    def _save_chunk_result(self, result):
+        """Save intermediate results"""
+        pass  # Implementation depends on storage strategy
+    
+    def _create_cache_key(self, request: Dict[str, Any]) -> str:
+        """Create deterministic cache key"""
+        import hashlib
+        key_string = str(sorted(request.items()))
+        return hashlib.md5(key_string.encode()).hexdigest()
+
+# ============================================================================
+# 4. INFRASTRUCTURE SCALING
+# ============================================================================
+
+class InfrastructureScaler:
+    """Infrastructure scaling strategies"""
+    
+    def __init__(self):
+        self.docker_client = docker.from_env()
+    
+    def horizontal_pod_autoscaler_config(self) -> str:
+        """Kubernetes HPA configuration for ML services"""
+        return """
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ml-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ml-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+"""
+    
+    def container_scaling_strategy(self) -> Dict[str, Any]:
+        """Docker container scaling configuration"""
+        
+        container_config = {
+            "image": "ml-service:latest",
+            "environment": {
+                "WORKERS": "4",
+                "BATCH_SIZE": "32",
+                "MODEL_CACHE_SIZE": "1000"
+            },
+            "ports": {"8000/tcp": None},
+            "mem_limit": "2g",
+            "cpu_count": 2,
+            "volumes": {
+                "/models": {"bind": "/app/models", "mode": "ro"},
+                "/data": {"bind": "/app/data", "mode": "ro"}
+            },
+            "restart_policy": {"Name": "unless-stopped"},
+            "health_check": {
+                "test": ["CMD", "curl", "-f", "http://localhost:8000/health"],
+                "interval": 30,
+                "timeout": 10,
+                "retries": 3
+            }
+        }
+        
+        return container_config
+    
+    def database_scaling_config(self) -> Dict[str, str]:
+        """Database scaling strategies"""
+        
+        return {
+            "read_replicas": """
+                # Read replica configuration for scaling read operations
+                DATABASES = {
+                    'default': {
+                        'ENGINE': 'django.db.backends.postgresql',
+                        'NAME': 'ml_primary',
+                        'HOST': 'primary-db',
+                        'PORT': '5432',
+                    },
+                    'read_replica': {
+                        'ENGINE': 'django.db.backends.postgresql',
+                        'NAME': 'ml_replica',
+                        'HOST': 'replica-db',
+                        'PORT': '5432',
+                    }
+                }
+                DATABASE_ROUTERS = ['myapp.routers.DatabaseRouter']
+            """,
+            
+            "sharding": """
+                # Horizontal sharding for large-scale data
+                SHARD_CONFIGS = {
+                    'shard_1': {'host': 'shard1-db', 'ranges': (0, 1000000)},
+                    'shard_2': {'host': 'shard2-db', 'ranges': (1000001, 2000000)},
+                    'shard_3': {'host': 'shard3-db', 'ranges': (2000001, None)}
+                }
+            """,
+            
+            "connection_pooling": """
+                # Connection pooling for efficient database access
+                import psycopg2.pool
+                
+                connection_pool = psycopg2.pool.ThreadedConnectionPool(
+                    minconn=5,
+                    maxconn=20,
+                    host="localhost",
+                    database="ml_db",
+                    user="ml_user",
+                    password="password"
+                )
+            """
+        }
+
+# ============================================================================
+# 5. MONITORING AND AUTO-SCALING
+# ============================================================================
+
+class ScalingMonitor:
+    """Monitor system metrics and implement auto-scaling"""
+    
+    def __init__(self):
+        self.metrics_history = []
+        self.scaling_policies = {
+            'cpu_threshold': 70.0,
+            'memory_threshold': 80.0,
+            'response_time_threshold': 2.0,
+            'error_rate_threshold': 5.0
+        }
+    
+    def collect_metrics(self) -> Dict[str, float]:
+        """Collect current system metrics"""
+        import psutil
+        
+        # System metrics
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        memory_percent = memory.percent
+        
+        # Application metrics (simulated)
+        response_time = np.random.normal(1.0, 0.3)  # Simulated response time
+        error_rate = np.random.uniform(0, 2)  # Simulated error rate
+        throughput = np.random.normal(100, 20)  # Requests per second
+        
+        metrics = {
+            'cpu_percent': cpu_percent,
+            'memory_percent': memory_percent,
+            'response_time': response_time,
+            'error_rate': error_rate,
+            'throughput': throughput,
+            'timestamp': time.time()
+        }
+        
+        self.metrics_history.append(metrics)
+        return metrics
+    
+    def should_scale_up(self, metrics: Dict[str, float]) -> bool:
+        """Determine if scaling up is needed"""
+        conditions = [
+            metrics['cpu_percent'] > self.scaling_policies['cpu_threshold'],
+            metrics['memory_percent'] > self.scaling_policies['memory_threshold'],
+            metrics['response_time'] > self.scaling_policies['response_time_threshold'],
+            metrics['error_rate'] > self.scaling_policies['error_rate_threshold']
+        ]
+        
+        # Scale up if any 2 conditions are met
+        return sum(conditions) >= 2
+    
+    def should_scale_down(self, metrics: Dict[str, float]) -> bool:
+        """Determine if scaling down is possible"""
+        # Check recent metrics history for sustained low usage
+        if len(self.metrics_history) < 10:
+            return False
+        
+        recent_metrics = self.metrics_history[-10:]
+        avg_cpu = np.mean([m['cpu_percent'] for m in recent_metrics])
+        avg_memory = np.mean([m['memory_percent'] for m in recent_metrics])
+        avg_response_time = np.mean([m['response_time'] for m in recent_metrics])
+        
+        return (avg_cpu < 30.0 and 
+                avg_memory < 50.0 and 
+                avg_response_time < 0.5)
+    
+    def auto_scale(self, current_instances: int) -> int:
+        """Implement auto-scaling logic"""
+        metrics = self.collect_metrics()
+        
+        if self.should_scale_up(metrics):
+            # Scale up by 50% but cap at reasonable limits
+            new_instances = min(current_instances * 1.5, 20)
+            print(f"Scaling UP: {current_instances} -> {new_instances}")
+            return int(new_instances)
+        
+        elif self.should_scale_down(metrics):
+            # Scale down by 25% but maintain minimum instances
+            new_instances = max(current_instances * 0.75, 2)
+            print(f"Scaling DOWN: {current_instances} -> {new_instances}")
+            return int(new_instances)
+        
+        return current_instances
+
+# ============================================================================
+# COMPREHENSIVE SCALING EXAMPLE
+# ============================================================================
+
+async def comprehensive_scaling_demo():
+    """Demonstrate comprehensive scaling strategies"""
+    
+    print("=== ML APPLICATION SCALING DEMONSTRATION ===\n")
+    
+    # Create test workload
+    workload = MLWorkload(complexity=500)
+    
+    # Generate test data
+    test_batches = [np.random.randn(100, 500) for _ in range(50)]
+    
+    # 1. Concurrency Scaling
+    print("1. CONCURRENCY SCALING")
+    print("-" * 40)
+    
+    concurrency_scaler = ConcurrencyScaler(workload)
+    
+    # Sequential baseline
+    seq_metrics = concurrency_scaler.sequential_processing(test_batches[:10])
+    print(f"Sequential: {seq_metrics.throughput:.2f} RPS, {seq_metrics.latency:.3f}s latency")
+    
+    # Thread-based
+    thread_metrics = concurrency_scaler.thread_based_scaling(test_batches[:10], max_workers=4)
+    print(f"Threading: {thread_metrics.throughput:.2f} RPS, {thread_metrics.latency:.3f}s latency")
+    
+    # Process-based
+    process_metrics = concurrency_scaler.process_based_scaling(test_batches[:10], max_workers=4)
+    print(f"Multiprocessing: {process_metrics.throughput:.2f} RPS, {process_metrics.latency:.3f}s latency")
+    
+    # Async processing
+    async_metrics = await concurrency_scaler.async_processing(test_batches[:10])
+    print(f"Async: {async_metrics.throughput:.2f} RPS, {async_metrics.latency:.3f}s latency")
+    
+    # 2. Data Scaling
+    print("\n2. DATA SCALING STRATEGIES")
+    print("-" * 40)
+    
+    data_scaler = DataScaler()
+    
+    # Simulate requests for caching demo
+    cache_requests = [
+        {'features': np.random.randn(500).tolist(), 'model_version': 'v1'}
+        for _ in range(100)
+    ]
+    # Add some duplicate requests to show cache effectiveness
+    cache_requests.extend(cache_requests[:20])
+    
+    cache_metrics = data_scaler.caching_strategy(cache_requests)
+    print(f"Caching: {cache_metrics.throughput:.2f} RPS, CPU usage: {cache_metrics.cpu_usage:.1f}%")
+    
+    # 3. Auto-scaling Simulation
+    print("\n3. AUTO-SCALING SIMULATION")
+    print("-" * 40)
+    
+    monitor = ScalingMonitor()
+    current_instances = 3
+    
+    for i in range(10):
+        current_instances = monitor.auto_scale(current_instances)
+        time.sleep(0.1)  # Simulate time passage
+    
+    print(f"Final instance count: {current_instances}")
+    
+    # 4. Infrastructure Configuration
+    print("\n4. INFRASTRUCTURE SCALING CONFIG")
+    print("-" * 40)
+    
+    infra_scaler = InfrastructureScaler()
+    
+    # Show HPA config
+    hpa_config = infra_scaler.horizontal_pod_autoscaler_config()
+    print("Kubernetes HPA configuration generated ✓")
+    
+    # Show container config
+    container_config = infra_scaler.container_scaling_strategy()
+    print(f"Container scaling config: {container_config['mem_limit']} memory, {container_config['cpu_count']} CPUs")
+    
+    # Show database scaling
+    db_configs = infra_scaler.database_scaling_config()
+    print(f"Database scaling strategies: {len(db_configs)} configurations available")
+
+if __name__ == "__main__":
+    # Run the comprehensive demonstration
+    asyncio.run(comprehensive_scaling_demo())
+```
+
+### Explanation
+
+**Key Scaling Dimensions:**
+
+1. **Computational Scaling**: Handle increased processing demands
+2. **Concurrency Scaling**: Manage multiple simultaneous requests
+3. **Data Scaling**: Process larger datasets efficiently
+4. **Infrastructure Scaling**: Scale underlying resources
+5. **Geographic Scaling**: Distribute across regions
+
+**Python-Specific Considerations:**
+
+1. **GIL Limitations**: Use multiprocessing for CPU-bound tasks
+2. **Memory Management**: Implement proper garbage collection strategies
+3. **Async Programming**: Leverage asyncio for I/O-bound operations
+4. **Library Optimization**: Use optimized libraries (NumPy, Numba)
+
+### Use Cases
+
+- **High-Traffic ML APIs**: Handle thousands of predictions per second
+- **Batch Processing**: Process large datasets overnight
+- **Real-time Streaming**: Handle continuous data streams
+- **Multi-Model Systems**: Scale different models independently
+- **Global Applications**: Distribute models across regions
+
+### Best Practices
+
+- **Horizontal Over Vertical**: Scale out rather than up when possible
+- **Stateless Design**: Keep services stateless for easier scaling
+- **Caching Strategy**: Implement multi-layer caching
+- **Load Testing**: Regularly test scaling under realistic loads
+- **Monitoring**: Implement comprehensive metrics collection
+
+### Pitfalls
+
+- **Premature Optimization**: Don't scale before you need to
+- **Resource Waste**: Over-provisioning can be expensive
+- **State Management**: Stateful components are harder to scale
+- **Cold Start Problems**: New instances may have slow initial performance
+- **Network Bottlenecks**: Inter-service communication can become bottleneck
+
+### Debugging
+
+- **Performance Profiling**: Use tools like cProfile and py-spy
+- **Memory Profiling**: Monitor memory usage with tracemalloc
+- **Distributed Tracing**: Track requests across services
+- **Load Testing**: Use tools like locust for realistic testing
+- **Resource Monitoring**: Track CPU, memory, and network usage
+
+### Optimization
+
+- **Connection Pooling**: Reuse database and HTTP connections
+- **Batch Processing**: Group individual requests into batches
+- **Model Optimization**: Use quantization and pruning
+- **Infrastructure as Code**: Automate scaling with Terraform/Ansible
+- **Edge Computing**: Deploy models closer to users
 
 ---
 
 ## Question 37
 
-**Describe a situation where a machine learning model might fail, and how you would investigate the issue using Python.**
+**What is model versioning, and how can it be managed in a real-world application?**
 
-**Answer:** _[To be filled]_
+### Theory
+
+Model versioning is the practice of tracking, managing, and deploying different versions of machine learning models throughout their lifecycle. It enables reproducibility, rollback capabilities, A/B testing, and systematic model evolution in production environments.
+
+### Code Example
+
+```python
+import os
+import json
+import pickle
+import hashlib
+import shutil
+from datetime import datetime, timezone
+from typing import Dict, List, Any, Optional, Union
+from dataclasses import dataclass, asdict
+from pathlib import Path
+import logging
+import joblib
+import mlflow
+import git
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
+import pandas as pd
+import boto3
+import docker
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float, Text, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+import semver
+
+# ============================================================================
+# MODEL VERSIONING SCHEMAS
+# ============================================================================
+
+@dataclass
+class ModelMetadata:
+    """Comprehensive model metadata"""
+    model_id: str
+    version: str
+    name: str
+    description: str
+    algorithm: str
+    framework: str
+    created_at: datetime
+    created_by: str
+    training_data_hash: str
+    hyperparameters: Dict[str, Any]
+    metrics: Dict[str, float]
+    tags: List[str]
+    size_mb: float
+    python_version: str
+    dependencies: Dict[str, str]
+    git_commit: Optional[str] = None
+    parent_version: Optional[str] = None
+    status: str = "development"  # development, staging, production, deprecated
+
+@dataclass
+class ModelArtifact:
+    """Model artifact information"""
+    artifact_id: str
+    model_id: str
+    version: str
+    artifact_type: str  # model, preprocessor, encoder, etc.
+    file_path: str
+    file_hash: str
+    file_size: int
+    created_at: datetime
+
+@dataclass
+class DeploymentRecord:
+    """Model deployment tracking"""
+    deployment_id: str
+    model_id: str
+    version: str
+    environment: str  # dev, staging, prod
+    endpoint_url: str
+    deployed_at: datetime
+    deployed_by: str
+    status: str  # active, inactive, failed
+    config: Dict[str, Any]
+
+# ============================================================================
+# DATABASE MODELS
+# ============================================================================
+
+Base = declarative_base()
+
+class ModelVersion(Base):
+    __tablename__ = "model_versions"
+    
+    id = Column(String, primary_key=True)
+    model_id = Column(String, nullable=False)
+    version = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(Text)
+    algorithm = Column(String)
+    framework = Column(String)
+    created_at = Column(DateTime)
+    created_by = Column(String)
+    training_data_hash = Column(String)
+    hyperparameters = Column(Text)  # JSON string
+    metrics = Column(Text)  # JSON string
+    tags = Column(Text)  # JSON string
+    size_mb = Column(Float)
+    python_version = Column(String)
+    dependencies = Column(Text)  # JSON string
+    git_commit = Column(String)
+    parent_version = Column(String)
+    status = Column(String, default="development")
+
+# ============================================================================
+# MODEL VERSION MANAGER
+# ============================================================================
+
+class ModelVersionManager:
+    """Comprehensive model versioning system"""
+    
+    def __init__(self, 
+                 storage_backend: str = "local",
+                 registry_url: str = "sqlite:///model_registry.db",
+                 artifact_store: str = "./model_store"):
+        
+        self.storage_backend = storage_backend
+        self.artifact_store = Path(artifact_store)
+        self.artifact_store.mkdir(exist_ok=True)
+        
+        # Database setup
+        self.engine = create_engine(registry_url)
+        Base.metadata.create_all(self.engine)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+        
+        # MLflow setup
+        mlflow.set_tracking_uri("sqlite:///mlflow.db")
+        
+        # Git repository
+        self.git_repo = self._init_git_repo()
+        
+        self.logger = logging.getLogger(__name__)
+    
+    def _init_git_repo(self) -> Optional[git.Repo]:
+        """Initialize or get existing git repository"""
+        try:
+            repo = git.Repo(".")
+            return repo
+        except git.InvalidGitRepositoryError:
+            return None
+    
+    def register_model(self, 
+                      model: Any,
+                      name: str,
+                      description: str = "",
+                      algorithm: str = "",
+                      hyperparameters: Dict[str, Any] = None,
+                      metrics: Dict[str, float] = None,
+                      tags: List[str] = None,
+                      training_data: Optional[Any] = None,
+                      preprocessors: Dict[str, Any] = None,
+                      auto_version: bool = True) -> ModelMetadata:
+        """Register a new model version"""
+        
+        # Generate model ID and version
+        model_id = self._generate_model_id(name)
+        
+        if auto_version:
+            version = self._get_next_version(model_id)
+        else:
+            version = "1.0.0"
+        
+        # Calculate training data hash
+        training_data_hash = ""
+        if training_data is not None:
+            training_data_hash = self._calculate_data_hash(training_data)
+        
+        # Get git commit
+        git_commit = None
+        if self.git_repo:
+            try:
+                git_commit = self.git_repo.head.commit.hexsha
+            except:
+                pass
+        
+        # Get dependencies
+        dependencies = self._get_dependencies()
+        
+        # Create metadata
+        metadata = ModelMetadata(
+            model_id=model_id,
+            version=version,
+            name=name,
+            description=description,
+            algorithm=algorithm,
+            framework=self._detect_framework(model),
+            created_at=datetime.now(timezone.utc),
+            created_by=os.environ.get("USER", "unknown"),
+            training_data_hash=training_data_hash,
+            hyperparameters=hyperparameters or {},
+            metrics=metrics or {},
+            tags=tags or [],
+            size_mb=self._calculate_model_size(model),
+            python_version=self._get_python_version(),
+            dependencies=dependencies,
+            git_commit=git_commit
+        )
+        
+        # Save model artifacts
+        artifact_paths = self._save_model_artifacts(metadata, model, preprocessors)
+        
+        # Register in database
+        self._save_metadata_to_db(metadata)
+        
+        # Register in MLflow
+        self._register_in_mlflow(metadata, model, artifact_paths)
+        
+        self.logger.info(f"Registered model {name} version {version}")
+        return metadata
+    
+    def get_model(self, model_id: str, version: str = "latest") -> tuple:
+        """Load a specific model version"""
+        
+        if version == "latest":
+            version = self._get_latest_version(model_id)
+        
+        # Get metadata
+        metadata = self._get_metadata_from_db(model_id, version)
+        if not metadata:
+            raise ValueError(f"Model {model_id} version {version} not found")
+        
+        # Load model artifacts
+        model_path = self.artifact_store / model_id / version / "model.pkl"
+        model = joblib.load(model_path)
+        
+        # Load preprocessors if available
+        preprocessors = {}
+        preprocessor_dir = self.artifact_store / model_id / version / "preprocessors"
+        if preprocessor_dir.exists():
+            for prep_file in preprocessor_dir.glob("*.pkl"):
+                prep_name = prep_file.stem
+                preprocessors[prep_name] = joblib.load(prep_file)
+        
+        return model, metadata, preprocessors
+    
+    def list_models(self, status: Optional[str] = None) -> List[ModelMetadata]:
+        """List all registered models"""
+        
+        session = self.SessionLocal()
+        try:
+            query = session.query(ModelVersion)
+            if status:
+                query = query.filter(ModelVersion.status == status)
+            
+            db_models = query.order_by(ModelVersion.created_at.desc()).all()
+            
+            models = []
+            for db_model in db_models:
+                metadata = ModelMetadata(
+                    model_id=db_model.model_id,
+                    version=db_model.version,
+                    name=db_model.name,
+                    description=db_model.description,
+                    algorithm=db_model.algorithm,
+                    framework=db_model.framework,
+                    created_at=db_model.created_at,
+                    created_by=db_model.created_by,
+                    training_data_hash=db_model.training_data_hash,
+                    hyperparameters=json.loads(db_model.hyperparameters) if db_model.hyperparameters else {},
+                    metrics=json.loads(db_model.metrics) if db_model.metrics else {},
+                    tags=json.loads(db_model.tags) if db_model.tags else [],
+                    size_mb=db_model.size_mb,
+                    python_version=db_model.python_version,
+                    dependencies=json.loads(db_model.dependencies) if db_model.dependencies else {},
+                    git_commit=db_model.git_commit,
+                    parent_version=db_model.parent_version,
+                    status=db_model.status
+                )
+                models.append(metadata)
+            
+            return models
+            
+        finally:
+            session.close()
+    
+    def promote_model(self, model_id: str, version: str, target_status: str) -> None:
+        """Promote model to different status (staging -> production)"""
+        
+        session = self.SessionLocal()
+        try:
+            model = session.query(ModelVersion).filter(
+                ModelVersion.model_id == model_id,
+                ModelVersion.version == version
+            ).first()
+            
+            if not model:
+                raise ValueError(f"Model {model_id} version {version} not found")
+            
+            # Demote other models in production if promoting to production
+            if target_status == "production":
+                session.query(ModelVersion).filter(
+                    ModelVersion.model_id == model_id,
+                    ModelVersion.status == "production"
+                ).update({"status": "deprecated"})
+            
+            model.status = target_status
+            session.commit()
+            
+            self.logger.info(f"Promoted model {model_id} v{version} to {target_status}")
+            
+        finally:
+            session.close()
+    
+    def compare_models(self, 
+                      model1: tuple, 
+                      model2: tuple,
+                      test_data: Optional[tuple] = None) -> Dict[str, Any]:
+        """Compare two model versions"""
+        
+        model1_id, version1 = model1
+        model2_id, version2 = model2
+        
+        # Get metadata
+        metadata1 = self._get_metadata_from_db(model1_id, version1)
+        metadata2 = self._get_metadata_from_db(model2_id, version2)
+        
+        comparison = {
+            "model1": {
+                "id": model1_id,
+                "version": version1,
+                "metrics": metadata1.metrics,
+                "size_mb": metadata1.size_mb,
+                "created_at": metadata1.created_at.isoformat()
+            },
+            "model2": {
+                "id": model2_id,
+                "version": version2,
+                "metrics": metadata2.metrics,
+                "size_mb": metadata2.size_mb,
+                "created_at": metadata2.created_at.isoformat()
+            }
+        }
+        
+        # Performance comparison if test data provided
+        if test_data:
+            X_test, y_test = test_data
+            
+            # Load and test both models
+            model1_obj, _, _ = self.get_model(model1_id, version1)
+            model2_obj, _, _ = self.get_model(model2_id, version2)
+            
+            pred1 = model1_obj.predict(X_test)
+            pred2 = model2_obj.predict(X_test)
+            
+            acc1 = accuracy_score(y_test, pred1)
+            acc2 = accuracy_score(y_test, pred2)
+            
+            comparison["test_performance"] = {
+                "model1_accuracy": acc1,
+                "model2_accuracy": acc2,
+                "accuracy_diff": acc2 - acc1,
+                "better_model": model2_id if acc2 > acc1 else model1_id
+            }
+        
+        return comparison
+    
+    def rollback_model(self, model_id: str, target_version: str) -> None:
+        """Rollback to a previous model version"""
+        
+        # Promote target version to production
+        self.promote_model(model_id, target_version, "production")
+        
+        self.logger.info(f"Rolled back model {model_id} to version {target_version}")
+    
+    def delete_model_version(self, model_id: str, version: str, force: bool = False) -> None:
+        """Delete a model version"""
+        
+        # Check if model is in production
+        metadata = self._get_metadata_from_db(model_id, version)
+        if metadata.status == "production" and not force:
+            raise ValueError("Cannot delete production model without force=True")
+        
+        # Delete from database
+        session = self.SessionLocal()
+        try:
+            session.query(ModelVersion).filter(
+                ModelVersion.model_id == model_id,
+                ModelVersion.version == version
+            ).delete()
+            session.commit()
+        finally:
+            session.close()
+        
+        # Delete artifacts
+        artifact_path = self.artifact_store / model_id / version
+        if artifact_path.exists():
+            shutil.rmtree(artifact_path)
+        
+        self.logger.info(f"Deleted model {model_id} version {version}")
+    
+    # Helper methods
+    def _generate_model_id(self, name: str) -> str:
+        """Generate unique model ID"""
+        clean_name = "".join(c for c in name if c.isalnum() or c in "_-").lower()
+        return f"{clean_name}_{datetime.now().strftime('%Y%m%d')}"
+    
+    def _get_next_version(self, model_id: str) -> str:
+        """Get next semantic version"""
+        session = self.SessionLocal()
+        try:
+            latest = session.query(ModelVersion).filter(
+                ModelVersion.model_id == model_id
+            ).order_by(ModelVersion.version.desc()).first()
+            
+            if not latest:
+                return "1.0.0"
+            
+            # Increment patch version
+            return semver.bump_patch(latest.version)
+            
+        finally:
+            session.close()
+    
+    def _get_latest_version(self, model_id: str) -> str:
+        """Get latest version for model"""
+        session = self.SessionLocal()
+        try:
+            latest = session.query(ModelVersion).filter(
+                ModelVersion.model_id == model_id
+            ).order_by(ModelVersion.version.desc()).first()
+            
+            if not latest:
+                raise ValueError(f"No versions found for model {model_id}")
+            
+            return latest.version
+            
+        finally:
+            session.close()
+    
+    def _calculate_data_hash(self, data: Any) -> str:
+        """Calculate hash of training data"""
+        if hasattr(data, 'values'):  # DataFrame
+            data_bytes = data.values.tobytes()
+        elif hasattr(data, 'tobytes'):  # NumPy array
+            data_bytes = data.tobytes()
+        else:
+            data_bytes = str(data).encode()
+        
+        return hashlib.sha256(data_bytes).hexdigest()[:16]
+    
+    def _get_dependencies(self) -> Dict[str, str]:
+        """Get current Python dependencies"""
+        try:
+            import pkg_resources
+            dependencies = {}
+            for dist in pkg_resources.working_set:
+                dependencies[dist.project_name] = dist.version
+            return dependencies
+        except:
+            return {}
+    
+    def _detect_framework(self, model: Any) -> str:
+        """Detect ML framework"""
+        model_type = type(model).__module__
+        if "sklearn" in model_type:
+            return "scikit-learn"
+        elif "tensorflow" in model_type:
+            return "tensorflow"
+        elif "torch" in model_type:
+            return "pytorch"
+        elif "xgboost" in model_type:
+            return "xgboost"
+        else:
+            return "unknown"
+    
+    def _calculate_model_size(self, model: Any) -> float:
+        """Calculate model size in MB"""
+        import pickle
+        model_bytes = pickle.dumps(model)
+        return len(model_bytes) / (1024 * 1024)
+    
+    def _get_python_version(self) -> str:
+        """Get current Python version"""
+        import sys
+        return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    
+    def _save_model_artifacts(self, 
+                             metadata: ModelMetadata, 
+                             model: Any, 
+                             preprocessors: Optional[Dict[str, Any]] = None) -> Dict[str, str]:
+        """Save model and related artifacts"""
+        
+        # Create directory structure
+        model_dir = self.artifact_store / metadata.model_id / metadata.version
+        model_dir.mkdir(parents=True, exist_ok=True)
+        
+        artifacts = {}
+        
+        # Save main model
+        model_path = model_dir / "model.pkl"
+        joblib.dump(model, model_path)
+        artifacts["model"] = str(model_path)
+        
+        # Save metadata
+        metadata_path = model_dir / "metadata.json"
+        with open(metadata_path, 'w') as f:
+            json.dump(asdict(metadata), f, indent=2, default=str)
+        artifacts["metadata"] = str(metadata_path)
+        
+        # Save preprocessors
+        if preprocessors:
+            prep_dir = model_dir / "preprocessors"
+            prep_dir.mkdir(exist_ok=True)
+            
+            for name, preprocessor in preprocessors.items():
+                prep_path = prep_dir / f"{name}.pkl"
+                joblib.dump(preprocessor, prep_path)
+                artifacts[f"preprocessor_{name}"] = str(prep_path)
+        
+        return artifacts
+    
+    def _save_metadata_to_db(self, metadata: ModelMetadata) -> None:
+        """Save metadata to database"""
+        session = self.SessionLocal()
+        try:
+            db_model = ModelVersion(
+                id=f"{metadata.model_id}_{metadata.version}",
+                model_id=metadata.model_id,
+                version=metadata.version,
+                name=metadata.name,
+                description=metadata.description,
+                algorithm=metadata.algorithm,
+                framework=metadata.framework,
+                created_at=metadata.created_at,
+                created_by=metadata.created_by,
+                training_data_hash=metadata.training_data_hash,
+                hyperparameters=json.dumps(metadata.hyperparameters),
+                metrics=json.dumps(metadata.metrics),
+                tags=json.dumps(metadata.tags),
+                size_mb=metadata.size_mb,
+                python_version=metadata.python_version,
+                dependencies=json.dumps(metadata.dependencies),
+                git_commit=metadata.git_commit,
+                parent_version=metadata.parent_version,
+                status=metadata.status
+            )
+            
+            session.add(db_model)
+            session.commit()
+            
+        finally:
+            session.close()
+    
+    def _get_metadata_from_db(self, model_id: str, version: str) -> Optional[ModelMetadata]:
+        """Get metadata from database"""
+        session = self.SessionLocal()
+        try:
+            db_model = session.query(ModelVersion).filter(
+                ModelVersion.model_id == model_id,
+                ModelVersion.version == version
+            ).first()
+            
+            if not db_model:
+                return None
+            
+            return ModelMetadata(
+                model_id=db_model.model_id,
+                version=db_model.version,
+                name=db_model.name,
+                description=db_model.description,
+                algorithm=db_model.algorithm,
+                framework=db_model.framework,
+                created_at=db_model.created_at,
+                created_by=db_model.created_by,
+                training_data_hash=db_model.training_data_hash,
+                hyperparameters=json.loads(db_model.hyperparameters) if db_model.hyperparameters else {},
+                metrics=json.loads(db_model.metrics) if db_model.metrics else {},
+                tags=json.loads(db_model.tags) if db_model.tags else [],
+                size_mb=db_model.size_mb,
+                python_version=db_model.python_version,
+                dependencies=json.loads(db_model.dependencies) if db_model.dependencies else {},
+                git_commit=db_model.git_commit,
+                parent_version=db_model.parent_version,
+                status=db_model.status
+            )
+            
+        finally:
+            session.close()
+    
+    def _register_in_mlflow(self, metadata: ModelMetadata, model: Any, artifact_paths: Dict[str, str]) -> None:
+        """Register model in MLflow"""
+        with mlflow.start_run():
+            # Log parameters
+            mlflow.log_params(metadata.hyperparameters)
+            
+            # Log metrics
+            mlflow.log_metrics(metadata.metrics)
+            
+            # Log model
+            mlflow.sklearn.log_model(model, "model")
+            
+            # Log artifacts
+            for name, path in artifact_paths.items():
+                mlflow.log_artifact(path)
+            
+            # Register model
+            mlflow.register_model(
+                model_uri=f"runs:/{mlflow.active_run().info.run_id}/model",
+                name=metadata.name,
+                tags={
+                    "version": metadata.version,
+                    "algorithm": metadata.algorithm,
+                    "framework": metadata.framework
+                }
+            )
+
+# ============================================================================
+# DEPLOYMENT INTEGRATION
+# ============================================================================
+
+class ModelDeploymentManager:
+    """Manage model deployments across environments"""
+    
+    def __init__(self, version_manager: ModelVersionManager):
+        self.version_manager = version_manager
+        self.deployments: Dict[str, DeploymentRecord] = {}
+    
+    def deploy_model(self, 
+                    model_id: str, 
+                    version: str, 
+                    environment: str,
+                    config: Dict[str, Any] = None) -> str:
+        """Deploy model to specific environment"""
+        
+        # Get model
+        model, metadata, preprocessors = self.version_manager.get_model(model_id, version)
+        
+        # Generate deployment configuration
+        deployment_config = {
+            "replicas": config.get("replicas", 1),
+            "cpu_limit": config.get("cpu_limit", "1000m"),
+            "memory_limit": config.get("memory_limit", "2Gi"),
+            "env_vars": {
+                "MODEL_ID": model_id,
+                "MODEL_VERSION": version,
+                "ENVIRONMENT": environment
+            }
+        }
+        
+        # Create deployment record
+        deployment_id = f"{model_id}_{version}_{environment}_{int(datetime.now().timestamp())}"
+        
+        deployment = DeploymentRecord(
+            deployment_id=deployment_id,
+            model_id=model_id,
+            version=version,
+            environment=environment,
+            endpoint_url=f"https://{environment}.api.example.com/models/{model_id}",
+            deployed_at=datetime.now(timezone.utc),
+            deployed_by=os.environ.get("USER", "unknown"),
+            status="active",
+            config=deployment_config
+        )
+        
+        self.deployments[deployment_id] = deployment
+        
+        # In real implementation, this would trigger actual deployment
+        self._trigger_deployment(deployment, model, preprocessors)
+        
+        return deployment_id
+    
+    def _trigger_deployment(self, deployment: DeploymentRecord, model: Any, preprocessors: Dict[str, Any]) -> None:
+        """Trigger actual deployment (Docker, Kubernetes, etc.)"""
+        # This would contain actual deployment logic
+        print(f"Deploying {deployment.model_id} v{deployment.version} to {deployment.environment}")
+
+# ============================================================================
+# EXAMPLE USAGE
+# ============================================================================
+
+def comprehensive_model_versioning_demo():
+    """Comprehensive demonstration of model versioning"""
+    
+    print("=== MODEL VERSIONING DEMONSTRATION ===\n")
+    
+    # Initialize version manager
+    version_manager = ModelVersionManager(
+        storage_backend="local",
+        artifact_store="./model_store"
+    )
+    
+    # Generate sample data
+    X, y = make_classification(n_samples=1000, n_features=20, n_classes=2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Train multiple model versions
+    print("1. TRAINING AND REGISTERING MODELS")
+    print("-" * 40)
+    
+    # Version 1.0.0 - Initial model
+    model_v1 = RandomForestClassifier(n_estimators=50, random_state=42)
+    model_v1.fit(X_train, y_train)
+    pred_v1 = model_v1.predict(X_test)
+    
+    metadata_v1 = version_manager.register_model(
+        model=model_v1,
+        name="fraud_detector",
+        description="Initial fraud detection model",
+        algorithm="RandomForest",
+        hyperparameters={"n_estimators": 50, "random_state": 42},
+        metrics={"accuracy": accuracy_score(y_test, pred_v1)},
+        tags=["fraud", "classification", "baseline"],
+        training_data=X_train
+    )
+    
+    print(f"Registered: {metadata_v1.name} v{metadata_v1.version}")
+    
+    # Version 1.0.1 - Improved model
+    model_v2 = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
+    model_v2.fit(X_train, y_train)
+    pred_v2 = model_v2.predict(X_test)
+    
+    metadata_v2 = version_manager.register_model(
+        model=model_v2,
+        name="fraud_detector",
+        description="Improved fraud detection with more trees",
+        algorithm="RandomForest",
+        hyperparameters={"n_estimators": 100, "max_depth": 10, "random_state": 42},
+        metrics={"accuracy": accuracy_score(y_test, pred_v2)},
+        tags=["fraud", "classification", "improved"]
+    )
+    
+    print(f"Registered: {metadata_v2.name} v{metadata_v2.version}")
+    
+    # 2. List models
+    print("\n2. LISTING MODELS")
+    print("-" * 40)
+    
+    models = version_manager.list_models()
+    for model in models:
+        print(f"Model: {model.name} v{model.version} - Accuracy: {model.metrics.get('accuracy', 'N/A'):.3f}")
+    
+    # 3. Compare models
+    print("\n3. COMPARING MODELS")
+    print("-" * 40)
+    
+    comparison = version_manager.compare_models(
+        (metadata_v1.model_id, metadata_v1.version),
+        (metadata_v2.model_id, metadata_v2.version),
+        test_data=(X_test, y_test)
+    )
+    
+    print(f"Model 1 Accuracy: {comparison['test_performance']['model1_accuracy']:.3f}")
+    print(f"Model 2 Accuracy: {comparison['test_performance']['model2_accuracy']:.3f}")
+    print(f"Better Model: {comparison['test_performance']['better_model']}")
+    
+    # 4. Promote model
+    print("\n4. MODEL PROMOTION")
+    print("-" * 40)
+    
+    # Promote better model to production
+    better_version = metadata_v2.version if comparison['test_performance']['model2_accuracy'] > comparison['test_performance']['model1_accuracy'] else metadata_v1.version
+    
+    version_manager.promote_model(metadata_v1.model_id, better_version, "production")
+    print(f"Promoted model v{better_version} to production")
+    
+    # 5. Deploy model
+    print("\n5. MODEL DEPLOYMENT")
+    print("-" * 40)
+    
+    deployment_manager = ModelDeploymentManager(version_manager)
+    
+    deployment_id = deployment_manager.deploy_model(
+        metadata_v1.model_id,
+        better_version,
+        "production",
+        config={"replicas": 3, "cpu_limit": "2000m", "memory_limit": "4Gi"}
+    )
+    
+    print(f"Deployed model to production: {deployment_id}")
+    
+    # 6. Load and test production model
+    print("\n6. LOADING PRODUCTION MODEL")
+    print("-" * 40)
+    
+    prod_model, prod_metadata, prod_preprocessors = version_manager.get_model(
+        metadata_v1.model_id, "latest"
+    )
+    
+    test_prediction = prod_model.predict(X_test[:5])
+    print(f"Production model predictions: {test_prediction}")
+    print(f"Model framework: {prod_metadata.framework}")
+    print(f"Model size: {prod_metadata.size_mb:.2f} MB")
+
+if __name__ == "__main__":
+    comprehensive_model_versioning_demo()
+```
+
+### Explanation
+
+**Core Versioning Components:**
+
+1. **Metadata Management**: Track model information, hyperparameters, and metrics
+2. **Artifact Storage**: Store model files, preprocessors, and related assets
+3. **Version Semantics**: Use semantic versioning (major.minor.patch)
+4. **Registry Database**: Centralized repository for model information
+5. **Deployment Tracking**: Monitor model deployments across environments
+
+**Versioning Strategies:**
+
+1. **Semantic Versioning**: Major.minor.patch for systematic progression
+2. **Git Integration**: Link model versions to code commits
+3. **Metadata Tracking**: Comprehensive information about each version
+4. **Artifact Management**: Store and retrieve all model components
+5. **Environment Promotion**: Move models through dev → staging → production
+
+### Use Cases
+
+- **Model Evolution**: Track improvements and changes over time
+- **A/B Testing**: Compare different model versions in production
+- **Rollback Capability**: Quickly revert to previous working versions
+- **Compliance**: Maintain audit trails for regulated industries
+- **Team Collaboration**: Enable multiple teams to work on model development
+
+### Best Practices
+
+- **Immutable Versions**: Never modify existing model versions
+- **Comprehensive Metadata**: Track all relevant information for reproducibility
+- **Testing Pipeline**: Validate models before promotion
+- **Automated Deployment**: Use CI/CD for consistent deployments
+- **Regular Cleanup**: Archive or delete obsolete model versions
+
+### Pitfalls
+
+- **Storage Overhead**: Multiple versions can consume significant storage
+- **Version Proliferation**: Too many versions can become difficult to manage
+- **Metadata Drift**: Incomplete or inaccurate metadata reduces value
+- **Deployment Complexity**: Managing multiple environments increases complexity
+- **Dependency Conflicts**: Different versions may require different dependencies
+
+### Debugging
+
+- **Audit Trails**: Track who created, modified, or deployed models
+- **Performance Monitoring**: Compare metrics across model versions
+- **Dependency Tracking**: Monitor library and framework compatibility
+- **Environment Validation**: Ensure models work correctly in target environments
+- **Rollback Testing**: Regularly test rollback procedures
+
+### Optimization
+
+- **Lazy Loading**: Load model artifacts only when needed
+- **Compression**: Use efficient storage formats for large models
+- **Caching**: Cache frequently accessed models in memory
+- **Parallel Deployment**: Deploy to multiple environments simultaneously
+- **Cleanup Automation**: Automatically archive old model versions
 
 ---
 
 ## Question 38
 
+**Describe a situation where a machine learning model might fail, and how you would investigate the issue using Python.**
+
+**Answer:**
+
+**Common ML Model Failure Scenarios:**
+
+Machine learning models can fail in various ways during development, deployment, or production. Here's a comprehensive investigation framework using Python.
+
+**1. Data-Related Failures**
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+import warnings
+warnings.filterwarnings('ignore')
+
+class DataQualityInvestigator:
+    """Comprehensive data quality investigation toolkit"""
+    
+    def __init__(self, data, target_column=None):
+        self.data = data.copy()
+        self.target_column = target_column
+        self.issues_found = {}
+    
+    def investigate_data_drift(self, reference_data, current_data):
+        """Detect data drift between training and production data"""
+        drift_report = {}
+        
+        for column in reference_data.select_dtypes(include=[np.number]).columns:
+            # Kolmogorov-Smirnov test for distribution differences
+            ref_values = reference_data[column].dropna()
+            curr_values = current_data[column].dropna()
+            
+            ks_stat, p_value = stats.ks_2samp(ref_values, curr_values)
+            
+            drift_report[column] = {
+                'ks_statistic': ks_stat,
+                'p_value': p_value,
+                'drift_detected': p_value < 0.05,
+                'ref_mean': ref_values.mean(),
+                'curr_mean': curr_values.mean(),
+                'ref_std': ref_values.std(),
+                'curr_std': curr_values.std()
+            }
+        
+        return drift_report
+    
+    def check_data_quality(self):
+        """Comprehensive data quality assessment"""
+        quality_report = {}
+        
+        # Missing values analysis
+        missing_data = self.data.isnull().sum()
+        quality_report['missing_values'] = missing_data[missing_data > 0].to_dict()
+        
+        # Duplicate records
+        duplicates = self.data.duplicated().sum()
+        quality_report['duplicates'] = duplicates
+        
+        # Outlier detection using IQR method
+        numeric_columns = self.data.select_dtypes(include=[np.number]).columns
+        outliers = {}
+        
+        for column in numeric_columns:
+            Q1 = self.data[column].quantile(0.25)
+            Q3 = self.data[column].quantile(0.75)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+            
+            outlier_mask = (self.data[column] < lower_bound) | (self.data[column] > upper_bound)
+            outliers[column] = {
+                'count': outlier_mask.sum(),
+                'percentage': (outlier_mask.sum() / len(self.data)) * 100,
+                'lower_bound': lower_bound,
+                'upper_bound': upper_bound
+            }
+        
+        quality_report['outliers'] = outliers
+        
+        # Feature correlation issues
+        if len(numeric_columns) > 1:
+            correlation_matrix = self.data[numeric_columns].corr()
+            high_correlation_pairs = []
+            
+            for i in range(len(correlation_matrix.columns)):
+                for j in range(i+1, len(correlation_matrix.columns)):
+                    corr_value = correlation_matrix.iloc[i, j]
+                    if abs(corr_value) > 0.9:
+                        high_correlation_pairs.append({
+                            'feature1': correlation_matrix.columns[i],
+                            'feature2': correlation_matrix.columns[j],
+                            'correlation': corr_value
+                        })
+            
+            quality_report['high_correlations'] = high_correlation_pairs
+        
+        return quality_report
+    
+    def visualize_data_issues(self, quality_report):
+        """Create visualizations for identified data issues"""
+        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        
+        # Missing values visualization
+        if quality_report['missing_values']:
+            missing_df = pd.DataFrame(list(quality_report['missing_values'].items()), 
+                                    columns=['Column', 'Missing_Count'])
+            axes[0, 0].bar(missing_df['Column'], missing_df['Missing_Count'])
+            axes[0, 0].set_title('Missing Values by Column')
+            axes[0, 0].tick_params(axis='x', rotation=45)
+        
+        # Outliers visualization
+        numeric_columns = self.data.select_dtypes(include=[np.number]).columns[:4]
+        if len(numeric_columns) > 0:
+            self.data[numeric_columns].boxplot(ax=axes[0, 1])
+            axes[0, 1].set_title('Outliers Detection (Box Plot)')
+        
+        # Distribution comparison (if available)
+        if len(numeric_columns) > 0:
+            for i, col in enumerate(numeric_columns[:2]):
+                self.data[col].hist(ax=axes[1, i], bins=30, alpha=0.7)
+                axes[1, i].set_title(f'Distribution of {col}')
+        
+        plt.tight_layout()
+        plt.show()
+        
+        return fig
+
+# Example usage
+def investigate_model_failure_scenario():
+    """Simulate a real-world model failure investigation"""
+    
+    # Simulate training data
+    np.random.seed(42)
+    n_samples = 1000
+    training_data = pd.DataFrame({
+        'feature1': np.random.normal(50, 10, n_samples),
+        'feature2': np.random.normal(100, 20, n_samples),
+        'feature3': np.random.exponential(2, n_samples),
+        'target': np.random.binomial(1, 0.3, n_samples)
+    })
+    
+    # Simulate production data with data drift
+    production_data = pd.DataFrame({
+        'feature1': np.random.normal(55, 12, n_samples),  # Mean shift
+        'feature2': np.random.normal(95, 25, n_samples),   # Variance change
+        'feature3': np.random.exponential(3, n_samples),   # Distribution change
+        'target': np.random.binomial(1, 0.3, n_samples)
+    })
+    
+    # Initialize investigator
+    investigator = DataQualityInvestigator(production_data, 'target')
+    
+    # Check data quality
+    quality_report = investigator.check_data_quality()
+    print("Data Quality Report:")
+    for key, value in quality_report.items():
+        print(f"\n{key.upper()}:")
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                print(f"  {sub_key}: {sub_value}")
+        else:
+            print(f"  {value}")
+    
+    # Check for data drift
+    drift_report = investigator.investigate_data_drift(training_data, production_data)
+    print("\nData Drift Report:")
+    for feature, drift_info in drift_report.items():
+        if drift_info['drift_detected']:
+            print(f"\n🚨 DRIFT DETECTED in {feature}:")
+            print(f"  KS Statistic: {drift_info['ks_statistic']:.4f}")
+            print(f"  P-value: {drift_info['p_value']:.6f}")
+            print(f"  Mean change: {drift_info['ref_mean']:.2f} → {drift_info['curr_mean']:.2f}")
+    
+    return investigator, quality_report, drift_report
+
+# investigate_model_failure_scenario()
+```
+
+**2. Model Performance Degradation Investigation**
+
+```python
+import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import roc_auc_score, precision_recall_curve
+import logging
+
+class ModelPerformanceInvestigator:
+    """Investigate model performance issues and degradation"""
+    
+    def __init__(self, model_path=None, model=None):
+        self.model = model if model else joblib.load(model_path)
+        self.performance_history = []
+        
+        # Setup logging for investigation
+        logging.basicConfig(level=logging.INFO, 
+                          format='%(asctime)s - %(levelname)s - %(message)s')
+        self.logger = logging.getLogger(__name__)
+    
+    def diagnose_performance_drop(self, X_test, y_test, baseline_metrics=None):
+        """Diagnose reasons for performance degradation"""
+        
+        current_predictions = self.model.predict(X_test)
+        current_probabilities = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, 'predict_proba') else None
+        
+        # Calculate current metrics
+        current_metrics = self._calculate_metrics(y_test, current_predictions, current_probabilities)
+        
+        self.logger.info(f"Current model performance: {current_metrics}")
+        
+        # Compare with baseline if available
+        if baseline_metrics:
+            performance_degradation = self._compare_with_baseline(current_metrics, baseline_metrics)
+            return current_metrics, performance_degradation
+        
+        return current_metrics, None
+    
+    def _calculate_metrics(self, y_true, y_pred, y_prob=None):
+        """Calculate comprehensive metrics"""
+        from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+        
+        metrics = {
+            'accuracy': accuracy_score(y_true, y_pred),
+            'precision': precision_score(y_true, y_pred, average='weighted'),
+            'recall': recall_score(y_true, y_pred, average='weighted'),
+            'f1_score': f1_score(y_true, y_pred, average='weighted')
+        }
+        
+        if y_prob is not None:
+            metrics['auc_roc'] = roc_auc_score(y_true, y_prob)
+        
+        return metrics
+    
+    def _compare_with_baseline(self, current_metrics, baseline_metrics):
+        """Compare current performance with baseline"""
+        degradation_report = {}
+        
+        for metric, current_value in current_metrics.items():
+            if metric in baseline_metrics:
+                baseline_value = baseline_metrics[metric]
+                change = current_value - baseline_value
+                percentage_change = (change / baseline_value) * 100
+                
+                degradation_report[metric] = {
+                    'baseline': baseline_value,
+                    'current': current_value,
+                    'absolute_change': change,
+                    'percentage_change': percentage_change,
+                    'degraded': change < -0.05  # 5% threshold
+                }
+        
+        return degradation_report
+    
+    def feature_importance_analysis(self, X_test, feature_names=None):
+        """Analyze feature importance and identify potential issues"""
+        
+        if hasattr(self.model, 'feature_importances_'):
+            importances = self.model.feature_importances_
+            
+            if feature_names is None:
+                feature_names = [f'feature_{i}' for i in range(len(importances))]
+            
+            importance_df = pd.DataFrame({
+                'feature': feature_names,
+                'importance': importances
+            }).sort_values('importance', ascending=False)
+            
+            # Identify potential issues
+            issues = []
+            
+            # Check for features with zero importance
+            zero_importance = importance_df[importance_df['importance'] == 0]
+            if len(zero_importance) > 0:
+                issues.append(f"Features with zero importance: {zero_importance['feature'].tolist()}")
+            
+            # Check for feature dominance
+            top_feature_importance = importance_df.iloc[0]['importance']
+            if top_feature_importance > 0.8:
+                issues.append(f"Single feature dominance: {importance_df.iloc[0]['feature']} ({top_feature_importance:.3f})")
+            
+            return importance_df, issues
+        
+        return None, ["Model doesn't support feature importance analysis"]
+    
+    def prediction_distribution_analysis(self, X_test, y_test):
+        """Analyze prediction distributions for anomalies"""
+        
+        predictions = self.model.predict(X_test)
+        
+        if hasattr(self.model, 'predict_proba'):
+            probabilities = self.model.predict_proba(X_test)
+            
+            # Analyze prediction confidence
+            max_probabilities = np.max(probabilities, axis=1)
+            low_confidence_threshold = 0.6
+            low_confidence_predictions = np.sum(max_probabilities < low_confidence_threshold)
+            
+            analysis_results = {
+                'total_predictions': len(predictions),
+                'low_confidence_count': low_confidence_predictions,
+                'low_confidence_percentage': (low_confidence_predictions / len(predictions)) * 100,
+                'mean_confidence': np.mean(max_probabilities),
+                'prediction_distribution': pd.Series(predictions).value_counts().to_dict()
+            }
+            
+            return analysis_results
+        
+        return {
+            'prediction_distribution': pd.Series(predictions).value_counts().to_dict()
+        }
+
+# Example usage
+def complete_failure_investigation():
+    """Complete workflow for investigating model failure"""
+    
+    # Generate sample data
+    np.random.seed(42)
+    X, y = make_classification(n_samples=1000, n_features=20, n_redundant=5, 
+                              n_informative=10, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    
+    # Train a model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Initialize investigator
+    investigator = ModelPerformanceInvestigator(model=model)
+    
+    # Simulate baseline metrics
+    baseline_metrics = {
+        'accuracy': 0.92,
+        'precision': 0.91,
+        'recall': 0.90,
+        'f1_score': 0.90,
+        'auc_roc': 0.95
+    }
+    
+    # Diagnose performance
+    current_metrics, degradation = investigator.diagnose_performance_drop(
+        X_test, y_test, baseline_metrics
+    )
+    
+    print("Performance Degradation Analysis:")
+    if degradation:
+        for metric, info in degradation.items():
+            if info['degraded']:
+                print(f"🚨 {metric.upper()} degraded: {info['baseline']:.3f} → {info['current']:.3f} "
+                      f"({info['percentage_change']:.1f}%)")
+    
+    # Feature importance analysis
+    feature_importance, importance_issues = investigator.feature_importance_analysis(X_test)
+    if feature_importance is not None:
+        print(f"\nTop 5 Important Features:")
+        print(feature_importance.head())
+    
+    if importance_issues:
+        print(f"\nFeature Importance Issues:")
+        for issue in importance_issues:
+            print(f"  - {issue}")
+    
+    # Prediction distribution analysis
+    pred_analysis = investigator.prediction_distribution_analysis(X_test, y_test)
+    print(f"\nPrediction Analysis:")
+    print(f"  Low confidence predictions: {pred_analysis['low_confidence_percentage']:.1f}%")
+    print(f"  Mean confidence: {pred_analysis['mean_confidence']:.3f}")
+    
+    return investigator
+
+# complete_failure_investigation()
+```
+
+**3. Production Environment Issues**
+
+```python
+import psutil
+import sys
+import traceback
+from datetime import datetime
+
+class ProductionModelMonitor:
+    """Monitor model performance in production environment"""
+    
+    def __init__(self, model, alert_thresholds=None):
+        self.model = model
+        self.alert_thresholds = alert_thresholds or {
+            'memory_usage_mb': 1000,
+            'prediction_time_ms': 1000,
+            'error_rate_percent': 5
+        }
+        self.metrics_history = []
+        self.error_log = []
+    
+    def monitor_prediction_request(self, X_input):
+        """Monitor a single prediction request"""
+        start_time = time.time()
+        start_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+        
+        try:
+            # Make prediction
+            prediction = self.model.predict(X_input)
+            success = True
+            error_message = None
+            
+        except Exception as e:
+            prediction = None
+            success = False
+            error_message = str(e)
+            
+            # Log detailed error information
+            self.error_log.append({
+                'timestamp': datetime.now(),
+                'error_type': type(e).__name__,
+                'error_message': error_message,
+                'traceback': traceback.format_exc(),
+                'input_shape': X_input.shape if hasattr(X_input, 'shape') else None,
+                'input_type': type(X_input).__name__
+            })
+        
+        end_time = time.time()
+        end_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+        
+        # Record metrics
+        metrics = {
+            'timestamp': datetime.now(),
+            'prediction_time_ms': (end_time - start_time) * 1000,
+            'memory_usage_mb': end_memory,
+            'memory_delta_mb': end_memory - start_memory,
+            'success': success,
+            'error_message': error_message
+        }
+        
+        self.metrics_history.append(metrics)
+        
+        # Check for alerts
+        alerts = self._check_alerts(metrics)
+        
+        return prediction, metrics, alerts
+    
+    def _check_alerts(self, metrics):
+        """Check if current metrics trigger any alerts"""
+        alerts = []
+        
+        if metrics['memory_usage_mb'] > self.alert_thresholds['memory_usage_mb']:
+            alerts.append(f"High memory usage: {metrics['memory_usage_mb']:.1f} MB")
+        
+        if metrics['prediction_time_ms'] > self.alert_thresholds['prediction_time_ms']:
+            alerts.append(f"Slow prediction: {metrics['prediction_time_ms']:.1f} ms")
+        
+        # Calculate recent error rate
+        recent_requests = self.metrics_history[-100:]  # Last 100 requests
+        if len(recent_requests) >= 10:
+            error_rate = (1 - sum(r['success'] for r in recent_requests) / len(recent_requests)) * 100
+            if error_rate > self.alert_thresholds['error_rate_percent']:
+                alerts.append(f"High error rate: {error_rate:.1f}%")
+        
+        return alerts
+    
+    def generate_health_report(self):
+        """Generate comprehensive health report"""
+        if not self.metrics_history:
+            return {"status": "No data available"}
+        
+        successful_requests = [m for m in self.metrics_history if m['success']]
+        
+        if successful_requests:
+            avg_prediction_time = np.mean([m['prediction_time_ms'] for m in successful_requests])
+            avg_memory_usage = np.mean([m['memory_usage_mb'] for m in successful_requests])
+            p95_prediction_time = np.percentile([m['prediction_time_ms'] for m in successful_requests], 95)
+        else:
+            avg_prediction_time = avg_memory_usage = p95_prediction_time = 0
+        
+        total_requests = len(self.metrics_history)
+        error_count = total_requests - len(successful_requests)
+        error_rate = (error_count / total_requests) * 100 if total_requests > 0 else 0
+        
+        # Analyze error patterns
+        error_types = {}
+        for error in self.error_log:
+            error_type = error['error_type']
+            error_types[error_type] = error_types.get(error_type, 0) + 1
+        
+        health_report = {
+            'total_requests': total_requests,
+            'successful_requests': len(successful_requests),
+            'error_rate_percent': error_rate,
+            'avg_prediction_time_ms': avg_prediction_time,
+            'p95_prediction_time_ms': p95_prediction_time,
+            'avg_memory_usage_mb': avg_memory_usage,
+            'error_types': error_types,
+            'recent_errors': self.error_log[-5:] if self.error_log else []
+        }
+        
+        return health_report
+
+# Usage example
+def production_monitoring_example():
+    """Example of production model monitoring"""
+    
+    # Create a simple model for demonstration
+    from sklearn.ensemble import RandomForestClassifier
+    model = RandomForestClassifier(n_estimators=50, random_state=42)
+    
+    # Train on dummy data
+    X_dummy = np.random.randn(100, 10)
+    y_dummy = np.random.randint(0, 2, 100)
+    model.fit(X_dummy, y_dummy)
+    
+    # Initialize monitor
+    monitor = ProductionModelMonitor(model)
+    
+    # Simulate production requests
+    print("Simulating production requests...")
+    for i in range(20):
+        # Create test input
+        X_test = np.random.randn(1, 10)
+        
+        # Sometimes introduce problematic inputs
+        if i % 10 == 0:
+            X_test = np.array([[np.inf] * 10])  # Problematic input
+        
+        prediction, metrics, alerts = monitor.monitor_prediction_request(X_test)
+        
+        if alerts:
+            print(f"Request {i}: ALERTS - {'; '.join(alerts)}")
+        
+        # Small delay to simulate real requests
+        time.sleep(0.01)
+    
+    # Generate health report
+    health_report = monitor.generate_health_report()
+    print(f"\nHealth Report:")
+    for key, value in health_report.items():
+        print(f"  {key}: {value}")
+    
+    return monitor
+
+# production_monitoring_example()
+```
+
+**Investigation Best Practices:**
+
+1. **Systematic Approach**: Follow a structured investigation process
+2. **Data Quality First**: Always start with data quality checks
+3. **Version Control**: Track model versions and associated data
+4. **Logging**: Implement comprehensive logging for debugging
+5. **Monitoring**: Set up continuous monitoring in production
+6. **Reproducibility**: Ensure investigation steps can be reproduced
+7. **Documentation**: Document findings and solutions
+
+**Common Failure Patterns:**
+- **Data Drift**: Training/production data distributions differ
+- **Feature Engineering Issues**: Missing or incorrect transformations
+- **Model Staleness**: Model performance degrades over time
+- **Infrastructure Problems**: Memory, CPU, or network issues
+- **Input Validation**: Unexpected input formats or ranges
+- **Dependencies**: Library version conflicts or updates
+
+This comprehensive framework provides the tools and methodology to systematically investigate and resolve machine learning model failures in production environments.
+
+---
+
+## Question 38 (Part 2)
+
 **What are Python's profiling tools and how do they assist in optimizing machine learning code?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+**Python Profiling Tools Overview:**
+
+Python profiling tools are essential for identifying performance bottlenecks, memory usage patterns, and optimization opportunities in machine learning applications. They provide detailed insights into function execution times, memory consumption, and resource utilization.
+
+**1. cProfile - Built-in Statistical Profiler**
+
+```python
+import cProfile
+import pstats
+import io
+from pstats import SortKey
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+class MLProfiler:
+    """Advanced ML code profiler using cProfile"""
+    
+    def __init__(self):
+        self.profiler = cProfile.Profile()
+        self.stats = None
+    
+    def profile_ml_training(self, training_function, *args, **kwargs):
+        """Profile ML training with detailed statistics"""
+        
+        # Start profiling
+        self.profiler.enable()
+        
+        try:
+            result = training_function(*args, **kwargs)
+        finally:
+            self.profiler.disable()
+        
+        # Generate statistics
+        s = io.StringIO()
+        ps = pstats.Stats(self.profiler, stream=s)
+        ps.sort_stats(SortKey.CUMULATIVE)
+        ps.print_stats()
+        
+        self.stats = s.getvalue()
+        return result, self.stats
+    
+    def profile_specific_functions(self, function_list):
+        """Profile specific functions and compare performance"""
+        results = {}
+        
+        for func_name, func in function_list.items():
+            profiler = cProfile.Profile()
+            profiler.enable()
+            
+            # Execute function
+            start_time = time.time()
+            func()
+            end_time = time.time()
+            
+            profiler.disable()
+            
+            # Collect stats
+            s = io.StringIO()
+            ps = pstats.Stats(profiler, stream=s)
+            ps.sort_stats(SortKey.CUMULATIVE)
+            ps.print_stats(10)  # Top 10 functions
+            
+            results[func_name] = {
+                'execution_time': end_time - start_time,
+                'profile_stats': s.getvalue()
+            }
+        
+        return results
+
+# Example ML training function to profile
+def expensive_ml_training():
+    """Simulate expensive ML training for profiling"""
+    np.random.seed(42)
+    X = np.random.randn(10000, 50)
+    y = np.random.randint(0, 2, 10000)
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Multiple models for comparison
+    models = {
+        'rf_small': RandomForestClassifier(n_estimators=10, random_state=42),
+        'rf_large': RandomForestClassifier(n_estimators=100, random_state=42)
+    }
+    
+    results = {}
+    for name, model in models.items():
+        model.fit(X_train, y_train)
+        predictions = model.predict(X_test)
+        results[name] = model
+    
+    return results
+
+# Usage example
+profiler = MLProfiler()
+# training_results, profile_stats = profiler.profile_ml_training(expensive_ml_training)
+# print("Top 10 most time-consuming functions:")
+# print(profile_stats)
+```
+
+**2. line_profiler - Line-by-Line Profiling**
+
+```python
+# Install: pip install line_profiler
+# Usage: kernprof -l -v script.py
+
+class LineProfilerExample:
+    """Example using line_profiler for detailed analysis"""
+    
+    @profile  # This decorator is added by line_profiler
+    def optimize_feature_engineering(self, data):
+        """Feature engineering function to be line-profiled"""
+        # Line 1: Data loading
+        processed_data = data.copy()
+        
+        # Line 2: Numerical operations
+        processed_data['feature_squared'] = processed_data['feature1'] ** 2
+        
+        # Line 3: String operations (typically slower)
+        processed_data['feature_processed'] = processed_data['text_feature'].str.lower()
+        
+        # Line 4: Complex calculations
+        processed_data['complex_feature'] = (
+            processed_data['feature1'] * processed_data['feature2'] + 
+            np.sin(processed_data['feature3'])
+        )
+        
+        # Line 5: Groupby operations
+        grouped_stats = processed_data.groupby('category')['feature1'].agg(['mean', 'std'])
+        
+        return processed_data, grouped_stats
+
+# Alternative implementation without decorator
+import line_profiler
+
+def line_profile_function(func, *args, **kwargs):
+    """Manually profile a function line by line"""
+    profiler = line_profiler.LineProfiler()
+    profiler.add_function(func)
+    profiler.enable_by_count()
+    
+    result = func(*args, **kwargs)
+    
+    profiler.disable_by_count()
+    profiler.print_stats()
+    
+    return result
+```
+
+**3. memory_profiler - Memory Usage Analysis**
+
+```python
+from memory_profiler import profile, memory_usage
+import psutil
+import os
+
+class MemoryProfiler:
+    """Comprehensive memory profiling for ML applications"""
+    
+    def __init__(self):
+        self.baseline_memory = self.get_current_memory()
+    
+    def get_current_memory(self):
+        """Get current memory usage in MB"""
+        process = psutil.Process(os.getpid())
+        return process.memory_info().rss / 1024 / 1024
+    
+    @profile  # Memory profiler decorator
+    def memory_intensive_ml_operation(self, size_factor=1):
+        """ML operation that uses significant memory"""
+        # Create large datasets
+        large_dataset = np.random.randn(1000 * size_factor, 100)
+        
+        # Feature engineering that creates copies
+        processed_dataset = large_dataset.copy()
+        processed_dataset = processed_dataset ** 2
+        
+        # Multiple model training
+        models = []
+        for i in range(3):
+            model = RandomForestClassifier(n_estimators=50)
+            y = np.random.randint(0, 2, len(large_dataset))
+            model.fit(large_dataset, y)
+            models.append(model)
+        
+        # Memory cleanup
+        del large_dataset
+        del processed_dataset
+        
+        return models
+    
+    def compare_memory_usage(self, functions_dict):
+        """Compare memory usage of different implementations"""
+        results = {}
+        
+        for func_name, func in functions_dict.items():
+            # Measure memory usage
+            mem_usage = memory_usage((func, ()), interval=0.1)
+            
+            results[func_name] = {
+                'max_memory_mb': max(mem_usage),
+                'min_memory_mb': min(mem_usage),
+                'memory_delta_mb': max(mem_usage) - min(mem_usage),
+                'average_memory_mb': np.mean(mem_usage)
+            }
+        
+        return results
+    
+    def memory_efficient_vs_inefficient(self):
+        """Compare memory-efficient vs inefficient implementations"""
+        
+        def memory_inefficient_approach():
+            """Inefficient memory usage"""
+            data = np.random.randn(10000, 100)
+            
+            # Creates unnecessary copies
+            results = []
+            for i in range(10):
+                temp_data = data.copy()  # Unnecessary copy
+                processed = temp_data ** 2
+                results.append(processed.mean())
+            
+            return results
+        
+        def memory_efficient_approach():
+            """Efficient memory usage"""
+            data = np.random.randn(10000, 100)
+            
+            # Process in-place when possible
+            results = []
+            for i in range(10):
+                # Use views instead of copies
+                processed_mean = (data ** 2).mean()
+                results.append(processed_mean)
+            
+            return results
+        
+        # Compare implementations
+        comparison = self.compare_memory_usage({
+            'inefficient': memory_inefficient_approach,
+            'efficient': memory_efficient_approach
+        })
+        
+        return comparison
+
+# Usage
+memory_profiler = MemoryProfiler()
+# memory_comparison = memory_profiler.memory_efficient_vs_inefficient()
+# print("Memory Usage Comparison:")
+# for approach, stats in memory_comparison.items():
+#     print(f"{approach}: {stats}")
+```
+
+**4. py-spy - Production Profiling**
+
+```python
+# Install: pip install py-spy
+# Usage: py-spy record -o profile.svg -- python ml_script.py
+
+import subprocess
+import sys
+import time
+
+class ProductionProfiler:
+    """Production-safe profiling using py-spy"""
+    
+    def __init__(self, output_format='svg'):
+        self.output_format = output_format
+        self.profile_data = {}
+    
+    def profile_running_process(self, pid, duration=30, output_file=None):
+        """Profile a running Python process"""
+        
+        if output_file is None:
+            output_file = f"profile_{pid}_{int(time.time())}.{self.output_format}"
+        
+        cmd = [
+            'py-spy', 'record',
+            '-p', str(pid),
+            '-d', str(duration),
+            '-o', output_file,
+            '-f', self.output_format
+        ]
+        
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=duration + 10)
+            
+            if result.returncode == 0:
+                return {
+                    'success': True,
+                    'output_file': output_file,
+                    'message': f"Profile saved to {output_file}"
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': result.stderr,
+                    'message': "Profiling failed"
+                }
+        
+        except subprocess.TimeoutExpired:
+            return {
+                'success': False,
+                'error': "Profiling timed out",
+                'message': "Consider reducing duration or checking process status"
+            }
+    
+    def profile_script_execution(self, script_path, output_file=None):
+        """Profile a Python script from start to finish"""
+        
+        if output_file is None:
+            script_name = os.path.basename(script_path).replace('.py', '')
+            output_file = f"profile_{script_name}_{int(time.time())}.{self.output_format}"
+        
+        cmd = [
+            'py-spy', 'record',
+            '-o', output_file,
+            '-f', self.output_format,
+            '--', 'python', script_path
+        ]
+        
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                return {
+                    'success': True,
+                    'output_file': output_file,
+                    'stdout': result.stdout,
+                    'stderr': result.stderr
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': result.stderr,
+                    'stdout': result.stdout
+                }
+        
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'message': "Failed to execute py-spy"
+            }
+```
+
+**5. Advanced Profiling Techniques**
+
+```python
+import timeit
+import functools
+from contextlib import contextmanager
+import threading
+import time
+
+class AdvancedMLProfiler:
+    """Advanced profiling techniques for ML optimization"""
+    
+    def __init__(self):
+        self.timing_results = {}
+        self.memory_snapshots = []
+    
+    def timing_decorator(self, func_name=None):
+        """Decorator to automatically time function execution"""
+        def decorator(func):
+            name = func_name or func.__name__
+            
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                start_time = time.perf_counter()
+                result = func(*args, **kwargs)
+                end_time = time.perf_counter()
+                
+                execution_time = end_time - start_time
+                
+                if name not in self.timing_results:
+                    self.timing_results[name] = []
+                self.timing_results[name].append(execution_time)
+                
+                print(f"{name} executed in {execution_time:.4f} seconds")
+                return result
+            
+            return wrapper
+        return decorator
+    
+    @contextmanager
+    def profile_context(self, operation_name):
+        """Context manager for profiling code blocks"""
+        start_time = time.perf_counter()
+        start_memory = psutil.Process().memory_info().rss / 1024 / 1024
+        
+        print(f"Starting {operation_name}...")
+        
+        try:
+            yield
+        finally:
+            end_time = time.perf_counter()
+            end_memory = psutil.Process().memory_info().rss / 1024 / 1024
+            
+            execution_time = end_time - start_time
+            memory_delta = end_memory - start_memory
+            
+            print(f"{operation_name} completed:")
+            print(f"  Time: {execution_time:.4f} seconds")
+            print(f"  Memory delta: {memory_delta:.2f} MB")
+    
+    def benchmark_implementations(self, implementations, setup_code="", number=100):
+        """Benchmark multiple implementations of the same functionality"""
+        results = {}
+        
+        for name, code in implementations.items():
+            try:
+                execution_time = timeit.timeit(
+                    code, 
+                    setup=setup_code, 
+                    number=number
+                )
+                results[name] = {
+                    'avg_time_seconds': execution_time / number,
+                    'total_time_seconds': execution_time,
+                    'iterations': number
+                }
+            except Exception as e:
+                results[name] = {
+                    'error': str(e),
+                    'failed': True
+                }
+        
+        return results
+    
+    def continuous_memory_monitoring(self, duration_seconds=60, interval_seconds=1):
+        """Continuously monitor memory usage"""
+        monitoring = True
+        memory_data = []
+        
+        def monitor():
+            while monitoring:
+                current_memory = psutil.Process().memory_info().rss / 1024 / 1024
+                timestamp = time.time()
+                memory_data.append({
+                    'timestamp': timestamp,
+                    'memory_mb': current_memory
+                })
+                time.sleep(interval_seconds)
+        
+        # Start monitoring thread
+        monitor_thread = threading.Thread(target=monitor)
+        monitor_thread.daemon = True
+        monitor_thread.start()
+        
+        # Wait for specified duration
+        time.sleep(duration_seconds)
+        monitoring = False
+        monitor_thread.join(timeout=1)
+        
+        return memory_data
+
+# Example usage of advanced profiler
+def demonstrate_advanced_profiling():
+    """Demonstrate advanced profiling techniques"""
+    
+    profiler = AdvancedMLProfiler()
+    
+    # Using timing decorator
+    @profiler.timing_decorator("matrix_multiplication")
+    def matrix_multiply_operation():
+        a = np.random.randn(1000, 1000)
+        b = np.random.randn(1000, 1000)
+        return np.dot(a, b)
+    
+    # Using context manager
+    with profiler.profile_context("Data Loading and Processing"):
+        data = np.random.randn(10000, 100)
+        processed_data = data ** 2 + np.sin(data)
+        result = processed_data.mean(axis=0)
+    
+    # Benchmarking implementations
+    implementations = {
+        'numpy_approach': 'np.random.randn(1000, 100).mean()',
+        'python_approach': 'sum(sum(row) for row in [[1]*100 for _ in range(1000)]) / 100000'
+    }
+    
+    benchmark_results = profiler.benchmark_implementations(
+        implementations,
+        setup_code="import numpy as np",
+        number=10
+    )
+    
+    print("\nBenchmark Results:")
+    for impl, stats in benchmark_results.items():
+        if 'error' not in stats:
+            print(f"{impl}: {stats['avg_time_seconds']:.6f} seconds per operation")
+        else:
+            print(f"{impl}: Failed - {stats['error']}")
+    
+    return profiler
+
+# demonstrate_advanced_profiling()
+```
+
+**Profiling Best Practices for ML:**
+
+1. **Profile Early and Often**: Integrate profiling into development workflow
+2. **Focus on Bottlenecks**: Identify the 20% of code consuming 80% of resources
+3. **Memory vs Speed Trade-offs**: Balance memory usage with execution speed
+4. **Production Profiling**: Use low-overhead tools like py-spy in production
+5. **Baseline Measurements**: Establish performance baselines before optimization
+6. **Iterative Optimization**: Profile → Optimize → Profile → Repeat
+
+**Common ML Performance Bottlenecks:**
+- **Data Loading**: Large dataset I/O operations
+- **Feature Engineering**: Complex transformations and aggregations
+- **Model Training**: Computationally expensive algorithms
+- **Hyperparameter Tuning**: Multiple model training iterations
+- **Memory Allocation**: Large matrix operations and data copies
+
+**Optimization Strategies:**
+- **Vectorization**: Use NumPy/Pandas vectorized operations
+- **Parallel Processing**: Leverage multiple cores for independent operations
+- **Memory Management**: Minimize data copies and use efficient data types
+- **Algorithm Selection**: Choose algorithms based on data size and requirements
+- **Caching**: Cache expensive computations and intermediate results
+
+These profiling tools provide comprehensive insights into ML application performance, enabling data scientists and engineers to build efficient, scalable machine learning systems.
 
 ---
 
@@ -13511,7 +17552,792 @@ Context managers provide several benefits for ML applications:
 
 **Explain how unit tests and integration tests ensure the correctness of your machine learning code.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+**ML Testing Framework Overview:**
+
+Testing machine learning code requires specialized approaches that go beyond traditional software testing. ML testing involves validating data quality, model behavior, pipeline integrity, and system performance across different scenarios.
+
+**1. Unit Testing for ML Components**
+
+```python
+import unittest
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+import joblib
+import tempfile
+import os
+
+class TestMLDataPreprocessing(unittest.TestCase):
+    """Unit tests for data preprocessing components"""
+    
+    def setUp(self):
+        """Set up test data for each test"""
+        self.sample_data = pd.DataFrame({
+            'feature1': [1, 2, 3, 4, 5, np.nan],
+            'feature2': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+            'feature3': ['A', 'B', 'A', 'C', 'B', 'A'],
+            'target': [0, 1, 0, 1, 0, 1]
+        })
+        
+        self.preprocessor = MLDataPreprocessor()
+    
+    def test_missing_value_handling(self):
+        """Test missing value imputation"""
+        cleaned_data = self.preprocessor.handle_missing_values(self.sample_data)
+        
+        # Assert no missing values remain
+        self.assertFalse(cleaned_data.isnull().any().any())
+        
+        # Assert data shape is preserved
+        self.assertEqual(cleaned_data.shape[0], self.sample_data.shape[0])
+        
+        # Assert numeric columns are filled with mean
+        expected_mean = self.sample_data['feature1'].mean()
+        self.assertAlmostEqual(cleaned_data.loc[5, 'feature1'], expected_mean, places=2)
+    
+    def test_categorical_encoding(self):
+        """Test categorical variable encoding"""
+        encoded_data = self.preprocessor.encode_categorical(self.sample_data, ['feature3'])
+        
+        # Assert new columns are created
+        expected_columns = ['feature3_A', 'feature3_B', 'feature3_C']
+        for col in expected_columns:
+            self.assertIn(col, encoded_data.columns)
+        
+        # Assert original categorical column is removed
+        self.assertNotIn('feature3', encoded_data.columns)
+        
+        # Assert binary encoding is correct
+        self.assertEqual(encoded_data.loc[0, 'feature3_A'], 1)
+        self.assertEqual(encoded_data.loc[0, 'feature3_B'], 0)
+    
+    def test_feature_scaling(self):
+        """Test feature scaling functionality"""
+        numeric_data = self.sample_data[['feature1', 'feature2']].dropna()
+        scaled_data = self.preprocessor.scale_features(numeric_data)
+        
+        # Assert scaled data has mean close to 0 and std close to 1
+        self.assertAlmostEqual(scaled_data.mean().mean(), 0, places=1)
+        self.assertAlmostEqual(scaled_data.std().mean(), 1, places=1)
+        
+        # Assert shape is preserved
+        self.assertEqual(scaled_data.shape, numeric_data.shape)
+
+class TestMLModel(unittest.TestCase):
+    """Unit tests for ML model components"""
+    
+    def setUp(self):
+        """Set up model and test data"""
+        X, y = make_classification(n_samples=100, n_features=10, random_state=42)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            X, y, test_size=0.3, random_state=42
+        )
+        self.model_wrapper = MLModelWrapper()
+    
+    def test_model_training(self):
+        """Test model training functionality"""
+        # Train model
+        self.model_wrapper.train(self.X_train, self.y_train)
+        
+        # Assert model is trained
+        self.assertTrue(self.model_wrapper.is_trained)
+        
+        # Assert model can make predictions
+        predictions = self.model_wrapper.predict(self.X_test)
+        self.assertEqual(len(predictions), len(self.y_test))
+        
+        # Assert predictions are valid
+        unique_predictions = set(predictions)
+        self.assertTrue(unique_predictions.issubset({0, 1}))
+    
+    def test_model_validation(self):
+        """Test model validation methods"""
+        self.model_wrapper.train(self.X_train, self.y_train)
+        
+        # Test cross-validation
+        cv_scores = self.model_wrapper.cross_validate(self.X_train, self.y_train, cv=3)
+        
+        # Assert CV scores are reasonable
+        self.assertEqual(len(cv_scores), 3)
+        self.assertTrue(all(0 <= score <= 1 for score in cv_scores))
+        
+        # Test performance metrics
+        metrics = self.model_wrapper.evaluate(self.X_test, self.y_test)
+        
+        # Assert metrics are present and reasonable
+        self.assertIn('accuracy', metrics)
+        self.assertIn('precision', metrics)
+        self.assertIn('recall', metrics)
+        self.assertTrue(0 <= metrics['accuracy'] <= 1)
+    
+    def test_model_serialization(self):
+        """Test model saving and loading"""
+        self.model_wrapper.train(self.X_train, self.y_train)
+        
+        # Save model to temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as tmp_file:
+            self.model_wrapper.save_model(tmp_file.name)
+            
+            # Load model from file
+            loaded_wrapper = MLModelWrapper()
+            loaded_wrapper.load_model(tmp_file.name)
+            
+            # Assert loaded model makes same predictions
+            original_pred = self.model_wrapper.predict(self.X_test)
+            loaded_pred = loaded_wrapper.predict(self.X_test)
+            
+            np.testing.assert_array_equal(original_pred, loaded_pred)
+            
+            # Cleanup
+            os.unlink(tmp_file.name)
+
+class TestMLPipeline(unittest.TestCase):
+    """Unit tests for ML pipeline components"""
+    
+    def setUp(self):
+        """Set up pipeline test data"""
+        self.pipeline = MLPipeline()
+        self.raw_data = pd.DataFrame({
+            'numeric_feature': [1, 2, 3, 4, 5],
+            'categorical_feature': ['A', 'B', 'A', 'C', 'B'],
+            'target': [0, 1, 0, 1, 0]
+        })
+    
+    def test_pipeline_components(self):
+        """Test individual pipeline components"""
+        # Test preprocessing step
+        processed_data = self.pipeline.preprocess_data(self.raw_data)
+        
+        # Assert preprocessing produces expected output
+        self.assertIsInstance(processed_data, pd.DataFrame)
+        self.assertGreater(processed_data.shape[1], self.raw_data.shape[1] - 1)  # Due to encoding
+        
+        # Test feature engineering
+        engineered_features = self.pipeline.engineer_features(processed_data)
+        self.assertIsInstance(engineered_features, pd.DataFrame)
+    
+    def test_pipeline_end_to_end(self):
+        """Test complete pipeline execution"""
+        X, y = self.pipeline.prepare_data(self.raw_data)
+        
+        # Assert data preparation works
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertIsInstance(y, pd.Series)
+        self.assertEqual(len(X), len(y))
+        
+        # Test pipeline training
+        trained_pipeline = self.pipeline.fit(self.raw_data)
+        
+        # Assert pipeline can make predictions
+        predictions = trained_pipeline.predict(self.raw_data.drop('target', axis=1))
+        self.assertEqual(len(predictions), len(self.raw_data))
+
+# Example ML classes being tested
+class MLDataPreprocessor:
+    """Example data preprocessing class"""
+    
+    def handle_missing_values(self, data):
+        """Handle missing values in data"""
+        numeric_columns = data.select_dtypes(include=[np.number]).columns
+        categorical_columns = data.select_dtypes(include=['object']).columns
+        
+        # Fill numeric missing values with mean
+        for col in numeric_columns:
+            data[col] = data[col].fillna(data[col].mean())
+        
+        # Fill categorical missing values with mode
+        for col in categorical_columns:
+            data[col] = data[col].fillna(data[col].mode()[0])
+        
+        return data
+    
+    def encode_categorical(self, data, categorical_columns):
+        """Encode categorical variables using one-hot encoding"""
+        return pd.get_dummies(data, columns=categorical_columns)
+    
+    def scale_features(self, data):
+        """Scale numerical features using StandardScaler"""
+        scaler = StandardScaler()
+        return pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
+
+class MLModelWrapper:
+    """Example ML model wrapper class"""
+    
+    def __init__(self):
+        self.model = RandomForestClassifier(n_estimators=50, random_state=42)
+        self.is_trained = False
+    
+    def train(self, X, y):
+        """Train the model"""
+        self.model.fit(X, y)
+        self.is_trained = True
+    
+    def predict(self, X):
+        """Make predictions"""
+        return self.model.predict(X)
+    
+    def cross_validate(self, X, y, cv=5):
+        """Perform cross-validation"""
+        from sklearn.model_selection import cross_val_score
+        return cross_val_score(self.model, X, y, cv=cv)
+    
+    def evaluate(self, X, y):
+        """Evaluate model performance"""
+        from sklearn.metrics import accuracy_score, precision_score, recall_score
+        predictions = self.predict(X)
+        
+        return {
+            'accuracy': accuracy_score(y, predictions),
+            'precision': precision_score(y, predictions, average='weighted'),
+            'recall': recall_score(y, predictions, average='weighted')
+        }
+    
+    def save_model(self, filepath):
+        """Save model to file"""
+        joblib.dump(self.model, filepath)
+    
+    def load_model(self, filepath):
+        """Load model from file"""
+        self.model = joblib.load(filepath)
+        self.is_trained = True
+
+class MLPipeline:
+    """Example ML pipeline class"""
+    
+    def __init__(self):
+        self.preprocessor = MLDataPreprocessor()
+        self.model = MLModelWrapper()
+        self.fitted = False
+    
+    def preprocess_data(self, data):
+        """Preprocess raw data"""
+        # Handle missing values
+        data = self.preprocessor.handle_missing_values(data)
+        
+        # Encode categorical variables
+        categorical_cols = data.select_dtypes(include=['object']).columns
+        categorical_cols = [col for col in categorical_cols if col != 'target']
+        
+        if len(categorical_cols) > 0:
+            data = self.preprocessor.encode_categorical(data, categorical_cols)
+        
+        return data
+    
+    def engineer_features(self, data):
+        """Create additional features"""
+        # Add polynomial features for numeric columns
+        numeric_cols = data.select_dtypes(include=[np.number]).columns
+        for col in numeric_cols:
+            if col != 'target':
+                data[f'{col}_squared'] = data[col] ** 2
+        
+        return data
+    
+    def prepare_data(self, data):
+        """Prepare data for training"""
+        processed_data = self.preprocess_data(data)
+        engineered_data = self.engineer_features(processed_data)
+        
+        X = engineered_data.drop('target', axis=1)
+        y = engineered_data['target']
+        
+        return X, y
+    
+    def fit(self, data):
+        """Fit the entire pipeline"""
+        X, y = self.prepare_data(data)
+        self.model.train(X, y)
+        self.fitted = True
+        return self
+    
+    def predict(self, data):
+        """Make predictions using the fitted pipeline"""
+        # Add dummy target for processing
+        data_with_target = data.copy()
+        data_with_target['target'] = 0
+        
+        X, _ = self.prepare_data(data_with_target)
+        return self.model.predict(X)
+
+# Run tests
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
+```
+
+**2. Integration Testing for ML Systems**
+
+```python
+import pytest
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+import requests
+import json
+import time
+import sqlite3
+import tempfile
+import shutil
+
+class TestMLSystemIntegration:
+    """Integration tests for complete ML system"""
+    
+    @pytest.fixture
+    def setup_test_environment(self):
+        """Set up test environment with database and temporary files"""
+        # Create temporary directory
+        test_dir = tempfile.mkdtemp()
+        
+        # Create test database
+        db_path = os.path.join(test_dir, 'test_ml.db')
+        conn = sqlite3.connect(db_path)
+        
+        # Create test tables
+        conn.execute('''
+            CREATE TABLE predictions (
+                id INTEGER PRIMARY KEY,
+                input_data TEXT,
+                prediction REAL,
+                confidence REAL,
+                timestamp TEXT
+            )
+        ''')
+        conn.commit()
+        
+        yield {
+            'test_dir': test_dir,
+            'db_path': db_path,
+            'db_connection': conn
+        }
+        
+        # Cleanup
+        conn.close()
+        shutil.rmtree(test_dir)
+    
+    def test_data_pipeline_integration(self, setup_test_environment):
+        """Test complete data pipeline from ingestion to storage"""
+        test_env = setup_test_environment
+        
+        # Create test data
+        raw_data = pd.DataFrame({
+            'feature1': np.random.randn(100),
+            'feature2': np.random.randn(100),
+            'feature3': np.random.choice(['A', 'B', 'C'], 100),
+            'target': np.random.choice([0, 1], 100)
+        })
+        
+        # Save raw data
+        raw_data_path = os.path.join(test_env['test_dir'], 'raw_data.csv')
+        raw_data.to_csv(raw_data_path, index=False)
+        
+        # Initialize pipeline
+        pipeline = MLDataPipeline(test_env['db_path'])
+        
+        # Test data ingestion
+        ingested_data = pipeline.ingest_data(raw_data_path)
+        assert isinstance(ingested_data, pd.DataFrame)
+        assert len(ingested_data) == len(raw_data)
+        
+        # Test data validation
+        validation_results = pipeline.validate_data(ingested_data)
+        assert validation_results['is_valid']
+        assert 'schema_check' in validation_results
+        assert 'quality_check' in validation_results
+        
+        # Test data transformation
+        transformed_data = pipeline.transform_data(ingested_data)
+        assert isinstance(transformed_data, pd.DataFrame)
+        assert transformed_data.shape[1] >= ingested_data.shape[1]  # Due to feature engineering
+        
+        # Test data storage
+        storage_result = pipeline.store_processed_data(transformed_data)
+        assert storage_result['success']
+        
+        # Verify data in database
+        conn = test_env['db_connection']
+        cursor = conn.execute("SELECT COUNT(*) FROM processed_data")
+        row_count = cursor.fetchone()[0]
+        assert row_count > 0
+    
+    def test_model_training_integration(self, setup_test_environment):
+        """Test model training and evaluation integration"""
+        test_env = setup_test_environment
+        
+        # Generate training data
+        X, y = make_classification(n_samples=1000, n_features=20, random_state=42)
+        training_data = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(20)])
+        training_data['target'] = y
+        
+        # Initialize training pipeline
+        trainer = MLModelTrainer(
+            model_config={'n_estimators': 50, 'random_state': 42},
+            validation_config={'test_size': 0.2, 'cv_folds': 3}
+        )
+        
+        # Test training process
+        training_results = trainer.train_model(training_data)
+        
+        # Assert training completed successfully
+        assert training_results['status'] == 'success'
+        assert 'model' in training_results
+        assert 'metrics' in training_results
+        assert 'validation_scores' in training_results
+        
+        # Test model persistence
+        model_path = os.path.join(test_env['test_dir'], 'trained_model.pkl')
+        save_result = trainer.save_model(model_path)
+        assert save_result['success']
+        assert os.path.exists(model_path)
+        
+        # Test model loading
+        loaded_trainer = MLModelTrainer()
+        load_result = loaded_trainer.load_model(model_path)
+        assert load_result['success']
+        
+        # Test prediction consistency
+        test_data = training_data.drop('target', axis=1).iloc[:10]
+        original_predictions = trainer.predict(test_data)
+        loaded_predictions = loaded_trainer.predict(test_data)
+        
+        np.testing.assert_array_equal(original_predictions, loaded_predictions)
+    
+    def test_api_endpoint_integration(self):
+        """Test ML API endpoint integration (requires running API server)"""
+        # Note: This test assumes an ML API server is running
+        api_base_url = "http://localhost:8000"
+        
+        # Test health endpoint
+        try:
+            health_response = requests.get(f"{api_base_url}/health", timeout=5)
+            assert health_response.status_code == 200
+            assert health_response.json()['status'] == 'healthy'
+        except requests.exceptions.RequestException:
+            pytest.skip("API server not running")
+        
+        # Test prediction endpoint
+        test_payload = {
+            'features': [1.0, 2.0, 3.0, 4.0, 5.0],
+            'model_version': 'latest'
+        }
+        
+        prediction_response = requests.post(
+            f"{api_base_url}/predict",
+            json=test_payload,
+            timeout=10
+        )
+        
+        assert prediction_response.status_code == 200
+        prediction_data = prediction_response.json()
+        assert 'prediction' in prediction_data
+        assert 'confidence' in prediction_data
+        assert 'model_version' in prediction_data
+        
+        # Test batch prediction endpoint
+        batch_payload = {
+            'features_batch': [
+                [1.0, 2.0, 3.0, 4.0, 5.0],
+                [2.0, 3.0, 4.0, 5.0, 6.0],
+                [3.0, 4.0, 5.0, 6.0, 7.0]
+            ],
+            'model_version': 'latest'
+        }
+        
+        batch_response = requests.post(
+            f"{api_base_url}/predict/batch",
+            json=batch_payload,
+            timeout=15
+        )
+        
+        assert batch_response.status_code == 200
+        batch_data = batch_response.json()
+        assert 'predictions' in batch_data
+        assert len(batch_data['predictions']) == 3
+    
+    def test_monitoring_integration(self, setup_test_environment):
+        """Test monitoring and alerting integration"""
+        test_env = setup_test_environment
+        
+        # Initialize monitoring system
+        monitor = MLSystemMonitor(test_env['db_path'])
+        
+        # Generate test metrics
+        test_metrics = {
+            'model_accuracy': 0.85,
+            'prediction_latency': 0.1,
+            'throughput': 100,
+            'error_rate': 0.02,
+            'memory_usage': 512
+        }
+        
+        # Test metrics ingestion
+        ingestion_result = monitor.ingest_metrics(test_metrics)
+        assert ingestion_result['success']
+        
+        # Test alert rule evaluation
+        alert_rules = [
+            {'metric': 'model_accuracy', 'threshold': 0.8, 'condition': 'below'},
+            {'metric': 'error_rate', 'threshold': 0.05, 'condition': 'above'},
+            {'metric': 'prediction_latency', 'threshold': 1.0, 'condition': 'above'}
+        ]
+        
+        alerts = monitor.evaluate_alerts(alert_rules)
+        
+        # Should not trigger alerts with current metrics
+        assert len(alerts) == 0
+        
+        # Test with problematic metrics
+        problematic_metrics = {
+            'model_accuracy': 0.7,  # Below threshold
+            'error_rate': 0.08,     # Above threshold
+            'prediction_latency': 0.1,
+            'throughput': 100,
+            'memory_usage': 512
+        }
+        
+        monitor.ingest_metrics(problematic_metrics)
+        alerts = monitor.evaluate_alerts(alert_rules)
+        
+        # Should trigger 2 alerts
+        assert len(alerts) == 2
+        assert any(alert['metric'] == 'model_accuracy' for alert in alerts)
+        assert any(alert['metric'] == 'error_rate' for alert in alerts)
+
+# Example classes for integration testing
+class MLDataPipeline:
+    """Example data pipeline for integration testing"""
+    
+    def __init__(self, db_path):
+        self.db_path = db_path
+    
+    def ingest_data(self, data_path):
+        """Ingest data from file"""
+        return pd.read_csv(data_path)
+    
+    def validate_data(self, data):
+        """Validate ingested data"""
+        return {
+            'is_valid': True,
+            'schema_check': 'passed',
+            'quality_check': 'passed'
+        }
+    
+    def transform_data(self, data):
+        """Transform and engineer features"""
+        # Add simple feature engineering
+        numeric_cols = data.select_dtypes(include=[np.number]).columns
+        for col in numeric_cols:
+            if col != 'target':
+                data[f'{col}_squared'] = data[col] ** 2
+        return data
+    
+    def store_processed_data(self, data):
+        """Store processed data in database"""
+        return {'success': True}
+
+class MLModelTrainer:
+    """Example model trainer for integration testing"""
+    
+    def __init__(self, model_config=None, validation_config=None):
+        self.model_config = model_config or {}
+        self.validation_config = validation_config or {}
+        self.model = None
+    
+    def train_model(self, data):
+        """Train ML model"""
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.model_selection import train_test_split, cross_val_score
+        
+        X = data.drop('target', axis=1)
+        y = data['target']
+        
+        # Split data
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=self.validation_config.get('test_size', 0.2)
+        )
+        
+        # Train model
+        self.model = RandomForestClassifier(**self.model_config)
+        self.model.fit(X_train, y_train)
+        
+        # Validation
+        cv_scores = cross_val_score(
+            self.model, X_train, y_train,
+            cv=self.validation_config.get('cv_folds', 5)
+        )
+        
+        # Test metrics
+        test_score = self.model.score(X_test, y_test)
+        
+        return {
+            'status': 'success',
+            'model': self.model,
+            'metrics': {'test_accuracy': test_score},
+            'validation_scores': cv_scores
+        }
+    
+    def save_model(self, filepath):
+        """Save trained model"""
+        joblib.dump(self.model, filepath)
+        return {'success': True}
+    
+    def load_model(self, filepath):
+        """Load trained model"""
+        self.model = joblib.load(filepath)
+        return {'success': True}
+    
+    def predict(self, data):
+        """Make predictions"""
+        return self.model.predict(data)
+
+class MLSystemMonitor:
+    """Example monitoring system for integration testing"""
+    
+    def __init__(self, db_path):
+        self.db_path = db_path
+        self.metrics_history = []
+    
+    def ingest_metrics(self, metrics):
+        """Ingest system metrics"""
+        metrics['timestamp'] = time.time()
+        self.metrics_history.append(metrics)
+        return {'success': True}
+    
+    def evaluate_alerts(self, alert_rules):
+        """Evaluate alert rules against current metrics"""
+        if not self.metrics_history:
+            return []
+        
+        latest_metrics = self.metrics_history[-1]
+        alerts = []
+        
+        for rule in alert_rules:
+            metric_value = latest_metrics.get(rule['metric'])
+            if metric_value is not None:
+                if rule['condition'] == 'above' and metric_value > rule['threshold']:
+                    alerts.append({
+                        'metric': rule['metric'],
+                        'value': metric_value,
+                        'threshold': rule['threshold'],
+                        'condition': rule['condition']
+                    })
+                elif rule['condition'] == 'below' and metric_value < rule['threshold']:
+                    alerts.append({
+                        'metric': rule['metric'],
+                        'value': metric_value,
+                        'threshold': rule['threshold'],
+                        'condition': rule['condition']
+                    })
+        
+        return alerts
+
+# Run integration tests
+if __name__ == '__main__':
+    pytest.main([__file__, '-v'])
+```
+
+**3. Property-Based Testing for ML**
+
+```python
+from hypothesis import given, strategies as st, settings, assume
+import numpy as np
+import pandas as pd
+
+class TestMLPropertyBased:
+    """Property-based tests for ML components"""
+    
+    @given(st.lists(st.floats(min_value=-1000, max_value=1000), min_size=10, max_size=1000))
+    def test_scaler_properties(self, data):
+        """Test that scaling preserves data properties"""
+        assume(len(set(data)) > 1)  # Ensure variance > 0
+        
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        
+        # Convert to numpy array and reshape
+        data_array = np.array(data).reshape(-1, 1)
+        scaled_data = scaler.fit_transform(data_array)
+        
+        # Property: scaled data should have mean ~0 and std ~1
+        assert abs(scaled_data.mean()) < 0.1
+        assert abs(scaled_data.std() - 1.0) < 0.1
+        
+        # Property: relative ordering should be preserved
+        original_order = np.argsort(data_array.flatten())
+        scaled_order = np.argsort(scaled_data.flatten())
+        np.testing.assert_array_equal(original_order, scaled_order)
+    
+    @given(
+        st.integers(min_value=10, max_value=1000),
+        st.integers(min_value=2, max_value=50),
+        st.integers(min_value=2, max_value=10)
+    )
+    def test_model_prediction_properties(self, n_samples, n_features, n_classes):
+        """Test model prediction properties"""
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.datasets import make_classification
+        
+        # Generate synthetic data
+        X, y = make_classification(
+            n_samples=n_samples,
+            n_features=n_features,
+            n_classes=n_classes,
+            random_state=42
+        )
+        
+        # Train model
+        model = RandomForestClassifier(n_estimators=10, random_state=42)
+        model.fit(X, y)
+        
+        # Make predictions
+        predictions = model.predict(X)
+        probabilities = model.predict_proba(X)
+        
+        # Property: predictions should be valid class labels
+        assert set(predictions).issubset(set(range(n_classes)))
+        
+        # Property: probabilities should sum to 1
+        prob_sums = probabilities.sum(axis=1)
+        np.testing.assert_allclose(prob_sums, 1.0, rtol=1e-10)
+        
+        # Property: predicted class should correspond to highest probability
+        predicted_from_proba = np.argmax(probabilities, axis=1)
+        np.testing.assert_array_equal(predictions, predicted_from_proba)
+
+# Run property-based tests
+if __name__ == '__main__':
+    pytest.main([__file__, '-v', '--hypothesis-show-statistics'])
+```
+
+**Testing Best Practices for ML:**
+
+1. **Test Data Quality**: Validate input data schemas, ranges, and distributions
+2. **Model Behavior**: Test model outputs for consistency and validity
+3. **Pipeline Integration**: Test complete workflows end-to-end
+4. **Performance**: Test latency, throughput, and resource usage
+5. **Robustness**: Test with edge cases and adversarial inputs
+6. **Reproducibility**: Ensure tests produce consistent results
+
+**Common ML Testing Scenarios:**
+
+1. **Data Validation**: Schema compliance, range checks, missing values
+2. **Feature Engineering**: Transformation correctness, feature importance
+3. **Model Training**: Convergence, overfitting, hyperparameter sensitivity
+4. **Prediction Quality**: Accuracy, consistency, confidence calibration
+5. **System Integration**: API endpoints, database connections, monitoring
+
+**Test Environment Setup:**
+
+1. **Isolated Testing**: Use separate test databases and file systems
+2. **Mock External Services**: Mock APIs, databases, and file systems
+3. **Test Data Management**: Create representative test datasets
+4. **Continuous Testing**: Integrate tests into CI/CD pipelines
+5. **Performance Benchmarks**: Track test execution time and resource usage
+
+Testing ML systems requires a comprehensive approach combining traditional software testing with ML-specific validation techniques to ensure model correctness, system reliability, and production readiness.
 
 ---
 
@@ -13519,7 +18345,888 @@ Context managers provide several benefits for ML applications:
 
 **What is the role of Explainable AI (XAI) and how can Python libraries help achieve it?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+**Explainable AI (XAI) Overview:**
+
+Explainable AI refers to methods and techniques that make machine learning models transparent, interpretable, and trustworthy. XAI provides insights into how models make decisions, enabling stakeholders to understand, trust, and effectively use AI systems in critical applications.
+
+**1. SHAP (SHapley Additive exPlanations)**
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import make_classification, load_boston, load_iris
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import shap
+import warnings
+warnings.filterwarnings('ignore')
+
+class SHAPExplainer:
+    """Comprehensive SHAP-based model explanation toolkit"""
+    
+    def __init__(self, model, model_type='classification'):
+        self.model = model
+        self.model_type = model_type
+        self.explainer = None
+        self.shap_values = None
+        
+    def create_explainer(self, X_background, explainer_type='tree'):
+        """Create SHAP explainer based on model type"""
+        if explainer_type == 'tree':
+            # For tree-based models (Random Forest, XGBoost, etc.)
+            self.explainer = shap.TreeExplainer(self.model)
+        elif explainer_type == 'kernel':
+            # For any model (model-agnostic)
+            self.explainer = shap.KernelExplainer(self.model.predict, X_background)
+        elif explainer_type == 'linear':
+            # For linear models
+            self.explainer = shap.LinearExplainer(self.model, X_background)
+        elif explainer_type == 'deep':
+            # For deep learning models
+            self.explainer = shap.DeepExplainer(self.model, X_background)
+        
+        return self.explainer
+    
+    def explain_predictions(self, X_explain):
+        """Generate SHAP values for predictions"""
+        if self.explainer is None:
+            raise ValueError("Explainer not created. Call create_explainer() first.")
+        
+        self.shap_values = self.explainer.shap_values(X_explain)
+        return self.shap_values
+    
+    def plot_summary(self, X_explain, feature_names=None, max_display=20):
+        """Create SHAP summary plot"""
+        if self.shap_values is None:
+            self.explain_predictions(X_explain)
+        
+        # Handle multi-class classification
+        if self.model_type == 'classification' and isinstance(self.shap_values, list):
+            # Plot for each class
+            for i, class_shap in enumerate(self.shap_values):
+                plt.figure(figsize=(10, 6))
+                shap.summary_plot(class_shap, X_explain, feature_names=feature_names, 
+                                show=False, max_display=max_display)
+                plt.title(f'SHAP Summary Plot - Class {i}')
+                plt.show()
+        else:
+            plt.figure(figsize=(10, 6))
+            shap.summary_plot(self.shap_values, X_explain, feature_names=feature_names,
+                            show=False, max_display=max_display)
+            plt.title('SHAP Summary Plot')
+            plt.show()
+    
+    def plot_waterfall(self, instance_idx, X_explain, feature_names=None):
+        """Create SHAP waterfall plot for single prediction"""
+        if self.shap_values is None:
+            self.explain_predictions(X_explain)
+        
+        # Handle multi-class case
+        if isinstance(self.shap_values, list):
+            shap_values_for_plot = self.shap_values[1]  # Usually positive class
+        else:
+            shap_values_for_plot = self.shap_values
+        
+        expected_value = self.explainer.expected_value
+        if isinstance(expected_value, list):
+            expected_value = expected_value[1]
+        
+        shap.waterfall_plot(
+            shap.Explanation(
+                values=shap_values_for_plot[instance_idx],
+                base_values=expected_value,
+                data=X_explain.iloc[instance_idx] if hasattr(X_explain, 'iloc') else X_explain[instance_idx],
+                feature_names=feature_names
+            )
+        )
+    
+    def plot_force(self, instance_idx, X_explain, feature_names=None):
+        """Create SHAP force plot for single prediction"""
+        if self.shap_values is None:
+            self.explain_predictions(X_explain)
+        
+        # Handle multi-class case
+        if isinstance(self.shap_values, list):
+            shap_values_for_plot = self.shap_values[1]
+            expected_value = self.explainer.expected_value[1]
+        else:
+            shap_values_for_plot = self.shap_values
+            expected_value = self.explainer.expected_value
+        
+        return shap.force_plot(
+            expected_value,
+            shap_values_for_plot[instance_idx],
+            X_explain.iloc[instance_idx] if hasattr(X_explain, 'iloc') else X_explain[instance_idx],
+            feature_names=feature_names
+        )
+    
+    def feature_importance_comparison(self, X_explain, feature_names=None):
+        """Compare SHAP feature importance with model's built-in importance"""
+        if self.shap_values is None:
+            self.explain_predictions(X_explain)
+        
+        # SHAP-based importance
+        if isinstance(self.shap_values, list):
+            # For multi-class, use absolute values across all classes
+            shap_importance = np.mean([np.mean(np.abs(sv), axis=0) for sv in self.shap_values], axis=0)
+        else:
+            shap_importance = np.mean(np.abs(self.shap_values), axis=0)
+        
+        # Model's built-in importance (if available)
+        model_importance = None
+        if hasattr(self.model, 'feature_importances_'):
+            model_importance = self.model.feature_importances_
+        
+        # Create comparison DataFrame
+        comparison_df = pd.DataFrame({
+            'feature': feature_names or [f'feature_{i}' for i in range(len(shap_importance))],
+            'shap_importance': shap_importance
+        })
+        
+        if model_importance is not None:
+            comparison_df['model_importance'] = model_importance
+        
+        comparison_df = comparison_df.sort_values('shap_importance', ascending=False)
+        
+        # Plot comparison
+        fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+        
+        # SHAP importance
+        axes[0].barh(comparison_df['feature'][:10], comparison_df['shap_importance'][:10])
+        axes[0].set_title('SHAP Feature Importance')
+        axes[0].set_xlabel('Mean |SHAP value|')
+        
+        # Model importance (if available)
+        if model_importance is not None:
+            axes[1].barh(comparison_df['feature'][:10], comparison_df['model_importance'][:10])
+            axes[1].set_title('Model Feature Importance')
+            axes[1].set_xlabel('Feature Importance')
+        
+        plt.tight_layout()
+        plt.show()
+        
+        return comparison_df
+
+# Example usage for classification
+def demonstrate_shap_classification():
+    """Demonstrate SHAP for classification tasks"""
+    print("=== SHAP Classification Example ===")
+    
+    # Generate sample data
+    X, y = make_classification(n_samples=1000, n_features=10, n_informative=8, 
+                              n_redundant=2, random_state=42)
+    feature_names = [f'feature_{i}' for i in range(X.shape[1])]
+    
+    # Convert to DataFrame
+    X_df = pd.DataFrame(X, columns=feature_names)
+    
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X_df, y, test_size=0.3, random_state=42)
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Create SHAP explainer
+    explainer = SHAPExplainer(model, model_type='classification')
+    explainer.create_explainer(X_train[:100], explainer_type='tree')
+    
+    # Generate explanations
+    shap_values = explainer.explain_predictions(X_test[:100])
+    
+    # Plot summary
+    explainer.plot_summary(X_test[:100], feature_names)
+    
+    # Feature importance comparison
+    importance_df = explainer.feature_importance_comparison(X_test[:100], feature_names)
+    print("\nTop 5 Features by SHAP Importance:")
+    print(importance_df.head())
+    
+    return explainer, importance_df
+
+# demonstrate_shap_classification()
+```
+
+**2. LIME (Local Interpretable Model-agnostic Explanations)**
+
+```python
+import lime
+import lime.lime_tabular
+import lime.lime_text
+import lime.lime_image
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+
+class LIMEExplainer:
+    """Comprehensive LIME-based explanation toolkit"""
+    
+    def __init__(self, model, training_data, feature_names=None, mode='classification'):
+        self.model = model
+        self.training_data = training_data
+        self.feature_names = feature_names or [f'feature_{i}' for i in range(training_data.shape[1])]
+        self.mode = mode
+        self.explainer = None
+        
+    def create_tabular_explainer(self, categorical_features=None, discretize_continuous=True):
+        """Create LIME explainer for tabular data"""
+        self.explainer = lime.lime_tabular.LimeTabularExplainer(
+            self.training_data,
+            feature_names=self.feature_names,
+            categorical_features=categorical_features,
+            mode=self.mode,
+            discretize_continuous=discretize_continuous,
+            random_state=42
+        )
+        return self.explainer
+    
+    def explain_instance(self, instance, num_features=10, num_samples=1000):
+        """Explain a single prediction instance"""
+        if self.explainer is None:
+            self.create_tabular_explainer()
+        
+        # Get prediction function
+        if hasattr(self.model, 'predict_proba'):
+            predict_fn = self.model.predict_proba
+        else:
+            predict_fn = self.model.predict
+        
+        # Generate explanation
+        explanation = self.explainer.explain_instance(
+            instance,
+            predict_fn,
+            num_features=num_features,
+            num_samples=num_samples
+        )
+        
+        return explanation
+    
+    def explain_multiple_instances(self, instances, num_features=10):
+        """Explain multiple instances and analyze patterns"""
+        explanations = []
+        
+        for i, instance in enumerate(instances):
+            exp = self.explain_instance(instance, num_features=num_features)
+            explanations.append({
+                'instance_idx': i,
+                'explanation': exp,
+                'feature_contributions': dict(exp.as_list())
+            })
+        
+        # Analyze common important features
+        all_features = {}
+        for exp_data in explanations:
+            for feature, contribution in exp_data['feature_contributions'].items():
+                if feature not in all_features:
+                    all_features[feature] = []
+                all_features[feature].append(abs(contribution))
+        
+        # Calculate average importance
+        feature_importance = {
+            feature: np.mean(contributions)
+            for feature, contributions in all_features.items()
+        }
+        
+        return explanations, feature_importance
+    
+    def plot_explanation(self, explanation, save_path=None):
+        """Plot LIME explanation"""
+        fig = explanation.as_pyplot_figure()
+        if save_path:
+            plt.savefig(save_path, bbox_inches='tight', dpi=300)
+        plt.show()
+        return fig
+    
+    def stability_analysis(self, instance, num_trials=10, num_samples=1000):
+        """Analyze stability of LIME explanations"""
+        explanations = []
+        
+        for trial in range(num_trials):
+            # Create new explainer with different random state
+            explainer = lime.lime_tabular.LimeTabularExplainer(
+                self.training_data,
+                feature_names=self.feature_names,
+                mode=self.mode,
+                random_state=trial
+            )
+            
+            # Get prediction function
+            if hasattr(self.model, 'predict_proba'):
+                predict_fn = self.model.predict_proba
+            else:
+                predict_fn = self.model.predict
+            
+            # Generate explanation
+            exp = explainer.explain_instance(
+                instance,
+                predict_fn,
+                num_samples=num_samples
+            )
+            
+            explanations.append(dict(exp.as_list()))
+        
+        # Analyze stability
+        all_features = set()
+        for exp in explanations:
+            all_features.update(exp.keys())
+        
+        stability_results = {}
+        for feature in all_features:
+            contributions = [exp.get(feature, 0) for exp in explanations]
+            stability_results[feature] = {
+                'mean_contribution': np.mean(contributions),
+                'std_contribution': np.std(contributions),
+                'stability_score': 1 - (np.std(contributions) / (abs(np.mean(contributions)) + 1e-10))
+            }
+        
+        return stability_results
+
+# Example usage for tabular data
+def demonstrate_lime_tabular():
+    """Demonstrate LIME for tabular data"""
+    print("=== LIME Tabular Example ===")
+    
+    # Generate sample data
+    X, y = make_classification(n_samples=1000, n_features=8, n_informative=6, 
+                              n_redundant=2, random_state=42)
+    feature_names = [f'feature_{i}' for i in range(X.shape[1])]
+    
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Create LIME explainer
+    lime_explainer = LIMEExplainer(model, X_train, feature_names)
+    
+    # Explain single instance
+    test_instance = X_test[0]
+    explanation = lime_explainer.explain_instance(test_instance)
+    
+    print("Single Instance Explanation:")
+    for feature, contribution in explanation.as_list():
+        print(f"  {feature}: {contribution:.3f}")
+    
+    # Plot explanation
+    lime_explainer.plot_explanation(explanation)
+    
+    # Stability analysis
+    stability = lime_explainer.stability_analysis(test_instance, num_trials=5)
+    print("\nStability Analysis (Top 3 features):")
+    sorted_stability = sorted(stability.items(), key=lambda x: abs(x[1]['mean_contribution']), reverse=True)
+    for feature, stats in sorted_stability[:3]:
+        print(f"  {feature}: mean={stats['mean_contribution']:.3f}, "
+              f"std={stats['std_contribution']:.3f}, "
+              f"stability={stats['stability_score']:.3f}")
+    
+    return lime_explainer, explanation
+
+# demonstrate_lime_tabular()
+```
+
+**3. Permutation Feature Importance**
+
+```python
+from sklearn.inspection import permutation_importance
+import eli5
+from eli5.sklearn import PermutationImportance
+
+class PermutationExplainer:
+    """Permutation-based feature importance explainer"""
+    
+    def __init__(self, model, scoring='accuracy'):
+        self.model = model
+        self.scoring = scoring
+        self.importance_results = None
+    
+    def calculate_importance(self, X, y, n_repeats=10, random_state=42):
+        """Calculate permutation feature importance"""
+        self.importance_results = permutation_importance(
+            self.model, X, y,
+            scoring=self.scoring,
+            n_repeats=n_repeats,
+            random_state=random_state
+        )
+        return self.importance_results
+    
+    def plot_importance(self, feature_names=None, top_k=10):
+        """Plot feature importance with confidence intervals"""
+        if self.importance_results is None:
+            raise ValueError("Calculate importance first using calculate_importance()")
+        
+        feature_names = feature_names or [f'feature_{i}' for i in range(len(self.importance_results.importances_mean))]
+        
+        # Create DataFrame for easier plotting
+        importance_df = pd.DataFrame({
+            'feature': feature_names,
+            'importance_mean': self.importance_results.importances_mean,
+            'importance_std': self.importance_results.importances_std
+        }).sort_values('importance_mean', ascending=False)
+        
+        # Plot top k features
+        top_features = importance_df.head(top_k)
+        
+        plt.figure(figsize=(10, 6))
+        plt.barh(top_features['feature'], top_features['importance_mean'], 
+                xerr=top_features['importance_std'], capsize=5)
+        plt.xlabel(f'Permutation Importance ({self.scoring})')
+        plt.title(f'Top {top_k} Features by Permutation Importance')
+        plt.gca().invert_yaxis()
+        plt.tight_layout()
+        plt.show()
+        
+        return importance_df
+    
+    def importance_comparison(self, X, y, feature_names=None):
+        """Compare with model's built-in importance"""
+        if self.importance_results is None:
+            self.calculate_importance(X, y)
+        
+        feature_names = feature_names or [f'feature_{i}' for i in range(len(self.importance_results.importances_mean))]
+        
+        comparison_df = pd.DataFrame({
+            'feature': feature_names,
+            'permutation_importance': self.importance_results.importances_mean,
+            'permutation_std': self.importance_results.importances_std
+        })
+        
+        # Add model importance if available
+        if hasattr(self.model, 'feature_importances_'):
+            comparison_df['model_importance'] = self.model.feature_importances_
+        
+        # Plot comparison
+        if 'model_importance' in comparison_df.columns:
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+            
+            # Permutation importance
+            top_perm = comparison_df.nlargest(10, 'permutation_importance')
+            ax1.barh(top_perm['feature'], top_perm['permutation_importance'],
+                    xerr=top_perm['permutation_std'], capsize=3)
+            ax1.set_title('Permutation Importance')
+            ax1.set_xlabel('Importance')
+            
+            # Model importance
+            top_model = comparison_df.nlargest(10, 'model_importance')
+            ax2.barh(top_model['feature'], top_model['model_importance'])
+            ax2.set_title('Model Built-in Importance')
+            ax2.set_xlabel('Importance')
+            
+            plt.tight_layout()
+            plt.show()
+        
+        return comparison_df
+
+# Example usage
+def demonstrate_permutation_importance():
+    """Demonstrate permutation feature importance"""
+    print("=== Permutation Importance Example ===")
+    
+    # Generate sample data
+    X, y = make_classification(n_samples=1000, n_features=10, n_informative=7, 
+                              n_redundant=3, random_state=42)
+    feature_names = [f'feature_{i}' for i in range(X.shape[1])]
+    
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Create permutation explainer
+    perm_explainer = PermutationExplainer(model, scoring='accuracy')
+    
+    # Calculate importance
+    importance_results = perm_explainer.calculate_importance(X_test, y_test)
+    
+    # Plot importance
+    importance_df = perm_explainer.plot_importance(feature_names)
+    
+    # Compare with model importance
+    comparison_df = perm_explainer.importance_comparison(X_test, y_test, feature_names)
+    
+    print("Top 5 Features by Permutation Importance:")
+    print(comparison_df.nlargest(5, 'permutation_importance')[['feature', 'permutation_importance', 'permutation_std']])
+    
+    return perm_explainer, comparison_df
+
+# demonstrate_permutation_importance()
+```
+
+**4. Model-Agnostic Explanations**
+
+```python
+import dalex as dx
+from sklearn.neural_network import MLPClassifier
+
+class ModelAgnosticExplainer:
+    """Model-agnostic explanation toolkit using DALEX"""
+    
+    def __init__(self, model, X_train, y_train, label="model"):
+        self.model = model
+        self.X_train = pd.DataFrame(X_train) if not isinstance(X_train, pd.DataFrame) else X_train
+        self.y_train = y_train
+        self.label = label
+        self.explainer = None
+        
+    def create_explainer(self):
+        """Create DALEX explainer object"""
+        self.explainer = dx.Explainer(
+            self.model,
+            self.X_train,
+            self.y_train,
+            label=self.label
+        )
+        return self.explainer
+    
+    def model_performance(self):
+        """Analyze overall model performance"""
+        if self.explainer is None:
+            self.create_explainer()
+        
+        model_perf = self.explainer.model_performance()
+        model_perf.plot()
+        plt.show()
+        
+        return model_perf
+    
+    def variable_importance(self, loss_function='1-auc'):
+        """Calculate variable importance"""
+        if self.explainer is None:
+            self.create_explainer()
+        
+        var_imp = self.explainer.model_parts(loss_function=loss_function)
+        var_imp.plot()
+        plt.show()
+        
+        return var_imp
+    
+    def partial_dependence(self, variables=None, N=100):
+        """Create partial dependence plots"""
+        if self.explainer is None:
+            self.create_explainer()
+        
+        if variables is None:
+            variables = self.X_train.columns[:4].tolist()
+        
+        pdp = self.explainer.model_profile(
+            variables=variables,
+            N=N
+        )
+        pdp.plot()
+        plt.show()
+        
+        return pdp
+    
+    def instance_explanation(self, instance, variables=None):
+        """Explain individual prediction"""
+        if self.explainer is None:
+            self.create_explainer()
+        
+        # Convert instance to DataFrame if needed
+        if not isinstance(instance, pd.DataFrame):
+            instance = pd.DataFrame([instance], columns=self.X_train.columns)
+        
+        # Break-down explanation
+        breakdown = self.explainer.predict_parts(instance, type='break_down')
+        breakdown.plot()
+        plt.show()
+        
+        # SHAP explanation
+        shap_exp = self.explainer.predict_parts(instance, type='shap')
+        shap_exp.plot()
+        plt.show()
+        
+        return breakdown, shap_exp
+    
+    def ceteris_paribus(self, instance, variables=None):
+        """Create Ceteris Paribus (What-If) analysis"""
+        if self.explainer is None:
+            self.create_explainer()
+        
+        if not isinstance(instance, pd.DataFrame):
+            instance = pd.DataFrame([instance], columns=self.X_train.columns)
+        
+        if variables is None:
+            variables = self.X_train.columns[:3].tolist()
+        
+        cp = self.explainer.predict_profile(instance, variables=variables)
+        cp.plot()
+        plt.show()
+        
+        return cp
+
+# Example usage
+def demonstrate_model_agnostic():
+    """Demonstrate model-agnostic explanations"""
+    print("=== Model-Agnostic Explanations Example ===")
+    
+    # Generate sample data
+    X, y = make_classification(n_samples=800, n_features=8, n_informative=6, 
+                              random_state=42)
+    feature_names = [f'feature_{i}' for i in range(X.shape[1])]
+    X_df = pd.DataFrame(X, columns=feature_names)
+    
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X_df, y, test_size=0.3, random_state=42)
+    
+    # Train multiple models for comparison
+    rf_model = RandomForestClassifier(n_estimators=50, random_state=42)
+    rf_model.fit(X_train, y_train)
+    
+    mlp_model = MLPClassifier(hidden_layer_sizes=(50, 30), max_iter=500, random_state=42)
+    mlp_model.fit(X_train, y_train)
+    
+    # Create explainers
+    rf_explainer = ModelAgnosticExplainer(rf_model, X_train, y_train, "Random Forest")
+    mlp_explainer = ModelAgnosticExplainer(mlp_model, X_train, y_train, "Neural Network")
+    
+    # Model performance comparison
+    print("Random Forest Performance:")
+    rf_perf = rf_explainer.model_performance()
+    
+    print("Neural Network Performance:")
+    mlp_perf = mlp_explainer.model_performance()
+    
+    # Variable importance
+    print("Random Forest Variable Importance:")
+    rf_importance = rf_explainer.variable_importance()
+    
+    # Instance explanation
+    test_instance = X_test.iloc[0]
+    print("Instance Explanation for Random Forest:")
+    breakdown, shap_exp = rf_explainer.instance_explanation(test_instance)
+    
+    return rf_explainer, mlp_explainer
+
+# demonstrate_model_agnostic()
+```
+
+**5. Comprehensive XAI Framework**
+
+```python
+class ComprehensiveXAIFramework:
+    """Unified framework for multiple explanation methods"""
+    
+    def __init__(self, model, X_train, y_train, X_test, y_test, feature_names=None):
+        self.model = model
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_test = X_test
+        self.y_test = y_test
+        self.feature_names = feature_names or [f'feature_{i}' for i in range(X_train.shape[1])]
+        
+        # Initialize explainers
+        self.shap_explainer = None
+        self.lime_explainer = None
+        self.perm_explainer = None
+        
+    def setup_explainers(self):
+        """Initialize all explanation methods"""
+        # SHAP
+        self.shap_explainer = SHAPExplainer(self.model)
+        self.shap_explainer.create_explainer(self.X_train[:100], explainer_type='tree')
+        
+        # LIME
+        self.lime_explainer = LIMEExplainer(self.model, self.X_train, self.feature_names)
+        
+        # Permutation Importance
+        self.perm_explainer = PermutationExplainer(self.model)
+        
+    def comprehensive_explanation(self, instance_idx=0, num_features=10):
+        """Generate comprehensive explanation using multiple methods"""
+        if self.shap_explainer is None:
+            self.setup_explainers()
+        
+        instance = self.X_test[instance_idx]
+        
+        print(f"=== Comprehensive Explanation for Instance {instance_idx} ===")
+        
+        # 1. SHAP Explanation
+        print("\n1. SHAP Explanation:")
+        shap_values = self.shap_explainer.explain_predictions(self.X_test[instance_idx:instance_idx+1])
+        self.shap_explainer.plot_waterfall(0, pd.DataFrame(self.X_test[instance_idx:instance_idx+1], 
+                                                          columns=self.feature_names), self.feature_names)
+        
+        # 2. LIME Explanation
+        print("\n2. LIME Explanation:")
+        lime_exp = self.lime_explainer.explain_instance(instance, num_features=num_features)
+        self.lime_explainer.plot_explanation(lime_exp)
+        
+        # 3. Permutation Importance
+        print("\n3. Global Feature Importance (Permutation):")
+        perm_importance = self.perm_explainer.calculate_importance(self.X_test, self.y_test)
+        importance_df = self.perm_explainer.plot_importance(self.feature_names)
+        
+        # 4. Comparison Summary
+        print("\n4. Method Comparison:")
+        self._compare_explanations(shap_values, lime_exp, importance_df)
+        
+        return {
+            'shap_values': shap_values,
+            'lime_explanation': lime_exp,
+            'permutation_importance': importance_df
+        }
+    
+    def _compare_explanations(self, shap_values, lime_exp, perm_importance):
+        """Compare results from different explanation methods"""
+        # Extract feature contributions
+        if isinstance(shap_values, list):
+            shap_contrib = dict(zip(self.feature_names, shap_values[1][0]))
+        else:
+            shap_contrib = dict(zip(self.feature_names, shap_values[0]))
+        
+        lime_contrib = dict(lime_exp.as_list())
+        perm_contrib = dict(zip(perm_importance['feature'], perm_importance['importance_mean']))
+        
+        # Create comparison DataFrame
+        comparison_data = []
+        for feature in self.feature_names:
+            comparison_data.append({
+                'feature': feature,
+                'shap_contribution': shap_contrib.get(feature, 0),
+                'lime_contribution': lime_contrib.get(feature, 0),
+                'permutation_importance': perm_contrib.get(feature, 0)
+            })
+        
+        comparison_df = pd.DataFrame(comparison_data)
+        
+        # Plot comparison
+        fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+        
+        # SHAP
+        top_shap = comparison_df.nlargest(8, 'shap_contribution', keep='all')
+        axes[0].barh(top_shap['feature'], top_shap['shap_contribution'])
+        axes[0].set_title('SHAP Contributions')
+        axes[0].set_xlabel('SHAP Value')
+        
+        # LIME
+        top_lime = comparison_df.reindex(comparison_df['lime_contribution'].abs().nlargest(8).index)
+        axes[1].barh(top_lime['feature'], top_lime['lime_contribution'])
+        axes[1].set_title('LIME Contributions')
+        axes[1].set_xlabel('LIME Value')
+        
+        # Permutation
+        top_perm = comparison_df.nlargest(8, 'permutation_importance')
+        axes[2].barh(top_perm['feature'], top_perm['permutation_importance'])
+        axes[2].set_title('Permutation Importance')
+        axes[2].set_xlabel('Importance')
+        
+        plt.tight_layout()
+        plt.show()
+        
+        return comparison_df
+    
+    def generate_explanation_report(self, output_file="xai_report.html"):
+        """Generate comprehensive HTML report"""
+        report_content = f"""
+        <html>
+        <head><title>XAI Analysis Report</title></head>
+        <body>
+        <h1>Explainable AI Analysis Report</h1>
+        <h2>Model Information</h2>
+        <p>Model Type: {type(self.model).__name__}</p>
+        <p>Number of Features: {len(self.feature_names)}</p>
+        <p>Training Samples: {len(self.X_train)}</p>
+        <p>Test Samples: {len(self.X_test)}</p>
+        
+        <h2>Feature Names</h2>
+        <ul>
+        """
+        
+        for feature in self.feature_names:
+            report_content += f"<li>{feature}</li>"
+        
+        report_content += """
+        </ul>
+        
+        <h2>Explanation Methods Used</h2>
+        <ul>
+        <li>SHAP (SHapley Additive exPlanations)</li>
+        <li>LIME (Local Interpretable Model-agnostic Explanations)</li>
+        <li>Permutation Feature Importance</li>
+        </ul>
+        
+        <h2>Key Insights</h2>
+        <p>This report provides explanations from multiple perspectives to ensure robustness and reliability of model interpretations.</p>
+        
+        </body>
+        </html>
+        """
+        
+        with open(output_file, 'w') as f:
+            f.write(report_content)
+        
+        print(f"XAI report saved to {output_file}")
+
+# Example comprehensive usage
+def demonstrate_comprehensive_xai():
+    """Demonstrate comprehensive XAI framework"""
+    print("=== Comprehensive XAI Framework Demo ===")
+    
+    # Generate sample data
+    X, y = make_classification(n_samples=1000, n_features=10, n_informative=8, 
+                              random_state=42)
+    feature_names = [f'important_feature_{i}' if i < 8 else f'noise_feature_{i}' 
+                    for i in range(X.shape[1])]
+    
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Create comprehensive XAI framework
+    xai_framework = ComprehensiveXAIFramework(
+        model, X_train, y_train, X_test, y_test, feature_names
+    )
+    
+    # Generate comprehensive explanation
+    explanations = xai_framework.comprehensive_explanation(instance_idx=0)
+    
+    # Generate report
+    xai_framework.generate_explanation_report()
+    
+    print("\nModel Accuracy:", model.score(X_test, y_test))
+    
+    return xai_framework, explanations
+
+# demonstrate_comprehensive_xai()
+```
+
+**XAI Best Practices:**
+
+1. **Multiple Methods**: Use different explanation techniques for robustness
+2. **Local vs Global**: Combine instance-level and model-level explanations
+3. **Stakeholder Needs**: Tailor explanations to audience expertise
+4. **Validation**: Verify explanations make domain sense
+5. **Documentation**: Maintain clear documentation of explanation methods
+
+**Key Benefits of XAI:**
+
+1. **Trust Building**: Increase confidence in model decisions
+2. **Debugging**: Identify model biases and errors
+3. **Compliance**: Meet regulatory requirements for transparency
+4. **Knowledge Discovery**: Gain insights into data patterns
+5. **Model Improvement**: Inform feature engineering and model selection
+
+**Common Use Cases:**
+
+1. **Healthcare**: Explain medical diagnosis predictions
+2. **Finance**: Interpret credit scoring and fraud detection
+3. **Legal**: Provide transparency in automated decision systems
+4. **Hiring**: Explain candidate scoring and selection
+5. **Safety-Critical Systems**: Validate autonomous system decisions
+
+Explainable AI is crucial for building trustworthy, transparent, and accountable machine learning systems that can be effectively deployed in real-world applications.
 
 ---
 
