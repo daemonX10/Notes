@@ -1,4 +1,4 @@
-# Python Ml Interview Questions - Theory Questions
+﻿# Python Ml Interview Questions - Theory Questions
 
 ## Question 1
 
@@ -934,7 +934,7 @@ class MLListComprehensions:
         ]
         
         # Extract numeric values from mixed data
-        mixed_data = ['$100.50', '€75.25', '¥1000']
+        mixed_data = ['$100.50', 'â‚¬75.25', 'Â¥1000']
         numeric_values = [
             float(''.join([char for char in item if char.isdigit() or char == '.']))
             for item in mixed_data
@@ -1610,23 +1610,1194 @@ class MLBestPractices:
 
 ## Question 7
 
-**How doesPython’s garbage collectionwork?**
+**How does Python's garbage collection work?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+**Python Garbage Collection Overview:**
+Python uses automatic memory management through a combination of reference counting and cyclic garbage collection to reclaim memory occupied by objects that are no longer reachable or needed.
+
+### Primary Garbage Collection Mechanisms
+
+**1. Reference Counting**
+```python
+import sys
+import gc
+
+def demonstrate_reference_counting():
+    """Demonstrate how reference counting works"""
+    # Create an object
+    data = [1, 2, 3, 4, 5]
+    print(f"Initial reference count: {sys.getrefcount(data)}")
+    
+    # Create additional references
+    reference1 = data
+    print(f"After creating reference1: {sys.getrefcount(data)}")
+    
+    reference2 = data
+    print(f"After creating reference2: {sys.getrefcount(data)}")
+    
+    # Delete references
+    del reference1
+    print(f"After deleting reference1: {sys.getrefcount(data)}")
+    
+    del reference2
+    print(f"After deleting reference2: {sys.getrefcount(data)}")
+    
+    # When reference count reaches 0, object is immediately deallocated
+    return data
+
+# Example of reference counting in ML context
+class MLModel:
+    def __init__(self, name):
+        self.name = name
+        self.weights = [0.1, 0.2, 0.3]
+        print(f"Model {name} created")
+    
+    def __del__(self):
+        print(f"Model {self.name} destroyed")
+
+def reference_counting_ml_example():
+    """Reference counting with ML objects"""
+    model = MLModel("LinearRegression")
+    print(f"Model ref count: {sys.getrefcount(model)}")
+    
+    # Assign to another variable
+    backup_model = model
+    print(f"Model ref count after backup: {sys.getrefcount(model)}")
+    
+    # Delete original reference
+    del model
+    print("Original model reference deleted")
+    
+    # Model still exists due to backup_model reference
+    print(f"Backup model name: {backup_model.name}")
+    
+    # Delete last reference - model will be destroyed
+    del backup_model
+    print("All references deleted")
+
+demonstrate_reference_counting()
+reference_counting_ml_example()
+```
+
+**2. Cyclic Garbage Collection**
+```python
+import gc
+import weakref
+
+class Node:
+    """Example class that can create circular references"""
+    def __init__(self, name):
+        self.name = name
+        self.children = []
+        self.parent = None
+    
+    def add_child(self, child):
+        self.children.append(child)
+        child.parent = self
+    
+    def __del__(self):
+        print(f"Node {self.name} garbage collected")
+
+def demonstrate_circular_references():
+    """Show how circular references are handled"""
+    print("Creating circular reference:")
+    
+    # Create nodes that reference each other
+    node1 = Node("Parent")
+    node2 = Node("Child")
+    
+    # Create circular reference
+    node1.add_child(node2)
+    # node2.parent already points to node1, creating a cycle
+    
+    print(f"Node1 ref count: {sys.getrefcount(node1)}")
+    print(f"Node2 ref count: {sys.getrefcount(node2)}")
+    
+    # Delete direct references
+    del node1, node2
+    
+    print("Direct references deleted")
+    print("Objects still exist due to circular reference")
+    
+    # Force garbage collection to clean up cycles
+    collected = gc.collect()
+    print(f"Garbage collector collected {collected} objects")
+
+# ML-specific circular reference example
+class MLPipeline:
+    def __init__(self, name):
+        self.name = name
+        self.preprocessor = None
+        self.model = None
+    
+    def set_preprocessor(self, preprocessor):
+        self.preprocessor = preprocessor
+        preprocessor.pipeline = self  # Creates circular reference
+
+class Preprocessor:
+    def __init__(self, name):
+        self.name = name
+        self.pipeline = None
+    
+    def __del__(self):
+        print(f"Preprocessor {self.name} destroyed")
+
+def ml_circular_reference_example():
+    """Circular references in ML context"""
+    pipeline = MLPipeline("TextClassification")
+    preprocessor = Preprocessor("TextPreprocessor")
+    
+    # Create circular reference
+    pipeline.set_preprocessor(preprocessor)
+    
+    print("Before deletion:")
+    print(f"Objects before GC: {len(gc.get_objects())}")
+    
+    # Delete references
+    del pipeline, preprocessor
+    
+    print("After deletion, before GC:")
+    collected = gc.collect()
+    print(f"Garbage collected {collected} objects")
+
+demonstrate_circular_references()
+ml_circular_reference_example()
+```
+
+### Generational Garbage Collection
+
+**Python's Three-Generation System:**
+```python
+def demonstrate_generational_gc():
+    """Demonstrate generational garbage collection"""
+    print("Generational Garbage Collection Info:")
+    print(f"GC thresholds: {gc.get_threshold()}")
+    print(f"GC counts: {gc.get_count()}")
+    
+    # Create many objects to trigger different generations
+    objects = []
+    
+    print("\nCreating objects and monitoring GC:")
+    for i in range(1000):
+        # Create objects that may become garbage
+        temp_list = [j for j in range(10)]
+        if i % 100 == 0:
+            print(f"Iteration {i}: GC counts = {gc.get_count()}")
+        
+        # Keep some objects alive (they'll move to older generations)
+        if i % 100 == 0:
+            objects.append(temp_list)
+    
+    print(f"\nFinal GC counts: {gc.get_count()}")
+    
+    # Force collection and see what gets collected
+    for generation in range(3):
+        collected = gc.collect(generation)
+        print(f"Generation {generation} collected: {collected} objects")
+
+def gc_statistics():
+    """Display detailed GC statistics"""
+    stats = gc.get_stats()
+    for i, stat in enumerate(stats):
+        print(f"Generation {i}:")
+        print(f"  Collections: {stat['collections']}")
+        print(f"  Collected: {stat['collected']}")
+        print(f"  Uncollectable: {stat['uncollectable']}")
+
+demonstrate_generational_gc()
+gc_statistics()
+```
+
+### Memory Management in ML Applications
+
+**1. Memory-Efficient Data Loading**
+```python
+import numpy as np
+import pandas as pd
+from memory_profiler import profile
+
+class MemoryEfficientMLWorkflow:
+    def __init__(self):
+        self.data = None
+        self.model = None
+    
+    @profile
+    def load_large_dataset(self, filepath, chunk_size=10000):
+        """Memory-efficient loading of large datasets"""
+        chunks = []
+        
+        # Process data in chunks to avoid memory overload
+        for chunk in pd.read_csv(filepath, chunksize=chunk_size):
+            # Process each chunk
+            processed_chunk = self.preprocess_chunk(chunk)
+            chunks.append(processed_chunk)
+            
+            # Explicitly delete chunk to free memory
+            del chunk
+            
+        # Combine chunks
+        self.data = pd.concat(chunks, ignore_index=True)
+        
+        # Clear intermediate data
+        del chunks
+        gc.collect()  # Force garbage collection
+        
+        return self.data
+    
+    def preprocess_chunk(self, chunk):
+        """Preprocess a data chunk"""
+        # Simulate preprocessing
+        chunk = chunk.dropna()
+        return chunk
+    
+    def memory_monitoring_training(self, X, y):
+        """Monitor memory during model training"""
+        import psutil
+        import os
+        
+        process = psutil.Process(os.getpid())
+        
+        print(f"Memory before training: {process.memory_info().rss / 1024 / 1024:.2f} MB")
+        
+        # Simulate model training
+        from sklearn.ensemble import RandomForestClassifier
+        model = RandomForestClassifier(n_estimators=100)
+        model.fit(X, y)
+        
+        print(f"Memory after training: {process.memory_info().rss / 1024 / 1024:.2f} MB")
+        
+        # Clean up
+        del model
+        gc.collect()
+        
+        print(f"Memory after cleanup: {process.memory_info().rss / 1024 / 1024:.2f} MB")
+
+# Example usage
+# workflow = MemoryEfficientMLWorkflow()
+# workflow.memory_monitoring_training(X_sample, y_sample)
+```
+
+**2. Managing Large Model Objects**
+```python
+class ModelManager:
+    """Manage ML models with proper garbage collection"""
+    
+    def __init__(self):
+        self.models = {}
+        self.model_metadata = {}
+    
+    def add_model(self, name, model, metadata=None):
+        """Add model with automatic cleanup of old models"""
+        # If model already exists, clean it up first
+        if name in self.models:
+            self.remove_model(name)
+        
+        self.models[name] = model
+        self.model_metadata[name] = metadata or {}
+        
+        print(f"Model '{name}' added. Total models: {len(self.models)}")
+    
+    def remove_model(self, name):
+        """Remove model and force garbage collection"""
+        if name in self.models:
+            del self.models[name]
+            del self.model_metadata[name]
+            gc.collect()
+            print(f"Model '{name}' removed and memory freed")
+    
+    def clear_all_models(self):
+        """Clear all models and free memory"""
+        self.models.clear()
+        self.model_metadata.clear()
+        gc.collect()
+        print("All models cleared")
+    
+    def get_memory_usage(self):
+        """Get approximate memory usage of stored models"""
+        total_size = 0
+        for name, model in self.models.items():
+            model_size = sys.getsizeof(model)
+            total_size += model_size
+            print(f"Model '{name}': ~{model_size / 1024:.2f} KB")
+        
+        print(f"Total model memory: ~{total_size / 1024:.2f} KB")
+        return total_size
+
+# Usage example
+manager = ModelManager()
+```
+
+### Memory Optimization Techniques
+
+**1. Weak References**
+```python
+import weakref
+
+class DataCache:
+    """Cache that doesn't prevent garbage collection"""
+    
+    def __init__(self):
+        self._cache = weakref.WeakValueDictionary()
+    
+    def get_or_create_data(self, key, create_func):
+        """Get cached data or create new if not available"""
+        data = self._cache.get(key)
+        if data is None:
+            print(f"Creating new data for key: {key}")
+            data = create_func()
+            self._cache[key] = data
+        else:
+            print(f"Using cached data for key: {key}")
+        return data
+
+class Dataset:
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+        self.data = np.random.randn(size, 10)  # Simulate large dataset
+    
+    def __del__(self):
+        print(f"Dataset {self.name} garbage collected")
+
+def demonstrate_weak_references():
+    """Show how weak references work with caching"""
+    cache = DataCache()
+    
+    # Create dataset through cache
+    dataset1 = cache.get_or_create_data("train", lambda: Dataset("train", 1000))
+    dataset2 = cache.get_or_create_data("train", lambda: Dataset("train", 1000))  # Same object
+    
+    print(f"Same object? {dataset1 is dataset2}")
+    
+    # Delete references
+    del dataset1, dataset2
+    gc.collect()
+    
+    # Try to get again - will create new since old was garbage collected
+    dataset3 = cache.get_or_create_data("train", lambda: Dataset("train", 1000))
+
+demonstrate_weak_references()
+```
+
+**2. Context Managers for Resource Management**
+```python
+class ModelTrainingContext:
+    """Context manager for ML model training with automatic cleanup"""
+    
+    def __init__(self, model_name):
+        self.model_name = model_name
+        self.model = None
+        self.start_memory = None
+    
+    def __enter__(self):
+        import psutil
+        import os
+        
+        process = psutil.Process(os.getpid())
+        self.start_memory = process.memory_info().rss
+        
+        print(f"Starting training for {self.model_name}")
+        print(f"Initial memory: {self.start_memory / 1024 / 1024:.2f} MB")
+        
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Clean up model
+        if hasattr(self, 'model') and self.model is not None:
+            del self.model
+        
+        # Force garbage collection
+        gc.collect()
+        
+        import psutil
+        import os
+        process = psutil.Process(os.getpid())
+        end_memory = process.memory_info().rss
+        
+        print(f"Training completed for {self.model_name}")
+        print(f"Final memory: {end_memory / 1024 / 1024:.2f} MB")
+        print(f"Memory freed: {(self.start_memory - end_memory) / 1024 / 1024:.2f} MB")
+    
+    def train_model(self, X, y):
+        """Train a model within the context"""
+        from sklearn.ensemble import RandomForestClassifier
+        self.model = RandomForestClassifier(n_estimators=100)
+        self.model.fit(X, y)
+        return self.model
+
+# Usage
+def demonstrate_context_manager():
+    # Create sample data
+    X_sample = np.random.randn(1000, 20)
+    y_sample = np.random.randint(0, 2, 1000)
+    
+    with ModelTrainingContext("RandomForest") as trainer:
+        model = trainer.train_model(X_sample, y_sample)
+        # Model automatically cleaned up when exiting context
+
+# demonstrate_context_manager()
+```
+
+### Garbage Collection Best Practices
+
+**1. Monitoring and Tuning**
+```python
+class GCMonitor:
+    """Monitor and tune garbage collection for ML applications"""
+    
+    def __init__(self):
+        self.initial_threshold = gc.get_threshold()
+        self.collection_stats = []
+    
+    def tune_gc_for_ml(self, dataset_size="large"):
+        """Tune GC parameters based on ML workload"""
+        if dataset_size == "large":
+            # For large datasets, reduce frequency of collection
+            # to avoid interrupting long-running operations
+            gc.set_threshold(2000, 15, 15)  # Increased thresholds
+        elif dataset_size == "small":
+            # For small datasets with frequent object creation
+            gc.set_threshold(500, 8, 8)   # More frequent collection
+        
+        print(f"GC tuned for {dataset_size} dataset")
+        print(f"New thresholds: {gc.get_threshold()}")
+    
+    def monitor_gc_during_training(self, training_func, *args, **kwargs):
+        """Monitor GC activity during training"""
+        # Enable GC debugging
+        gc.set_debug(gc.DEBUG_STATS)
+        
+        initial_stats = gc.get_stats()
+        
+        # Run training
+        result = training_func(*args, **kwargs)
+        
+        final_stats = gc.get_stats()
+        
+        # Calculate collections that occurred
+        for i, (initial, final) in enumerate(zip(initial_stats, final_stats)):
+            collections = final['collections'] - initial['collections']
+            collected = final['collected'] - initial['collected']
+            print(f"Generation {i}: {collections} collections, {collected} objects collected")
+        
+        # Disable debugging
+        gc.set_debug(0)
+        
+        return result
+    
+    def restore_default_gc(self):
+        """Restore default GC settings"""
+        gc.set_threshold(*self.initial_threshold)
+        print(f"GC restored to default: {gc.get_threshold()}")
+
+# Example usage
+monitor = GCMonitor()
+monitor.tune_gc_for_ml("large")
+
+def sample_training_function():
+    """Sample training function for monitoring"""
+    data = [np.random.randn(100, 10) for _ in range(100)]
+    del data
+    return "Training complete"
+
+# Monitor GC during training
+# result = monitor.monitor_gc_during_training(sample_training_function)
+monitor.restore_default_gc()
+```
+
+**2. Manual Memory Management**
+```python
+def manual_memory_management_example():
+    """Best practices for manual memory management"""
+    
+    # 1. Explicitly delete large objects
+    large_array = np.random.randn(10000, 1000)
+    print(f"Created large array: {large_array.nbytes / 1024 / 1024:.2f} MB")
+    
+    # Use the array...
+    result = np.mean(large_array)
+    
+    # Explicitly delete when done
+    del large_array
+    gc.collect()  # Force collection
+    
+    # 2. Use generators for large datasets
+    def data_generator(size):
+        """Generator to avoid loading all data at once"""
+        for i in range(size):
+            yield np.random.randn(100)
+    
+    # Process data in batches
+    batch_results = []
+    for i, batch in enumerate(data_generator(1000)):
+        if i % 100 == 0:
+            print(f"Processing batch {i}")
+        
+        # Process batch
+        batch_result = np.mean(batch)
+        batch_results.append(batch_result)
+        
+        # Batch is automatically cleaned up after each iteration
+    
+    # 3. Monitor memory during processing
+    import psutil
+    import os
+    
+    process = psutil.Process(os.getpid())
+    
+    def memory_checkpoint(label):
+        memory_mb = process.memory_info().rss / 1024 / 1024
+        print(f"{label}: {memory_mb:.2f} MB")
+    
+    memory_checkpoint("Start")
+    
+    # Create and process data
+    temp_data = [np.random.randn(1000) for _ in range(100)]
+    memory_checkpoint("After data creation")
+    
+    # Process and clean up
+    results = [np.sum(arr) for arr in temp_data]
+    del temp_data
+    gc.collect()
+    memory_checkpoint("After cleanup")
+
+manual_memory_management_example()
+```
+
+### Key Takeaways
+
+**Garbage Collection Mechanisms:**
+1. **Reference Counting**: Immediate cleanup when references reach zero
+2. **Cyclic GC**: Handles circular references that reference counting misses
+3. **Generational GC**: Optimizes collection based on object age
+
+**ML-Specific Considerations:**
+- Large datasets require careful memory management
+- Model objects can consume significant memory
+- Training processes may create many temporary objects
+- Use context managers for automatic resource cleanup
+- Monitor memory usage during training
+- Tune GC parameters for specific workloads
+
+**Best Practices:**
+- Explicitly delete large objects when done
+- Use generators for large datasets
+- Implement proper cleanup in classes (`__del__` methods)
+- Use weak references for caches
+- Monitor memory usage in production
+- Tune GC thresholds for ML workloads
+- Use context managers for resource management
+
+Understanding Python's garbage collection is crucial for building efficient, memory-conscious machine learning applications that can handle large datasets and complex models without running into memory issues.
 
 ---
 
 ## Question 8
 
-**What aredecorators, and can you provide an example of when you’d use one?**
+**What are decorators, and can you provide an example of when you'd use one?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+**Python Decorators Overview:**
+Decorators are a powerful feature in Python that allow you to modify or extend the behavior of functions, methods, or classes without permanently modifying their structure. They implement the decorator pattern and provide a clean, readable way to add functionality to existing code.
 
+### Understanding Decorators
+
+**1. Basic Decorator Concepts**
+```python
+def my_decorator(func):
+    """Basic decorator that wraps a function"""
+    def wrapper(*args, **kwargs):
+        print(f"Before calling {func.__name__}")
+        result = func(*args, **kwargs)
+        print(f"After calling {func.__name__}")
+        return result
+    return wrapper
+
+# Using the decorator
+@my_decorator
+def greet(name):
+    return f"Hello, {name}!"
+
+# This is equivalent to: greet = my_decorator(greet)
+
+# Usage
+result = greet("Alice")
+print(result)
+
+# Output:
+# Before calling greet
+# After calling greet
+# Hello, Alice!
+```
+
+**2. Decorators with Parameters**
+```python
+def repeat(times):
+    """Decorator factory that creates a decorator to repeat function execution"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            results = []
+            for i in range(times):
+                result = func(*args, **kwargs)
+                results.append(result)
+                print(f"Execution {i+1}: {result}")
+            return results
+        return wrapper
+    return decorator
+
+@repeat(3)
+def roll_dice():
+    import random
+    return random.randint(1, 6)
+
+# Usage
+results = roll_dice()
+print(f"All results: {results}")
+```
+
+### ML-Specific Decorator Examples
+
+**1. Performance Monitoring Decorator**
+```python
+import time
+import functools
+from memory_profiler import memory_usage
+import psutil
+import os
+
+def monitor_performance(func):
+    """Decorator to monitor execution time and memory usage of ML functions"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Get initial memory
+        process = psutil.Process(os.getpid())
+        initial_memory = process.memory_info().rss / 1024 / 1024  # MB
+        
+        # Record start time
+        start_time = time.time()
+        
+        print(f"Starting {func.__name__}")
+        print(f"Initial memory: {initial_memory:.2f} MB")
+        
+        # Execute function
+        try:
+            result = func(*args, **kwargs)
+            
+            # Calculate metrics
+            end_time = time.time()
+            execution_time = end_time - start_time
+            final_memory = process.memory_info().rss / 1024 / 1024  # MB
+            memory_used = final_memory - initial_memory
+            
+            print(f"Function {func.__name__} completed:")
+            print(f"  Execution time: {execution_time:.4f} seconds")
+            print(f"  Final memory: {final_memory:.2f} MB")
+            print(f"  Memory used: {memory_used:.2f} MB")
+            
+            return result
+            
+        except Exception as e:
+            print(f"Function {func.__name__} failed: {str(e)}")
+            raise
+    
+    return wrapper
+
+# Usage in ML context
+@monitor_performance
+def train_model(X, y):
+    """Example ML training function"""
+    from sklearn.ensemble import RandomForestClassifier
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X, y)
+    return model
+
+# Example usage
+import numpy as np
+X_sample = np.random.randn(1000, 20)
+y_sample = np.random.randint(0, 2, 1000)
+
+# model = train_model(X_sample, y_sample)
+```
+
+**2. Data Validation Decorator**
+```python
+import numpy as np
+import pandas as pd
+from typing import Union, Callable
+
+def validate_ml_data(input_checks=None, output_checks=None):
+    """
+    Decorator to validate input and output data for ML functions
+    
+    Args:
+        input_checks: List of validation functions for inputs
+        output_checks: List of validation functions for outputs
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Validate inputs
+            if input_checks:
+                for i, check_func in enumerate(input_checks):
+                    if i < len(args):
+                        try:
+                            check_func(args[i])
+                        except AssertionError as e:
+                            raise ValueError(f"Input validation failed for argument {i}: {e}")
+            
+            # Execute function
+            result = func(*args, **kwargs)
+            
+            # Validate outputs
+            if output_checks:
+                for check_func in output_checks:
+                    try:
+                        check_func(result)
+                    except AssertionError as e:
+                        raise ValueError(f"Output validation failed: {e}")
+            
+            return result
+        return wrapper
+    return decorator
+
+# Define validation functions
+def check_no_missing_values(data):
+    """Check that data has no missing values"""
+    if isinstance(data, np.ndarray):
+        assert not np.any(np.isnan(data)), "Data contains NaN values"
+    elif isinstance(data, pd.DataFrame):
+        assert not data.isnull().any().any(), "DataFrame contains missing values"
+
+def check_positive_shape(data):
+    """Check that data has positive dimensions"""
+    if hasattr(data, 'shape'):
+        assert all(dim > 0 for dim in data.shape), "Data has zero or negative dimensions"
+
+def check_feature_range(data, min_val=-100, max_val=100):
+    """Check that features are within expected range"""
+    if isinstance(data, (np.ndarray, pd.DataFrame)):
+        values = data.values if isinstance(data, pd.DataFrame) else data
+        assert np.all(values >= min_val) and np.all(values <= max_val), \
+            f"Data values outside expected range [{min_val}, {max_val}]"
+
+# Usage example
+@validate_ml_data(
+    input_checks=[check_no_missing_values, check_positive_shape],
+    output_checks=[check_positive_shape]
+)
+def preprocess_data(raw_data):
+    """Preprocess ML data with validation"""
+    # Remove any remaining NaN values
+    if isinstance(raw_data, pd.DataFrame):
+        processed = raw_data.dropna()
+    else:
+        processed = raw_data[~np.isnan(raw_data).any(axis=1)]
+    
+    # Normalize data
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    if len(processed.shape) == 2:
+        processed = scaler.fit_transform(processed)
+    
+    return processed
+
+# Example usage
+# sample_data = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+# clean_data = preprocess_data(sample_data)
+```
+
+**3. Caching/Memoization Decorator**
+```python
+import pickle
+import hashlib
+import os
+from pathlib import Path
+
+def cache_results(cache_dir="./ml_cache", expire_hours=24):
+    """
+    Decorator to cache expensive ML computations
+    
+    Args:
+        cache_dir: Directory to store cached results
+        expire_hours: Hours after which cache expires
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Create cache directory
+            cache_path = Path(cache_dir)
+            cache_path.mkdir(exist_ok=True)
+            
+            # Create unique cache key
+            cache_key = f"{func.__name__}_{hash(str(args) + str(sorted(kwargs.items())))}"
+            cache_file = cache_path / f"{cache_key}.pkl"
+            
+            # Check if cached result exists and is not expired
+            if cache_file.exists():
+                file_age_hours = (time.time() - cache_file.stat().st_mtime) / 3600
+                if file_age_hours < expire_hours:
+                    print(f"Loading cached result for {func.__name__}")
+                    with open(cache_file, 'rb') as f:
+                        return pickle.load(f)
+                else:
+                    print(f"Cache expired for {func.__name__}, recomputing...")
+            
+            # Compute result
+            print(f"Computing {func.__name__}...")
+            result = func(*args, **kwargs)
+            
+            # Cache result
+            try:
+                with open(cache_file, 'wb') as f:
+                    pickle.dump(result, f)
+                print(f"Result cached for {func.__name__}")
+            except Exception as e:
+                print(f"Failed to cache result: {e}")
+            
+            return result
+        return wrapper
+    return decorator
+
+@cache_results(expire_hours=6)
+def expensive_feature_engineering(data, n_components=50):
+    """Expensive feature engineering that benefits from caching"""
+    print("Performing expensive PCA transformation...")
+    from sklearn.decomposition import PCA
+    
+    # Simulate expensive computation
+    time.sleep(2)  # Simulate processing time
+    
+    pca = PCA(n_components=n_components)
+    transformed_data = pca.fit_transform(data)
+    
+    return {
+        'transformed_data': transformed_data,
+        'explained_variance': pca.explained_variance_ratio_,
+        'components': pca.components_
+    }
+
+# Usage
+# First call - computes and caches
+# result1 = expensive_feature_engineering(X_sample, n_components=10)
+
+# Second call - loads from cache
+# result2 = expensive_feature_engineering(X_sample, n_components=10)
+```
+
+**4. Logging and Debugging Decorator**
+```python
+import logging
+from datetime import datetime
+
+def log_ml_operations(log_level=logging.INFO):
+    """Decorator to log ML operations with detailed information"""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Setup logging
+            logger = logging.getLogger(func.__name__)
+            logger.setLevel(log_level)
+            
+            if not logger.handlers:
+                handler = logging.StreamHandler()
+                formatter = logging.Formatter(
+                    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                )
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+            
+            # Log function start
+            logger.info(f"Starting {func.__name__}")
+            logger.info(f"Arguments: args={len(args)}, kwargs={list(kwargs.keys())}")
+            
+            # Log input data info
+            for i, arg in enumerate(args):
+                if hasattr(arg, 'shape'):
+                    logger.info(f"Argument {i} shape: {arg.shape}")
+                elif hasattr(arg, '__len__'):
+                    logger.info(f"Argument {i} length: {len(arg)}")
+            
+            start_time = time.time()
+            
+            try:
+                result = func(*args, **kwargs)
+                
+                # Log success
+                execution_time = time.time() - start_time
+                logger.info(f"Successfully completed {func.__name__} in {execution_time:.4f}s")
+                
+                # Log output info
+                if hasattr(result, 'shape'):
+                    logger.info(f"Output shape: {result.shape}")
+                elif hasattr(result, '__len__'):
+                    logger.info(f"Output length: {len(result)}")
+                
+                return result
+                
+            except Exception as e:
+                # Log error
+                execution_time = time.time() - start_time
+                logger.error(f"Failed {func.__name__} after {execution_time:.4f}s: {str(e)}")
+                raise
+        
+        return wrapper
+    return decorator
+
+@log_ml_operations(log_level=logging.DEBUG)
+def train_and_evaluate_model(X_train, X_test, y_train, y_test):
+    """Train and evaluate ML model with detailed logging"""
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, classification_report
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=50, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = model.predict(X_test)
+    
+    # Calculate metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    return {
+        'model': model,
+        'accuracy': accuracy,
+        'predictions': y_pred
+    }
+
+# Usage
+# from sklearn.model_selection import train_test_split
+# X_train, X_test, y_train, y_test = train_test_split(X_sample, y_sample, test_size=0.2)
+# results = train_and_evaluate_model(X_train, X_test, y_train, y_test)
+```
+
+**5. Rate Limiting Decorator (for API calls)**
+```python
+import time
+from collections import defaultdict
+from threading import Lock
+
+class RateLimiter:
+    """Thread-safe rate limiter for API calls"""
+    def __init__(self):
+        self.calls = defaultdict(list)
+        self.lock = Lock()
+    
+    def is_allowed(self, key, max_calls, time_window):
+        with self.lock:
+            now = time.time()
+            # Remove old calls outside the time window
+            self.calls[key] = [call_time for call_time in self.calls[key] 
+                              if now - call_time < time_window]
+            
+            # Check if we can make another call
+            if len(self.calls[key]) < max_calls:
+                self.calls[key].append(now)
+                return True
+            return False
+
+rate_limiter = RateLimiter()
+
+def rate_limit(max_calls=10, time_window=60, key_func=None):
+    """
+    Decorator to rate limit function calls
+    
+    Args:
+        max_calls: Maximum calls allowed
+        time_window: Time window in seconds
+        key_func: Function to generate unique key for rate limiting
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Generate rate limiting key
+            if key_func:
+                key = key_func(*args, **kwargs)
+            else:
+                key = func.__name__
+            
+            # Check rate limit
+            if not rate_limiter.is_allowed(key, max_calls, time_window):
+                wait_time = time_window / max_calls
+                print(f"Rate limit exceeded for {func.__name__}. Waiting {wait_time:.2f}s...")
+                time.sleep(wait_time)
+            
+            return func(*args, **kwargs)
+        
+        return wrapper
+    return decorator
+
+@rate_limit(max_calls=5, time_window=30)
+def call_ml_api(endpoint, data):
+    """Simulate ML API call with rate limiting"""
+    print(f"Calling API endpoint: {endpoint}")
+    # Simulate API call
+    time.sleep(0.1)
+    return {"status": "success", "prediction": "positive"}
+
+# Usage
+# for i in range(10):
+#     result = call_ml_api("/predict", {"text": f"sample text {i}"})
+#     print(f"Call {i+1}: {result}")
+```
+
+### Class-Based Decorators
+
+**1. Model Registry Decorator**
+```python
+class ModelRegistry:
+    """Registry to track and manage ML models"""
+    def __init__(self):
+        self.models = {}
+        self.model_metadata = {}
+    
+    def register_model(self, name=None, version="1.0", tags=None):
+        """Decorator to register models in the registry"""
+        def decorator(model_class):
+            model_name = name or model_class.__name__
+            
+            # Store model information
+            self.models[model_name] = model_class
+            self.model_metadata[model_name] = {
+                'version': version,
+                'tags': tags or [],
+                'registered_at': datetime.now(),
+                'class_name': model_class.__name__
+            }
+            
+            print(f"Registered model: {model_name} v{version}")
+            return model_class
+        
+        return decorator
+    
+    def get_model(self, name):
+        """Get registered model by name"""
+        return self.models.get(name)
+    
+    def list_models(self):
+        """List all registered models"""
+        for name, metadata in self.model_metadata.items():
+            print(f"{name} v{metadata['version']} - {metadata['tags']}")
+
+# Usage
+registry = ModelRegistry()
+
+@registry.register_model(name="CustomClassifier", version="2.1", tags=["classification", "ensemble"])
+class MyCustomModel:
+    def __init__(self, n_estimators=100):
+        self.n_estimators = n_estimators
+        self.model = None
+    
+    def fit(self, X, y):
+        from sklearn.ensemble import RandomForestClassifier
+        self.model = RandomForestClassifier(n_estimators=self.n_estimators)
+        self.model.fit(X, y)
+        return self
+    
+    def predict(self, X):
+        return self.model.predict(X)
+
+# List registered models
+registry.list_models()
+
+# Get and use model
+ModelClass = registry.get_model("CustomClassifier")
+# model_instance = ModelClass(n_estimators=50)
+```
+
+### Advanced Decorator Patterns
+
+**1. Retry Decorator with Exponential Backoff**
+```python
+import random
+
+def retry_with_backoff(max_retries=3, base_delay=1, max_delay=60, backoff_factor=2):
+    """Decorator to retry failed operations with exponential backoff"""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    
+                    if attempt == max_retries:
+                        print(f"All {max_retries + 1} attempts failed for {func.__name__}")
+                        raise last_exception
+                    
+                    # Calculate delay with exponential backoff
+                    delay = min(base_delay * (backoff_factor ** attempt), max_delay)
+                    jitter = delay * 0.1 * random.random()  # Add jitter
+                    total_delay = delay + jitter
+                    
+                    print(f"Attempt {attempt + 1} failed for {func.__name__}. "
+                          f"Retrying in {total_delay:.2f}s...")
+                    time.sleep(total_delay)
+            
+            raise last_exception
+        
+        return wrapper
+    return decorator
+
+@retry_with_backoff(max_retries=3, base_delay=1)
+def unreliable_data_fetch():
+    """Simulate unreliable data fetching that might fail"""
+    if random.random() < 0.7:  # 70% chance of failure
+        raise ConnectionError("Failed to fetch data")
+    
+    return "Successfully fetched data"
+
+# Usage
+# try:
+#     data = unreliable_data_fetch()
+#     print(data)
+# except Exception as e:
+#     print(f"Final failure: {e}")
+```
+
+### When to Use Decorators in ML
+
+**Common Use Cases:**
+
+1. **Performance Monitoring**: Track execution time and memory usage
+2. **Data Validation**: Ensure input/output data meets requirements
+3. **Caching**: Store expensive computation results
+4. **Logging**: Track ML operations and debugging
+5. **Rate Limiting**: Control API call frequency
+6. **Retry Logic**: Handle transient failures
+7. **Model Registration**: Track and manage model versions
+8. **Authentication**: Secure ML endpoints
+9. **Preprocessing**: Apply consistent data transformations
+10. **Metrics Collection**: Gather performance statistics
+
+**Best Practices:**
+
+1. Use `functools.wraps` to preserve function metadata
+2. Handle exceptions appropriately in decorators
+3. Make decorators configurable with parameters
+4. Document decorator behavior clearly
+5. Consider performance overhead of decorators
+6. Use class-based decorators for complex state management
+7. Keep decorators focused on single responsibilities
+8. Test decorated functions thoroughly
+
+**Key Benefits:**
+- **Separation of Concerns**: Keep core logic separate from cross-cutting concerns
+- **Reusability**: Apply same functionality across multiple functions
+- **Clean Code**: Reduce repetitive boilerplate code
+- **Maintainability**: Centralize common functionality
+- **Flexibility**: Easy to add/remove functionality
+
+Decorators are essential for building robust, maintainable ML systems that handle cross-cutting concerns like monitoring, validation, and error handling elegantly.
 ---
 
 ## Question 9
 
-**What isNumPyand how is it useful inmachine learning?**
+**What is NumPy and how is it useful in machine learning?**
 
 **Answer:**
 
@@ -1769,7 +2940,7 @@ class MLAlgorithmsWithNumPy:
         # Add bias term
         X_bias = np.column_stack([np.ones(len(X)), X])
         
-        # Normal equation: θ = (X^T X)^(-1) X^T y
+        # Normal equation: Î¸ = (X^T X)^(-1) X^T y
         XTX = np.dot(X_bias.T, X_bias)
         XTy = np.dot(X_bias.T, y)
         theta = np.linalg.solve(XTX, XTy)  # More stable than inverse
@@ -1899,7 +3070,7 @@ def performance_comparison():
 
 ## Question 10
 
-**How doesScikit-learnfit into themachine learning workflow?**
+**How does Scikit-learn fit into the machine learning workflow?**
 
 **Answer:**
 
@@ -2902,7 +4073,7 @@ with tf.GradientTape() as tape:
 
 # Compute gradient dy/dx
 gradient = tape.gradient(y, x)
-print(f"Gradient of y = x² + 2x + 1 at x=3: {gradient.numpy()}")
+print(f"Gradient of y = xÂ² + 2x + 1 at x=3: {gradient.numpy()}")
 ```
 
 **2. TensorFlow Data Pipeline**
@@ -3513,10 +4684,685 @@ The combination of TensorFlow and Keras provides the most comprehensive and flex
 
 ## Question 13
 
-**Explain the process ofdata cleaningand why it’s important inmachine learning.**
+**Explain the process of data cleaning and why it’s important in machine learning.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+**Data Cleaning Overview:**
+Data cleaning is the process of identifying and correcting (or removing) errors, inconsistencies, and inaccuracies in datasets to improve data quality. It's a critical preprocessing step that ensures machine learning models can learn meaningful patterns from reliable, consistent data.
 
+### Why Data Cleaning is Crucial in ML
+
+**Impact on Model Performance:**
+- **Garbage In, Garbage Out**: Poor quality data leads to poor model performance
+- **Biased Results**: Inconsistent or incorrect data can introduce systematic biases
+- **Reduced Accuracy**: Missing values and outliers can significantly degrade model accuracy
+- **Unstable Predictions**: Inconsistent data formats cause unreliable model behavior
+- **Computational Efficiency**: Clean data reduces training time and computational resources
+
+### Common Data Quality Issues
+
+**1. Missing Values**
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+# Create sample dataset with missing values
+np.random.seed(42)
+data = {
+    'age': [25, 30, np.nan, 45, 35, np.nan, 28, 40],
+    'income': [50000, 60000, 55000, np.nan, 65000, 45000, np.nan, 70000],
+    'education': ['Bachelor', 'Master', np.nan, 'PhD', 'Bachelor', 'High School', 'Master', np.nan],
+    'experience': [2, 5, 3, np.nan, 7, 0, 1, 10]
+}
+
+df = pd.DataFrame(data)
+
+def analyze_missing_data(df):
+    """Analyze missing data patterns"""
+    print("Missing Data Analysis:")
+    print("=" * 40)
+    
+    # Count missing values
+    missing_counts = df.isnull().sum()
+    missing_percentage = (missing_counts / len(df)) * 100
+    
+    missing_df = pd.DataFrame({
+        'Column': missing_counts.index,
+        'Missing Count': missing_counts.values,
+        'Missing Percentage': missing_percentage.values
+    })
+    
+    print(missing_df)
+    
+    # Visualize missing data patterns
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(df.isnull(), yticklabels=False, cbar=True, cmap='viridis')
+    plt.title('Missing Data Pattern')
+    plt.show()
+    
+    return missing_df
+
+# Analyze missing data
+missing_analysis = analyze_missing_data(df)
+
+# Different strategies for handling missing values
+def handle_missing_values(df):
+    """Demonstrate various missing value handling strategies"""
+    
+    # Strategy 1: Remove rows with any missing values
+    df_dropna = df.dropna()
+    print(f"Original shape: {df.shape}")
+    print(f"After dropping NaN: {df_dropna.shape}")
+    
+    # Strategy 2: Remove columns with too many missing values
+    threshold = 0.5  # Remove columns with >50% missing
+    df_drop_cols = df.dropna(thresh=int(threshold * len(df)), axis=1)
+    print(f"After dropping columns with >{threshold*100}% missing: {df_drop_cols.shape}")
+    
+    # Strategy 3: Simple imputation
+    # Numerical columns - mean/median/mode
+    numerical_cols = df.select_dtypes(include=[np.number]).columns
+    categorical_cols = df.select_dtypes(include=['object']).columns
+    
+    df_imputed = df.copy()
+    
+    # Impute numerical columns with median
+    if len(numerical_cols) > 0:
+        imputer_num = SimpleImputer(strategy='median')
+        df_imputed[numerical_cols] = imputer_num.fit_transform(df_imputed[numerical_cols])
+    
+    # Impute categorical columns with mode
+    if len(categorical_cols) > 0:
+        imputer_cat = SimpleImputer(strategy='most_frequent')
+        df_imputed[categorical_cols] = imputer_cat.fit_transform(df_imputed[categorical_cols])
+    
+    print("Simple imputation completed")
+    
+    # Strategy 4: Advanced imputation - KNN
+    df_knn = df.copy()
+    # For KNN, need to encode categorical variables first
+    from sklearn.preprocessing import LabelEncoder
+    le = LabelEncoder()
+    
+    # Create a copy for KNN imputation
+    df_encoded = df.copy()
+    for col in categorical_cols:
+        if col in df_encoded.columns:
+            df_encoded[col] = df_encoded[col].fillna('missing')  # Temporary fill
+            df_encoded[col] = le.fit_transform(df_encoded[col])
+    
+    knn_imputer = KNNImputer(n_neighbors=3)
+    df_knn_imputed = pd.DataFrame(
+        knn_imputer.fit_transform(df_encoded),
+        columns=df_encoded.columns
+    )
+    
+    print("KNN imputation completed")
+    
+    return {
+        'original': df,
+        'dropna': df_dropna,
+        'simple_imputed': df_imputed,
+        'knn_imputed': df_knn_imputed
+    }
+
+# Handle missing values
+imputation_results = handle_missing_values(df)
+```
+
+**2. Duplicate Records**
+```python
+def handle_duplicates(df):
+    """Identify and handle duplicate records"""
+    print("Duplicate Analysis:")
+    print("=" * 30)
+    
+    # Create sample data with duplicates
+    sample_data = {
+        'id': [1, 2, 3, 4, 2, 5, 6, 3],  # Duplicate IDs
+        'name': ['Alice', 'Bob', 'Charlie', 'David', 'Bob', 'Eve', 'Frank', 'Charlie'],
+        'age': [25, 30, 35, 40, 30, 28, 45, 35],
+        'salary': [50000, 60000, 70000, 80000, 60000, 55000, 90000, 70000]
+    }
+    
+    df_with_dups = pd.DataFrame(sample_data)
+    
+    # Check for duplicates
+    print(f"Total records: {len(df_with_dups)}")
+    print(f"Duplicate rows (all columns): {df_with_dups.duplicated().sum()}")
+    print(f"Duplicate rows (subset of columns): {df_with_dups.duplicated(subset=['name', 'age']).sum()}")
+    
+    # Show duplicate records
+    duplicates = df_with_dups[df_with_dups.duplicated(subset=['name', 'age'], keep=False)]
+    print("\nDuplicate records:")
+    print(duplicates.sort_values(['name', 'age']))
+    
+    # Remove duplicates
+    df_no_dups = df_with_dups.drop_duplicates(subset=['name', 'age'], keep='first')
+    print(f"\nAfter removing duplicates: {len(df_no_dups)} records")
+    
+    return df_no_dups
+
+# Handle duplicates
+clean_df = handle_duplicates(df)
+```
+
+**3. Outliers Detection and Treatment**
+```python
+def detect_and_handle_outliers(df, column):
+    """Detect and handle outliers using various methods"""
+    
+    # Create sample data with outliers
+    np.random.seed(42)
+    normal_data = np.random.normal(50, 15, 95)
+    outliers = np.array([120, 150, -10, 200, 180])  # Clear outliers
+    data_with_outliers = np.concatenate([normal_data, outliers])
+    
+    df_outliers = pd.DataFrame({'values': data_with_outliers})
+    
+    print("Outlier Detection Methods:")
+    print("=" * 40)
+    
+    # Method 1: IQR (Interquartile Range)
+    Q1 = df_outliers['values'].quantile(0.25)
+    Q3 = df_outliers['values'].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    iqr_outliers = df_outliers[(df_outliers['values'] < lower_bound) | 
+                               (df_outliers['values'] > upper_bound)]
+    
+    print(f"IQR Method: {len(iqr_outliers)} outliers detected")
+    print(f"Bounds: [{lower_bound:.2f}, {upper_bound:.2f}]")
+    
+    # Method 2: Z-Score
+    from scipy import stats
+    z_scores = np.abs(stats.zscore(df_outliers['values']))
+    z_threshold = 3
+    z_outliers = df_outliers[z_scores > z_threshold]
+    
+    print(f"Z-Score Method (threshold={z_threshold}): {len(z_outliers)} outliers detected")
+    
+    # Method 3: Modified Z-Score (using median)
+    median = df_outliers['values'].median()
+    mad = np.median(np.abs(df_outliers['values'] - median))
+    modified_z_scores = 0.6745 * (df_outliers['values'] - median) / mad
+    modified_z_outliers = df_outliers[np.abs(modified_z_scores) > z_threshold]
+    
+    print(f"Modified Z-Score Method: {len(modified_z_outliers)} outliers detected")
+    
+    # Visualization
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    
+    # Box plot
+    axes[0,0].boxplot(df_outliers['values'])
+    axes[0,0].set_title('Box Plot - Outlier Detection')
+    axes[0,0].set_ylabel('Values')
+    
+    # Histogram
+    axes[0,1].hist(df_outliers['values'], bins=20, alpha=0.7)
+    axes[0,1].set_title('Histogram')
+    axes[0,1].set_xlabel('Values')
+    axes[0,1].set_ylabel('Frequency')
+    
+    # Scatter plot with outliers highlighted
+    axes[1,0].scatter(range(len(df_outliers)), df_outliers['values'], alpha=0.7)
+    axes[1,0].scatter(iqr_outliers.index, iqr_outliers['values'], color='red', s=50)
+    axes[1,0].set_title('Data Points with IQR Outliers (Red)')
+    axes[1,0].set_xlabel('Index')
+    axes[1,0].set_ylabel('Values')
+    
+    # Q-Q plot
+    stats.probplot(df_outliers['values'], dist="norm", plot=axes[1,1])
+    axes[1,1].set_title('Q-Q Plot')
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # Treatment strategies
+    print("\nOutlier Treatment Strategies:")
+    print("=" * 40)
+    
+    # Strategy 1: Remove outliers
+    df_no_outliers = df_outliers[(df_outliers['values'] >= lower_bound) & 
+                                 (df_outliers['values'] <= upper_bound)]
+    print(f"Original data points: {len(df_outliers)}")
+    print(f"After removing outliers: {len(df_no_outliers)}")
+    
+    # Strategy 2: Cap/Winsorize outliers
+    df_winsorized = df_outliers.copy()
+    df_winsorized['values'] = np.clip(df_winsorized['values'], lower_bound, upper_bound)
+    print(f"Winsorized outliers to bounds: [{lower_bound:.2f}, {upper_bound:.2f}]")
+    
+    # Strategy 3: Transform data (log transform for positive skewed data)
+    df_log = df_outliers.copy()
+    df_log['values'] = np.log1p(df_log['values'] - df_log['values'].min() + 1)
+    print("Applied log transformation")
+    
+    return {
+        'original': df_outliers,
+        'no_outliers': df_no_outliers,
+        'winsorized': df_winsorized,
+        'log_transformed': df_log
+    }
+
+# Detect and handle outliers
+outlier_results = detect_and_handle_outliers(df, 'values')
+```
+
+**4. Data Type Inconsistencies**
+```python
+def fix_data_types(df):
+    """Fix data type inconsistencies"""
+    
+    # Create sample data with type issues
+    messy_data = {
+        'user_id': ['1', '2', '3', '4', '5'],  # Should be int
+        'age': ['25', '30.0', '35', 'unknown', '40'],  # Mixed types
+        'salary': ['50000', '60,000', '$70000', '80000.50', 'N/A'],  # Currency format
+        'date_joined': ['2023-01-15', '15/02/2023', '2023.03.20', 'March 25, 2023', '2023-04-30'],
+        'is_active': ['true', '1', 'yes', 'false', '0']  # Boolean variations
+    }
+    
+    df_messy = pd.DataFrame(messy_data)
+    
+    print("Data Type Issues:")
+    print("=" * 30)
+    print(df_messy.dtypes)
+    print("\nSample data:")
+    print(df_messy)
+    
+    # Fix user_id
+    df_clean = df_messy.copy()
+    df_clean['user_id'] = pd.to_numeric(df_clean['user_id'], errors='coerce')
+    
+    # Fix age - handle 'unknown' values
+    df_clean['age'] = pd.to_numeric(df_clean['age'], errors='coerce')
+    
+    # Fix salary - remove currency symbols and commas
+    df_clean['salary'] = (df_clean['salary']
+                         .str.replace('$', '', regex=False)
+                         .str.replace(',', '', regex=False)
+                         .replace('N/A', np.nan))
+    df_clean['salary'] = pd.to_numeric(df_clean['salary'], errors='coerce')
+    
+    # Fix dates - standardize format
+    date_formats = ['%Y-%m-%d', '%d/%m/%Y', '%Y.%m.%d', '%B %d, %Y']
+    
+    def parse_date(date_str):
+        for fmt in date_formats:
+            try:
+                return pd.to_datetime(date_str, format=fmt)
+            except ValueError:
+                continue
+        return pd.NaT
+    
+    df_clean['date_joined'] = df_clean['date_joined'].apply(parse_date)
+    
+    # Fix boolean values
+    boolean_mapping = {'true': True, '1': True, 'yes': True, 
+                      'false': False, '0': False}
+    df_clean['is_active'] = df_clean['is_active'].map(boolean_mapping)
+    
+    print("\nAfter cleaning:")
+    print(df_clean.dtypes)
+    print("\nCleaned data:")
+    print(df_clean)
+    
+    return df_clean
+
+# Fix data types
+clean_types_df = fix_data_types(df)
+```
+
+**5. Inconsistent Text Data**
+```python
+def clean_text_data(df):
+    """Clean and standardize text data"""
+    
+    # Sample text data with inconsistencies
+    text_data = {
+        'name': [' John Doe ', 'JANE SMITH', 'bob johnson', 'Alice  Brown', 'charlie WILSON '],
+        'city': ['New York', 'new york', 'NEW YORK', 'Los Angeles', 'los angeles'],
+        'category': ['Category A', 'category_a', 'CATEGORY A', 'Category B', 'category b'],
+        'description': ['This is a GREAT product!!!', 'good quality item.', 
+                       'EXCELLENT VALUE FOR MONEY', 'nice product', 'Highly recommended!!!']
+    }
+    
+    df_text = pd.DataFrame(text_data)
+    
+    print("Text Data Cleaning:")
+    print("=" * 30)
+    print("Original data:")
+    print(df_text)
+    
+    df_text_clean = df_text.copy()
+    
+    # Clean name field
+    df_text_clean['name'] = (df_text_clean['name']
+                            .str.strip()  # Remove leading/trailing spaces
+                            .str.title()  # Proper case
+                            .str.replace(r'\s+', ' ', regex=True))  # Multiple spaces to single
+    
+    # Standardize city names
+    df_text_clean['city'] = (df_text_clean['city']
+                            .str.lower()
+                            .str.title())
+    
+    # Standardize category format
+    df_text_clean['category'] = (df_text_clean['category']
+                                .str.lower()
+                                .str.replace('_', ' ')
+                                .str.title())
+    
+    # Clean description text
+    df_text_clean['description'] = (df_text_clean['description']
+                                   .str.lower()
+                                   .str.replace(r'[!]{2,}', '!', regex=True)  # Multiple ! to single
+                                   .str.strip())
+    
+    print("\nAfter cleaning:")
+    print(df_text_clean)
+    
+    return df_text_clean
+
+# Clean text data
+clean_text_df = clean_text_data(df)
+```
+
+### Comprehensive Data Cleaning Pipeline
+
+**Complete Data Cleaning Workflow**
+```python
+class DataCleaningPipeline:
+    """Comprehensive data cleaning pipeline for ML preprocessing"""
+    
+    def __init__(self):
+        self.cleaning_report = {}
+    
+    def analyze_data_quality(self, df):
+        """Analyze overall data quality"""
+        report = {
+            'total_rows': len(df),
+            'total_columns': len(df.columns),
+            'missing_data': {},
+            'duplicate_rows': df.duplicated().sum(),
+            'data_types': df.dtypes.to_dict(),
+            'numerical_columns': list(df.select_dtypes(include=[np.number]).columns),
+            'categorical_columns': list(df.select_dtypes(include=['object']).columns),
+            'memory_usage': df.memory_usage(deep=True).sum()
+        }
+        
+        # Missing data analysis
+        for col in df.columns:
+            missing_count = df[col].isnull().sum()
+            missing_pct = (missing_count / len(df)) * 100
+            report['missing_data'][col] = {
+                'count': missing_count,
+                'percentage': missing_pct
+            }
+        
+        # Outlier analysis for numerical columns
+        report['outliers'] = {}
+        for col in report['numerical_columns']:
+            Q1 = df[col].quantile(0.25)
+            Q3 = df[col].quantile(0.75)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+            outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
+            report['outliers'][col] = len(outliers)
+        
+        self.cleaning_report = report
+        return report
+    
+    def clean_missing_values(self, df, strategy='auto'):
+        """Clean missing values with configurable strategy"""
+        df_clean = df.copy()
+        
+        if strategy == 'auto':
+            # Automatic strategy based on missing percentage
+            for col in df.columns:
+                missing_pct = (df[col].isnull().sum() / len(df)) * 100
+                
+                if missing_pct > 70:
+                    # Drop columns with >70% missing
+                    df_clean = df_clean.drop(columns=[col])
+                    print(f"Dropped column '{col}' ({missing_pct:.1f}% missing)")
+                
+                elif missing_pct > 0:
+                    if df[col].dtype in ['int64', 'float64']:
+                        # Use median for numerical columns
+                        df_clean[col].fillna(df_clean[col].median(), inplace=True)
+                        print(f"Filled '{col}' with median")
+                    else:
+                        # Use mode for categorical columns
+                        mode_value = df_clean[col].mode()[0] if not df_clean[col].mode().empty else 'Unknown'
+                        df_clean[col].fillna(mode_value, inplace=True)
+                        print(f"Filled '{col}' with mode: {mode_value}")
+        
+        return df_clean
+    
+    def remove_duplicates(self, df, subset=None, keep='first'):
+        """Remove duplicate records"""
+        initial_count = len(df)
+        df_clean = df.drop_duplicates(subset=subset, keep=keep)
+        removed_count = initial_count - len(df_clean)
+        
+        print(f"Removed {removed_count} duplicate rows")
+        return df_clean
+    
+    def handle_outliers(self, df, method='iqr', threshold=1.5):
+        """Handle outliers in numerical columns"""
+        df_clean = df.copy()
+        numerical_cols = df.select_dtypes(include=[np.number]).columns
+        
+        for col in numerical_cols:
+            if method == 'iqr':
+                Q1 = df[col].quantile(0.25)
+                Q3 = df[col].quantile(0.75)
+                IQR = Q3 - Q1
+                lower_bound = Q1 - threshold * IQR
+                upper_bound = Q3 + threshold * IQR
+                
+                # Cap outliers instead of removing them
+                outliers_count = len(df_clean[(df_clean[col] < lower_bound) | 
+                                             (df_clean[col] > upper_bound)])
+                
+                df_clean[col] = np.clip(df_clean[col], lower_bound, upper_bound)
+                
+                if outliers_count > 0:
+                    print(f"Capped {outliers_count} outliers in '{col}'")
+        
+        return df_clean
+    
+    def standardize_text(self, df, text_columns=None):
+        """Standardize text data"""
+        df_clean = df.copy()
+        
+        if text_columns is None:
+            text_columns = df.select_dtypes(include=['object']).columns
+        
+        for col in text_columns:
+            if col in df_clean.columns:
+                df_clean[col] = (df_clean[col]
+                                .astype(str)
+                                .str.strip()
+                                .str.replace(r'\s+', ' ', regex=True))
+                print(f"Standardized text in '{col}'")
+        
+        return df_clean
+    
+    def fix_data_types(self, df, type_mapping=None):
+        """Fix data type inconsistencies"""
+        df_clean = df.copy()
+        
+        if type_mapping:
+            for col, dtype in type_mapping.items():
+                if col in df_clean.columns:
+                    try:
+                        df_clean[col] = df_clean[col].astype(dtype)
+                        print(f"Converted '{col}' to {dtype}")
+                    except Exception as e:
+                        print(f"Failed to convert '{col}' to {dtype}: {e}")
+        
+        return df_clean
+    
+    def clean_dataset(self, df, config=None):
+        """Complete data cleaning pipeline"""
+        print("Starting Data Cleaning Pipeline")
+        print("=" * 50)
+        
+        # Step 1: Analyze data quality
+        quality_report = self.analyze_data_quality(df)
+        print(f"Initial dataset: {quality_report['total_rows']} rows, {quality_report['total_columns']} columns")
+        
+        # Step 2: Clean missing values
+        df_clean = self.clean_missing_values(df)
+        
+        # Step 3: Remove duplicates
+        df_clean = self.remove_duplicates(df_clean)
+        
+        # Step 4: Handle outliers
+        df_clean = self.handle_outliers(df_clean)
+        
+        # Step 5: Standardize text
+        df_clean = self.standardize_text(df_clean)
+        
+        # Step 6: Final quality check
+        final_report = self.analyze_data_quality(df_clean)
+        
+        print("\nCleaning Summary:")
+        print("=" * 30)
+        print(f"Original shape: {df.shape}")
+        print(f"Final shape: {df_clean.shape}")
+        print(f"Rows removed: {len(df) - len(df_clean)}")
+        print(f"Columns removed: {len(df.columns) - len(df_clean.columns)}")
+        print(f"Missing values reduced from {sum(quality_report['missing_data'][col]['count'] for col in quality_report['missing_data'])} to {sum(final_report['missing_data'][col]['count'] for col in final_report['missing_data'])}")
+        
+        return df_clean, final_report
+
+# Usage example
+def demonstrate_cleaning_pipeline():
+    """Demonstrate the complete cleaning pipeline"""
+    
+    # Create a messy dataset
+    np.random.seed(42)
+    messy_data = {
+        'id': range(1, 101),
+        'age': np.random.choice([25, 30, np.nan, 35, 40, 150, -5], 100),  # Has outliers and missing
+        'income': np.random.choice([50000, 60000, np.nan, 1000000, 70000], 100),  # Has outliers
+        'name': ['John Doe', 'JANE SMITH', '  bob  ', np.nan, 'Alice'] * 20,
+        'city': ['New York', 'new york', 'NEW YORK', 'Los Angeles', np.nan] * 20,
+        'score': np.random.normal(75, 15, 100)  # Normal distribution with some natural outliers
+    }
+    
+    # Add some duplicate rows
+    df_messy = pd.DataFrame(messy_data)
+    df_messy = pd.concat([df_messy, df_messy.iloc[:5]], ignore_index=True)  # Add 5 duplicates
+    
+    # Initialize and run cleaning pipeline
+    cleaner = DataCleaningPipeline()
+    df_clean, report = cleaner.clean_dataset(df_messy)
+    
+    return df_clean, report
+
+# Run demonstration
+# clean_data, cleaning_report = demonstrate_cleaning_pipeline()
+```
+
+### Best Practices for Data Cleaning
+
+**1. Documentation and Reproducibility**
+```python
+def create_cleaning_documentation(df_original, df_clean, cleaning_steps):
+    """Document all cleaning steps for reproducibility"""
+    doc = {
+        'timestamp': pd.Timestamp.now(),
+        'original_shape': df_original.shape,
+        'final_shape': df_clean.shape,
+        'cleaning_steps': cleaning_steps,
+        'columns_removed': list(set(df_original.columns) - set(df_clean.columns)),
+        'data_quality_improvement': {
+            'missing_values_before': df_original.isnull().sum().sum(),
+            'missing_values_after': df_clean.isnull().sum().sum(),
+            'duplicates_removed': len(df_original) - len(df_clean.drop_duplicates())
+        }
+    }
+    
+    # Save documentation
+    with open('data_cleaning_log.json', 'w') as f:
+        import json
+        json.dump(doc, f, indent=2, default=str)
+    
+    return doc
+```
+
+**2. Validation and Quality Checks**
+```python
+def validate_cleaned_data(df):
+    """Validate cleaned data meets quality requirements"""
+    validation_results = {
+        'passed': True,
+        'issues': []
+    }
+    
+    # Check for remaining missing values
+    missing_pct = (df.isnull().sum().sum() / (len(df) * len(df.columns))) * 100
+    if missing_pct > 5:  # More than 5% missing
+        validation_results['issues'].append(f"High missing data: {missing_pct:.2f}%")
+        validation_results['passed'] = False
+    
+    # Check for duplicates
+    duplicate_count = df.duplicated().sum()
+    if duplicate_count > 0:
+        validation_results['issues'].append(f"Duplicates found: {duplicate_count}")
+        validation_results['passed'] = False
+    
+    # Check data types
+    for col in df.select_dtypes(include=['object']).columns:
+        unique_ratio = len(df[col].unique()) / len(df)
+        if unique_ratio > 0.95:  # Mostly unique values
+            validation_results['issues'].append(f"Column '{col}' has high cardinality: {unique_ratio:.2f}")
+    
+    return validation_results
+```
+
+### Key Takeaways
+
+**Importance of Data Cleaning:**
+1. **Model Performance**: Clean data directly improves model accuracy and reliability
+2. **Bias Reduction**: Removes systematic errors that could bias results
+3. **Computational Efficiency**: Reduces training time and resource consumption
+4. **Interpretability**: Makes model insights more meaningful and trustworthy
+5. **Production Stability**: Ensures consistent model behavior in deployment
+
+**Common Data Quality Issues:**
+- Missing values (various patterns and causes)
+- Duplicate records (exact and near-duplicates)
+- Outliers and anomalies
+- Inconsistent data types and formats
+- Text inconsistencies and encoding issues
+- Incorrect or placeholder values
+
+**Best Practices:**
+1. **Understand Your Data**: Analyze patterns before cleaning
+2. **Document Everything**: Keep detailed logs of all cleaning steps
+3. **Validate Results**: Check data quality after each cleaning step
+4. **Preserve Original Data**: Always work on copies
+5. **Domain Knowledge**: Apply business logic to cleaning decisions
+6. **Iterative Process**: Clean, validate, and refine repeatedly
+7. **Automation**: Build reusable cleaning pipelines
+8. **Quality Metrics**: Define and monitor data quality KPIs
+
+Data cleaning is foundational to successful machine learning projects. Poor data quality is often the primary reason for model failures in production, making thorough data cleaning essential for reliable ML systems.
 ---
 
 ## Question 14
@@ -3754,7 +5600,7 @@ class DataCleaner:
                     self.log_action('missing_categorical', f'{col}: filled with mode ({fill_val})')
         
         missing_after = self.df.isnull().sum().sum()
-        print(f"Missing values: {missing_before} → {missing_after}")
+        print(f"Missing values: {missing_before} â†’ {missing_after}")
         
         return self.df
     
@@ -4398,7 +6244,7 @@ class FeatureScalingDemo:
         print(scaled_df.describe())
         
         print("\nStandard Scaling Properties:")
-        print("- Mean ≈ 0, Standard Deviation ≈ 1")
+        print("- Mean â‰ˆ 0, Standard Deviation â‰ˆ 1")
         print("- Preserves the shape of the original distribution")
         print("- Handles outliers but doesn't bound the range")
         
@@ -4553,7 +6399,7 @@ class FeatureScalingDemo:
         
         # Check that each row has unit norm
         row_norms = np.linalg.norm(scaled_data, axis=1)
-        print(f"\nSample row norms (should be ≈ 1.0):")
+        print(f"\nSample row norms (should be â‰ˆ 1.0):")
         print(f"Mean: {row_norms.mean():.6f}")
         print(f"Std: {row_norms.std():.6f}")
         print(f"Min: {row_norms.min():.6f}")
@@ -4822,7 +6668,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 16
 
-**Explain the difference betweenlabel encodingandone-hot encoding.**
+**Explain the difference between label encoding and one-hot encoding.**
 
 **Answer:** _[To be filled]_
 
@@ -4830,7 +6676,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 17
 
-**What is the purpose ofdata splittingintrain,validation, andtest sets?**
+**What is the purpose of data splitting in train, validation, and test sets?**
 
 **Answer:** _[To be filled]_
 
@@ -4838,7 +6684,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 18
 
-**Describe the process of building amachine learning modelinPython.**
+**Describe the process of building a machine learning model in Python.**
 
 **Answer:** _[To be filled]_
 
@@ -4846,7 +6692,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 19
 
-**Explaincross-validationand where it fits in themodel trainingprocess.**
+**Explain cross-validation and where it fits in the model training process.**
 
 **Answer:** _[To be filled]_
 
@@ -4854,7 +6700,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 20
 
-**What is thebias-variance tradeoffinmachine learning?**
+**What is the bias-variance trade-off in machine learning?**
 
 **Answer:** _[To be filled]_
 
@@ -4862,7 +6708,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 21
 
-**Describe the steps taken to improve amodel’s accuracy.**
+**Describe the steps taken to improve a model's accuracy.**
 
 **Answer:** _[To be filled]_
 
@@ -4870,7 +6716,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 22
 
-**What arehyperparameters, and how do youtunethem?**
+**What are hyperparameters, and how do you tune them?**
 
 **Answer:** _[To be filled]_
 
@@ -4878,7 +6724,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 23
 
-**What is aconfusion matrix, and how is it interpreted?**
+**What is a confusion matrix, and how is it interpreted?**
 
 **Answer:** _[To be filled]_
 
@@ -4886,7 +6732,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 24
 
-**Explain theROC curveand thearea under the curve (AUC)metric.**
+**Explain the ROC curve and the area under the curve (AUC) metric.**
 
 **Answer:** _[To be filled]_
 
@@ -4894,7 +6740,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 25
 
-**Explain differentvalidation strategies, such ask-fold cross-validation.**
+**Explain different validation strategies, such ask-fold cross-validation.**
 
 **Answer:** _[To be filled]_
 
@@ -4902,7 +6748,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 26
 
-**Describe steps to take when amodel performs wellon thetraining databutpoorlyonnew data.**
+**Describe steps to take when a model performs well on the training data but poorly on new data.**
 
 **Answer:** _[To be filled]_
 
@@ -4910,7 +6756,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 27
 
-**Explain the use ofregularizationinlinear modelsand provide aPython example.**
+**Explain the use of regularization in linear models and provide a Python example.**
 
 **Answer:** _[To be filled]_
 
@@ -4918,7 +6764,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 28
 
-**What are the advantages of usingStochastic Gradient Descentoverstandard Gradient Descent?**
+**What are the advantages of using Stochastic Gradient Descent over standard Gradient Descent?**
 
 **Answer:** _[To be filled]_
 
@@ -4926,7 +6772,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 29
 
-**What isdimensionality reduction, and when would you use it?**
+**What is dimensionality reduction, and when would you use it?**
 
 **Answer:** _[To be filled]_
 
@@ -4934,7 +6780,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 30
 
-**Explain the difference betweenbatch learningandonline learning.**
+**Explain the difference between batch learning and online learning.**
 
 **Answer:** _[To be filled]_
 
@@ -4942,7 +6788,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 31
 
-**What is the role ofattention mechanismsinnatural language processingmodels?**
+**What is the role of attention mechanisms in natural language processing models?**
 
 **Answer:** _[To be filled]_
 
@@ -4950,7 +6796,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 32
 
-**Explain how to usecontext managersinPythonand provide a machine learning-related example.**
+**Explain how to use context managers in Python and provide a machine learning-related example.**
 
 **Answer:** _[To be filled]_
 
@@ -4958,7 +6804,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 33
 
-**What areslotsinPython classesand how could they be useful in machine learning applications?**
+**What are slots in Python classes and how could they be useful in machine learning applications?**
 
 **Answer:** _[To be filled]_
 
@@ -4966,7 +6812,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 34
 
-**Explain the concept ofmicroservices architecturein deployingmachine learning models.**
+**Explain the concept of microservices architecture in deploying machine learning models.**
 
 **Answer:** _[To be filled]_
 
@@ -4974,7 +6820,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 35
 
-**What are the considerations forscaling a machine learning applicationwithPython?**
+**What are the considerations for scaling a machine learning application with Python?**
 
 **Answer:** _[To be filled]_
 
@@ -4982,7 +6828,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 36
 
-**What ismodel versioning, and how can it be managed in areal-world application?**
+**What is model versioning, and how can it be managed in a real-world application?**
 
 **Answer:** _[To be filled]_
 
@@ -4990,7 +6836,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 37
 
-**Describe a situation where amachine learning modelmight fail, and how you would investigate the issue usingPython.**
+**Describe a situation where a machine learning model might fail, and how you would investigate the issue using Python.**
 
 **Answer:** _[To be filled]_
 
@@ -4998,7 +6844,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 38
 
-**What arePython’s profiling toolsand how do they assist in optimizingmachine learning code?**
+**What are Python's profiling tools and how do they assist in optimizing machine learning code?**
 
 **Answer:** _[To be filled]_
 
@@ -5006,7 +6852,7 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 39
 
-**Explain howunit testsandintegration testsensure the correctness of your machine learning code.**
+**Explain how unit tests and integration tests ensure the correctness of your machine learning code.**
 
 **Answer:** _[To be filled]_
 
@@ -5014,9 +6860,12 @@ Feature scaling is a fundamental preprocessing step that can significantly impac
 
 ## Question 40
 
-**What is the role ofExplainable AI (XAI)and how canPython librarieshelp achieve it?**
+**What is the role of Explainable AI (XAI) and how can Python libraries help achieve it?**
 
 **Answer:** _[To be filled]_
 
 ---
+
+
+
 
