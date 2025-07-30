@@ -26,7 +26,7 @@
 
 ## Question 4
 
-**How do you calculate thedeterminantof amatrix?**
+**How do you calculate the determinant of amatrix?**
 
 **Answer:** _[To be filled]_
 
