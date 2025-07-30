@@ -1,4 +1,4 @@
-﻿# Python Ml Interview Questions - Theory Questions
+# Python Ml Interview Questions - Theory Questions
 
 ## Question 1
 
