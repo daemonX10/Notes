@@ -2,7 +2,7 @@
 
 ## Question 1
 
-**How do you handlecategorical variablesin machine learning?**
+**How do you handle categorical variables in machine learning?**
 
 **Answer:** _[To be filled]_
 
