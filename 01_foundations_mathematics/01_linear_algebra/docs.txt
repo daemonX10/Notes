@@ -1,0 +1,142 @@
+
+3
+
+Automatic Zoom
+Question 1 
+What is a vector and how is it used in machine learning? 
+Answer: A vector is a mathematical object that has both magnitude and direction, represented 
+as an ordered collection of numbers (components). In machine learning: 
+●  Feature Representation: Each data point is represented as a feature vector where each 
+component represents a specific attribute or feature 
+●  Model Parameters: Weight vectors store the learned parameters of models 
+●  Embeddings: Words, images, or other data are converted into vector representations in 
+high-dimensional spaces 
+●  Computations: Operations like dot products, distance calculations, and transformations 
+are performed using vector arithmetic 
+●  Examples: A house might be represented as [bedrooms=3, bathrooms=2, sqft=1500, 
+price=300000] 
+ 
+Question 2 
+Explain the difference between a scalar and a vector. 
+Answer: 
+Scalar: 
+●  A single numerical value with magnitude only 
+●  Has no direction (0-dimensional) 
+●  Examples: temperature (25°C), mass (5kg), speed (60 mph) 
+●  Represented by simple numbers: 5, -3.14, 100 
+Vector: 
+●  An ordered collection of numbers with both magnitude and direction 
+●  Multi-dimensional (1D, 2D, 3D, or higher) 
+●  Examples: velocity (60 mph northeast), force (10N at 45°), position coordinates (x=3, 
+y=4) 
+●  Represented as arrays: [3, 4], [-1, 2, 5] 
+Key Differences: 
+●  Dimensionality: Scalars are 0D, vectors are 1D or higher 
+●  Operations: Scalars use basic arithmetic, vectors use specialized operations (dot 
+product, cross product) 
+●  Representation: Scalars are single values, vectors are arrays/matrices 
+ 
+Question 3 
+What is a matrix and why is it central to linear algebra? 
+Answer: A matrix is a 2D array of numbers arranged in rows and columns, represented as: 
+A = [a₁₁  a₁₂  a₁₃] 
+    [a₂₁  a₂₂  a₂₃] 
+    [a₃₁  a₃₂  a₃₃] 
+ 
+Why matrices are central to linear algebra: 
+1.  Linear Transformations: Matrices represent linear transformations between vector 
+spaces 
+2.  System of Equations: Solve multiple linear equations simultaneously (Ax = b) 
+3.  Data Organization: Store and manipulate large datasets efficiently 
+4.  Composition: Combine multiple transformations through matrix multiplication 
+5.  Eigenvalue Problems: Find characteristic vectors and values 
+6.  Dimensionality: Work with high-dimensional spaces 
+Applications in ML: 
+●  Dataset Representation: Each row = sample, each column = feature 
+●  Neural Networks: Weight matrices connect layers 
+●  PCA: Covariance matrices for dimensionality reduction 
+●  Transformations: Rotation, scaling, translation operations 
+ 
+Question 4 
+Explain the concept of a tensor in the context of machine learning. 
+Answer: A tensor is a generalization of scalars, vectors, and matrices to arbitrary dimensions: 
+Tensor Hierarchy: 
+●  0D Tensor: Scalar (single number) 
+●  1D Tensor: Vector (array of numbers) 
+●  2D Tensor: Matrix (2D array) 
+●  3D Tensor: Cube of numbers (height × width × depth) 
+●  nD Tensor: n-dimensional array 
+In Machine Learning: 
+1.  Data Representation: 
+○  Images: 3D tensors (height × width × channels) 
+○  Video: 4D tensors (time × height × width × channels) 
+○  Batch Processing: Add batch dimension (batch × features) 
+2.  Deep Learning: 
+○  Input: Multi-dimensional data tensors 
+○  Weights: Parameter tensors of various shapes 
+○  Activations: Feature maps as tensors 
+3.  Operations: 
+○  Tensor Addition: Element-wise operations 
+○  Tensor Multiplication: Generalized matrix multiplication 
+○  Reshaping: Change dimensions while preserving data 
+Example: A batch of 32 RGB images (224×224) = tensor shape [32, 224, 224, 3] 
+ 
+Question 5 
+What are the properties of matrix multiplication? 
+Theory 
+Matrix multiplication is a binary operation that produces a single matrix from two matrices. For 
+the product of two matrices A (of size m × n) and B (of size n × p) to be defined, the number of 
+columns in the first matrix (n) must be equal to the number of rows in the second matrix (n). The 
+resulting matrix, C = AB, will have dimensions m × p. 
+The element cᵢ in the resulting matrix C is calculated by taking the dot product of the i-th row of 
+A with the j-th column of B. 
+Core Properties 
+1.  Associativity: Matrix multiplication is associative. For matrices A, B, and C of 
+compatible dimensions: (AB)C = A(BC) This means the order of performing the multiplications does not affect the final result. 
+2.  Non-Commutativity: Matrix multiplication is generally not commutative. The order of 
+matrices matters significantly. AB ≠ BA In many cases, if AB is defined, BA may not even be defined due to dimension 
+mismatch. Even if both are defined, the resulting matrices are usually different. 
+3.  Distributivity: It is distributive over matrix addition. 
+○  Left Distributive: A(B + C) = AB + AC 
+○  Right Distributive: (A + B)C = AC + BC 
+4.   
+5.  Multiplicative Identity: The identity matrix I acts as the neutral element for 
+multiplication. For any matrix A: AI = IA = A The identity matrix I must have dimensions compatible with A for the multiplication to be 
+defined. 
+6.  Scalar Multiplication Property: A scalar c can be multiplied in any order: c(AB) = (cA)B = A(cB) 
+7.  Transpose of a Product: The transpose of a product of matrices is the product of their 
+transposes in reverse order: (AB)ᵀ = BᵀAᵀ 
+Common Pitfalls 
+●  Assuming Commutativity: The most frequent error is assuming AB = BA. This is a 
+fundamental difference from scalar multiplication. 
+●  Dimension Mismatch: Attempting to multiply matrices with incompatible inner 
+dimensions is a common source of errors in both theoretical work and programming. 
+●  Cancellation Law Does Not Hold: If AB = AC, it does not necessarily imply that B = C, 
+even if A is not a zero matrix. This is true only if A is invertible. 
+Use Cases 
+●  Composing Linear Transformations: If transformation T₁ is represented by matrix A 
+and T₂ by matrix B, applying T₁ then T₂ is equivalent to a single transformation 
+represented by the matrix product BA. 
+●  Solving Systems of Linear Equations: Used in methods like LU decomposition. 
+●  Neural Networks: The forward pass in a neural network is a series of matrix 
+multiplications between input/activation vectors and weight matrices. 
+ 
+Question 6 
+Explain the dot product of two vectors and its significance in machine learning. 
+Theory 
+The dot product (also known as the scalar product) is an algebraic operation that takes two 
+equal-length sequences of numbers (usually coordinate vectors) and returns a single number. 
+For two vectors a = [a₁, a₂, ..., a] and b = [b₁, b₂, ..., b], the dot product is defined algebraically 
+as: 
+a ⋅ b = Σᵢ(aᵢ * bᵢ) = a₁b₁ + a₂b₂ + ... + ab 
+Geometrically, the dot product is defined as: 
+a ⋅ b = ||a|| ||b|| cos(θ) where ||a|| and ||b|| are the magnitudes (or norms) of the vectors, and θ is the angle between 
+them. 
+Significance in Machine Learning 
+The dot product is a cornerstone of many machine learning algorithms due to its dual nature: it 
+acts as both a measure of projection and a measure of similarity. 
+1.  Similarity Measurement (Cosine Similarity): 
+○  By rearranging the geometric formula, we get cos(θ) = (a ⋅ b) / (||a|| ||b||). 
+○  This value, called cosine similarity, measures the orientation of two vectors. It 
+ranges from -1 (opposite directions) to 1 (same direction). A value of 0 indicates 
+the vectors are orthogonal (perpendicular), implying no similarity. 
