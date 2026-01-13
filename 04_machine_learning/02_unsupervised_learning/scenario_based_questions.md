@@ -10,7 +10,7 @@
 
 ## Question 2
 
-**Discuss the concepts of support, confidence, and lift in association rule learning.**
+**Discuss the concepts ofsupport,confidence, andliftinassociation rule learning.**
 
 **Answer:** _[To be filled]_
 

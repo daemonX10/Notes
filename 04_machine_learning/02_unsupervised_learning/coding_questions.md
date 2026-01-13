@@ -2,7 +2,7 @@
 
 ## Question 1
 
-**How would you implement clustering on a large,distributed dataset?**
+**How would you implementclusteringon a large,distributed dataset?**
 
 **Answer:** _[To be filled]_
 
