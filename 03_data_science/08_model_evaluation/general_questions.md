@@ -2,9 +2,17 @@
 
 ## Question 1
 
-**Defineprecision,recall, andF1-score.**
+**Define precision, recall, and F1-score.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definitions
+- **Precision** = TP / (TP + FP)
+- **Recall** = TP / (TP + FN)
+- **F1-score** = 2 × (P × R) / (P + R)
+
+### Interview Tip
+Choose based on cost: FP cost → precision; FN cost → recall.
 
 ---
 
@@ -12,15 +20,35 @@
 
 **What do you understand by the term “Confusion Matrix”?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Structure
+- True Positives (TP), False Positives (FP)
+- False Negatives (FN), True Negatives (TN)
+
+### Derived Metrics
+Accuracy, Precision, Recall, Specificity
+
+### Interview Tip
+Can derive all classification metrics from confusion matrix.
 
 ---
 
 ## Question 3
 
-**Why isaccuracynot always the best metric for model evaluation?**
+**Why is accuracy not always the best metric for model evaluation?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Problem with Accuracy
+- Misleading for imbalanced datasets
+- A model predicting all majority class gets high accuracy
+
+### Better Alternatives
+F1, AUC, precision-recall curves
+
+### Interview Tip
+Always check class distribution before using accuracy.
 
 ---
 
