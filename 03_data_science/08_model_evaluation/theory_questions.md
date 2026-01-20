@@ -7,16 +7,51 @@
 **Answer:**
 
 ### Definition
-Model evaluation is the process of assessing how well a trained model performs on unseen data and comparing different models to select the best one.
+Model evaluation is the systematic process of measuring how well a trained machine learning model generalizes to new, unseen data. It answers: "Will this model work in the real world?"
 
-### Purpose
-- Estimate real-world performance
-- Compare alternative models
-- Detect overfitting/underfitting
-- Guide model improvement
+### Core Concepts
+
+**Why We Evaluate:**
+- Training accuracy is misleading (model memorizes training data)
+- Need to estimate performance on future/unseen data
+- Select the best model among candidates
+- Identify overfitting or underfitting problems
+
+**What We Measure:**
+- **Generalization ability**: Performance gap between train and test
+- **Prediction quality**: Accuracy, precision, recall, MSE depending on task
+- **Calibration**: Are predicted probabilities reliable?
+- **Robustness**: Does model work across different data slices?
+
+### Evaluation Workflow
+
+```
+Training Data → Train Model → Validation Data → Tune Hyperparameters → Test Data → Final Score
+```
+
+**Step-by-step:**
+1. Split data into train/validation/test (before any training)
+2. Train model on training set only
+3. Evaluate on validation set, tune hyperparameters
+4. Once finalized, evaluate once on test set
+5. Report test set performance as expected real-world performance
+
+### Key Metrics by Task
+
+| Task | Common Metrics |
+|------|----------------|
+| Classification | Accuracy, Precision, Recall, F1, AUC-ROC |
+| Regression | MSE, RMSE, MAE, R² |
+| Clustering | Silhouette Score, Davies-Bouldin Index |
+| Ranking | NDCG, MAP, MRR |
+
+### Practical Relevance
+- Wrong evaluation leads to deploying bad models
+- Business decisions depend on reliable performance estimates
+- Helps debug model issues before production
 
 ### Interview Tip
-Always evaluate on data the model hasn't seen during training.
+Never use test data for any decision-making. Test set is a "sealed envelope" opened only once at the end.
 
 ---
 
@@ -26,19 +61,83 @@ Always evaluate on data the model hasn't seen during training.
 
 **Answer:**
 
-### Roles
+### Definition
+Data splitting divides your dataset into three distinct subsets, each serving a specific purpose in the model development lifecycle. This prevents information leakage and ensures honest performance estimates.
 
-| Dataset | Purpose | Used For |
-|---------|---------|----------|
-| Training | Fit model parameters | Learning weights |
-| Validation | Tune hyperparameters | Model selection |
-| Test | Final evaluation | Performance reporting |
+### Core Concepts
 
-### Typical Split
-60-70% train, 15-20% validation, 15-20% test
+| Dataset | Purpose | When Used | Who Sees It |
+|---------|---------|-----------|-------------|
+| **Training** | Learn model parameters (weights) | During training | Model learns from it |
+| **Validation** | Tune hyperparameters, select model | During development | Used for decisions |
+| **Test** | Final unbiased performance estimate | Once, at the end | Never touched until final evaluation |
+
+### Detailed Explanation
+
+**Training Set (60-70%)**
+- Model learns patterns from this data
+- Weights/parameters are adjusted to minimize loss on this set
+- Larger = better learning, but need enough for validation/test
+
+**Validation Set (15-20%)**
+- Used to compare different models or hyperparameters
+- Example: Which learning rate is best? Which model architecture?
+- Can be used multiple times during development
+- Slight bias introduced because we optimize for validation performance
+
+**Test Set (15-20%)**
+- Simulates real-world unseen data
+- Used exactly ONCE after all development is complete
+- Gives unbiased estimate of how model will perform in production
+- Never use for any decision-making
+
+### Visual Workflow
+
+```
+Original Data
+     │
+     ├── Training Set (70%) ──→ Model learns weights
+     │
+     ├── Validation Set (15%) ──→ Compare models, tune hyperparameters
+     │
+     └── Test Set (15%) ──→ Final performance (report this number)
+```
+
+### Why Three Sets?
+
+If only train/test:
+- You tune on test set → test set becomes validation set
+- No unbiased estimate remains
+
+The validation set acts as a "buffer" protecting test set integrity.
+
+### Python Code Example
+
+```python
+from sklearn.model_selection import train_test_split
+
+# Step 1: Split into train+val and test
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=0.15, random_state=42
+)
+
+# Step 2: Split train+val into train and validation
+X_train, X_val, y_train, y_val = train_test_split(
+    X_temp, y_temp, test_size=0.18, random_state=42  # 0.18 of 85% ≈ 15%
+)
+
+# Result: ~70% train, ~15% val, ~15% test
+print(f"Train: {len(X_train)}, Val: {len(X_val)}, Test: {len(X_test)}")
+```
+
+### Common Pitfalls
+1. Using test set to tune hyperparameters (data leakage)
+2. Looking at test set multiple times and picking best result
+3. Not shuffling data before splitting (especially time-series needs care)
+4. Unequal class distribution across splits (use stratified split)
 
 ### Interview Tip
-Never use test data for any decision-making during development.
+When someone says "80/20 train-test split," ask: "Where are you tuning hyperparameters?" If answer is test set, that's a red flag.
 
 ---
 
@@ -49,21 +148,86 @@ Never use test data for any decision-making during development.
 **Answer:**
 
 ### Definition
-Cross-validation rotates training and validation sets to use all data for both purposes.
+Cross-validation is a resampling technique that uses different portions of data as training and validation sets in multiple rounds. It provides a more reliable estimate of model performance by using all data for both training and validation.
 
-### K-Fold Process
-1. Split data into K equal parts
-2. Train on K-1 folds, validate on 1
-3. Repeat K times
-4. Average the metrics
+### Why Cross-Validation?
+- Single train/val split is noisy (depends on which samples land where)
+- Limited data makes single split unreliable
+- Reduces variance of performance estimate
+- Uses all data points for training AND validation (different rounds)
 
-### Benefits
-- More reliable performance estimates
-- Better use of limited data
-- Reduces variance of estimates
+### K-Fold Cross-Validation (Most Common)
+
+**Algorithm:**
+```
+1. Shuffle dataset randomly
+2. Split into K equal-sized folds (K=5 or 10 typical)
+3. For i = 1 to K:
+   - Use fold i as validation set
+   - Use remaining K-1 folds as training set
+   - Train model, record validation score
+4. Final score = average of K validation scores
+5. Standard deviation = measure of estimate reliability
+```
+
+**Visual (K=5):**
+```
+Round 1: [VAL] [Train] [Train] [Train] [Train]  → Score₁
+Round 2: [Train] [VAL] [Train] [Train] [Train]  → Score₂
+Round 3: [Train] [Train] [VAL] [Train] [Train]  → Score₃
+Round 4: [Train] [Train] [Train] [VAL] [Train]  → Score₄
+Round 5: [Train] [Train] [Train] [Train] [VAL]  → Score₅
+
+Final Score = (Score₁ + Score₂ + Score₃ + Score₄ + Score₅) / 5
+```
+
+### Types of Cross-Validation
+
+| Type | When to Use |
+|------|-------------|
+| **K-Fold** | Standard choice, K=5 or 10 |
+| **Stratified K-Fold** | Classification with imbalanced classes |
+| **Leave-One-Out (LOOCV)** | Very small datasets (K=n) |
+| **Time Series Split** | Time-ordered data (no future leakage) |
+| **Group K-Fold** | When samples from same group must stay together |
+
+### Mathematical Formulation
+
+$$\text{CV Score} = \frac{1}{K} \sum_{i=1}^{K} \text{Score}_i$$
+
+$$\text{Variance} = \frac{1}{K} \sum_{i=1}^{K} (\text{Score}_i - \text{CV Score})^2$$
+
+### Python Code Example
+
+```python
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier
+
+# Simple cross-validation
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+
+print(f"Scores per fold: {scores}")
+print(f"Mean: {scores.mean():.3f} ± {scores.std():.3f}")
+
+# Stratified K-Fold for imbalanced classification
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scores = cross_val_score(model, X, y, cv=skf, scoring='f1')
+```
+
+### Choosing K
+- K=5 or K=10: Standard choice, good bias-variance tradeoff
+- K=n (LOOCV): Low bias, high variance, computationally expensive
+- K=3: Use when dataset is very large (computation matters)
+
+### Common Pitfalls
+1. Doing feature selection/preprocessing BEFORE cross-validation (data leakage)
+2. Using regular K-Fold for imbalanced classification (use Stratified)
+3. Using regular K-Fold for time-series (use TimeSeriesSplit)
+4. Reporting only mean without standard deviation
 
 ### Interview Tip
-Use stratified K-fold for classification to maintain class balance.
+"The correct way: preprocessing must happen INSIDE each fold. Otherwise, validation fold has seen information from training data through scaling/feature selection."
 
 ---
 
@@ -73,20 +237,123 @@ Use stratified K-fold for classification to maintain class balance.
 
 **Answer:**
 
-### ROC Curve
-Plot of True Positive Rate vs False Positive Rate at all classification thresholds.
+### Definition
+**ROC (Receiver Operating Characteristic) Curve**: A plot showing the tradeoff between True Positive Rate (sensitivity) and False Positive Rate (1-specificity) at all possible classification thresholds.
 
-### AUC (Area Under Curve)
-- 0.5 = Random classifier
-- 0.7-0.8 = Fair
-- 0.8-0.9 = Good
-- 0.9+ = Excellent
+**AUC (Area Under the ROC Curve)**: A single number summarizing the entire ROC curve. It represents the probability that a randomly chosen positive example is ranked higher than a randomly chosen negative example.
 
-### Interpretation
-AUC = probability that model ranks a random positive higher than a random negative.
+### Core Concepts
+
+**Building Blocks:**
+```
+                    Predicted
+                 Positive  Negative
+Actual Positive    TP        FN
+Actual Negative    FP        TN
+```
+
+$$\text{True Positive Rate (TPR)} = \frac{TP}{TP + FN} = \text{Recall}$$
+
+$$\text{False Positive Rate (FPR)} = \frac{FP}{FP + TN}$$
+
+### How ROC Curve is Created
+
+**Algorithm:**
+```
+1. Model outputs probability scores for each sample
+2. Sort samples by probability (high to low)
+3. For each unique probability as threshold:
+   - Classify samples above threshold as positive
+   - Calculate TPR and FPR
+   - Plot point (FPR, TPR)
+4. Connect all points to form ROC curve
+```
+
+**Visual:**
+```
+TPR (Sensitivity)
+     │
+  1.0├─────────────────●  ← Perfect classifier (0,1)
+     │              ●
+     │           ●    ← Good model curves toward top-left
+     │        ●
+     │     ●
+     │  ●
+  0.5├●─────────────────  ← Random classifier (diagonal)
+     │
+     └────────────────────
+    0                   1.0  FPR (1-Specificity)
+```
+
+### AUC Interpretation
+
+| AUC Value | Interpretation |
+|-----------|----------------|
+| 0.5 | Random guessing (no discrimination) |
+| 0.6-0.7 | Poor |
+| 0.7-0.8 | Fair |
+| 0.8-0.9 | Good |
+| 0.9-1.0 | Excellent |
+| 1.0 | Perfect classifier |
+
+**Probabilistic Interpretation:**
+AUC = P(score of random positive > score of random negative)
+
+Example: AUC = 0.85 means if you pick a random positive and random negative sample, 85% of the time the positive will have a higher predicted probability.
+
+### Why Use ROC-AUC?
+
+**Advantages:**
+- Threshold-independent: Evaluates model across all thresholds
+- Class-imbalance robust (somewhat): Uses rates, not raw counts
+- Good for comparing models regardless of threshold choice
+
+**When to Use:**
+- Binary classification
+- When you need to compare model ranking ability
+- When threshold will be chosen later based on business needs
+
+### Python Code Example
+
+```python
+from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+
+# Get probability predictions
+y_prob = model.predict_proba(X_test)[:, 1]  # Probability of class 1
+
+# Calculate ROC curve points
+fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+
+# Calculate AUC
+auc = roc_auc_score(y_test, y_prob)
+
+# Plot ROC curve
+plt.plot(fpr, tpr, label=f'Model (AUC = {auc:.2f})')
+plt.plot([0, 1], [0, 1], 'k--', label='Random')  # Diagonal line
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+plt.show()
+```
+
+### ROC vs Precision-Recall Curve
+
+| ROC Curve | PR Curve |
+|-----------|----------|
+| Works well for balanced data | Better for imbalanced data |
+| Can be optimistic with imbalance | More informative when positives are rare |
+| Shows FPR which matters when negatives >> positives | Focuses on positive class performance |
+
+### Common Pitfalls
+1. Using accuracy when data is imbalanced (use AUC instead)
+2. Relying only on AUC for highly imbalanced data (check PR-AUC too)
+3. Forgetting AUC measures ranking, not calibration
+4. Comparing AUC across different datasets (not meaningful)
 
 ### Interview Tip
-ROC/AUC is threshold-independent, useful for comparing models.
+"For imbalanced datasets (e.g., fraud detection with 1% fraud), Precision-Recall curve is more informative than ROC because ROC can look good even when model performs poorly on the minority class."
 
 ---
 
