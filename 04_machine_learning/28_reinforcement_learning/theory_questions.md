@@ -2088,3 +2088,2502 @@ class ProductionMonitor:
 - Maintenance procedures
 
 ---
+
+
+---
+
+# --- SARSA Questions (from 05_reinforcement_learning/01_sarsa) ---
+
+# SARSA - Theory Questions
+
+## Question 1
+**What does the acronym SARSA stand for?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**Explain the "on-policy" nature of SARSA.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**How is the SARSA update rule formulated mathematically?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**Compare SARSA and Q-Learning: what are the key differences?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**Describe the process of learning a policy using SARSA on a gridworld.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**When would SARSA be preferred over Q-Learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**What are the main steps in the SARSA algorithm?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**How do you select the next action in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**What role does the learning rate (α) play in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What is the impact of a high discount factor (γ) in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How does SARSA handle the exploration-exploitation tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**In which scenarios can SARSA perform worse than Q-Learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How does on-policy learning affect convergence in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**Explain the term "temporal difference" in SARSA.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**What is Eligibility Traces in the context of SARSA(λ)?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**How are rewards propagated in episodes using SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How can SARSA be extended for continuous state and action spaces?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What is the role of ε-greedy policy in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**Provide an example of a real-world task suitable for SARSA.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**How does SARSA handle stochastic environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**What is SARSA(λ) and why is λ introduced?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**How do you initialize Q-values in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**What is the effect of the initial Q-values on learning speed?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**How does Expected SARSA differ from regular SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**What are the benefits of Expected SARSA over SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What is the computational complexity of SARSA per iteration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How would you implement SARSA for the Taxi-v3 environment?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**Explain why SARSA is considered an on-policy algorithm.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How does batch updating work in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What is the policy improvement step in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**Describe a scenario of policy evaluation in SARSA.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**How would you visualize the learning progress in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**What challenges do you face in hyperparameter tuning for SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**How can function approximation be integrated with SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**What are the limitations of tabular SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What makes SARSA robust to policy changes?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do terminal states affect updates in SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**Give an example of using decaying epsilon for exploration in SARSA.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**What are the theoretical convergence guarantees for SARSA?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**How does stochasticity in the environment dynamics affect SARSA learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**What is the practical impact of action stochasticity on SARSA's updates?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**Explain reward shaping with respect to SARSA.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you modify SARSA for partially observable environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What is the difference between Monte Carlo and SARSA methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How can SARSA be used in multi-agent settings?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**Illustrate SARSA's performance in sparse reward environments.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**What role does delayed reward play in SARSA's learning curve?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**How do you adapt SARSA for continuous reward spaces?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**Describe applications where SARSA may underperform.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What recent advancements or variants exist for the SARSA algorithm?**
+
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- DQN (Deep Q-Network) Questions (from 05_reinforcement_learning/02_dqn) ---
+
+# Deep Q-Network (DQN) - Theory Questions
+
+## Question 1
+**What is a Deep Q-Network (DQN)?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**How does DQN differ from traditional Q-learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**Describe the architecture of a typical DQN.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**What role does the replay buffer play in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**Why is a target network used in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**Describe the concept of "experience replay" in DQN.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**How are Q-values represented in a DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What types of problems are well suited for DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**Explain how the Bellman equation is applied in DQN.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What are some common challenges when training DQNs?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How is stability achieved in DQN training?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**Why are mini-batches used in DQN updates?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How does the target network improve convergence?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**Explain the concept of reward clipping in DQN.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How does DQN handle high-dimensional inputs like images?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**What is Double DQN and why is it needed?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**What are dueling architectures in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**Explain prioritized experience replay.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How is the loss function defined in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**What metrics can be used to evaluate a DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**What are common pitfalls in hyperparameter tuning for DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**How do you prevent overestimation of Q-values in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**What is the role of the discount factor in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**How is exploration implemented in DQN agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How can DQN be extended to continuous action spaces?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What are common activation functions used in DQN networks?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How does DQN perform in non-stationary environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**When should you update the target network in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**What are the main differences between DQN and Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**How does DQN manage memory constraints with large replay buffers?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**What is the effect of batch size in DQN training?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**How do you monitor and debug a DQN agent's performance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**What is "catastrophic forgetting" and how does it manifest in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What are possible improvements for vanilla DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How would you visualize the learned Q-function in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What are real-world applications of DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How robust is DQN to different reward structures?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What's the impact of reward delay on DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How can transfer learning be applied to DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What regularization techniques are effective for DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**How does DQN scale to multi-agent systems?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What is the impact of exploration vs. exploitation in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you choose when to end training for a DQN agent?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What metrics diagnose overfitting in DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you use DQN for policy distillation?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What are the limitations of DQN for real-time control tasks?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**In what scenarios would DQN fail?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**How can DQN be combined with other RL algorithms?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How does network size affect DQN performance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What are the main research trends in improving DQN?**
+
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- Policy Gradient Questions (from 05_reinforcement_learning/03_policy_gradient) ---
+
+# Policy Gradient Methods - Theory Questions
+
+## Question 1
+**What are Policy Gradient methods in RL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**How do Policy Gradient methods differ from value-based methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**Explain the general objective function optimized in Policy Gradient.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**Why are Policy Gradient methods suitable for continuous action spaces?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**Describe the steps of the REINFORCE algorithm.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What is the variance problem with Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**How is the likelihood ratio trick used?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What does "stochastic policy" mean in Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How does baseline function help reduce variance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What's the difference between actor-only and actor-critic architectures?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**What is entropy regularization and why is it used?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**Explain episodic vs. step-wise policy gradient methods.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How do Policy Gradient methods handle large state spaces?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**What is reward-to-go and how is it used?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How do you use advantage estimates in Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**Why is reward normalization important?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How do discount factors affect Policy Gradient performance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What is the gradient estimator in the classic Policy Gradient method?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**Describe the use of trust regions in TRPO.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**How does PPO improve stability over vanilla Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**What is exploration noise in Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**How do you implement constraint policies in Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How does off-policy policy gradient differ from on-policy?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**What does "credit assignment" mean in policy gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How is policy improvement measured in practice?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What optimization techniques work well for Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**What does it mean to "clip" objective functions in PPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**How is advantage estimated in PPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**Describe sample efficiency in Policy Gradient methods.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What is GAE (Generalized Advantage Estimator)?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How does batch size affect Policy Gradient performance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**When do Policy Gradient methods diverge?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**What are deterministic Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**Can deterministic Policy Gradients be used with discrete actions?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How do Policy Gradient methods apply to multi-agent settings?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**When would you not use Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do Policy Gradient methods scale to large environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What is reward shaping in Policy Gradient approaches?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**Describe a scenario where Policy Gradients outperform value-based methods.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**How is the policy parameterized in deep Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**What is the relationship between actor-critic and Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What are common pitfalls in hyperparameter selection for Policy Gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you debug a Policy Gradient agent?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What are popular libraries implementing Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you evaluate a trained Policy Gradient agent?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What are the main limitations of Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How would you extend Policy Gradient methods to partial observability?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**Discuss recent advancements in Policy Gradient research.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How is robustness analyzed in Policy Gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What are practical ways to visualize policy evolution over training?**
+
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- Actor-Critic / A3C / PPO / TRPO Questions (from 05_reinforcement_learning/04_actor_critic_a3c_ppo_trpo) ---
+
+# Actor-Critic / A3C / PPO / TRPO - Theory Questions
+
+## Question 1
+**What is an Actor-Critic architecture?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**How does the actor-critic framework differ from pure policy gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**What is the main advantage of A3C over traditional RL algorithms?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**How do multiple agents in A3C speed up learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**What is asynchronous updating in A3C?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What does PPO stand for? How does it work?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**What problem does PPO solve in policy gradient methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**How does TRPO enforce trust regions?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**What are surrogate objective functions?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What is the advantage function, and how is it estimated?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**What is the purpose of the critic in actor-critic methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**How can the bias-variance tradeoff be managed in actor-critic models?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**Compare PPO and TRPO: when would you use each?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**What role does entropy bonus play in actor-critic methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How is experience replay handled in actor-critic approaches?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**How do actor-critic methods ensure stability?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**Describe synchronous vs. asynchronous actor-critic training.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What is GAE(λ) and how is it used?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**What are the limitations of on-policy actor-critic methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**How is off-policy learning used in actor-critic variants?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**How do you implement clipping in PPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**What is the main benefit of parallel environments in RL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How are recurrent neural networks used in A3C?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**Why is PPO considered less sensitive to changes in hyperparameters?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**Describe a typical use case for PPO.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**How are policy updates constrained in TRPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**What are the main challenges in scaling actor-critic methods?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**How do you handle exploration in actor-critic models?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**What is shared parameterization in actor-critic networks?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**Describe sample efficiency in actor-critic approaches.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**What is the role of the advantage estimator in PPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**How do you prevent reward hacking in actor-critic RL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**Describe how actor-critic methods are used in robotics.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What is the computational cost of TRPO per update?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How is the KL divergence used in PPO and TRPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What are common pitfalls when implementing A3C from scratch?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**Explain transfer learning in the context of actor-critic RL.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**How is TRPO's constraint implemented mathematically?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**What are the main differences between A3C and DDPG?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**How are distributed systems applied in actor-critic training?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**What is stochasticity in policy outputs and why does it matter?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**How does actor-critic handle delayed rewards?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**In what ways can credit assignment be improved in actor-critic?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**How do you monitor convergence in actor-critic agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**Why might actor-critic methods be unstable?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**How can you regularize actor-critic models?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How do you ensure reproducibility in actor-critic experiments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**What are recent trends in actor-critic research?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**What are real-world applications of PPO and TRPO?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**How can actor-critic architectures be applied to multi-task RL?**
+
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- Multi-Agent RL Questions (from 05_reinforcement_learning/05_multi_agent_rl) ---
+
+# Multi-Agent RL - Theory Questions
+
+## Question 1
+**What is Multi-Agent Reinforcement Learning (MARL)?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**How does MARL differ from single-agent RL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**What are the primary challenges in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**How do agents communicate in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**What is non-stationarity in MARL environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**How is cooperation handled in multi-agent settings?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**Describe the credit assignment problem in MARL.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What are Markov Games (Stochastic Games) in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**Give examples of real-world MARL applications.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**When is competition preferred over cooperation in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**What are decentralized policies in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**How do centralized critics improve learning in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**What methods exist for credit assignment in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**How does reward sharing affect MARL performance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**What is the role of partial observability in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**How can communication protocols be learned among agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**What is independent Q-learning in the context of MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**How does scalability affect MARL design?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**Explain the role of agent identity and role assignment.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**How do you evaluate MARL agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**What challenges exist for exploration in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**How does reward shaping work in multi-agent scenarios?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**What are typical failures in MARL systems?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**How are policies coordinated among agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**What is the role of competition and adversarial learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What approaches exist for cooperative MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How do you prevent collusion among agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**What is transfer learning in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How do agents learn to negotiate in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**Describe policy gradients applied in multi-agent contexts.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How is robustness ensured in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**When might centralized training with decentralized execution be needed?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**What are emergent behaviors in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**Give an example of hierarchical learning in MARL.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How do you implement curriculum learning in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**How is communication overhead managed in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do policies adapt to changing agent populations?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What role does game theory play in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How can exploration-exploitation tradeoff be balanced in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What are benchmarks for MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**What is the biggest challenge in scaling MARL systems?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**How are rewards split in cooperative tasks?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How is stability measured in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What are meta-learning approaches in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you visualize interactions among agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What optimization techniques are used in MARL training?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How is experience replay managed for multiple agents?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**When do MARL systems fail to generalize?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**What recent advancements exist in MARL research?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**How can explainability be incorporated in MARL systems?**
+
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- Reward Shaping Questions (from 05_reinforcement_learning/06_reward_shaping) ---
+
+# Reward Shaping - Theory Questions
+
+## Question 1
+**What is reward shaping in RL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**Why is reward shaping used?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**How does reward shaping accelerate learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**Give examples of potential-based reward shaping.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**What are the risks of incorrect reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**How can reward shaping cause reward hacking?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**What are the criteria for a "safe" reward shaping function?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**Explain the concept of "potential" in potential-based reward shaping.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How does reward shaping affect policy convergence?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What is the Bellman equation with reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How do you evaluate the effectiveness of reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**What challenges arise in multi-objective reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How do you design reward functions for complex tasks?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**How is domain knowledge incorporated into reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**What is sparse vs. dense reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**How does reward shaping affect exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**What is the impact of reward shaping on credit assignment?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**Can reward shaping change the optimal policy? Why or why not?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How is reward decomposition related to reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**What are intrinsic vs. extrinsic rewards?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**How do you balance multiple reward shaping signals?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**How is reward shaping handled in multi-agent settings?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**What is the effect of noisy rewards on reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**How is reward shaping validated empirically?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**Describe applications where reward shaping is essential.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What is the impact of delayed reward on reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How do you prevent negative side effects of reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**How can reward shaping be used for transfer learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How do you combine reward shaping with policy gradients?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What is the role of auxiliary tasks in reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How do you manage conflicting objectives in reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**When does reward shaping fail to help?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**How is interpretability ensured in reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What are examples of unintended consequences in reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**What is curriculum learning and how does it relate to reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What role does reward scaling play?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do you debug a poorly shaped reward function?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**How does reward shaping affect robustness?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**What tools exist to visualize reward shaping effects?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**How is reward shaping applied in robotics?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**What are the theoretical guarantees of reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**How do you empirically test if reward shaping improves performance?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you choose hyperparameters for shaped rewards?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What is the interaction of reward shaping with exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**When might you not use reward shaping?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**How do humans inform reward function design?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**What is the link between reward shaping and behavioral cloning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**How do you adapt reward shaping for dynamic environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How is fairness integrated with reward shaping in social applications?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**Give examples of recent trends and innovations in reward shaping.**
+
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- Exploration vs Exploitation Questions (from 05_reinforcement_learning/07_exploration_exploitation) ---
+
+# Exploration-Exploitation Tradeoff - Theory Questions
+
+## Question 1
+**What is the exploration-exploitation tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**Why is it fundamental in reinforcement learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**Give examples of exploration strategies in RL.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**What is ε-greedy exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**How does softmax exploration differ from ε-greedy?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What are annealing schedules for exploration parameters?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**What is optimism in the face of uncertainty?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**Explain Upper Confidence Bound (UCB) exploration.**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How does Thompson Sampling handle the tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**Why is balancing short-term and long-term rewards challenging?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**What is the regret in RL, and how is it measured?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**How do deep RL algorithms deal with the tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**What is the effect of over-exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**How can under-exploration hinder learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**What is intrinsic motivation and how is it used for exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**How does count-based exploration work?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How do curiosity-driven approaches affect RL training?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What are the risks of exploration in real-world systems?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How does the multi-armed bandit problem illustrate this tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**How is the tradeoff quantified mathematically?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**Why is exploration more challenging in sparse reward environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**What is the impact of exploration on convergence time?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How do you visualize exploration in state space?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**What are hybrid strategies for exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How does Bayesian RL address exploration-exploitation?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What is parameter noise and how is it used?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**What is bootstrapped DQN, and how does it affect exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**How do meta-learning approaches inform exploration-exploitation?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**What is exploration bonus in RL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**How do biological systems solve the exploration-exploitation tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**What practical problems are caused by misbalancing exploration and exploitation?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**How is hierarchical reinforcement learning related to exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**What role does exploration play in transfer learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**How do ensembles help in exploration strategies?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**When is pure exploitation preferred?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What is the impact of reward shaping on exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do you empirically measure exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What tools exist for monitoring exploration vs. exploitation?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How do dynamic environments affect the tradeoff?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What is "deep exploration" and how is it achieved?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**How do you set exploration schedules for curriculum learning?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What are theoretical bounds for exploration algorithms?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**What is the exploration-exploitation dilemma in MARL?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**How do you tune exploration parameters in practice?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**Why does exploration sometimes lead to catastrophic forgetting?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What is the connection between generalization and exploration?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How is exploration managed in partially observable environments?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**What is the computational cost of different exploration techniques?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**What are possible future directions in exploration-exploitation research?**
+
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**How does the exploration-exploitation tradeoff influence agent behavior long-term?**
+
+**Answer:** _To be filled_
+
+---

@@ -12849,3 +12849,1224 @@ def train_multi_task():
 **Interview Tip:** Multi-task learning works best when tasks share meaningful features (segmentation + depth both need edge detection). Key challenge is task balancing—uncertainty weighting (learning log-variance per task) is simple and effective. For autonomous driving, combining segmentation + depth + flow in one network is efficient for real-time deployment.
 
 ---
+
+
+---
+
+# --- Vision Transformers (ViT) Questions (from 45_vision_transformers) ---
+
+# Vision Transformers (ViT) Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the core innovation of Vision Transformers compared to CNNs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**How are images converted into patch embeddings in ViT?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**What is the role of the [CLS] token in Vision Transformers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Describe the positional encoding scheme used in ViT.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How does the self-attention mechanism work with image patches?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What are the computational advantages of patch-based processing?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Explain the linear projection layer in ViT patch embedding.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How does ViT handle different input image resolutions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**What is the significance of patch size in ViT performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Describe the pre-training strategy for large-scale ViT models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How does ViT compare to ResNet in terms of inductive biases?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What are the data requirements for training ViT from scratch?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain the role of layer normalization in ViT blocks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How does transfer learning work with pre-trained ViT models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**What is the computational complexity of ViT compared to CNNs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Describe the MLP head used for classification in ViT.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you visualize attention patterns in Vision Transformers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What are the limitations of ViT on small datasets?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain the scaling laws for Vision Transformers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**How does ViT handle object detection tasks (DETR)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**What are hybrid architectures combining CNN and ViT?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Describe the DeiT (Data-efficient image Transformers) approach.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**How does knowledge distillation improve ViT training?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**What is the role of the distillation token in DeiT?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Explain masked image modeling in ViT (MAE).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**How do you implement efficient attention for high-resolution images?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**What are the memory requirements for training large ViT models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Describe the fine-tuning process for downstream tasks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**How does ViT perform on different types of visual tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**What is the effect of different attention head configurations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Explain the role of dropout in ViT training.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**How do you handle class imbalance in ViT classification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**What are the architectural variants of ViT (ViT-B, ViT-L, ViT-H)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Describe the attention rollout technique for interpretability.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**How does ViT handle multi-scale features?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**What are the optimization challenges specific to ViT training?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain the concept of attention distance in ViT.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**How do you implement ViT for video understanding?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**What is the impact of batch size on ViT training stability?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Describe the gradient flow characteristics in deep ViT models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**How does ViT compare to EfficientNet in efficiency metrics?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**What are the deployment considerations for ViT models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Explain the role of warmup in ViT optimization.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**How do you handle computational constraints in ViT inference?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**What are the failure modes of Vision Transformers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Describe the attention patterns learned by different ViT layers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**How does ViT perform on out-of-distribution images?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**What are the recent advances in efficient ViT architectures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Explain the relationship between ViT and CLIP models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**What are the future research directions for Vision Transformers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Swin Transformer Questions (from 46_swin_transformer) ---
+
+# Swin Transformer Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain shifted window partitioning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Describe hierarchical representation in Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Compare Swin-T, Swin-S, Swin-B and Swin-L.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Explain limitation of global attention and Swin's solution.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Discuss computational cost versus ViT.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Explain relative positional bias in Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Describe patch merging and linear embedding.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Explain Swin in object detection pipelines (Swin + FPN).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Describe Swin for semantic segmentation (UPerNet).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss Swin-MST variant for super-resolution.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Explain linear complexity to image size in Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Compare window size hyperparameter effects.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Discuss window attention masking implementation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain gradient flow across windows.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Describe Swin's performance on ImageNet-22K.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Explain layer normalisation placement in Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Discuss data augmentation differences vs. CNNs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain adapting Swin for video (Swin-V2, Swin Transformer 3-D).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Compare Swin to ConvNeXt performance.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Explain meta-former perspective on Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Discuss Swin's transfer to medical image tasks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain model-scaling rules in Swin-V2.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Describe training stability improvements in Swin-V2.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain log-scaled continuous position bias.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Discuss memory savings via zero-redundancy optimizer.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Explain Swin's robustness to translation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Describe window-wise activation checkpointing.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Discuss sparsity patterns for Swin inference acceleration.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Explain distillation of Swin into smaller models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Describe challenges of Swin on non-square images.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Discuss Swin in panoptic segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Explain adapting Swin for multi-modal tasks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Describe cross-window attention variants.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Discuss Swin's receptive field growth.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Explain efficient attention kernels for Swin on GPUs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Discuss Swin for LiDAR point clouds.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain hierarchical clustering vs. fixed windows.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Discuss fine-tuning Swin on small datasets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Explain window size search with NAS.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Discuss self-distillation in Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Explain cyclic shift and overlap ratio.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Describe global average pooling head for classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Discuss label smoothing and Mixup for Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Explain zero-shot robustness of Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Discuss quantisation aware training of Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Explain data efficient training recipe (DeiT) applied to Swin.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Describe 3-D Swin for video action detection.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Explain weakly supervised Swin pre-training.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Discuss open-vocabulary detection with Swin backbones.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Predict future Swin research directions.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- U-Net Questions (from 50_unet) ---
+
+# U-Net Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain encoder–decoder structure of U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Describe skip connections and why crucial.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Discuss U-Net for biomedical segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Explain Dice loss vs. cross-entropy for segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Describe training with patch extraction.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Explain U-Net variants (U-Net++, UNet-3+).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Discuss attention U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Explain 3-D U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Describe residual U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Explain multi-scale supervision.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Discuss cascaded U-Nets for coarse-to-fine.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Explain why symmetric depth helpful.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Describe memory optimisation via tiled prediction.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain deep supervision in U-Net++.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Discuss efficient channel attention in U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Explain use of dilated convolutions.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Discuss domain adaptation in medical U-Nets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain UNet for self-driving car lane detection.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Describe label smoothing for segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Explain data augmentation specifics (elastic deformation).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Discuss combined BCE+Dice loss.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain overlap-tile strategy for inference.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Describe group norm vs. batch norm in small batch segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain Mobile U-Net for on-device.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Discuss U-Net in GAN generator (Pix2Pix).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Explain integrating transformers into U-Net (TransUNet).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Describe U-NeXt and meta-former perspectives.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Explain probabilistic U-Net for uncertainty.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Discuss anisotropic receptive fields in 3-D U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Explain federated learning with U-Nets across hospitals.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Describe neural architecture search for U-Net blocks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Explain morphological post-processing.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Discuss pyramid pooling vs. U-Net skip.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Explain attention gates for organ segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Describe class imbalance handling.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Explain U-Net in domain generalisation tasks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Discuss adversarial training to refine segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Explain boundary loss for thin structures.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Describe ensemble of U-Nets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Explain quantisation for real-time semantic segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Discuss semi-supervised consistency loss in U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Explain multi-modal input (RGB + Depth) U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Describe integration with conditional random fields.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Explain hypertuning patch size and stride.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Discuss memory attention U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Explain jointly learning segmentation and uncertainty maps.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Describe auto-context U-Net pipelines.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Explain label propagation with U-Net.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Discuss limitations of U-Net on very large images.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Predict future U-Net innovations.**
+
+**Answer:** _[To be filled]_
+
+---

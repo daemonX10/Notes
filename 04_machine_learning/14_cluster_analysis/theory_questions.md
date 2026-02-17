@@ -2349,3 +2349,1224 @@ To find neighbors of point p:
 High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
+
+
+---
+
+# --- DBSCAN Questions (from 29_dbscan) ---
+
+# DBSCAN Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the core idea of DBSCAN clustering.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Define ε-neighborhood and MinPts.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Describe core, border, and noise points.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**How does DBSCAN discover clusters of arbitrary shape?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Discuss parameter selection difficulties for ε and MinPts.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Explain time complexity of DBSCAN with index structures.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Compare DBSCAN with K-Means for density-based clusters.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Describe reachability and density-reachability concepts.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain why DBSCAN is robust to outliers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss limitations of DBSCAN on varying density clusters.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Explain how to use k-distance plot to choose ε.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Describe OPTICS and how it extends DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain how DBSCAN handles high-dimensional data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Discuss distance metrics supported in DBSCAN implementations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Explain DBSCAN's sensitivity to data scale.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Describe parallel implementations of DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Explain usage of spatial indexing (KD-Tree, BallTree) in sklearn DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Discuss minPts heuristic (≥ D+1 where D is dimension).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain difference between border noise and outlier noise.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Describe incremental DBSCAN for streaming data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Discuss memory consumption vs dataset size.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain how DBSCAN clusters image pixels for segmentation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Describe shortcomings when clusters vary widely in density.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain grid-based acceleration methods for DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Discuss DBSCAN* variant to reduce neighborhood queries.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Describe performance on Asiatic vs Euclidean spaces.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Explain distance threshold effect on cluster count.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Discuss evaluation metrics suitable for DBSCAN clusters.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Explain cluster labeling reproducibility issues.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Describe HDBSCAN and its advantages.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Explain why DBSCAN cannot cluster nested clusters well.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Discuss DBSCAN for geospatial lat-long data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Explain integrating DBSCAN in anomaly detection pipelines.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Provide pseudo-code for DBSCAN algorithm.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Explain complexity difference with pre-computed distances.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Discuss GPU-accelerated DBSCAN (cuml, cuML DBSCAN).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Describe combining DBSCAN with K-Means (hybrid).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Explain parameter tuning automation for DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Discuss using DBSCAN with cosine similarity.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Explain noise ratio impact on cluster purity.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Describe visualization of DBSCAN clusters in 3D.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Discuss scalability of DBSCAN in BigQuery ML.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Explain strengths of DBSCAN in market basket analysis.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Describe cluster fragmentation problem.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Explain using DBSCAN for time-series subsequence clustering.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Discuss root causes when DBSCAN finds single giant cluster.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Explain algorithm behavior on uniform random noise data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Discuss case study: customer GPS trajectory clustering.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Explain evaluation via adjusted Rand index for DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Predict research trends in adaptive density-based clustering.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Hierarchical Clustering Questions (from 30_hierarchical_clustering) ---
+
+# Hierarchical Clustering Interview Questions - Theory Questions
+
+## Question 1
+
+**Distinguish between agglomerative and divisive strategies.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Explain "linkage criterion" and list four common variants.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Why does single linkage suffer from chaining, and how can you detect it?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Derive the computational complexity of naïve agglomerative clustering.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How does Ward's method minimize total within-cluster variance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What is the Lance–Williams update formula?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Describe the steps to build a dendrogram from scratch.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Interpret cophenetic distance and the cophenetic correlation coefficient.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain how inconsistency coefficients flag unreliable merges.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Compare hierarchical clustering with K-means for non-spherical data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**When would you truncate (cut) a dendrogram, and how do you pick the level?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Discuss advantages of monotonicity in merge distances.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain the effect of different distance metrics (Euclidean vs. Manhattan).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How does centroid linkage differ from average linkage?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Describe space-saving algorithms for massive datasets (e.g., CURE, BIRCH).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What role does cluster variance play in Ward's criterion?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Show how you would visualize ultrametric property violations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Why is hierarchical clustering deterministic for a fixed linkage metric?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Discuss scalability trade-offs of SLINK vs. naive algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**How does HAC handle categorical variables encoded as one-hot?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Outline a method to cluster streaming data hierarchically.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain dendrogram purity as an external evaluation metric.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**What is the effect of standardizing features before HAC?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Describe the "reversal" phenomenon in dendrograms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Compare bottom-up HAC with OPTICS reachability plots.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**How can bootstrap resampling assess cluster stability in HAC?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Explain how to cut a dendrogram by distance threshold vs. cluster count.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Discuss interpretability advantages over DBSCAN.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Provide a pseudocode sketch of the SLINK algorithm.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Why does centroid linkage risk inversions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Describe hybrid clustering (HAC + K-means) and its benefit.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**What is complete linkage's bias regarding cluster shape?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Explain average silhouette width computation for HAC results.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Discuss memory requirements of pairwise distance matrices.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**How can you prune irrelevant branches early during agglomeration?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Describe time complexity improvements with nearest-neighbor chains.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain "monotone chain" rule used in single-link implementations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Contrast hierarchical clustering with hierarchical DBSCAN (HDBSCAN).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Discuss meaningfulness of cluster centroids in HAC outputs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**What are ultrametrics and how do they relate to dendrogram heights?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Explain dynamic tree cut for automatic cluster extraction.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Describe visual assessment of cluster tendency (VAT) before HAC.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**How do graph-based minimum-spanning-tree methods relate to single linkage?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Explain taxonomy construction in biology via HAC.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Discuss noise sensitivity of HAC compared with OPTICS.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**How would you parallelize HAC on a GPU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Show how HAC can precede Gaussian mixture EM initialization.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Explain hierarchical soft clustering (e.g., hierarchical EM).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Provide an industrial use case where HAC outperformed flat clustering.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Predict future research directions in hierarchical scalable algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Gaussian Mixture Models Questions (from 31_gaussian_mixture_models) ---
+
+# Gaussian Mixture Models Interview Questions - Theory Questions
+
+## Question 1
+
+**Define a finite mixture model formally.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Explain the EM algorithm for parameter-learning in GMMs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Why does the E-step compute posterior responsibilities?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Derive the M-step update for component means.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Describe diagonal vs. full covariance trade-offs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**How does GMM relate to K-means as covariances → 0?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Explain model selection with BIC/AIC for choosing k.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Discuss singular covariance issues and remedies.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain identifiability problems when permuting components.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Illustrate spherical, tied, and full-covariance models in scikit-learn.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Compare EM convergence to local vs. global maxima.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How would you initialize GMMs robustly (k-means++, k-means, random)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Discuss using Dirichlet priors for Bayesian GMMs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain collapsed Gibbs sampling for mixture models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Describe variational Bayes GMM and automatic relevance determination.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How does regularization of covariance matrices prevent overfitting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Show how to compute log-likelihood for held-out validation data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain degeneracy when a component captures one point.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Discuss split-and-merge EM accelerations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Describe semi-supervised GMMs with partially labeled data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Explain expectation-conditional maximization (ECM) variants.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Discuss application of GMMs in speaker diarization.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**How do you perform anomaly detection with GMM scores?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain mixture of factor analysers vs. standard GMMs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Describe using GMMs for background subtraction in video.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**How does mean-shift clustering approximate an adaptive GMM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Discuss EM stopping criteria and sensitivity.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Explain covariance determinant and cluster volume interpretation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Why do log probabilities improve numerical stability?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Illustrate shape control via covariance eigen-decomposition.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Explain incremental / online EM for streaming data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Provide pseudo-code for a single EM iteration.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Discuss propensity of EM to find saddle points.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**How does heteroscedasticity violate GMM assumptions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Compare Dirichlet Process GMM with finite GMM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Describe mixture models on non-Euclidean manifolds.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain mixture of von Mises distributions for circular data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Describe hard EM (classification EM) and its drawbacks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Discuss information-theoretic merging of redundant components.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**How does annealed EM escape poor local maxima?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Provide a method to visualize high-dimensional GMM clusters.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Explain parameter ties across mixture components.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**How would you parallelize EM on MapReduce?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Discuss GPU acceleration for large-n, small-d GMMs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Describe mixture models for heterogeneous data (mixed types).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Explain subspace-constrained GMMs (Mixture of PPCA).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Discuss calibration of component weights for class imbalance.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Provide an industrial success story using GMMs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Predict research trends in Bayesian nonparametric mixtures.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Summarize pros/cons of GMMs vs. density-based clustering.**
+
+**Answer:** _[To be filled]_
+
+---

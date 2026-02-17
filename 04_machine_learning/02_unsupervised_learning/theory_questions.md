@@ -633,3 +633,33 @@ Large Unlabeled Data → Pre-train → Fine-tune on Small Labeled Data → Deplo
 ```
 
 This is now the **default approach** in modern deep learning for NLP and vision.
+
+
+---
+
+# --- Missing Questions Restored from Source (Q26-Q28) ---
+
+## Question 26
+
+**Explain howunsupervised learningcould assist in identifying patterns ingenomic data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**What are some of the latest advancements inclustering algorithms?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**What is the role ofunsupervised learninginBig Data analytics?**
+
+**Answer:** _[To be filled]_
+
+---
+

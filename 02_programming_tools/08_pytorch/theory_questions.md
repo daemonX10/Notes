@@ -519,3 +519,96 @@ scaler.update()
 # Clear GPU memory
 torch.cuda.empty_cache()
 ```
+
+
+---
+
+# --- Missing Questions Restored from Source (Q11-Q21) ---
+
+## Question 11
+
+**What is the purpose ofzero_grad()in PyTorch, and when is it used?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Describe the process ofbackpropagationin PyTorch.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain howgradient clippingworks in PyTorch and why it may be necessary.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explainbatch normalizationand its effects on training convergence.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How does PyTorch handleweight initializationfor neural networks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What are some common issues you may encounter when training models in PyTorch, and how do you troubleshoot them?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**What is the use oftransformsin PyTorch’storchvisionpackage?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What is PyTorch’sTorchScript, and how does it aid in deploying PyTorch models in production environments?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain the concept of “model quantization” in PyTorch and when it is useful.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What is the role of PyTorch inreinforcement learningresearch, and can you provide an example?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Describe your experience contributing to PyTorch’s open-source community or using community-created tools.**
+
+**Answer:** _[To be filled]_
+
+---

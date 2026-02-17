@@ -6297,3 +6297,1659 @@ def evaluate_downstream_impact(tokenizer1, tokenizer2, model, test_data):
 - Common issue: tokenizer-model mismatch (different vocab)
 
 ---
+
+
+---
+
+# --- Tokenization/Lemmatization/Stemming Questions (from 08_nlp/01_tokenization_lemmatization_stemming) ---
+
+# Tokenization/Lemmatization/Stemming - Theory Questions
+
+## Question 1
+**How do you choose between different tokenization strategies (word-level, subword, character-level) for specific NLP tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**What are the trade-offs between stemming and lemmatization for information retrieval applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**How do you handle tokenization for multilingual texts with mixed scripts and languages?**
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**What techniques work best for tokenization of social media text with informal language and emojis?**
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**How do you implement subword tokenization algorithms like BPE, WordPiece, and SentencePiece?**
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What strategies help with handling out-of-vocabulary words during tokenization?**
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**How do you design tokenization schemes that preserve important linguistic information?**
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What approaches work best for tokenization of domain-specific texts like legal or medical documents?**
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How do you handle tokenization for languages without clear word boundaries?**
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What techniques help with normalization and preprocessing before tokenization?**
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How do you implement lemmatization for morphologically rich languages?**
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**What strategies work best for handling tokenization of noisy or corrupted text data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How do you design evaluation metrics for assessing tokenization quality?**
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**What approaches help with tokenization of code-mixed or transliterated text?**
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How do you handle tokenization for real-time processing with computational constraints?**
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**What techniques work best for preserving named entities during tokenization?**
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How do you implement adaptive tokenization that adjusts to different text domains?**
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What strategies help with tokenization of historical or archaic text varieties?**
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How do you handle tokenization quality control and error detection?**
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**What approaches work best for tokenization in federated learning scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**How do you implement efficient tokenization pipelines for large-scale text processing?**
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**What techniques help with explaining tokenization decisions to end users?**
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How do you handle tokenization for texts with special formatting or markup?**
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**What strategies work best for tokenization of multilingual documents?**
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How do you implement privacy-preserving tokenization for sensitive text data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What approaches help with tokenization of streaming text in real-time applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How do you handle tokenization adaptation to emerging text formats and platforms?**
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**What techniques work best for tokenization with minimal computational resources?**
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How do you implement robust error handling for tokenization in production systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What strategies help with combining tokenization with other text preprocessing tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How do you handle tokenization for texts requiring high accuracy for downstream tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**What approaches work best for tokenization of conversational or dialogue text?**
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**How do you implement customizable tokenization for different user requirements?**
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What techniques help with tokenization consistency across different text sources?**
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How do you handle tokenization optimization for specific NLP model architectures?**
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What strategies work best for tokenization of technical or scientific literature?**
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do you implement batch processing pipelines for large-scale tokenization?**
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What approaches help with tokenization quality assessment without ground truth?**
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How do you handle tokenization for texts with cultural or linguistic variations?**
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What techniques work best for tokenization in resource-constrained environments?**
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**How do you implement fairness-aware tokenization to avoid bias across languages?**
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What strategies help with tokenization of emerging text types and genres?**
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you handle tokenization integration with modern transformer-based models?**
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What approaches work best for tokenization with specific encoding requirements?**
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you implement monitoring and quality control for tokenization systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What techniques help with tokenization of texts requiring semantic preservation?**
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How do you handle tokenization adaptation to user-specific vocabulary and terminology?**
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**What strategies work best for tokenization in multilingual neural machine translation?**
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How do you implement efficient storage and retrieval of tokenization vocabularies?**
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What approaches help with balancing tokenization granularity and computational efficiency?**
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- NER Questions (from 08_nlp/02_ner) ---
+
+# Named Entity Recognition (NER) - Theory Questions
+
+## Question 1
+**How do you handle NER for entities that span multiple tokens or have complex internal structure?**
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**What techniques work best for NER in low-resource languages with limited training data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**How do you implement domain adaptation for NER models across different text domains?**
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**What strategies help with handling nested or overlapping entities in NER tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**How do you design NER models that can identify new entity types with minimal examples?**
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What approaches work best for NER in noisy or informal text like social media posts?**
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**How do you handle NER for entities with ambiguous boundaries or unclear definitions?**
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What techniques help with NER in multilingual texts with code-switching?**
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How do you implement active learning strategies for efficient NER annotation?**
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What strategies work best for NER in specialized domains like biomedical or legal texts?**
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How do you handle NER quality control and confidence scoring?**
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**What approaches help with explaining NER decisions and predicted entity boundaries?**
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How do you implement knowledge distillation for compressing large NER models?**
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**What techniques work best for NER with limited computational resources?**
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How do you handle NER for entities that change over time or have temporal significance?**
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**What strategies help with NER consistency across different text formats and sources?**
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How do you implement online learning for NER models adapting to new entity types?**
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What approaches work best for NER in conversational or dialogue systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How do you handle NER optimization for specific downstream applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**What techniques help with NER for entities requiring cultural or contextual knowledge?**
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**How do you implement fairness-aware NER to avoid bias across different entity types?**
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**What strategies work best for NER in real-time processing scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How do you handle NER quality assessment when ground truth annotations vary?**
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**What approaches help with NER for entities in multiple languages within the same text?**
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How do you implement privacy-preserving NER for sensitive text data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What techniques work best for NER with hierarchical or structured entity relationships?**
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How do you handle NER adaptation to emerging entity categories and definitions?**
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**What strategies help with NER for entities requiring external knowledge or context?**
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How do you implement robust error handling for NER in production systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What approaches work best for combining NER with other information extraction tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How do you handle NER for entities with varying granularity levels?**
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**What techniques help with NER consistency in federated learning scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**How do you implement efficient batch processing for large-scale NER applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What strategies work best for NER with specific accuracy requirements?**
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How do you handle NER for entities that require disambiguation or linking?**
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What approaches help with NER adaptation to user-specific entity definitions?**
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do you implement monitoring and quality control for NER systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What techniques work best for NER in texts with complex formatting or structure?**
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How do you handle NER optimization when balancing precision and recall?**
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What strategies help with NER for entities in emerging text types and platforms?**
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**How do you implement cross-lingual transfer learning for multilingual NER?**
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What approaches work best for NER with minimal false positive rates?**
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you handle NER integration with knowledge graphs and databases?**
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What techniques help with NER for entities requiring temporal or spatial context?**
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you implement customizable NER systems for different user needs?**
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What strategies work best for NER in streaming text processing applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How do you handle NER quality benchmarking across different model architectures?**
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**What approaches help with NER for entities with evolving definitions or categories?**
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How do you implement efficient storage and retrieval of NER results?**
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What techniques work best for balancing NER accuracy with computational efficiency?**
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- POS Tagging Questions (from 08_nlp/03_pos_tagging) ---
+
+# Part-of-Speech (POS) Tagging - Theory Questions
+
+## Question 1
+**How do you handle POS tagging for morphologically rich languages with complex inflectional systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**What techniques work best for POS tagging in low-resource languages with limited annotated data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**How do you implement domain adaptation for POS tagging across different text genres?**
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**What strategies help with handling ambiguous words that can have multiple POS tags?**
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**How do you design POS taggers that can handle out-of-vocabulary words effectively?**
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What approaches work best for POS tagging in noisy or informal text environments?**
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**How do you handle POS tagging for languages with non-standard orthography or spelling?**
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What techniques help with POS tagging in multilingual or code-switched texts?**
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How do you implement active learning strategies for efficient POS tagging annotation?**
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What strategies work best for POS tagging in specialized domains with domain-specific vocabulary?**
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How do you handle POS tagging quality control and confidence assessment?**
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**What approaches help with explaining POS tagging decisions for linguistic analysis?**
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How do you implement knowledge distillation for compressing POS tagging models?**
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**What techniques work best for POS tagging with limited computational resources?**
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How do you handle POS tagging for historical or archaic text varieties?**
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**What strategies help with POS tagging consistency across different annotation schemes?**
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How do you implement online learning for POS taggers adapting to new text domains?**
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What approaches work best for POS tagging in conversational or dialogue systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How do you handle POS tagging optimization for specific downstream NLP tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**What techniques help with POS tagging for languages with flexible word order?**
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**How do you implement fairness-aware POS tagging to avoid bias across language varieties?**
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**What strategies work best for POS tagging in real-time text processing applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How do you handle POS tagging quality assessment with inter-annotator disagreement?**
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**What approaches help with POS tagging for texts requiring high linguistic accuracy?**
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How do you implement privacy-preserving POS tagging for sensitive text data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What techniques work best for POS tagging with fine-grained tagset distinctions?**
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How do you handle POS tagging adaptation to emerging language varieties and dialects?**
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**What strategies help with POS tagging for texts with complex syntactic constructions?**
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How do you implement robust error handling for POS tagging in production systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What approaches work best for combining POS tagging with other linguistic annotation tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How do you handle POS tagging for texts with varying levels of formality?**
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**What techniques help with POS tagging consistency in federated learning scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**How do you implement efficient batch processing for large-scale POS tagging?**
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What strategies work best for POS tagging with specific linguistic theory requirements?**
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How do you handle POS tagging for texts requiring syntactic parsing downstream?**
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What approaches help with POS tagging adaptation to user-specific annotation needs?**
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do you implement monitoring and quality control for POS tagging systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What techniques work best for POS tagging in texts with special formatting or markup?**
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How do you handle POS tagging optimization when balancing speed and accuracy?**
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What strategies help with POS tagging for emerging text types and social media platforms?**
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**How do you implement cross-lingual transfer learning for multilingual POS tagging?**
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What approaches work best for POS tagging with minimal error propagation?**
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you handle POS tagging integration with modern neural language models?**
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What techniques help with POS tagging for texts requiring morphological analysis?**
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you implement customizable POS tagging for different linguistic frameworks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What strategies work best for POS tagging in streaming text processing scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How do you handle POS tagging quality benchmarking across different languages?**
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**What approaches help with POS tagging for texts with evolving grammatical patterns?**
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How do you implement efficient storage and retrieval of POS tagging results?**
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What techniques work best for balancing POS tagging accuracy with processing efficiency?**
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- Text Classification Questions (from 08_nlp/04_text_classification) ---
+
+# Text Classification - Theory Questions
+
+## Question 1
+**How do you handle text classification for extremely imbalanced datasets with rare classes?**
+**Answer:** _To be filled_
+
+---
+
+## Question 2
+**What techniques work best for multi-label text classification with label dependencies?**
+**Answer:** _To be filled_
+
+---
+
+## Question 3
+**How do you implement domain adaptation for text classifiers across different text sources?**
+**Answer:** _To be filled_
+
+---
+
+## Question 4
+**What strategies help with handling text classification for very long documents?**
+**Answer:** _To be filled_
+
+---
+
+## Question 5
+**How do you design text classifiers that work effectively with limited labeled data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 6
+**What approaches work best for text classification in multilingual or cross-lingual settings?**
+**Answer:** _To be filled_
+
+---
+
+## Question 7
+**How do you handle text classification for noisy or poorly formatted text data?**
+**Answer:** _To be filled_
+
+---
+
+## Question 8
+**What techniques help with explaining text classification decisions to end users?**
+**Answer:** _To be filled_
+
+---
+
+## Question 9
+**How do you implement active learning strategies for efficient text classification annotation?**
+**Answer:** _To be filled_
+
+---
+
+## Question 10
+**What strategies work best for text classification in specialized domains like legal or medical?**
+**Answer:** _To be filled_
+
+---
+
+## Question 11
+**How do you handle text classification quality control and confidence scoring?**
+**Answer:** _To be filled_
+
+---
+
+## Question 12
+**What approaches help with text classification robustness against adversarial attacks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 13
+**How do you implement knowledge distillation for compressing text classification models?**
+**Answer:** _To be filled_
+
+---
+
+## Question 14
+**What techniques work best for text classification with computational efficiency constraints?**
+**Answer:** _To be filled_
+
+---
+
+## Question 15
+**How do you handle text classification for streaming or real-time text processing?**
+**Answer:** _To be filled_
+
+---
+
+## Question 16
+**What strategies help with text classification consistency across different text formats?**
+**Answer:** _To be filled_
+
+---
+
+## Question 17
+**How do you implement online learning for text classifiers adapting to new categories?**
+**Answer:** _To be filled_
+
+---
+
+## Question 18
+**What approaches work best for text classification in conversational or dialogue contexts?**
+**Answer:** _To be filled_
+
+---
+
+## Question 19
+**How do you handle text classification optimization for specific downstream applications?**
+**Answer:** _To be filled_
+
+---
+
+## Question 20
+**What techniques help with text classification for texts requiring cultural context?**
+**Answer:** _To be filled_
+
+---
+
+## Question 21
+**How do you implement fairness-aware text classification to reduce bias across groups?**
+**Answer:** _To be filled_
+
+---
+
+## Question 22
+**What strategies work best for text classification with hierarchical category structures?**
+**Answer:** _To be filled_
+
+---
+
+## Question 23
+**How do you handle text classification quality assessment with subjective categories?**
+**Answer:** _To be filled_
+
+---
+
+## Question 24
+**What approaches help with text classification for texts in multiple languages?**
+**Answer:** _To be filled_
+
+---
+
+## Question 25
+**How do you implement privacy-preserving text classification for sensitive documents?**
+**Answer:** _To be filled_
+
+---
+
+## Question 26
+**What techniques work best for text classification with fine-grained category distinctions?**
+**Answer:** _To be filled_
+
+---
+
+## Question 27
+**How do you handle text classification adaptation to emerging topics or categories?**
+**Answer:** _To be filled_
+
+---
+
+## Question 28
+**What strategies help with text classification for texts requiring temporal context?**
+**Answer:** _To be filled_
+
+---
+
+## Question 29
+**How do you implement robust error handling for text classification in production?**
+**Answer:** _To be filled_
+
+---
+
+## Question 30
+**What approaches work best for combining text classification with other NLP tasks?**
+**Answer:** _To be filled_
+
+---
+
+## Question 31
+**How do you handle text classification for texts with varying lengths and structures?**
+**Answer:** _To be filled_
+
+---
+
+## Question 32
+**What techniques help with text classification consistency in federated learning scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 33
+**How do you implement efficient batch processing for large-scale text classification?**
+**Answer:** _To be filled_
+
+---
+
+## Question 34
+**What strategies work best for text classification with specific regulatory requirements?**
+**Answer:** _To be filled_
+
+---
+
+## Question 35
+**How do you handle text classification for texts requiring domain expertise?**
+**Answer:** _To be filled_
+
+---
+
+## Question 36
+**What approaches help with text classification adaptation to user-specific categories?**
+**Answer:** _To be filled_
+
+---
+
+## Question 37
+**How do you implement monitoring and quality control for text classification systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 38
+**What techniques work best for text classification in texts with special formatting?**
+**Answer:** _To be filled_
+
+---
+
+## Question 39
+**How do you handle text classification optimization when balancing precision and recall?**
+**Answer:** _To be filled_
+
+---
+
+## Question 40
+**What strategies help with text classification for emerging text types and platforms?**
+**Answer:** _To be filled_
+
+---
+
+## Question 41
+**How do you implement transfer learning for multilingual text classification?**
+**Answer:** _To be filled_
+
+---
+
+## Question 42
+**What approaches work best for text classification with minimal false positive requirements?**
+**Answer:** _To be filled_
+
+---
+
+## Question 43
+**How do you handle text classification integration with information retrieval systems?**
+**Answer:** _To be filled_
+
+---
+
+## Question 44
+**What techniques help with text classification for texts requiring contextual understanding?**
+**Answer:** _To be filled_
+
+---
+
+## Question 45
+**How do you implement customizable text classification for different user needs?**
+**Answer:** _To be filled_
+
+---
+
+## Question 46
+**What strategies work best for text classification in high-throughput processing scenarios?**
+**Answer:** _To be filled_
+
+---
+
+## Question 47
+**How do you handle text classification quality benchmarking across different models?**
+**Answer:** _To be filled_
+
+---
+
+## Question 48
+**What approaches help with text classification for texts with evolving language patterns?**
+**Answer:** _To be filled_
+
+---
+
+## Question 49
+**How do you implement efficient storage and indexing of text classification results?**
+**Answer:** _To be filled_
+
+---
+
+## Question 50
+**What techniques work best for balancing text classification accuracy with interpretability?**
+**Answer:** _To be filled_
+
+---
+
+
+---
+
+# --- NLP (from 06_ai_nlp/01_nlp) - theory questions ---
+
+# Nlp Interview Questions - Theory Questions
+
+## Question 1
+
+**What isNatural Language Processing (NLP)and why is it important?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Explain the significance ofPart-of-Speech (POS) taggingin NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Describelemmatizationandstemming. When would you use one over the other?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**What is a ‘named entity’ and how isNamed Entity Recognition (NER)useful in NLP tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How does adependency parserwork, and what information does it provide?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What aren-grams, and how do they contribute tolanguage modeling?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Describe what a ‘bag of words’ model is and its limitations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Explain how theNaive Bayes classifieris used in NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**What are the advantages of usingRandom Forestsin NLP?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Explain howDecision Treesare utilized for NLP problems.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Briefly explainword embeddingsand their importance in NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Describe the architecture and applications ofRecurrent Neural Networks (RNN)in NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What are the benefits of usingAttention Mechanismsin NLP models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain the concept and capabilities ofTransformer modelslikeBERTandGPT.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Describe theTF-IDFstatistic and its significance in document retrieval.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What is the idea behindLatent Semantic Analysis (LSA)in NLP?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Describe a typical workflow with theNatural Language Toolkit (NLTK)in Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What are the benefits of using libraries likeHugging Face’s Transformers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain howPyTorchandTensorFlowfacilitate NLP model building.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What arecontext-free grammars, and how do they apply toparsingin NLP?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**What is the difference betweenrule-based,statistical, andneural approachesin NLP?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain howmachine translation modelsare evaluated for accuracy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Explain the importance of domain-specificcorporaand language resources in NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Describe an approach to automaticallysummarizelong documents.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- NLP (from 06_ai_nlp/01_nlp) - coding questions ---
+
+# Nlp Interview Questions - Coding Questions
+
+## Question 1
+
+**Write a Python function fortokenizing textusingNLTK.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Implement ann-gram language modelin Python from scratch.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Code a regular expression in Python forextracting email addressesfrom text.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Design a Python function that calculatescosine similaritybetween two text documents.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Implement a simplesentiment analysis classifierusing abag-of-words modelandScikit-learn.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- NLP (from 06_ai_nlp/01_nlp) - general questions ---
+
+# Nlp Interview Questions - General Questions
+
+## Question 1
+
+**What do you understand by the terms ‘corpus’, ‘tokenization’, and ‘stopwords’ in NLP?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Distinguish betweenmorphologyandsyntaxin the context of NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How areHidden Markov Models (HMMs)applied in NLP tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**How doLong Short-Term Memory (LSTM) networkswork, and when would you use them?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How doword2vecandGloVediffer as word embedding techniques?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What challenges does one face when usingvector space modelsfor semantic analysis?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**How do you usespaCyfor text processing tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How do you handle multilingual text processing in modern NLP libraries?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**How cantopic modelingbe used in analyzing large collections of documents?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**How do you handle noisy text data from sources like social media for NLP tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How do you address the issue ofdata scarcitywhen working with less-resourced languages?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What measures can be taken to reducebiasin NLP models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Outline your approach to develop a recommendation system based ontextual content analysis.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- NLP (from 06_ai_nlp/01_nlp) - scenario based questions ---
+
+# Nlp Interview Questions - Scenario_Based Questions
+
+## Question 1
+
+**Define ‘sentiment analysis’ and discuss its applications.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Discuss the role ofSupport Vector Machines (SVM)intext classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Discuss the concept ofsemantic similarityand its computational approaches in NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Discuss the use ofConditional Random Fields (CRF)in sequence modeling for NLP.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Discuss strategies for dealing withslangandabbreviationsin text processing.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**How would you build a chatbot using NLP principles?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Propose an NLP solution for detectingfake news articles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How would you design a voice-activated assistant like Siri or Alexa with NLP technology?**
+
+**Answer:** _[To be filled]_
+
+---

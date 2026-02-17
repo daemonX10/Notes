@@ -2146,3 +2146,817 @@ v2.0 debugging → v2.1 fix released
 Emphasize that model versioning is not just about saving weights—it includes everything needed to reproduce results: data version, preprocessing code, hyperparameters, and environment. For RNNs specifically, vocabulary and tokenization must be versioned together with the model.
 
 ---
+
+
+---
+
+# --- LSTM Questions (from 41_lstm) ---
+
+# LSTM Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the LSTM architecture and its key components.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**What are the three gates in LSTM and their functions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How does the forget gate work in LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Describe the input gate mechanism in LSTM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Explain the output gate and hidden state computation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What is the cell state and how does it flow through LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**How do LSTMs solve the vanishing gradient problem?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Derive the LSTM forward pass equations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain the LSTM backward pass and gradient computation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**What are the advantages of LSTM over vanilla RNN?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Describe different LSTM variants (peephole, coupled gates).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What are bidirectional LSTMs and their benefits?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain stacked/deep LSTM architectures.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you initialize LSTM weights and biases?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**What is the role of activation functions in LSTM gates?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Describe LSTM regularization techniques (dropout, recurrent dropout).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you handle variable-length sequences in LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What is stateful vs stateless LSTM training?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain attention mechanisms with LSTM encoders.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**How do you implement LSTM for sequence classification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Describe LSTM applications in language modeling.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**What are encoder-decoder LSTM architectures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**How do LSTMs handle long-term dependencies?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain the computational complexity of LSTM training.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**What are the memory requirements for LSTM models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**How do you optimize LSTM hyperparameters?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Describe LSTM performance on different sequence lengths.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**What is teacher forcing in LSTM sequence generation?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**How do you implement beam search with LSTM decoders?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Explain LSTM applications in time series forecasting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**What are the challenges of training very deep LSTMs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**How do you handle missing values in LSTM input sequences?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Describe LSTM-based autoencoders for sequence learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**What is the difference between LSTM and GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**How do you implement multi-task learning with LSTMs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Explain LSTM applications in speech recognition.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**What are convolutional LSTMs (ConvLSTM)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**How do you visualize and interpret LSTM hidden states?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Describe techniques for LSTM model compression.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**What are the limitations of LSTM architectures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**How do you debug LSTM training convergence issues?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Explain LSTM applications in anomaly detection.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**What is curriculum learning for LSTM training?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**How do you implement online learning with LSTMs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Describe LSTM ensemble methods and voting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**What are highway networks and their relation to LSTMs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**How do LSTMs compare to Transformer attention models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Explain LSTM applications in reinforcement learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**What are recent advances and improvements to LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Describe deployment considerations for LSTM models in production.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- GRU Questions (from 42_gru) ---
+
+# GRU Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the GRU architecture and its design motivation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**What are the two gates in GRU and their functions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How does the reset gate work in GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Describe the update gate mechanism in GRU.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How does GRU compute the candidate hidden state?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Derive the complete GRU forward pass equations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**What are the key differences between GRU and LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How does GRU handle the vanishing gradient problem?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain the computational efficiency advantages of GRU.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**What is the parameter count comparison between GRU and LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Describe the GRU backward pass and gradient flow.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How do you initialize GRU weights and biases?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What activation functions are used in GRU gates?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain bidirectional GRU architectures.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How do you stack multiple GRU layers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Describe GRU regularization techniques.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**What is the role of the reset gate in memory selection?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How does the update gate control information flow?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain GRU variants and modifications.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What are minimal gated units (MGU)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How do you implement GRU for sequence-to-sequence tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Describe GRU applications in natural language processing.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**What are the memory advantages of GRU over LSTM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**How does GRU performance compare to LSTM empirically?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Explain GRU training dynamics and convergence.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**What hyperparameters are important for GRU tuning?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**How do you handle variable-length sequences in GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Describe GRU-based attention mechanisms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**What are the limitations of GRU architectures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**How do you implement GRU for time series forecasting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Explain GRU applications in speech recognition.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**What is the computational graph structure of GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**How do you visualize GRU gate activations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Describe GRU ensemble methods and combinations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**What are convolutional GRU (ConvGRU) architectures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**How do you implement teacher forcing with GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain GRU applications in anomaly detection.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**What debugging techniques work for GRU training?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**How do you handle overfitting in GRU models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Describe GRU transfer learning strategies.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**What are the interpretability challenges with GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**How do you compress and quantize GRU models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Explain GRU applications in reinforcement learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**What is the role of highway connections in GRU?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**How do GRUs handle long-term dependencies?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Describe GRU-based autoencoders for representation learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**What are the deployment considerations for GRU models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**How do GRUs compare to Transformer models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Explain recent improvements and variants of GRU.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**What are the best practices for GRU implementation?**
+
+**Answer:** _[To be filled]_
+
+---

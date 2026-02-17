@@ -1121,3 +1121,2882 @@ Layer 2:       [      Final Meta-Model      ]
 - Monitor for overfitting between layers
 
 ---
+
+
+---
+
+# --- Missing Questions Restored from Source (Q26-Q28) ---
+
+## Question 26
+
+**How doesensemble pruningwork, and why might it be necessary?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Describe howtransfer learningcan be used alongsideensemble learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**What is the role ofensemble learninginsemi-supervised learningcontexts?**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+
+---
+
+# --- CatBoost Questions (from 34_catboost) ---
+
+# CatBoost Interview Questions - Theory Questions
+
+## Question 1
+
+**What motivated the creation of CatBoost compared with XGBoost and LightGBM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**How does CatBoost natively handle categorical features?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Explain the concept of "ordered target statistics" in CatBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Why are target-leakage and prediction shift concerns in naive target encoding?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Describe symmetric (oblivious) decision trees used by CatBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Outline CatBoost's ordered boosting process and its benefit.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Compare CatBoost's handling of missing values to that of XGBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**What is the role of the ctr_leaf_weight parameter?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain how CatBoost reduces gradient bias on small data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Describe the difference between plain and ordered boosting modes.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How does CatBoost implement multi-class classification internally?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Discuss GPU acceleration in CatBoost versus competitors.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain CatBoost's eval_metric vs loss_function.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**What is "snapshot saving," and why is it useful for long training jobs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How can you export a CatBoost model to Core ML or ONNX?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Discuss depth and iterations hyper-parameters' impacts.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Describe CatBoost's built-in cross-validation utility.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**When should you use CatBoost's calc_feature_importance vs SHAP values?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain the meaning of "one-hot max size" in CatBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**How does CatBoost avoid overfitting due to high-cardinality categories?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**What's CatBoost's policy for monotonic constraints?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Compare CatBoost's oblivious trees to LightGBM's leaf-wise trees in depth.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**How can you enable/disable bagging in CatBoost?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Discuss CatBoost's od_type (overfitting detector) options.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Explain the role of prior distributions in CatBoost categorical targets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Outline steps to perform grid/random search for CatBoost parameters.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**How do learning_rate and l2_leaf_reg interact in CatBoost?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Discuss CatBoost's support for text and embedding features.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**How would you interpret CatBoost's "prediction values change" importance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**What data preprocessing steps are unnecessary with CatBoost?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Describe memory considerations when training CatBoost on large data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Explain CatBoost's quantization of numerical features.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**How to set class weights for imbalanced classification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**What is the use of pairwise loss in ranking tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Discuss best practices for early stopping in CatBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**How does CatBoost random seed affect reproducibility?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Outline deployment options for CatBoost in real-time systems.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Explain CatBoost's model compression techniques (CTR pruning).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Discuss limitations of CatBoost for sparse NLP feature sets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**How to combine CatBoost with SHAP library efficiently?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Explain CatBoostPool and how to pass feature names.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**What are floating-point versus integer categorical representations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**How can you handle unseen categories in production inference?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Compare CatBoost's logloss to cross-entropy implementations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Describe parameter tuning order for CatBoost (baseline, then fine-tune).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**How does using bootstrap_type=Bayesian differ from Bernoulli?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Explain the internal fast scoring (oblivious tree bitset evaluation).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**How does CatBoost support multi-label tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Provide a case study where CatBoost beat traditional one-hot LightGBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**What future features are planned in CatBoost's roadmap?**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Gradient Boosting Questions (from 35_gradient_boosting) ---
+
+# Gradient Boosting Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain boosting in ensemble learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Derive the additive model formulation of GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**What loss functions are available for GBM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Describe stage-wise additive modeling.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How does learning rate shrinkage affect GBM performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Discuss subsampling (stochastic GBM) and its effect on variance.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Explain the role of tree depth in GBM bias-variance trade-off.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Compare GBM to Random Forest in terms of bias and variance.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**How is the negative gradient used as pseudo-residuals?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Outline the training loop of GBM in pseudocode.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Explain how GBM handles categorical predictors (generic answer).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Discuss the effect of interaction depth parameter.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What is the concept of "warm start" in GBM implementations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How does monotone constraint enforcement work in GBM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Explain how to interpret feature importance in GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What is the impact of n_estimators on overfitting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Compare Friedman's original GBM to XGBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Describe how GBM can be used for ranking problems.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain gradient boosting with logistic loss for binary classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**How do you tune hyper-parameters of GBM systematically?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Discuss advantages of histogram-based GBM over exact splits.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain the concept of "interaction constraints" in modern GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**What regularization techniques exist for GBM besides learning rate?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Compare L1 vs L2 regularization on leaf weights (as in XGBoost).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Explain influence of min_child_weight / min_samples_split.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Discuss initial prediction offset in GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**How does early stopping work in GBM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**What is the typical default base learner used in GBM and why?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Describe huber loss and quantile loss in GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Explain how GBM is extended to multiclass tasks (softmax).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**What is the idea behind dart (dropout) boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Discuss categorical histogram splits (LightGBM).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Explain GPU acceleration benefits for GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Provide steps to diagnose a poorly performing GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Discuss interpretability challenges with GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Compare AdaBoost vs Gradient Boosting in error focus.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain how learning rate and number of trees interact.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**What is out-of-bag improvement plot and how to use it?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Describe influence functions for GBM interpretability.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Explain randomization strategies in GBM to reduce overfitting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Discuss calibration of GBM probability outputs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**How to handle class imbalance in GBM?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Explain use of GBM in time series forecasting with lag features.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Describe parameter differences between scikit-learn GBM and LightGBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**How to visualize partial dependence for GBM models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Explain leaf-wise vs level-wise tree growth (LightGBM).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Discuss the role of colsample_bytree in GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Provide an example of using GBM for insurance claim severity.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Explain limitations of GBM with extremely sparse data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Describe future trends in gradient boosting research.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- AdaBoost Questions (from 36_adaboost) ---
+
+# AdaBoost Interview Questions - Theory Questions
+
+## Question 1
+
+**Describe the AdaBoost algorithm intuition.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**Explain weak learner requirements for AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How are sample weights updated after each round?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Derive the weight update formula using exponential loss.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Explain why AdaBoost focuses on hard-to-classify samples.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Discuss the effect of weak learner overfitting on AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**What is AdaBoost.M1 versus AdaBoost.M2?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Explain discrete AdaBoost vs Real AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**How is classifier weight α_t computed?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss margin theory and AdaBoost generalization.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Why can AdaBoost be robust to overfitting with many trees?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What base estimators are typically used with AdaBoost?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Contrast AdaBoost with LogitBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How does AdaBoost handle noisy labels?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Explain shrinkage (learning rate) in AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Discuss the number of estimators vs performance curve.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do class imbalances affect AdaBoost training?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain SAMME and SAMME.R algorithms in sklearn.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Provide pseudo-code for AdaBoost binary classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Compare AdaBoost to Gradient Boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Explain influence of max_depth of decision stumps in AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**How can AdaBoost be adapted for regression (AdaBoost.R2)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Discuss the role of exponential loss as upper bound on 0-1 loss.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain AdaBoost's sensitivity to outliers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**How does AdaBoost perform feature selection implicitly?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Describe ways to visualize AdaBoost decision boundaries.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Discuss heteroskedasticity in AdaBoost regression.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**What is AdaCost and cost-sensitive boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Explain how AdaBoost can be parallelized.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Discuss AdaBoost with SVM base learners.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Explain multi-class AdaBoost.W.MH algorithm.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**What is BrownBoost and how does it differ?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Describe GentleBoost and its advantages.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Explain AdaBoost ensemble pruning methods.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Discuss hybrid AdaBoost with Random Forest stumps.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**How would you tune hyper-parameters of AdaBoost?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain theoretical convergence of training error in AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Provide a real-world application where AdaBoost excels.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Compare AdaBoost and Bagging on variance control.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**How is AdaBoost used for face detection (Viola-Jones)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Explain L2-regularized AdaBoost variants.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**What diagnostics indicate AdaBoost is overfitting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Explain margin distribution plots for AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Discuss AdaBoost in presence of label noise - MadaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Describe adaptive boosting for imbalanced cost settings.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Explain how to extend AdaBoost for ranking (AdaRank).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Provide guidelines for choosing weak learner complexity.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Discuss interpretability strategies for AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Explain weighted voting at inference in AdaBoost.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Compare AdaBoost's computational complexity with GBM.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Bagging Questions (from 37_bagging) ---
+
+# Bagging Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the Bootstrap Aggregating (Bagging) algorithm.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**How does bagging reduce variance in ensemble models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Derive the variance reduction formula for bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**What is the out-of-bag (OOB) error and its utility?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Explain bias-variance tradeoff in bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Why does bagging work better with high-variance models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Describe bootstrap sampling with replacement.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How many unique samples are expected in each bootstrap?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Compare bagging with pasting (sampling without replacement).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Explain random subspace method in bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Discuss the role of bootstrap bias in bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How does bagging handle overfitting base learners?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What is the relationship between bagging and Random Forest?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain parallel training advantages of bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How is prediction made in bagging for regression vs classification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Discuss optimal number of bootstrap samples.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**What base learners are most suitable for bagging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain OOB feature importance estimation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**How does sample size affect bagging performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Compare bagging with boosting algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Explain stratified sampling in classification bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**What is Double Bagging and its benefits?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Discuss computational complexity of bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**How can bagging be used for feature selection?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Explain bagging with different base learner types.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**What is Subagging and how does it differ?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Describe confidence intervals from bagged predictions.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**How does class imbalance affect bagging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Explain Random Patches method.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**What is Extremely Randomized Trees (Extra Trees)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Discuss memory requirements for bagging ensembles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**How do you validate bagging models effectively?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Explain bagging with cross-validation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**What is Bayesian Model Averaging vs Bagging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Describe online/incremental bagging algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**How can you interpret bagged model predictions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**Explain diversity measures in bagging ensembles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**What hyperparameters need tuning in bagging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Discuss bagging performance on high-dimensional data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**How does bagging handle outliers and noise?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**Explain theoretical guarantees of bagging convergence.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**What is Negative Correlation Learning in bagging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**Describe weighted bagging approaches.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**How do you select optimal bootstrap sample size?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**Explain bagging for time series forecasting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**What are limitations and failure cases of bagging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**Discuss ensemble pruning for bagged models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**How does bagging compare to stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**Explain quantile prediction with bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Provide implementation tips for efficient bagging.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Boosting Questions (from 38_boosting) ---
+
+# Boosting Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the core concept of boosting algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**How does boosting convert weak learners to strong learners?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**Discuss the PAC learning framework for boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**What is the difference between adaptive and non-adaptive boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Explain forward stagewise additive modeling.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**How do loss functions affect boosting algorithms?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Compare sequential vs parallel ensemble methods.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**What are the theoretical guarantees of boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Explain the bias-variance decomposition for boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss overfitting behavior in boosting algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How does regularization work in boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What is the role of learning rate in boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain early stopping strategies for boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Compare different weak learner choices for boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**What is coordinate descent in the context of boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Discuss the functional gradient descent view of boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you handle multi-class problems in boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain weight initialization strategies in boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**What is the difference between discrete and continuous boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Discuss convergence properties of boosting algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How does noise affect boosting performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain the margin theory for boosting generalization.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**What are the computational complexities of various boosting methods?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Discuss memory efficiency in boosting algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**How do you validate and tune boosting models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Explain ensemble diversity in boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**What is the relationship between boosting and neural networks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Discuss robust boosting algorithms for outliers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**How does sample weighting evolve during boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Explain cost-sensitive boosting approaches.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**What is Newton boosting and second-order methods?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Discuss online and incremental boosting algorithms.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**How do you interpret feature importance in boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Explain boosting for ranking and structured prediction.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**What are the limitations of boosting algorithms?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Discuss distributed and parallel boosting implementations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**How does tree depth affect boosting performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Explain boosting with different base learner families.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**What is LPBoost and linear programming formulation?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Discuss boosting for imbalanced datasets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**How do you handle categorical features in boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Explain multi-armed bandit approaches to boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**What is AnyBoost framework?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Discuss boosting for time series and temporal data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**How do you perform feature selection with boosting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Explain confidence and prediction intervals in boosting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**What is the relationship between boosting and kernel methods?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Discuss ensemble pruning for boosted models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**How do you debug and diagnose boosting model issues?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Explain recent advances and trends in boosting research.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Stacking Questions (from 39_stacking) ---
+
+# Stacking Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain the stacked generalization (stacking) concept.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**What is the difference between blending and stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How do you prevent overfitting in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Explain the role of meta-learner in stacking.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**Describe k-fold cross-validation stacking.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What are level-0 and level-1 predictions in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**How do you select diverse base learners for stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Explain multi-level stacking architectures.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**What meta-learners work best for stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss computational complexity of stacking ensembles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How does stacking handle feature importance attribution?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Explain holdout vs cross-validation for meta-features.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What is dynamic stacking and adaptive meta-learning?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you optimize base learner diversity in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Discuss regularization in stacking meta-learners.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Explain stacking for regression vs classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**What is super learning and targeted maximum likelihood?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How does stacking compare to voting ensembles?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Describe feature engineering for meta-learners.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What are the theoretical guarantees of stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Explain nested cross-validation for stacking validation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**How do you handle class imbalance in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**What is Bayesian model stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Discuss parallel vs sequential stacking implementations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**How do you perform hyperparameter tuning in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Explain confidence intervals from stacked predictions.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**What is ensemble selection vs stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**How does sample size affect stacking performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Discuss memory and storage requirements for stacking.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Explain interpretability challenges in stacking.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**What is negative correlation learning in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**How do you debug stacking model performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Describe online and streaming stacking approaches.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**What is mixture of experts vs stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**Explain stacking with heterogeneous base learners.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**How does noise affect stacking ensemble performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**What are common failure modes of stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Discuss feature selection for stacking meta-features.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**Explain weighted stacking and adaptive combining.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**How do you handle temporal data in stacking?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**What is evolutionary ensemble selection?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Describe stacking for multi-output prediction problems.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**How does stacking perform with limited training data?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Explain automated machine learning (AutoML) with stacking.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**What is the relationship between stacking and neural networks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Discuss distributed stacking implementations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**How do you validate stacking models effectively?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Explain transfer learning with stacked ensembles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**What are best practices for production stacking systems?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Describe recent advances in stacking and meta-learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+
+---
+
+# --- Voting Classifier Questions (from 40_voting_classifier) ---
+
+# Voting Classifier Interview Questions - Theory Questions
+
+## Question 1
+
+**Explain hard voting vs soft voting in ensemble classifiers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**When is majority voting optimal for ensemble classification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How does Condorcet's jury theorem apply to voting classifiers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**Derive the theoretical error rate for majority voting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**What are the assumptions for effective voting ensembles?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**Explain weighted voting and optimal weight selection.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**How do you handle ties in voting classifiers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Discuss diversity requirements for voting ensembles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**What is the difference between averaging and voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Explain probability calibration for soft voting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How does class imbalance affect voting performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What are the computational advantages of voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Describe unanimous voting and its applications.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you select base classifiers for voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Explain threshold voting and confidence-based voting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What is ranked voting in multi-class classification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Discuss the bias-variance tradeoff in voting ensembles.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How does voting handle unreliable base classifiers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain adaptive voting and dynamic weight adjustment.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What are the limitations of simple voting schemes?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How do you validate voting classifier performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Describe voting for ordinal and structured outputs.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**What is consensus voting and agreement measures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Explain voting with heterogeneous feature spaces.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**How does sample size affect voting ensemble accuracy?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Discuss interpretability of voting classifier decisions.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**What is the role of base classifier correlation in voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Explain voting with missing predictions from base models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**How do you optimize the number of voters?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Describe voting mechanisms for regression problems.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**What is fuzzy voting and soft decision boundaries?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Explain voting with confidence intervals and uncertainty.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**How does voting compare to other ensemble methods?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Discuss parallel implementation of voting classifiers.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**What are best practices for voting ensemble design?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**Explain strategic voting and game-theoretic considerations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**How do you handle multi-label classification with voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**Describe voting aggregation in hierarchical classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**What is expert voting and domain-specific ensembles?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**Explain voting robustness to adversarial attacks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**How do you perform feature importance analysis in voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**Discuss voting with time-varying base classifier performance.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**What is deliberation and iterative voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**Explain voting for online and streaming classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**How does voting handle concept drift?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**Describe voting mechanisms for cost-sensitive learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**What are the communication requirements in distributed voting?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**Explain voting with heterogeneous evaluation metrics.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**How do you debug voting classifier failures?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**Discuss recent research in voting and consensus methods.**
+
+**Answer:** _[To be filled]_
+
+---

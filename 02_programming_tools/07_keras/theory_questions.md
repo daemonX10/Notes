@@ -513,3 +513,120 @@ class CustomCallback(keras.callbacks.Callback):
             self.model.stop_training = True
 ```
 
+
+
+---
+
+# --- Missing Questions Restored from Source (Q11-Q24) ---
+
+## Question 11
+
+**Can you explain the difference betweenvalidationandtest setsin the context of aKeras model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What is the importance ofdata preprocessingintraining Keras models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Can you describe the concept ofhyperparameter tuningand its importance inKeras models?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How doeslearning rateaffect thetraining of a Keras model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Explain how you wouldfine-tune a pre-trained modelinKeras.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What is the use of agrid searchinhyperparameter optimizationand can it be used withKeras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Explain how you would usedata augmentationinKeras.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How doesKerashandlesequence datafor tasks liketext generationortranslation?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Explain the use ofattention mechanismsinKeras models.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What are the challenges associated withtraining very deep networksinKerasand how can you overcome them?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**What are some common issues you might face when working withKerasand how do you resolve them?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Describe the process ofserving a Keras modelusingTensorFlow Serving.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**How doesreinforcement learningwork inKeras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Describe how you would useKerasto develop arecommendation system.**
+
+**Answer:** _[To be filled]_
+
+---

@@ -426,3 +426,72 @@ print(f"Recall: {recall_score(y_test, y_pred):.4f}")
 print(f"F1: {f1_score(y_test, y_pred):.4f}")
 ```
 
+
+
+---
+
+# --- Missing Questions Restored from Source (Q12-Q19) ---
+
+## Question 12
+
+**What is the difference between.fit(),.predict(), and.transform()methods?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Describe how adecision treeis constructed inScikit-Learn.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain the differences betweenRandomForestClassifierandGradientBoostingClassifierinScikit-Learn.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How doesScikit-Learn’sSVMhandle non-linear data?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What is asupport vector machine, and how can it be used for bothclassificationandregressiontasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Describe the process ofdeployingaScikit-Learn modelinto a production environment.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Explain how you wouldupdateaScikit-Learn modelwithnew dataover time.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**What are some of thelimitationsofScikit-Learnwhen dealing with verylarge datasets?**
+
+**Answer:** _[To be filled]_
+
+---
