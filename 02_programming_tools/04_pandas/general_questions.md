@@ -373,7 +373,51 @@ sns.heatmap(df.corr(), annot=True)
 
 **What techniques can you use to improve the performance of Pandas operations?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Key Optimization Techniques
+
+| Technique | Speedup | When to Use |
+|-----------|---------|-------------|
+| Vectorization | 10-100× | Always — replace loops with built-in ops |
+| `apply()` → vectorized | 5-50× | Replace `df.apply()` with column math |
+| Categorical dtype | 2-10× | Low-cardinality string columns |
+| `eval()` / `query()` | 2-5× | Complex expressions on large DataFrames |
+| Chunking | N/A | Data larger than RAM |
+
+```python
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'a': range(1_000_000), 'b': range(1_000_000)})
+
+# BAD: Python loop (~10s)
+# for i in range(len(df)): df.loc[i, 'c'] = df.loc[i, 'a'] + df.loc[i, 'b']
+
+# GOOD: Vectorized (~5ms)
+df['c'] = df['a'] + df['b']
+
+# BAD: apply (~1s)
+# df['c'] = df.apply(lambda row: row['a'] + row['b'], axis=1)
+
+# GOOD: eval (fast for large DataFrames)
+df['c'] = df.eval('a + b')
+
+# GOOD: query instead of boolean indexing
+result = df.query('a > 500 and b < 1000')  # vs df[(df['a']>500) & (df['b']<1000)]
+
+# Use appropriate dtypes
+df['category_col'] = df['category_col'].astype('category')  # 90% less memory
+df['int_col'] = pd.to_numeric(df['int_col'], downcast='integer')  # int64 → int8
+
+# Use numpy under the hood
+df['c'] = np.where(df['a'] > 500, df['a'], df['b'])  # Faster than .apply()
+
+# Parallel with swifter or modin
+# import modin.pandas as pd  # Drop-in replacement, auto-parallel
+```
+
+> **Interview Tip:** The #1 rule is **avoid Python loops**. Use vectorized operations, and if you must use `apply()`, consider `np.where()` or `np.vectorize()` first.
 
 ---
 
@@ -381,7 +425,56 @@ sns.heatmap(df.corr(), annot=True)
 
 **Compare and contrast the memory usage in Pandas for categories vs. objects.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Memory Comparison
+
+```python
+import pandas as pd
+import numpy as np
+
+# Create sample data
+n = 1_000_000
+df = pd.DataFrame({
+    'color_object': np.random.choice(['red', 'green', 'blue', 'yellow'], n),
+})
+df['color_category'] = df['color_object'].astype('category')
+
+# Memory usage
+print(df['color_object'].memory_usage(deep=True))    # ~62 MB (object dtype)
+print(df['color_category'].memory_usage(deep=True))  # ~1 MB  (category dtype)
+# ~62× less memory!
+```
+
+### How Categories Work
+
+| Aspect | Object (string) | Category |
+|--------|-----------------|----------|
+| Storage | Full string per row | Integer codes + lookup table |
+| Memory (1M rows, 4 unique) | ~62 MB | ~1 MB |
+| Groupby speed | Slower | 2-5× faster |
+| Sort speed | String comparison | Integer comparison |
+| Merge speed | String matching | Integer matching |
+| New values | Flexible | Must add to categories first |
+
+```python
+# Internal representation
+cat = df['color_category']
+print(cat.cat.codes[:5])         # [2, 0, 1, 3, 0] (integer codes)
+print(cat.cat.categories)        # ['blue', 'green', 'red', 'yellow']
+
+# Ordered categories (for ordinal data)
+size_cat = pd.Categorical(['S', 'M', 'L', 'XL'],
+                           categories=['S', 'M', 'L', 'XL'],
+                           ordered=True)
+print(size_cat > 'M')  # [False, False, True, True]
+
+# When NOT to use categories
+# - High cardinality (unique values > 50% of rows) — no benefit
+# - Columns that need frequent new value insertion
+```
+
+> **Interview Tip:** Convert to **category** when cardinality is low (e.g., <50 unique values). It saves memory AND speeds up groupby, merge, and sort operations.
 
 ---
 
@@ -389,7 +482,83 @@ sns.heatmap(df.corr(), annot=True)
 
 **How do you manage memory usage when working with large DataFrames?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Strategy 1: Optimize dtypes
+
+```python
+import pandas as pd
+import numpy as np
+
+# Check current memory
+df.info(memory_usage='deep')
+print(df.memory_usage(deep=True).sum() / 1e6, 'MB')
+
+# Downcast numeric types
+def reduce_mem_usage(df):
+    for col in df.columns:
+        col_type = df[col].dtype
+        if col_type == 'float64':
+            df[col] = pd.to_numeric(df[col], downcast='float')  # float64 → float32
+        elif col_type == 'int64':
+            df[col] = pd.to_numeric(df[col], downcast='integer')  # int64 → int8/16/32
+        elif col_type == 'object':
+            if df[col].nunique() / len(df) < 0.5:  # Low cardinality
+                df[col] = df[col].astype('category')
+    return df
+
+df = reduce_mem_usage(df)  # Often reduces by 50-80%
+```
+
+### Strategy 2: Load only what you need
+
+```python
+# Select columns at read time
+df = pd.read_csv('data.csv', usecols=['col1', 'col2', 'col3'])
+
+# Specify dtypes at read time
+df = pd.read_csv('data.csv', dtype={'id': 'int32', 'name': 'category', 'value': 'float32'})
+
+# Read in chunks
+chunks = pd.read_csv('big.csv', chunksize=100_000)
+result = pd.concat([chunk.query('value > 0') for chunk in chunks])
+```
+
+### Strategy 3: Delete and collect
+
+```python
+import gc
+
+# Drop unneeded columns
+df.drop(['unnecessary_col'], axis=1, inplace=True)
+
+# Delete intermediate DataFrames
+del temp_df
+gc.collect()  # Force garbage collection
+
+# Use inplace operations
+df.fillna(0, inplace=True)  # Avoids creating a copy
+```
+
+### Strategy 4: Alternative backends
+
+```python
+# Parquet (columnar, compressed)
+df.to_parquet('data.parquet')  # 5-10× smaller than CSV
+df = pd.read_parquet('data.parquet', columns=['col1', 'col2'])
+
+# PyArrow backend (Pandas 2.0+)
+df = pd.read_csv('data.csv', dtype_backend='pyarrow')  # ~50% less memory
+```
+
+| Strategy | Savings |
+|----------|--------|
+| float64 → float32 | 50% |
+| int64 → int8 | 87.5% |
+| object → category | 60-95% |
+| Parquet over CSV | 70-90% |
+
+> **Interview Tip:** The biggest wins come from **dtype optimization** (especially category for strings) and **reading only needed columns**. For truly massive data, switch to **Dask** or **Polars**.
 
 ---
 
@@ -397,4 +566,74 @@ sns.heatmap(df.corr(), annot=True)
 
 **How can you use chunking to process large CSV files with Pandas?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import pandas as pd
+import numpy as np
+
+# === Basic Chunked Reading ===
+chunks = pd.read_csv('large_file.csv', chunksize=100_000)
+
+for chunk in chunks:
+    print(f"Processing {len(chunk)} rows")
+    # Process each chunk
+    process(chunk)
+
+# === Aggregation across chunks ===
+def chunked_statistics(filename, chunksize=100_000):
+    total_sum = 0
+    total_count = 0
+    value_counts = pd.Series(dtype='int64')
+    
+    for chunk in pd.read_csv(filename, chunksize=chunksize):
+        total_sum += chunk['value'].sum()
+        total_count += len(chunk)
+        value_counts = value_counts.add(chunk['category'].value_counts(), fill_value=0)
+    
+    mean = total_sum / total_count
+    return mean, value_counts
+
+# === Filter and concatenate ===
+filtered_chunks = []
+for chunk in pd.read_csv('large.csv', chunksize=50_000):
+    filtered = chunk[chunk['amount'] > 100]  # Filter rows
+    filtered_chunks.append(filtered)
+
+result = pd.concat(filtered_chunks, ignore_index=True)
+
+# === Write results incrementally ===
+header_written = False
+for chunk in pd.read_csv('input.csv', chunksize=100_000):
+    processed = chunk.copy()
+    processed['new_col'] = processed['value'] * 2
+    
+    processed.to_csv('output.csv',
+                     mode='a',
+                     header=not header_written,
+                     index=False)
+    header_written = True
+
+# === Memory-efficient groupby ===
+grouped_results = {}
+for chunk in pd.read_csv('sales.csv', chunksize=100_000):
+    chunk_grouped = chunk.groupby('region')['revenue'].sum()
+    for region, revenue in chunk_grouped.items():
+        grouped_results[region] = grouped_results.get(region, 0) + revenue
+
+final = pd.Series(grouped_results)
+
+# === Using context manager ===
+with pd.read_csv('large.csv', chunksize=50_000) as reader:
+    for chunk in reader:
+        process(chunk)
+```
+
+| Parameter | Description |
+|-----------|------------|
+| `chunksize=N` | Rows per chunk |
+| `nrows=N` | Read only first N rows |
+| `usecols=[...]` | Read only specific columns |
+| `dtype={...}` | Specify dtypes to save memory |
+
+> **Interview Tip:** Chunking keeps memory constant regardless of file size. Combine with `usecols` and `dtype` for maximum efficiency. For complex aggregations, consider **Dask** which handles chunking automatically.

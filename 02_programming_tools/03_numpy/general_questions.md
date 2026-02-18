@@ -224,7 +224,44 @@ np.isnan(np.nan)  # Returns True
 
 **How do you create a record array in NumPy?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+A **record array** (recarray) is a structured array that allows field access using attribute syntax (`arr.field`) instead of dictionary syntax (`arr['field']`).
+
+```python
+import numpy as np
+
+# Method 1: np.rec.array from tuples
+data = np.rec.array([
+    ('Alice', 25, 85.5),
+    ('Bob', 30, 92.0),
+    ('Charlie', 28, 78.3)
+], dtype=[('name', 'U10'), ('age', 'i4'), ('score', 'f8')])
+
+print(data.name)    # ['Alice' 'Bob' 'Charlie']  — attribute access
+print(data.age)     # [25 30 28]
+print(data[0])      # ('Alice', 25, 85.5)
+
+# Method 2: np.rec.fromarrays
+names = np.array(['Alice', 'Bob', 'Charlie'])
+ages = np.array([25, 30, 28])
+scores = np.array([85.5, 92.0, 78.3])
+data = np.rec.fromarrays([names, ages, scores], names='name,age,score')
+
+# Method 3: Structured array + view
+dt = np.dtype([('name', 'U10'), ('age', 'i4'), ('score', 'f8')])
+arr = np.array([('Alice', 25, 85.5)], dtype=dt)
+rec = arr.view(np.recarray)
+print(rec.name)  # attribute access works
+```
+
+| Feature | Structured Array | Record Array |
+|---------|------------------|--------------|
+| Access | `arr['field']` | `arr.field` (attribute) |
+| Performance | Slightly faster | Slight overhead |
+| Creation | `np.array(..., dtype=dt)` | `np.rec.array(...)` |
+
+> **Interview Tip:** Record arrays are convenient for tabular data with named columns. For large-scale tabular work, prefer **Pandas DataFrames** instead.
 
 ---
 
@@ -232,7 +269,55 @@ np.isnan(np.nan)  # Returns True
 
 **How can NumPy be used for audio signal processing?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+NumPy provides the mathematical foundation for audio signal processing through its array operations and FFT module.
+
+### Key Operations
+
+```python
+import numpy as np
+from scipy.io import wavfile
+
+# 1. Load audio data
+sr, audio = wavfile.read('audio.wav')  # sr = sample rate
+audio = audio.astype(np.float32) / 32768.0  # Normalize 16-bit to [-1, 1]
+
+# 2. Fourier Transform — frequency analysis
+fft_result = np.fft.fft(audio)
+freqs = np.fft.fftfreq(len(audio), d=1/sr)
+magnitude = np.abs(fft_result)
+phase = np.angle(fft_result)
+
+# 3. Filter frequencies (e.g., low-pass filter at 1000 Hz)
+fft_filtered = fft_result.copy()
+fft_filtered[np.abs(freqs) > 1000] = 0
+filtered_audio = np.real(np.fft.ifft(fft_filtered))
+
+# 4. Generate audio signals
+t = np.linspace(0, 1, sr)  # 1 second
+sine_wave = 0.5 * np.sin(2 * np.pi * 440 * t)  # 440 Hz (A note)
+
+# 5. Spectrogram (short-time FFT)
+window_size = 1024
+hop = 512
+frames = np.lib.stride_tricks.sliding_window_view(audio, window_size)[::hop]
+spectrogram = np.abs(np.fft.rfft(frames * np.hanning(window_size), axis=1))
+
+# 6. Energy / RMS
+rms = np.sqrt(np.mean(audio**2))
+energy_frames = np.array([np.sum(f**2) for f in frames])
+```
+
+| Task | NumPy Function |
+|------|---------------|
+| FFT | `np.fft.fft()`, `np.fft.rfft()` |
+| Frequency axis | `np.fft.fftfreq()` |
+| Windowing | `np.hanning()`, `np.hamming()` |
+| Convolution | `np.convolve()` |
+| Cross-correlation | `np.correlate()` |
+
+> **Interview Tip:** NumPy handles raw signal math. For production audio ML, use **librosa** (built on NumPy) for mel spectrograms, MFCCs, and other audio features.
 
 ---
 
@@ -240,7 +325,68 @@ np.isnan(np.nan)  # Returns True
 
 **What methods are there in NumPy to deal with missing data?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+NumPy uses `np.nan` (Not a Number, float type) to represent missing data.
+
+### Detection
+
+```python
+import numpy as np
+
+arr = np.array([1.0, np.nan, 3.0, np.nan, 5.0])
+
+# Detect NaN
+np.isnan(arr)                    # [False, True, False, True, False]
+np.any(np.isnan(arr))            # True
+np.sum(np.isnan(arr))            # 2 (count of NaN)
+np.where(np.isnan(arr))          # (array([1, 3]),)  — indices
+```
+
+### NaN-safe Aggregations
+
+```python
+# Standard functions propagate NaN
+np.mean(arr)      # nan
+np.sum(arr)       # nan
+
+# NaN-ignoring versions
+np.nanmean(arr)   # 3.0
+np.nansum(arr)    # 9.0
+np.nanstd(arr)    # 1.633
+np.nanmin(arr)    # 1.0
+np.nanmax(arr)    # 5.0
+np.nanmedian(arr) # 3.0
+np.nanpercentile(arr, 50)  # 3.0
+```
+
+### Removal & Replacement
+
+```python
+# Remove NaN values
+clean = arr[~np.isnan(arr)]  # [1.0, 3.0, 5.0]
+
+# Replace with a value (imputation)
+arr_filled = np.where(np.isnan(arr), 0, arr)                    # Replace with 0
+arr_mean = np.where(np.isnan(arr), np.nanmean(arr), arr)        # Replace with mean
+np.nan_to_num(arr, nan=0.0, posinf=1e10, neginf=-1e10)         # Replace NaN & inf
+
+# Forward fill (carry last valid value)
+def forward_fill(arr):
+    mask = np.isnan(arr)
+    idx = np.where(~mask, np.arange(len(arr)), 0)
+    np.maximum.accumulate(idx, out=idx)
+    return arr[idx]
+```
+
+### Masked Arrays
+
+```python
+masked = np.ma.masked_invalid(arr)  # masks NaN and inf
+np.ma.mean(masked)                  # 3.0 — ignores masked values
+```
+
+> **Interview Tip:** NumPy's NaN handling is limited to float arrays (integers can't hold NaN). For robust missing data handling with mixed types, use **Pandas** (`pd.isna()`, `.fillna()`, `.dropna()`).
 
 ---
 
@@ -248,7 +394,51 @@ np.isnan(np.nan)  # Returns True
 
 **How do you find unique values and their counts in a NumPy array?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import numpy as np
+
+arr = np.array([3, 1, 2, 3, 1, 3, 2, 4, 1])
+
+# Basic unique values (sorted)
+np.unique(arr)  # [1, 2, 3, 4]
+
+# Unique values with counts
+values, counts = np.unique(arr, return_counts=True)
+# values: [1, 2, 3, 4],  counts: [3, 2, 3, 1]
+
+# Display as dictionary
+dict(zip(values, counts))  # {1: 3, 2: 2, 3: 3, 4: 1}
+
+# Unique with indices
+values, indices = np.unique(arr, return_index=True)         # first occurrence index
+values, inverse = np.unique(arr, return_inverse=True)       # map back to original
+
+# All at once
+values, idx, inv, cnt = np.unique(arr, return_index=True,
+                                   return_inverse=True,
+                                   return_counts=True)
+
+# Reconstruct original: arr == values[inv]  → True
+
+# 2D array — unique rows
+arr2d = np.array([[1,2],[3,4],[1,2],[5,6]])
+np.unique(arr2d, axis=0)  # [[1,2],[3,4],[5,6]]
+
+# Most frequent value (mode)
+values, counts = np.unique(arr, return_counts=True)
+mode = values[np.argmax(counts)]  # 1 or 3 (both have count 3)
+```
+
+| Parameter | Returns |
+|-----------|--------|
+| `return_counts` | Count of each unique value |
+| `return_index` | Index of first occurrence |
+| `return_inverse` | Indices to reconstruct original from unique |
+| `axis=0` | Unique rows (2D) |
+
+> **Interview Tip:** `np.unique` always returns **sorted** values. For unsorted order-preserving unique, use `pd.unique()` or `np.unique` with `return_index` and sort by index.
 
 ---
 
@@ -256,4 +446,75 @@ np.isnan(np.nan)  # Returns True
 
 **How can you use NumPy arrays with Cython for performance optimization?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+**Cython** compiles Python-like code to C, and with **typed memoryviews** it can access NumPy array data at C speed (bypassing Python overhead).
+
+### Basic Example
+
+```cython
+# fast_ops.pyx
+import numpy as np
+cimport numpy as cnp
+from cython cimport boundscheck, wraparound
+
+@boundscheck(False)   # Disable bounds checking for speed
+@wraparound(False)    # Disable negative indexing
+def fast_sum(cnp.ndarray[cnp.float64_t, ndim=1] arr):
+    cdef int i, n = arr.shape[0]
+    cdef double total = 0.0
+    for i in range(n):
+        total += arr[i]
+    return total
+```
+
+### Modern Typed Memoryview (Preferred)
+
+```cython
+# modern_ops.pyx
+from cython cimport boundscheck, wraparound
+
+@boundscheck(False)
+@wraparound(False)
+def pairwise_distance(double[:, :] X):
+    cdef int n = X.shape[0]
+    cdef int d = X.shape[1]
+    cdef double[:, :] D = np.zeros((n, n))
+    cdef int i, j, k
+    cdef double tmp, diff
+    for i in range(n):
+        for j in range(i+1, n):
+            tmp = 0.0
+            for k in range(d):
+                diff = X[i, k] - X[j, k]
+                tmp += diff * diff
+            D[i, j] = D[j, i] = tmp ** 0.5
+    return np.asarray(D)
+```
+
+### Setup & Compilation
+
+```python
+# setup.py
+from setuptools import setup
+from Cython.Build import cythonize
+import numpy as np
+
+setup(
+    ext_modules=cythonize("fast_ops.pyx"),
+    include_dirs=[np.get_include()]
+)
+# Build: python setup.py build_ext --inplace
+```
+
+### Performance Comparison
+
+| Approach | Relative Speed |
+|----------|---------------|
+| Pure Python loop | 1× (baseline) |
+| NumPy vectorized | ~50-100× |
+| Cython (untyped) | ~10-30× |
+| Cython (typed memoryview) | ~200-500× |
+| Cython + parallel (prange) | ~500-2000× |
+
+> **Interview Tip:** Cython gives C-level speed for element-wise loops that can't be vectorized with NumPy. For simpler cases, try **Numba** (`@jit`) first — zero compilation step needed.

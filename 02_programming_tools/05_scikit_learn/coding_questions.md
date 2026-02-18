@@ -515,7 +515,46 @@ plot_learning_curve(model, X, y)
 
 **How does Scikit-Learn implement logistic regression differently from linear regression?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+| Aspect | Linear Regression | Logistic Regression |
+|--------|-------------------|--------------------|
+| Task | Regression (continuous) | Classification (discrete) |
+| Output | $\hat{y} = Xw + b$ | $P(y=1) = \sigma(Xw + b)$ |
+| Loss function | MSE: $\frac{1}{n}\sum(y - \hat{y})^2$ | Log loss: $-\frac{1}{n}\sum[y\log(p) + (1-y)\log(1-p)]$ |
+| Activation | None (identity) | Sigmoid: $\sigma(z) = \frac{1}{1+e^{-z}}$ |
+| Solver | Closed-form (OLS) or SGD | Iterative (LBFGS, Newton, SAG) |
+| Regularization | Optional (Ridge, Lasso) | Always applied (`C` parameter) |
+
+```python
+from sklearn.linear_model import LinearRegression, LogisticRegression
+
+# Linear Regression
+lin_reg = LinearRegression()  # No regularization by default
+lin_reg.fit(X_train, y_continuous)
+y_pred = lin_reg.predict(X_test)  # Continuous values
+print(lin_reg.coef_)              # Feature weights
+print(lin_reg.intercept_)         # Bias term
+
+# Logistic Regression
+log_reg = LogisticRegression(
+    C=1.0,              # Inverse regularization (higher = less regularization)
+    penalty='l2',       # Regularization type
+    solver='lbfgs',     # Optimization algorithm
+    max_iter=100,
+    multi_class='auto'  # 'ovr' or 'multinomial'
+)
+log_reg.fit(X_train, y_class)
+y_pred = log_reg.predict(X_test)          # Class labels
+y_prob = log_reg.predict_proba(X_test)    # Probabilities
+print(log_reg.classes_)                    # [0, 1]
+
+# Key difference: LogisticRegression ALWAYS regularizes
+# C=1e10 ≈ no regularization
+# C=0.01 = strong regularization
+```
+
+> **Interview Tip:** Despite the name, logistic regression is a **classifier**. The key API difference is `predict_proba()` — linear regression doesn't have it. Logistic regression always uses regularization (`C` parameter).
 
 ---
 
@@ -523,7 +562,62 @@ plot_learning_curve(model, X, y)
 
 **Write a Python script using Scikit-Learn to train and evaluate a logistic regression model.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score, classification_report, confusion_matrix, roc_auc_score
+)
+from sklearn.pipeline import Pipeline
+from sklearn.datasets import load_breast_cancer
+
+# 1. Load data
+data = load_breast_cancer()
+X, y = data.data, data.target
+feature_names = data.feature_names
+
+# 2. Train/test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# 3. Build pipeline (preprocessing + model)
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('model', LogisticRegression(C=1.0, max_iter=1000, random_state=42))
+])
+
+# 4. Cross-validation
+cv_scores = cross_val_score(pipeline, X_train, y_train, cv=5, scoring='accuracy')
+print(f"CV Accuracy: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
+
+# 5. Train on full training set
+pipeline.fit(X_train, y_train)
+
+# 6. Evaluate
+y_pred = pipeline.predict(X_test)
+y_prob = pipeline.predict_proba(X_test)[:, 1]
+
+print(f"\nTest Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+print(f"AUC-ROC: {roc_auc_score(y_test, y_prob):.3f}")
+print(f"\nClassification Report:\n{classification_report(y_test, y_pred)}")
+print(f"Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}")
+
+# 7. Feature importance (coefficients)
+model = pipeline.named_steps['model']
+coef_df = pd.DataFrame({
+    'Feature': feature_names,
+    'Coefficient': model.coef_[0]
+}).sort_values('Coefficient', key=abs, ascending=False)
+print(f"\nTop 5 Features:\n{coef_df.head()}")
+```
+
+> **Interview Tip:** Always use a **Pipeline** to prevent data leakage. Use **stratify** in train_test_split for classification to preserve class distribution.
 
 ---
 
@@ -531,7 +625,76 @@ plot_learning_curve(model, X, y)
 
 **Implement feature extraction from text using Scikit-Learn's CountVectorizer or TfidfVectorizer.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+
+corpus = [
+    "Machine learning is great",
+    "Deep learning is a subset of machine learning",
+    "Natural language processing uses machine learning",
+    "Deep learning models are powerful"
+]
+
+# === CountVectorizer: Bag of Words ===
+count_vec = CountVectorizer(
+    max_features=100,        # Keep top 100 words
+    stop_words='english',    # Remove common words
+    ngram_range=(1, 2),      # Unigrams + bigrams
+    min_df=2,                # Appear in at least 2 docs
+    max_df=0.9               # Appear in at most 90% of docs
+)
+
+X_count = count_vec.fit_transform(corpus)  # Sparse matrix
+print(f"Shape: {X_count.shape}")           # (4, num_features)
+print(f"Feature names: {count_vec.get_feature_names_out()}")
+print(f"Dense:\n{X_count.toarray()}")
+
+# === TfidfVectorizer: TF-IDF (preferred for ML) ===
+tfidf_vec = TfidfVectorizer(
+    max_features=100,
+    stop_words='english',
+    ngram_range=(1, 2),
+    sublinear_tf=True,       # Use 1 + log(tf) instead of tf
+    norm='l2'                # L2 normalize rows
+)
+
+X_tfidf = tfidf_vec.fit_transform(corpus)
+print(f"\nTF-IDF Shape: {X_tfidf.shape}")
+print(f"TF-IDF Dense:\n{X_tfidf.toarray().round(3)}")
+
+# === Full Text Classification Pipeline ===
+from sklearn.pipeline import Pipeline
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import cross_val_score
+
+text_pipeline = Pipeline([
+    ('tfidf', TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
+    ('classifier', MultinomialNB())
+])
+
+# Assuming texts and labels
+# scores = cross_val_score(text_pipeline, texts, labels, cv=5, scoring='f1')
+
+# === Custom tokenization ===
+import re
+def custom_tokenizer(text):
+    text = text.lower()
+    text = re.sub(r'[^a-zA-Z]', ' ', text)
+    return text.split()
+
+vec = TfidfVectorizer(tokenizer=custom_tokenizer)
+```
+
+| Feature | CountVectorizer | TfidfVectorizer |
+|---------|----------------|------------------|
+| Output | Raw word counts | TF-IDF weights |
+| Value range | Integers (0, 1, 2...) | Floats [0, 1] |
+| Common words | High values | Downweighted |
+| Best for | Short texts, Naive Bayes | General text classification |
+
+> **Interview Tip:** **TfidfVectorizer** is generally preferred over CountVectorizer because it downweights common words. Use `sublinear_tf=True` for better performance and `ngram_range=(1, 2)` to capture phrases.
 
 ---
 
@@ -539,7 +702,61 @@ plot_learning_curve(model, X, y)
 
 **Normalize a given dataset using Scikit-Learn's preprocessing module, then train and test a Naive Bayes classifier.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, classification_report
+
+# 1. Load data
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# 2. Split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# === Option A: MinMaxScaler + MultinomialNB ===
+# MultinomialNB requires non-negative values
+pipeline_mnb = Pipeline([
+    ('scaler', MinMaxScaler()),        # Scale to [0, 1]
+    ('classifier', MultinomialNB())
+])
+pipeline_mnb.fit(X_train, y_train)
+y_pred_mnb = pipeline_mnb.predict(X_test)
+print(f"MultinomialNB Accuracy: {accuracy_score(y_test, y_pred_mnb):.3f}")
+
+# === Option B: StandardScaler + GaussianNB ===
+pipeline_gnb = Pipeline([
+    ('scaler', StandardScaler()),      # Z-score normalization
+    ('classifier', GaussianNB())
+])
+pipeline_gnb.fit(X_train, y_train)
+y_pred_gnb = pipeline_gnb.predict(X_test)
+print(f"GaussianNB Accuracy: {accuracy_score(y_test, y_pred_gnb):.3f}")
+
+# 3. Detailed evaluation
+print("\nGaussianNB Report:")
+print(classification_report(y_test, y_pred_gnb, target_names=iris.target_names))
+
+# 4. Predict probabilities
+y_prob = pipeline_gnb.predict_proba(X_test)
+print(f"Confidence for first sample: {y_prob[0].round(3)}")
+```
+
+| NB Variant | Assumes | Normalization | Use Case |
+|-----------|---------|---------------|---------|
+| GaussianNB | Gaussian features | StandardScaler | Continuous |
+| MultinomialNB | Count-like features | MinMaxScaler (≥0) | Text, counts |
+| BernoulliNB | Binary features | Binarizer | Binary features |
+
+> **Interview Tip:** **GaussianNB** doesn't technically need scaling (it fits mean/variance per feature), but scaling helps when combined in pipelines. **MultinomialNB** requires non-negative inputs, so use `MinMaxScaler`.
 
 ---
 
@@ -547,7 +764,70 @@ plot_learning_curve(model, X, y)
 
 **Use Scikit-Learn to visualize the decision boundary of a SVM with a non-linear kernel.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.svm import SVC
+from sklearn.datasets import make_moons
+from sklearn.preprocessing import StandardScaler
+
+# 1. Generate non-linear data
+X, y = make_moons(n_samples=300, noise=0.2, random_state=42)
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# 2. Train SVM with RBF kernel
+svm = SVC(kernel='rbf', C=1.0, gamma='scale')
+svm.fit(X, y)
+
+# 3. Visualize decision boundary
+def plot_decision_boundary(model, X, y, title=""):
+    h = 0.02  # Step size
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    
+    plt.figure(figsize=(8, 6))
+    plt.contourf(xx, yy, Z, alpha=0.3, cmap='RdYlBu')
+    plt.contour(xx, yy, Z, colors='k', linewidths=0.5)
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap='RdYlBu', edgecolors='k', s=50)
+    
+    # Highlight support vectors
+    sv = model.support_vectors_
+    plt.scatter(sv[:, 0], sv[:, 1], s=200, facecolors='none',
+                edgecolors='black', linewidths=2, label='Support Vectors')
+    
+    plt.title(title)
+    plt.legend()
+    plt.show()
+
+plot_decision_boundary(svm, X, y, title='SVM with RBF Kernel')
+
+# 4. Compare kernels
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+for ax, kernel in zip(axes, ['linear', 'poly', 'rbf']):
+    model = SVC(kernel=kernel, C=1.0, degree=3)
+    model.fit(X, y)
+    ax.set_title(f'{kernel.upper()} kernel (acc={model.score(X,y):.2f})')
+    # Plot on each axis...
+plt.tight_layout()
+plt.show()
+```
+
+| Kernel | Use Case | Key Parameter |
+|--------|----------|---------------|
+| `linear` | Linearly separable | `C` |
+| `poly` | Polynomial boundaries | `C`, `degree` |
+| `rbf` | Complex, non-linear | `C`, `gamma` |
+| `sigmoid` | Neural network-like | `C`, `gamma` |
+
+> **Interview Tip:** `meshgrid` + `predict` on the grid creates the decision surface. `gamma` controls the RBF’s influence radius — low gamma = smoother boundary, high gamma = complex/overfitting.
 
 ---
 
@@ -555,7 +835,61 @@ plot_learning_curve(model, X, y)
 
 **Implement dimensionality reduction using PCA with Scikit-Learn and visualize the result.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_iris
+
+# 1. Load and scale data
+iris = load_iris()
+X = StandardScaler().fit_transform(iris.data)  # Always scale before PCA
+y = iris.target
+
+# 2. Apply PCA — reduce from 4D to 2D
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+
+print(f"Original shape: {iris.data.shape}")       # (150, 4)
+print(f"Reduced shape: {X_pca.shape}")             # (150, 2)
+print(f"Explained variance ratio: {pca.explained_variance_ratio_}")  # [0.729, 0.228]
+print(f"Total variance explained: {sum(pca.explained_variance_ratio_):.1%}")  # 95.8%
+
+# 3. Visualize 2D projection
+plt.figure(figsize=(8, 6))
+scatter = plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y,
+                      cmap='viridis', edgecolors='k', s=50)
+plt.colorbar(scatter, label='Class')
+plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} variance)')
+plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%} variance)')
+plt.title('PCA: Iris Dataset (4D → 2D)')
+plt.legend(handles=scatter.legend_elements()[0],
+           labels=iris.target_names.tolist())
+plt.show()
+
+# 4. Scree plot — choose number of components
+pca_full = PCA().fit(X)
+plt.figure(figsize=(8, 4))
+plt.bar(range(1, 5), pca_full.explained_variance_ratio_, alpha=0.7, label='Individual')
+plt.step(range(1, 5), np.cumsum(pca_full.explained_variance_ratio_),
+         where='mid', label='Cumulative')
+plt.axhline(y=0.95, color='r', linestyle='--', label='95% threshold')
+plt.xlabel('Principal Component')
+plt.ylabel('Explained Variance Ratio')
+plt.title('Scree Plot')
+plt.legend()
+plt.show()
+
+# 5. PCA with threshold
+pca_95 = PCA(n_components=0.95)  # Keep components for 95% variance
+X_reduced = pca_95.fit_transform(X)
+print(f"Components needed for 95% variance: {pca_95.n_components_}")
+```
+
+> **Interview Tip:** Always **StandardScaler** before PCA (PCA is sensitive to scale). Use the **scree plot** to choose components. `n_components=0.95` automatically selects enough components for 95% variance.
 
 ---
 
@@ -563,7 +897,79 @@ plot_learning_curve(model, X, y)
 
 **Create a clustering analysis on a dataset using Scikit-Learn's DBSCAN method.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import make_moons, make_blobs
+from sklearn.metrics import silhouette_score
+
+# 1. Generate non-linear data (DBSCAN excels here)
+X, y_true = make_moons(n_samples=300, noise=0.1, random_state=42)
+X = StandardScaler().fit_transform(X)
+
+# 2. Apply DBSCAN
+dbscan = DBSCAN(
+    eps=0.3,          # Maximum distance between neighbors
+    min_samples=5,    # Minimum points to form a cluster
+    metric='euclidean'
+)
+labels = dbscan.fit_predict(X)
+
+# 3. Analyze results
+n_clusters = len(set(labels) - {-1})    # Exclude noise label (-1)
+n_noise = list(labels).count(-1)
+print(f"Clusters found: {n_clusters}")
+print(f"Noise points: {n_noise} ({n_noise/len(X):.1%})")
+
+# Silhouette score (exclude noise)
+mask = labels != -1
+if len(set(labels[mask])) > 1:
+    sil = silhouette_score(X[mask], labels[mask])
+    print(f"Silhouette Score: {sil:.3f}")
+
+# 4. Visualize
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='tab10',
+                      edgecolors='k', s=50)
+noise_mask = labels == -1
+plt.scatter(X[noise_mask, 0], X[noise_mask, 1], c='red', marker='x',
+            s=100, label=f'Noise ({n_noise})', linewidths=2)
+plt.title(f'DBSCAN: {n_clusters} clusters, eps={0.3}, min_samples={5}')
+plt.legend()
+plt.show()
+
+# 5. Tune eps with k-distance plot
+from sklearn.neighbors import NearestNeighbors
+neighbors = NearestNeighbors(n_neighbors=5)
+neighbors.fit(X)
+distances, _ = neighbors.kneighbors(X)
+distances = np.sort(distances[:, -1])  # k-th nearest neighbor distance
+
+plt.figure(figsize=(8, 4))
+plt.plot(distances)
+plt.xlabel('Points (sorted)')
+plt.ylabel(f'{5}-th nearest neighbor distance')
+plt.title('K-Distance Plot (elbow = optimal eps)')
+plt.show()
+```
+
+| Parameter | Effect | How to Choose |
+|-----------|--------|---------------|
+| `eps` | Neighborhood radius | K-distance elbow plot |
+| `min_samples` | Min cluster density | Rule of thumb: 2 × dimensions |
+
+| DBSCAN vs K-Means | DBSCAN | K-Means |
+|-------------------|--------|---------|
+| Shape | Arbitrary | Spherical |
+| Num clusters | Automatic | Must specify k |
+| Outliers | Detected as noise | Assigned to clusters |
+| Scalability | O(n²) or O(n log n) | O(nk) |
+
+> **Interview Tip:** DBSCAN is ideal for **non-spherical clusters** and **outlier detection**. Use the **k-distance plot** to find optimal `eps` value (look for the elbow).
 
 ---
 
@@ -571,4 +977,67 @@ plot_learning_curve(model, X, y)
 
 **How do you save a trained Scikit-Learn model to disk and load it back for later use?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import joblib
+import pickle
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+# Train a model
+model = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', RandomForestClassifier(n_estimators=100, random_state=42))
+])
+model.fit(X_train, y_train)
+
+# === Method 1: joblib (RECOMMENDED for Scikit-Learn) ===
+# Save
+joblib.dump(model, 'model.joblib')
+
+# Save compressed (smaller file)
+joblib.dump(model, 'model.joblib.gz', compress=3)
+
+# Load
+loaded_model = joblib.load('model.joblib')
+y_pred = loaded_model.predict(X_test)
+
+# === Method 2: pickle ===
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+with open('model.pkl', 'rb') as f:
+    loaded_model = pickle.load(f)
+
+# === Method 3: ONNX (cross-platform deployment) ===
+# pip install skl2onnx onnxruntime
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
+initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
+onnx_model = convert_sklearn(model, initial_types=initial_type)
+with open('model.onnx', 'wb') as f:
+    f.write(onnx_model.SerializeToString())
+
+# === Best Practices ===
+# Save metadata alongside model
+import json
+metadata = {
+    'sklearn_version': '1.3.0',
+    'features': list(feature_names),
+    'target': 'label',
+    'accuracy': 0.95,
+    'training_date': '2024-01-15'
+}
+joblib.dump({'model': model, 'metadata': metadata}, 'model_with_meta.joblib')
+```
+
+| Method | Speed | Size | Cross-platform | Best For |
+|--------|-------|------|----------------|----------|
+| joblib | Fastest | Compact | Python only | Development, Scikit-Learn |
+| pickle | Fast | Larger | Python only | General Python objects |
+| ONNX | N/A | Small | Yes (any lang) | Production deployment |
+
+> **Interview Tip:** Always save the **Scikit-Learn version** with the model — models may be incompatible across versions. Use `joblib` for Scikit-Learn (optimized for large NumPy arrays). For production, convert to **ONNX** for language-agnostic deployment.

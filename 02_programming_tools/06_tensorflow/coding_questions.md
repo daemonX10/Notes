@@ -612,7 +612,44 @@ model.compile(
 
 **Write a TensorFlow code to create two Tensors and perform element-wise multiplication.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+
+# Create tensors
+a = tf.constant([1, 2, 3, 4, 5], dtype=tf.float32)
+b = tf.constant([10, 20, 30, 40, 50], dtype=tf.float32)
+
+# Element-wise multiplication
+result1 = a * b                        # Operator overload
+result2 = tf.multiply(a, b)            # Explicit function
+result3 = tf.math.multiply(a, b)       # Math module
+
+print(result1)  # tf.Tensor([10. 40. 90. 160. 250.], shape=(5,), dtype=float32)
+
+# 2D tensors
+A = tf.constant([[1, 2], [3, 4]], dtype=tf.float32)
+B = tf.constant([[5, 6], [7, 8]], dtype=tf.float32)
+
+elem_mul = A * B    # Element-wise: [[5, 12], [21, 32]]
+mat_mul = A @ B     # Matrix multiplication: [[19, 22], [43, 50]]
+mat_mul2 = tf.matmul(A, B)  # Same as @
+
+# Broadcasting
+scalar = tf.constant(3.0)
+result = a * scalar  # [3, 6, 9, 12, 15]
+
+# Different shapes with broadcasting
+matrix = tf.constant([[1, 2, 3]], dtype=tf.float32)  # (1, 3)
+vector = tf.constant([[10], [20]], dtype=tf.float32) # (2, 1)
+broadcast_result = matrix * vector  # (2, 3)
+print(broadcast_result)
+# [[10, 20, 30],
+#  [20, 40, 60]]
+```
+
+> **Interview Tip:** `*` is element-wise, `@` or `tf.matmul` is matrix multiplication. Broadcasting rules in TensorFlow follow NumPy conventions.
 
 ---
 
@@ -620,7 +657,70 @@ model.compile(
 
 **Implement logistic regression using TensorFlow.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+import numpy as np
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# 1. Load & prepare data
+data = load_breast_cancer()
+X_train, X_test, y_train, y_test = train_test_split(
+    data.data, data.target, test_size=0.2, random_state=42
+)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train).astype(np.float32)
+X_test = scaler.transform(X_test).astype(np.float32)
+y_train = y_train.astype(np.float32)
+y_test = y_test.astype(np.float32)
+
+# === Method 1: From Scratch with GradientTape ===
+n_features = X_train.shape[1]
+W = tf.Variable(tf.zeros([n_features, 1]))
+b = tf.Variable(tf.zeros([1]))
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+
+def logistic_regression(X):
+    z = tf.matmul(X, W) + b
+    return tf.sigmoid(z)
+
+def compute_loss(y_true, y_pred):
+    y_true = tf.reshape(y_true, [-1, 1])
+    return -tf.reduce_mean(
+        y_true * tf.math.log(y_pred + 1e-7) +
+        (1 - y_true) * tf.math.log(1 - y_pred + 1e-7)
+    )
+
+# Training loop
+for epoch in range(100):
+    with tf.GradientTape() as tape:
+        y_pred = logistic_regression(X_train)
+        loss = compute_loss(y_train, y_pred)
+    gradients = tape.gradient(loss, [W, b])
+    optimizer.apply_gradients(zip(gradients, [W, b]))
+    if (epoch + 1) % 20 == 0:
+        print(f"Epoch {epoch+1}, Loss: {loss:.4f}")
+
+# Evaluate
+y_pred_test = logistic_regression(X_test)
+accuracy = tf.reduce_mean(
+    tf.cast(tf.equal(tf.round(y_pred_test[:, 0]), y_test), tf.float32)
+)
+print(f"Test Accuracy: {accuracy:.4f}")
+
+# === Method 2: Keras API (simpler) ===
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(1, activation='sigmoid', input_shape=(n_features,))
+])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.fit(X_train, y_train, epochs=100, batch_size=32, verbose=0)
+print(f"Keras Accuracy: {model.evaluate(X_test, y_test, verbose=0)[1]:.4f}")
+```
+
+> **Interview Tip:** Method 1 shows understanding of the math; Method 2 shows practical skills. Logistic regression in TF is a single Dense layer with sigmoid activation.
 
 ---
 
@@ -628,7 +728,70 @@ model.compile(
 
 **Write a TensorFlow script to normalize the features of a dataset.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+import numpy as np
+
+# Sample data
+data = np.array([
+    [100, 0.5, 1000],
+    [200, 0.8, 2000],
+    [150, 0.3, 1500],
+    [300, 0.9, 3000]
+], dtype=np.float32)
+
+# === Method 1: Manual Min-Max Normalization ===
+def min_max_normalize(tensor):
+    min_vals = tf.reduce_min(tensor, axis=0)
+    max_vals = tf.reduce_max(tensor, axis=0)
+    return (tensor - min_vals) / (max_vals - min_vals + 1e-8)
+
+normalized = min_max_normalize(data)
+print("Min-Max Normalized:\n", normalized.numpy())
+
+# === Method 2: Manual Z-Score Standardization ===
+def standardize(tensor):
+    mean = tf.reduce_mean(tensor, axis=0)
+    std = tf.math.reduce_std(tensor, axis=0)
+    return (tensor - mean) / (std + 1e-8)
+
+standardized = standardize(data)
+print("Standardized:\n", standardized.numpy())
+
+# === Method 3: Keras Normalization Layer (Recommended) ===
+normalizer = tf.keras.layers.Normalization(axis=-1)
+normalizer.adapt(data)  # Computes mean and std from data
+normalized_keras = normalizer(data)
+
+# In a model pipeline
+model = tf.keras.Sequential([
+    tf.keras.layers.Normalization(axis=-1),  # Auto-normalize
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1)
+])
+model.layers[0].adapt(X_train)  # Fit on training data only
+
+# === Method 4: tf.data pipeline normalization ===
+def normalize_fn(features, labels):
+    mean = tf.constant([175.0, 0.625, 1875.0])  # Precomputed
+    std = tf.constant([70.7, 0.234, 707.1])
+    features = (features - mean) / std
+    return features, labels
+
+dataset = tf.data.Dataset.from_tensor_slices((data, labels))
+dataset = dataset.map(normalize_fn).batch(32)
+```
+
+| Method | Use Case | Advantage |
+|--------|----------|----------|
+| Manual Min-Max | Custom range [0,1] | Full control |
+| Manual Z-Score | Standard distribution | Mathematical transparency |
+| `Normalization` layer | Keras models | Integrated in model, no leakage |
+| `tf.data.map()` | Data pipeline | Efficient, on-the-fly |
+
+> **Interview Tip:** Use the **Keras Normalization layer** in production — it stores mean/std in the model, preventing train/test leakage and simplifying deployment.
 
 ---
 
@@ -636,7 +799,74 @@ model.compile(
 
 **Write a Python function using TensorFlow to compute the gradient of a given function.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+
+# === 1. Basic Gradient Computation ===
+x = tf.Variable(3.0)
+
+with tf.GradientTape() as tape:
+    y = x ** 2 + 2 * x + 1  # y = x² + 2x + 1
+
+dy_dx = tape.gradient(y, x)  # dy/dx = 2x + 2 = 8.0
+print(f"dy/dx at x=3: {dy_dx.numpy()}")  # 8.0
+
+# === 2. Multiple Variables ===
+w = tf.Variable(2.0)
+b = tf.Variable(1.0)
+
+with tf.GradientTape() as tape:
+    y = w * 5.0 + b     # y = 5w + b
+
+grads = tape.gradient(y, [w, b])
+print(f"dy/dw: {grads[0].numpy()}")  # 5.0
+print(f"dy/db: {grads[1].numpy()}")  # 1.0
+
+# === 3. Higher-Order Gradients ===
+x = tf.Variable(3.0)
+
+with tf.GradientTape() as outer:
+    with tf.GradientTape() as inner:
+        y = x ** 3       # y = x³
+    dy_dx = inner.gradient(y, x)   # dy/dx = 3x² = 27
+d2y_dx2 = outer.gradient(dy_dx, x)  # d²y/dx² = 6x = 18
+print(f"Second derivative: {d2y_dx2.numpy()}")  # 18.0
+
+# === 4. Gradient Function (Reusable) ===
+def compute_gradient(func, x_val):
+    """Compute gradient of func at x_val."""
+    x = tf.Variable(float(x_val))
+    with tf.GradientTape() as tape:
+        y = func(x)
+    return tape.gradient(y, x).numpy()
+
+# Usage
+print(compute_gradient(lambda x: tf.sin(x), 0.0))         # 1.0 (cos(0))
+print(compute_gradient(lambda x: tf.exp(x), 1.0))         # 2.718 (e¹)
+print(compute_gradient(lambda x: x**3 - 2*x + 1, 2.0))    # 10.0
+
+# === 5. Persistent Tape (use gradient multiple times) ===
+x = tf.Variable(3.0)
+
+with tf.GradientTape(persistent=True) as tape:
+    y = x ** 2
+    z = x ** 3
+
+dy_dx = tape.gradient(y, x)  # 6.0
+dz_dx = tape.gradient(z, x)  # 27.0
+del tape  # Must delete persistent tape
+```
+
+| Feature | Description |
+|---------|------------|
+| `GradientTape()` | Records operations for auto-differentiation |
+| `persistent=True` | Allow multiple `.gradient()` calls |
+| `tape.watch(tensor)` | Track non-Variable tensors |
+| Nested tapes | Higher-order derivatives |
+
+> **Interview Tip:** `GradientTape` is TensorFlow's automatic differentiation engine. It's used in custom training loops. The tape is consumed after one `.gradient()` call unless `persistent=True`.
 
 ---
 
@@ -644,7 +874,64 @@ model.compile(
 
 **Develop a code to save and load a trained TensorFlow model.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+
+# Build and train a model
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation='relu', input_shape=(10,)),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# model.fit(X_train, y_train, epochs=10)
+
+# === Method 1: SavedModel Format (Recommended) ===
+model.save('saved_model/my_model')       # Directory
+loaded = tf.keras.models.load_model('saved_model/my_model')
+
+# === Method 2: HDF5 (.h5) Format ===
+model.save('my_model.h5')
+loaded = tf.keras.models.load_model('my_model.h5')
+
+# === Method 3: Weights Only ===
+model.save_weights('weights/my_weights')  # Save weights
+model.load_weights('weights/my_weights')  # Load into same architecture
+
+# === Method 4: Checkpoints During Training ===
+checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
+    'checkpoints/model_{epoch:02d}_{val_loss:.4f}.h5',
+    save_best_only=True,
+    monitor='val_loss',
+    mode='min'
+)
+# model.fit(X_train, y_train, callbacks=[checkpoint_cb], validation_split=0.2)
+
+# === Method 5: TFLite (for deployment) ===
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+# === Method 6: Export with custom signature ===
+@tf.function(input_signature=[tf.TensorSpec(shape=[None, 10], dtype=tf.float32)])
+def serve(x):
+    return model(x, training=False)
+
+tf.saved_model.save(model, 'export/', signatures={'serving_default': serve})
+```
+
+| Format | Saves | Size | Use Case |
+|--------|-------|------|----------|
+| SavedModel | Everything (graph+weights+optimizer) | Largest | Full reproducibility |
+| HDF5 (.h5) | Architecture+weights+optimizer | Medium | Quick save/share |
+| Weights only | Just weights | Smallest | Same architecture transfer |
+| TFLite | Optimized inference graph | Smallest | Mobile/edge |
+| Checkpoint | Weights at intervals | Medium | Training recovery |
+
+> **Interview Tip:** Use **SavedModel** for production (includes computation graph). Use **checkpoints** during training to recover from crashes. Use **TFLite** for mobile deployment.
 
 ---
 
@@ -652,7 +939,74 @@ model.compile(
 
 **Code a TensorFlow program that uses dataset shuffling, repetition, and batching.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+import numpy as np
+
+# Create sample data
+X = np.arange(20).reshape(10, 2).astype(np.float32)
+y = np.array([0, 1, 0, 1, 0, 1, 0, 1, 0, 1])
+
+# === Complete Pipeline ===
+dataset = tf.data.Dataset.from_tensor_slices((X, y))
+
+train_ds = (
+    dataset
+    .shuffle(buffer_size=10, seed=42)     # Randomize order
+    .repeat(3)                            # Repeat dataset 3 times (3 epochs)
+    .batch(4)                             # Group into batches of 4
+    .prefetch(tf.data.AUTOTUNE)           # Overlap data prep with training
+)
+
+# Iterate and inspect
+for i, (batch_x, batch_y) in enumerate(train_ds):
+    print(f"Batch {i}: X shape={batch_x.shape}, y={batch_y.numpy()}")
+
+# === Order Matters! ===
+# Correct: shuffle -> repeat -> batch (different shuffle each epoch)
+correct = dataset.shuffle(10).repeat(3).batch(4)
+
+# Also valid: repeat -> shuffle -> batch (shuffles across epoch boundaries)
+alternative = dataset.repeat(3).shuffle(10).batch(4)
+
+# === Advanced Pipeline with Augmentation ===
+def augment(features, label):
+    features = features + tf.random.normal(tf.shape(features), stddev=0.01)
+    return features, label
+
+train_ds = (
+    dataset
+    .cache()                              # Cache in memory after first read
+    .shuffle(buffer_size=len(X))          # Full shuffle
+    .batch(4)
+    .map(augment, num_parallel_calls=tf.data.AUTOTUNE)  # Parallel augmentation
+    .prefetch(tf.data.AUTOTUNE)
+)
+
+# === Without repeat (use epochs in model.fit) ===
+# Better approach: let fit() handle epochs
+train_ds = dataset.shuffle(10).batch(4).prefetch(tf.data.AUTOTUNE)
+# model.fit(train_ds, epochs=3)  # 3 epochs handled by fit()
+
+# === Reading from files ===
+file_ds = tf.data.Dataset.list_files('data/*.csv')
+parsed_ds = file_ds.interleave(
+    lambda f: tf.data.TextLineDataset(f).skip(1),
+    num_parallel_calls=tf.data.AUTOTUNE
+).shuffle(1000).batch(32).prefetch(tf.data.AUTOTUNE)
+```
+
+| Operation | Purpose | Key Parameter |
+|-----------|---------|---------------|
+| `.shuffle(N)` | Randomize samples | `buffer_size` (larger = better shuffle) |
+| `.repeat(N)` | Repeat dataset | `N` (None = infinite) |
+| `.batch(N)` | Create mini-batches | Batch size |
+| `.prefetch(N)` | Overlap CPU/GPU | `AUTOTUNE` (auto-optimal) |
+| `.cache()` | Cache processed data | After decode, before augment |
+
+> **Interview Tip:** The standard pipeline order is: `cache -> shuffle -> batch -> map (augmentation) -> prefetch`. Place `cache()` before random augmentations so cached data gets different augmentations each epoch. Use `shuffle -> repeat` (not `repeat -> shuffle`) for better randomness across epochs.
 
 ---
 
@@ -660,4 +1014,111 @@ model.compile(
 
 **How would you implement attention mechanisms in TensorFlow?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import tensorflow as tf
+from tensorflow.keras import layers
+import numpy as np
+
+# === 1. Scaled Dot-Product Attention (Core) ===
+def scaled_dot_product_attention(Q, K, V, mask=None):
+    """Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) * V"""
+    d_k = tf.cast(tf.shape(K)[-1], tf.float32)
+    scores = tf.matmul(Q, K, transpose_b=True) / tf.sqrt(d_k)
+    
+    if mask is not None:
+        scores += (mask * -1e9)  # Mask positions with large negative
+    
+    weights = tf.nn.softmax(scores, axis=-1)
+    output = tf.matmul(weights, V)
+    return output, weights
+
+# Test
+Q = tf.random.normal((1, 4, 64))  # (batch, seq_len, d_k)
+K = tf.random.normal((1, 4, 64))
+V = tf.random.normal((1, 4, 64))
+output, weights = scaled_dot_product_attention(Q, K, V)
+print(f"Output: {output.shape}, Weights: {weights.shape}")
+
+# === 2. Multi-Head Attention (from scratch) ===
+class MultiHeadAttention(layers.Layer):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        self.num_heads = num_heads
+        self.d_model = d_model
+        assert d_model % num_heads == 0
+        self.depth = d_model // num_heads
+        
+        self.wq = layers.Dense(d_model)
+        self.wk = layers.Dense(d_model)
+        self.wv = layers.Dense(d_model)
+        self.dense = layers.Dense(d_model)
+    
+    def split_heads(self, x, batch_size):
+        x = tf.reshape(x, (batch_size, -1, self.num_heads, self.depth))
+        return tf.transpose(x, perm=[0, 2, 1, 3])  # (batch, heads, seq, depth)
+    
+    def call(self, q, k, v, mask=None):
+        batch_size = tf.shape(q)[0]
+        q = self.split_heads(self.wq(q), batch_size)
+        k = self.split_heads(self.wk(k), batch_size)
+        v = self.split_heads(self.wv(v), batch_size)
+        
+        attention, weights = scaled_dot_product_attention(q, k, v, mask)
+        attention = tf.transpose(attention, perm=[0, 2, 1, 3])
+        concatenated = tf.reshape(attention, (batch_size, -1, self.d_model))
+        return self.dense(concatenated)
+
+# === 3. Using Built-in Keras Layer (Production) ===
+attention_layer = layers.MultiHeadAttention(num_heads=8, key_dim=64)
+
+inputs = layers.Input(shape=(100, 256))  # (seq_len, embed_dim)
+attn_output = attention_layer(inputs, inputs)  # Self-attention (Q=K=V)
+output = layers.LayerNormalization()(inputs + attn_output)  # Residual + norm
+
+# === 4. Bahdanau (Additive) Attention ===
+class BahdanauAttention(layers.Layer):
+    def __init__(self, units):
+        super().__init__()
+        self.W1 = layers.Dense(units)
+        self.W2 = layers.Dense(units)
+        self.V = layers.Dense(1)
+    
+    def call(self, query, values):
+        # query: (batch, hidden), values: (batch, seq_len, hidden)
+        query_expanded = tf.expand_dims(query, 1)
+        score = self.V(tf.nn.tanh(self.W1(query_expanded) + self.W2(values)))
+        weights = tf.nn.softmax(score, axis=1)
+        context = tf.reduce_sum(weights * values, axis=1)
+        return context, weights
+
+# === 5. Transformer Block ===
+class TransformerBlock(layers.Layer):
+    def __init__(self, d_model, num_heads, ff_dim, dropout=0.1):
+        super().__init__()
+        self.attn = layers.MultiHeadAttention(num_heads=num_heads, key_dim=d_model)
+        self.ffn = tf.keras.Sequential([
+            layers.Dense(ff_dim, activation='relu'),
+            layers.Dense(d_model)
+        ])
+        self.norm1 = layers.LayerNormalization()
+        self.norm2 = layers.LayerNormalization()
+        self.drop1 = layers.Dropout(dropout)
+        self.drop2 = layers.Dropout(dropout)
+    
+    def call(self, x, training=False):
+        attn_out = self.attn(x, x)                   # Self-attention
+        x = self.norm1(x + self.drop1(attn_out, training=training))
+        ffn_out = self.ffn(x)
+        return self.norm2(x + self.drop2(ffn_out, training=training))
+```
+
+| Attention Type | Formula | Use Case |
+|---------------|---------|----------|
+| Scaled Dot-Product | $\text{softmax}(QK^T / \sqrt{d_k}) \cdot V$ | Transformer core |
+| Multi-Head | Parallel dot-product heads | Modern NLP/Vision |
+| Bahdanau (Additive) | $V^T \tanh(W_1Q + W_2K)$ | Seq2Seq translation |
+| Luong (Multiplicative) | $Q^T W K$ | Simpler Seq2Seq |
+
+> **Interview Tip:** Multi-head attention lets the model attend to different representation subspaces simultaneously. Self-attention (Q=K=V from same input) captures intra-sequence relationships; cross-attention (Q from decoder, K/V from encoder) is used in translation tasks.

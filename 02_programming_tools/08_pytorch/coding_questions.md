@@ -901,7 +901,79 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **How do you implement custom layers in PyTorch?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+Custom layers in PyTorch extend `nn.Module` with learnable parameters and a `forward()` method.
+
+```python
+import torch
+import torch.nn as nn
+
+# === Basic Custom Layer ===
+class LinearLayer(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        # nn.Parameter makes tensors trainable
+        self.weight = nn.Parameter(torch.randn(in_features, out_features))
+        self.bias = nn.Parameter(torch.zeros(out_features))
+    
+    def forward(self, x):
+        return x @ self.weight + self.bias
+
+# === Custom Layer with Existing Layers ===
+class ResidualBlock(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Linear(channels, channels),
+            nn.BatchNorm1d(channels),
+            nn.ReLU(),
+            nn.Linear(channels, channels),
+            nn.BatchNorm1d(channels)
+        )
+        self.relu = nn.ReLU()
+    
+    def forward(self, x):
+        residual = x
+        out = self.block(x)
+        return self.relu(out + residual)  # Skip connection
+
+# === Attention Layer ===
+class SelfAttention(nn.Module):
+    def __init__(self, embed_dim):
+        super().__init__()
+        self.query = nn.Linear(embed_dim, embed_dim)
+        self.key = nn.Linear(embed_dim, embed_dim)
+        self.value = nn.Linear(embed_dim, embed_dim)
+        self.scale = embed_dim ** 0.5
+    
+    def forward(self, x):
+        Q, K, V = self.query(x), self.key(x), self.value(x)
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / self.scale
+        weights = torch.softmax(scores, dim=-1)
+        return torch.matmul(weights, V)
+
+# === Usage ===
+model = nn.Sequential(
+    LinearLayer(784, 128),
+    nn.ReLU(),
+    ResidualBlock(128),
+    nn.Linear(128, 10)
+)
+
+x = torch.randn(32, 784)
+output = model(x)
+print(output.shape)  # torch.Size([32, 10])
+```
+
+| Component | Purpose |
+|-----------|--------|
+| `nn.Module` | Base class for all layers/models |
+| `nn.Parameter` | Registers tensor as trainable parameter |
+| `forward()` | Defines computation |
+| `__init__()` | Define sub-layers and parameters |
+
+> **Interview Tip:** Every custom layer must call `super().__init__()`. Use `nn.Parameter` for learnable weights; plain tensors won't be updated by the optimizer.
 
 ---
 
@@ -909,7 +981,72 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **How can you implement learning rate scheduling in PyTorch?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+model = nn.Linear(10, 1)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+# === 1. StepLR: Decay every N epochs ===
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+# LR: 0.01 -> 0.005 (epoch 10) -> 0.0025 (epoch 20)
+
+# === 2. ExponentialLR ===
+scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+# LR *= 0.95 each epoch
+
+# === 3. CosineAnnealingLR ===
+scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-6)
+# Cosine decay to eta_min over T_max epochs
+
+# === 4. ReduceLROnPlateau (most practical) ===
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer, mode='min', factor=0.5, patience=5, min_lr=1e-7
+)
+
+# === 5. OneCycleLR (best for training from scratch) ===
+scheduler = optim.lr_scheduler.OneCycleLR(
+    optimizer, max_lr=0.01, total_steps=num_epochs * len(train_loader)
+)
+
+# === 6. Warmup + Decay (Custom) ===
+def warmup_lambda(epoch):
+    warmup_epochs = 5
+    if epoch < warmup_epochs:
+        return epoch / warmup_epochs  # Linear warmup
+    return 0.5 * (1 + torch.cos(torch.tensor((epoch - warmup_epochs) / 45 * 3.14159)))
+
+scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=warmup_lambda)
+
+# === Training Loop ===
+for epoch in range(num_epochs):
+    for batch in train_loader:
+        optimizer.zero_grad()
+        loss = criterion(model(batch[0]), batch[1])
+        loss.backward()
+        optimizer.step()
+        # For OneCycleLR: scheduler.step() HERE (per batch)
+    
+    # For most schedulers: step per epoch
+    scheduler.step()  # StepLR, ExponentialLR, CosineAnnealing
+    # scheduler.step(val_loss)  # For ReduceLROnPlateau only
+    
+    print(f"Epoch {epoch}, LR: {optimizer.param_groups[0]['lr']:.6f}")
+```
+
+| Scheduler | Best For | Step When |
+|-----------|----------|----------|
+| StepLR | Simple decay | Per epoch |
+| CosineAnnealing | Training from scratch | Per epoch |
+| ReduceLROnPlateau | Any (adaptive) | Per epoch (pass val_loss) |
+| OneCycleLR | Fast convergence | Per batch |
+| Warmup + Decay | Large models, transformers | Per epoch |
+
+> **Interview Tip:** `OneCycleLR` often gives the best results for training from scratch. For fine-tuning, use `CosineAnnealingLR` or `ReduceLROnPlateau`. Always call `scheduler.step()` **after** `optimizer.step()`.
 
 ---
 
@@ -917,7 +1054,87 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **Explain transfer learning and its implementation in PyTorch.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+Transfer learning uses a model pre-trained on a large dataset and adapts it to a new, smaller dataset.
+
+```python
+import torch
+import torch.nn as nn
+import torchvision.models as models
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
+import torchvision
+
+# === 1. Load Pre-trained Model ===
+model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V2)
+
+# === 2. Freeze All Layers ===
+for param in model.parameters():
+    param.requires_grad = False
+
+# === 3. Replace Classifier Head ===
+num_classes = 10
+model.fc = nn.Sequential(
+    nn.Linear(model.fc.in_features, 256),
+    nn.ReLU(),
+    nn.Dropout(0.5),
+    nn.Linear(256, num_classes)
+)
+# New layers are trainable by default
+
+# === 4. Setup Data ===
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
+
+# === 5. Phase 1: Train Head Only ===
+optimizer = torch.optim.Adam(model.fc.parameters(), lr=1e-3)
+criterion = nn.CrossEntropyLoss()
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = model.to(device)
+
+for epoch in range(5):
+    model.train()
+    for images, labels in train_loader:
+        images, labels = images.to(device), labels.to(device)
+        optimizer.zero_grad()
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+# === 6. Phase 2: Fine-tune Last Layers ===
+# Unfreeze last few layers
+for param in model.layer4.parameters():
+    param.requires_grad = True
+
+optimizer = torch.optim.Adam([
+    {'params': model.layer4.parameters(), 'lr': 1e-5},  # Low LR for pre-trained
+    {'params': model.fc.parameters(), 'lr': 1e-4}       # Higher LR for new layers
+], weight_decay=1e-4)
+
+for epoch in range(10):
+    model.train()
+    for images, labels in train_loader:
+        images, labels = images.to(device), labels.to(device)
+        optimizer.zero_grad()
+        loss = criterion(model(images), labels)
+        loss.backward()
+        optimizer.step()
+```
+
+| Strategy | Freeze | When to Use |
+|----------|--------|-------------|
+| Feature extraction | All base layers | Very small dataset, similar domain |
+| Fine-tuning top layers | Most base layers | Medium dataset |
+| Full fine-tuning | Nothing | Large dataset, different domain |
+
+> **Interview Tip:** PyTorch allows per-parameter-group learning rates in the optimizer—use lower LR for pre-trained layers and higher LR for new layers. Always use ImageNet normalization when using ImageNet-pretrained models.
 
 ---
 
@@ -925,7 +1142,78 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **Code a Python script that demonstrates tensor operations, such as slicing, indexing, concatenating, and transposing, using PyTorch.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import torch
+
+# === Creating Tensors ===
+a = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+b = torch.randn(3, 3)
+print(f"a shape: {a.shape}, dtype: {a.dtype}")
+
+# === Indexing ===
+print(a[0])         # First row: tensor([1, 2, 3])
+print(a[0, 2])      # Element at (0,2): 3
+print(a[:, 1])      # Second column: tensor([2, 5, 8])
+print(a[-1])        # Last row: tensor([7, 8, 9])
+
+# === Slicing ===
+print(a[0:2, 1:3])  # Rows 0-1, Cols 1-2: tensor([[2,3],[5,6]])
+print(a[::2])       # Every other row: tensor([[1,2,3],[7,8,9]])
+
+# === Boolean Indexing ===
+mask = a > 4
+print(a[mask])      # tensor([5, 6, 7, 8, 9])
+
+# === Fancy Indexing ===
+idx = torch.tensor([0, 2])
+print(a[idx])       # Rows 0 and 2
+
+# === Concatenation ===
+x = torch.tensor([[1, 2], [3, 4]])
+y = torch.tensor([[5, 6], [7, 8]])
+
+cat_row = torch.cat([x, y], dim=0)   # Vertical stack: (4, 2)
+cat_col = torch.cat([x, y], dim=1)   # Horizontal stack: (2, 4)
+stacked = torch.stack([x, y], dim=0) # New dimension: (2, 2, 2)
+print(f"cat_row: {cat_row.shape}, cat_col: {cat_col.shape}, stacked: {stacked.shape}")
+
+# === Transposing ===
+t = torch.randn(2, 3, 4)
+print(t.T.shape)                     # Full transpose (reverses all dims)
+print(t.transpose(0, 2).shape)       # Swap dim 0 and 2: (4, 3, 2)
+print(t.permute(2, 0, 1).shape)      # Custom order: (4, 2, 3)
+
+# === Reshaping ===
+r = torch.arange(12)
+print(r.view(3, 4))                  # Reshape to (3, 4)
+print(r.view(3, 4).contiguous())     # Ensure contiguous memory
+print(r.reshape(2, 6))               # Like view but works on non-contiguous
+
+# === Squeeze/Unsqueeze ===
+s = torch.randn(1, 3, 1, 4)
+print(s.squeeze().shape)             # Remove all size-1 dims: (3, 4)
+print(s.squeeze(0).shape)            # Remove dim 0 only: (3, 1, 4)
+u = torch.randn(3, 4)
+print(u.unsqueeze(0).shape)          # Add dim at 0: (1, 3, 4)
+
+# === Element-wise Operations ===
+print(a + 10)         # Add scalar
+print(a * b)          # Element-wise multiply
+print(torch.matmul(a.float(), b))  # Matrix multiply
+```
+
+| Operation | Method | Example |
+|-----------|--------|---------|
+| Concatenate | `torch.cat([a,b], dim)` | Stack along existing dim |
+| Stack | `torch.stack([a,b], dim)` | Create new dim |
+| Transpose | `.transpose(d1, d2)` | Swap two dims |
+| Permute | `.permute(d0, d1, ...)` | Reorder all dims |
+| Reshape | `.view()` / `.reshape()` | Change shape |
+| Squeeze | `.squeeze()` | Remove size-1 dims |
+
+> **Interview Tip:** `.view()` requires contiguous memory; `.reshape()` works on any tensor. Use `.permute()` for multi-dimensional transposes, `.transpose()` for swapping exactly two dimensions.
 
 ---
 
@@ -933,7 +1221,77 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **Create a simple feedforward neural network in PyTorch that works on the MNIST dataset.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+
+# === 1. Data ===
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.1307,), (0.3081,))
+])
+train_data = datasets.MNIST('./data', train=True, download=True, transform=transform)
+test_data = datasets.MNIST('./data', train=False, transform=transform)
+train_loader = DataLoader(train_data, batch_size=64, shuffle=True)
+test_loader = DataLoader(test_data, batch_size=1000)
+
+# === 2. Model ===
+class FeedForwardNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.network = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(28 * 28, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(128, 10)
+        )
+    
+    def forward(self, x):
+        return self.network(x)
+
+# === 3. Setup ===
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = FeedForwardNN().to(device)
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# === 4. Training ===
+for epoch in range(10):
+    model.train()
+    total_loss = 0
+    for images, labels in train_loader:
+        images, labels = images.to(device), labels.to(device)
+        optimizer.zero_grad()
+        output = model(images)
+        loss = criterion(output, labels)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    
+    # Evaluate
+    model.eval()
+    correct = 0
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images, labels = images.to(device), labels.to(device)
+            pred = model(images).argmax(dim=1)
+            correct += (pred == labels).sum().item()
+    
+    acc = correct / len(test_data)
+    print(f"Epoch {epoch+1}: Loss={total_loss/len(train_loader):.4f}, Acc={acc:.4f}")
+```
+
+> **Interview Tip:** PyTorch requires manual `model.train()` / `model.eval()` toggling (affects Dropout/BatchNorm). Always use `torch.no_grad()` during evaluation to save memory and speed up inference.
 
 ---
 
@@ -941,7 +1299,69 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **Write a PyTorch function to manually compute the gradients for a basic linear regression model.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import torch
+import numpy as np
+
+# === Manual Gradient Computation (No Autograd) ===
+np.random.seed(42)
+X = np.random.randn(100, 1).astype(np.float32)
+y = 3 * X + 2 + np.random.randn(100, 1).astype(np.float32) * 0.1
+
+# Initialize parameters
+w = np.random.randn(1, 1).astype(np.float32)
+b = np.zeros(1).astype(np.float32)
+lr = 0.01
+
+def forward(X, w, b):
+    return X @ w + b
+
+def compute_gradients(X, y, y_pred):
+    n = len(X)
+    error = y_pred - y
+    dw = (2 / n) * (X.T @ error)   # dL/dw = (2/n) * X^T * (y_pred - y)
+    db = (2 / n) * error.sum()      # dL/db = (2/n) * sum(y_pred - y)
+    return dw, db
+
+# Training loop
+for epoch in range(100):
+    y_pred = forward(X, w, b)
+    loss = np.mean((y_pred - y) ** 2)  # MSE
+    dw, db = compute_gradients(X, y, y_pred)
+    w -= lr * dw
+    b -= lr * db
+    if epoch % 20 == 0:
+        print(f"Epoch {epoch}: Loss={loss:.4f}, w={w[0,0]:.4f}, b={b[0]:.4f}")
+
+print(f"Learned: w={w[0,0]:.4f} (true=3), b={b[0]:.4f} (true=2)")
+
+# === Same with PyTorch Autograd (Comparison) ===
+X_t = torch.tensor(X)
+y_t = torch.tensor(y)
+w_t = torch.randn(1, 1, requires_grad=True)
+b_t = torch.zeros(1, requires_grad=True)
+
+optimizer = torch.optim.SGD([w_t, b_t], lr=0.01)
+
+for epoch in range(100):
+    y_pred = X_t @ w_t + b_t
+    loss = torch.mean((y_pred - y_t) ** 2)
+    
+    loss.backward()           # Autograd computes gradients
+    optimizer.step()          # Update parameters
+    optimizer.zero_grad()     # Reset gradients
+
+print(f"Autograd: w={w_t.item():.4f}, b={b_t.item():.4f}")
+```
+
+| Gradient | Formula | Meaning |
+|----------|---------|--------|
+| $\frac{\partial L}{\partial w}$ | $\frac{2}{n} X^T (\hat{y} - y)$ | How loss changes with weight |
+| $\frac{\partial L}{\partial b}$ | $\frac{2}{n} \sum(\hat{y} - y)$ | How loss changes with bias |
+
+> **Interview Tip:** Understanding manual gradient computation shows deep knowledge. In practice, always use `autograd`. The key insight: `loss.backward()` computes all gradients via chain rule, which replaces manual computation.
 
 ---
 
@@ -949,7 +1369,76 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **Write a Python script using PyTorch that saves and loads a trained model.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+```python
+import torch
+import torch.nn as nn
+
+# Sample model
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(10, 64)
+        self.fc2 = nn.Linear(64, 1)
+    
+    def forward(self, x):
+        return self.fc2(torch.relu(self.fc1(x)))
+
+model = SimpleModel()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+# === Method 1: Save/Load State Dict (Recommended) ===
+torch.save(model.state_dict(), 'model_weights.pth')
+
+# Load
+loaded_model = SimpleModel()  # Must create same architecture
+loaded_model.load_state_dict(torch.load('model_weights.pth'))
+loaded_model.eval()
+
+# === Method 2: Save Entire Model (Not Recommended) ===
+torch.save(model, 'full_model.pth')
+loaded = torch.load('full_model.pth')
+
+# === Method 3: Save Checkpoint (Best Practice) ===
+checkpoint = {
+    'epoch': 50,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'loss': 0.05,
+    'best_accuracy': 0.95
+}
+torch.save(checkpoint, 'checkpoint.pth')
+
+# Resume training from checkpoint
+checkpoint = torch.load('checkpoint.pth')
+model.load_state_dict(checkpoint['model_state_dict'])
+optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+start_epoch = checkpoint['epoch']
+print(f"Resumed from epoch {start_epoch}, loss: {checkpoint['loss']}")
+
+# === Method 4: Save for Inference (TorchScript) ===
+scripted = torch.jit.script(model)
+scripted.save('model_scripted.pt')
+
+loaded_scripted = torch.jit.load('model_scripted.pt')
+output = loaded_scripted(torch.randn(1, 10))
+
+# === Method 5: ONNX Export ===
+dummy_input = torch.randn(1, 10)
+torch.onnx.export(model, dummy_input, 'model.onnx',
+                  input_names=['input'], output_names=['output'])
+```
+
+| Method | Saves | Use Case | Portable |
+|--------|-------|----------|----------|
+| `state_dict` | Weights only | Resume training / inference | Code needed |
+| `torch.save(model)` | Everything (pickle) | Quick save | Fragile |
+| Checkpoint | Weights + optimizer + metadata | Resume training | Code needed |
+| TorchScript | Compiled model | Production deployment | Yes |
+| ONNX | Cross-framework model | Multi-framework deployment | Yes |
+
+> **Interview Tip:** Always use `state_dict` over saving the entire model. Full model saving uses pickle which is fragile and tied to the exact class structure. For production, export to TorchScript or ONNX.
 
 ---
 
@@ -957,4 +1446,90 @@ print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 
 **What are Graph Neural Networks (GNNs) and how can they be implemented in PyTorch?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+GNNs operate on graph-structured data (nodes + edges), learning representations by aggregating information from neighbors.
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# === 1. Simple GCN from Scratch ===
+class GraphConvolution(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.weight = nn.Parameter(torch.randn(in_features, out_features))
+        self.bias = nn.Parameter(torch.zeros(out_features))
+    
+    def forward(self, x, adj):
+        # x: (N, in_features), adj: (N, N) adjacency matrix
+        support = torch.mm(x, self.weight)    # Transform features
+        output = torch.mm(adj, support)        # Aggregate neighbors
+        return output + self.bias
+
+class GCN(nn.Module):
+    def __init__(self, n_features, n_hidden, n_classes):
+        super().__init__()
+        self.conv1 = GraphConvolution(n_features, n_hidden)
+        self.conv2 = GraphConvolution(n_hidden, n_classes)
+    
+    def forward(self, x, adj):
+        x = F.relu(self.conv1(x, adj))
+        x = F.dropout(x, p=0.5, training=self.training)
+        return self.conv2(x, adj)
+
+# === 2. Using PyTorch Geometric (Production) ===
+# pip install torch-geometric
+from torch_geometric.nn import GCNConv, GATConv, global_mean_pool
+from torch_geometric.data import Data
+
+class GCN_PyG(nn.Module):
+    def __init__(self, num_features, hidden_dim, num_classes):
+        super().__init__()
+        self.conv1 = GCNConv(num_features, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, hidden_dim)
+        self.classifier = nn.Linear(hidden_dim, num_classes)
+    
+    def forward(self, data):
+        x, edge_index, batch = data.x, data.edge_index, data.batch
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = self.conv2(x, edge_index)
+        x = global_mean_pool(x, batch)  # Graph-level pooling
+        return self.classifier(x)
+
+# Create graph data
+edge_index = torch.tensor([[0, 1, 1, 2], [1, 0, 2, 1]], dtype=torch.long)
+node_features = torch.randn(3, 16)  # 3 nodes, 16 features each
+graph = Data(x=node_features, edge_index=edge_index)
+
+# === 3. Graph Attention Network (GAT) ===
+class GAT(nn.Module):
+    def __init__(self, in_dim, hidden_dim, out_dim, heads=4):
+        super().__init__()
+        self.conv1 = GATConv(in_dim, hidden_dim, heads=heads)
+        self.conv2 = GATConv(hidden_dim * heads, out_dim, heads=1)
+    
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = F.elu(self.conv1(x, edge_index))
+        x = self.conv2(x, edge_index)
+        return x
+```
+
+| GNN Type | Mechanism | Best For |
+|----------|-----------|----------|
+| GCN | Spectral convolution | Node classification |
+| GAT | Attention on neighbors | When neighbor importance varies |
+| GraphSAGE | Sampling + aggregating | Large-scale graphs |
+| GIN | Isomorphism-based | Graph-level classification |
+
+| Application | Input Graph |
+|------------|-------------|
+| Drug discovery | Molecular structure |
+| Social networks | User connections |
+| Fraud detection | Transaction networks |
+| Recommendation | User-item interactions |
+
+> **Interview Tip:** GNNs follow a message-passing paradigm: each node aggregates features from its neighbors, applies a transformation, and updates its representation. PyTorch Geometric provides optimized implementations for production use.

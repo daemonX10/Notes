@@ -1445,7 +1445,46 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **What is the significance ofcombinerin theHadoop MapReduce framework?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+A **combiner** (also called a mini-reducer) is an optional optimization that runs on the **mapper node** after the map phase, performing local aggregation before data is shuffled to reducers.
+
+### How It Works
+```
+Without Combiner:
+  Mapper 1: (cat,1)(dog,1)(cat,1)(cat,1)  ──shuffle──▶ Reducer: (cat,[1,1,1,1,1]) → (cat,5)
+  Mapper 2: (cat,1)(dog,1)                ──shuffle──▶  6 records transferred
+
+With Combiner:
+  Mapper 1: (cat,1)(dog,1)(cat,1)(cat,1) → Combiner → (cat,3)(dog,1) ─▶ Reducer
+  Mapper 2: (cat,1)(dog,1)               → Combiner → (cat,1)(dog,1) ─▶  4 records transferred
+```
+
+### Code Example
+```java
+// The combiner class is often the SAME as the reducer
+job.setMapperClass(WordCountMapper.class);
+job.setCombinerClass(WordCountReducer.class);  // <-- Same as reducer
+job.setReducerClass(WordCountReducer.class);
+```
+
+### Rules for Combiners
+
+| Rule | Explanation |
+|------|-------------|
+| **Commutative** | Order doesn't matter: a + b = b + a |
+| **Associative** | Grouping doesn't matter: (a+b)+c = a+(b+c) |
+| **Same input/output types** | Combiner output = Reducer input |
+| **No guarantee** | Hadoop may run it 0, 1, or many times |
+
+### When NOT to Use
+- **Average**: `avg(1,3) ≠ avg(avg(1), avg(3))` — not associative
+- **Median**: Not decomposable
+- **Standard deviation**: Requires all data points
+
+### Interview Tip
+The combiner can reduce shuffle data by **10-100x** for aggregation operations. Always mention that it's **not guaranteed to run** — the program must produce correct results without it. Think of it as a performance hint, not a correctness requirement.
 
 ---
 
@@ -1453,7 +1492,48 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **Explain what you can do tooptimize the performanceofHDFS.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### HDFS Performance Optimization Strategies
+
+| Category | Strategy | Impact |
+|----------|----------|--------|
+| **Block size** | Increase to 256/512 MB for large files | Reduces NameNode memory, fewer seeks |
+| **Replication** | Tune factor based on access patterns | Balance reliability vs storage |
+| **Compression** | Snappy (speed) or Gzip (ratio) | 2-5x storage reduction |
+| **Short-circuit reads** | Read local blocks without DataNode | 10-30% read improvement |
+| **Caching** | Centralized cache for hot data | Eliminates disk I/O |
+| **SSD tiering** | Store hot data on SSD, cold on HDD | 5-10x faster reads |
+
+### Key Configurations
+```xml
+<!-- Increase block size for large files -->
+<property>
+    <name>dfs.blocksize</name>
+    <value>268435456</value>  <!-- 256 MB -->
+</property>
+
+<!-- Enable short-circuit local reads -->
+<property>
+    <name>dfs.client.read.shortcircuit</name>
+    <value>true</value>
+</property>
+
+<!-- Increase handler threads -->
+<property>
+    <name>dfs.namenode.handler.count</name>
+    <value>64</value>  <!-- Default: 10 -->
+</property>
+```
+
+### Application-Level Optimizations
+- **Avoid small files**: Merge into SequenceFiles or HAR archives
+- **Use columnar formats**: ORC/Parquet for analytical workloads
+- **Batch writes**: Buffer data and write in large chunks
+- **Rack-aware placement**: Configure topology for optimal replication
+
+### Interview Tip
+The single biggest HDFS optimization is avoiding the **small files problem** — each file/block consumes ~150 bytes of NameNode memory. A million small files = 300 MB of heap. Solutions: merge files, use CombineFileInputFormat, or switch to HBase for small random reads.
 
 ---
 
@@ -1461,7 +1541,64 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **What are thebest practicesfor managingmemory and CPU resourcesin aHadoop cluster?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Resource Management with YARN
+
+YARN manages **memory** and **CPU (vcores)** as the two fundamental cluster resources.
+
+### Key Configurations
+```xml
+<!-- yarn-site.xml: Per-node resource limits -->
+<property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>65536</value>  <!-- 64 GB available for YARN -->
+</property>
+<property>
+    <name>yarn.nodemanager.resource.cpu-vcores</name>
+    <value>16</value>
+</property>
+
+<!-- Container size bounds -->
+<property>
+    <name>yarn.scheduler.minimum-allocation-mb</name>
+    <value>1024</value>  <!-- Min 1 GB per container -->
+</property>
+<property>
+    <name>yarn.scheduler.maximum-allocation-mb</name>
+    <value>16384</value>  <!-- Max 16 GB per container -->
+</property>
+
+<!-- MapReduce task resources -->
+<property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>4096</value>
+</property>
+<property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>8192</value>
+</property>
+```
+
+### Scheduling Strategies
+
+| Scheduler | Description | Best For |
+|-----------|-------------|----------|
+| **FIFO** | First come, first served | Single-user clusters |
+| **Capacity** | Guaranteed queue capacities | Multi-tenant organizations |
+| **Fair** | Equal resource sharing | Mixed workload clusters |
+
+### Memory Sizing Best Practices
+```
+Reserved for OS:         ~20% of total RAM
+YARN NodeManager memory: Total RAM - OS reserved - other services
+Mapper memory:           1-4 GB (depending on data)
+Reducer memory:          1.5x - 2x of mapper memory
+JVM heap (-Xmx):         0.8 × container memory
+```
+
+### Interview Tip
+A common mistake is setting container memory equal to JVM heap. The container memory must be **larger** than JVM heap to account for off-heap usage. Rule: set `-Xmx` to **80%** of `mapreduce.map.memory.mb`. Also, leave 15-20% of node resources for OS and DataNode/NodeManager daemons.
 
 ---
 
@@ -1469,7 +1606,54 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **What is the concept oferasure codinginHDFS, and how does it differ fromreplication?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Erasure Coding (EC) is a data protection method that provides **fault tolerance with less storage overhead** than replication by encoding data into fragments and computing parity blocks.
+
+### Replication vs Erasure Coding
+
+| Feature | Replication (3x) | Erasure Coding (RS-6-3) |
+|---------|------------------|-------------------------|
+| **Storage overhead** | 200% (3 copies) | 50% (6 data + 3 parity) |
+| **Fault tolerance** | Survives 2 failures | Survives 3 failures |
+| **100 TB raw data** | 300 TB total | 150 TB total |
+| **Read performance** | Fast (data-local) | Slower (reconstruction) |
+| **Write performance** | Fast (pipeline) | Slower (encoding) |
+| **Best for** | Hot data, low latency | Cold/warm data, archival |
+
+### How It Works
+```
+Reed-Solomon (6,3) example:
+
+Original data: [D1][D2][D3][D4][D5][D6]  (6 data blocks)
+Parity blocks: [P1][P2][P3]               (3 parity blocks)
+Total: 9 blocks for 6 data = 50% overhead
+
+If D2 and D5 fail → reconstruct from remaining blocks
+Any 6 of 9 blocks can reconstruct the original data
+```
+
+### Configuration (Hadoop 3.x+)
+```bash
+# List available EC policies
+hdfs ec -listPolicies
+
+# Enable and set policy
+hdfs ec -enablePolicy -policy RS-6-3-1024k
+hdfs ec -setPolicy -path /data/cold -policy RS-6-3-1024k
+```
+
+### Available Policies
+
+| Policy | Data:Parity | Overhead | Min Nodes |
+|--------|-------------|----------|-----------|
+| RS-3-2-1024k | 3:2 | 67% | 5 |
+| RS-6-3-1024k | 6:3 | 50% | 9 |
+| RS-10-4-1024k | 10:4 | 40% | 14 |
+
+### Interview Tip
+Erasure coding (Hadoop 3.0+) saves **~50% storage** vs 3x replication while providing equal or better fault tolerance. The tradeoff is higher CPU for encoding/decoding and slower reconstruction. Use it for **cold data** (infrequent access) and keep replication for **hot data** (frequent access).
 
 ---
 
@@ -1477,7 +1661,56 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **Explain howHadoop uses data localityto improveperformance.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Data locality means **moving computation to where the data resides** rather than transferring data to the compute node. It's a core Hadoop optimization principle.
+
+### Locality Levels
+
+| Level | Description | Network Cost | Speed |
+|-------|-------------|-------------|-------|
+| **Data-local** | Task runs on node storing the block | None | Fastest |
+| **Rack-local** | Same rack, different node | Intra-rack | Medium |
+| **Off-rack** | Different rack entirely | Cross-rack | Slowest |
+
+### How It Works
+```
+1. File stored in HDFS → blocks distributed across nodes
+   B1 → Node1, B2 → Node2
+
+2. MapReduce job submitted
+   - Mapper for B1 → assigned to Node1 (data-local ✅)
+   - If Node1 busy → Node in same rack (rack-local ⚠️)
+   - Last resort → any node (off-rack ❌)
+```
+
+### Configuration
+```xml
+<!-- Rack awareness -->
+<property>
+    <name>net.topology.script.file.name</name>
+    <value>/etc/hadoop/topology.sh</value>
+</property>
+
+<!-- Delay scheduling (wait for data-local slot) -->
+<property>
+    <name>yarn.scheduler.capacity.node-locality-delay</name>
+    <value>40</value>
+</property>
+```
+
+### Performance Impact
+```
+Data-local:  ~100-200 MB/s (disk speed)
+Rack-local:  Limited by rack switch (~1-10 Gbps shared)
+Off-rack:    Limited by core switch (~10-40 Gbps shared)
+
+10 TB job: Data-local ~15 min vs Off-rack ~45 min
+```
+
+### Interview Tip
+Data locality is why Hadoop scales linearly — it avoids the **network bottleneck** by processing data in-place. YARN uses **delay scheduling** to wait for a data-local slot before falling back. Proper **rack awareness configuration** is essential for intelligent task placement.
 
 ---
 
@@ -1485,7 +1718,54 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **How doesHadoop support different file formats, and what are some of them?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Hadoop File Formats Comparison
+
+| Format | Type | Splittable | Schema | Compression | Best For |
+|--------|------|-----------|--------|-------------|----------|
+| **Text/CSV** | Row | Yes (uncompressed) | No | External | Simple data, interop |
+| **SequenceFile** | Row (binary) | Yes | No | Built-in | MapReduce intermediate |
+| **Avro** | Row (binary) | Yes | Embedded | Built-in | Schema evolution, streaming |
+| **Parquet** | Columnar | Yes | Embedded | Built-in | Analytics, column queries |
+| **ORC** | Columnar | Yes | Embedded | Built-in | Hive, heavy analytics |
+
+### Row vs Columnar Storage
+```
+Row-based (Avro, SequenceFile):
+  [id=1, name="Alice", age=30] [id=2, name="Bob", age=25]
+  ✅ Fast full-row reads   ❌ Slow column queries
+
+Columnar (Parquet, ORC):
+  Column 'id':   [1, 2, 3, ...]
+  Column 'name': ["Alice", "Bob", ...]
+  ✅ Fast column queries   ✅ Better compression
+```
+
+### When to Use Which
+
+| Scenario | Recommended Format |
+|----------|-------------------|
+| ETL intermediate | SequenceFile or Avro |
+| Data warehouse | Parquet or ORC |
+| Hive workloads | ORC |
+| Spark workloads | Parquet |
+| Schema evolution | Avro |
+| Streaming ingestion | Avro |
+
+### Code Example
+```python
+# Spark: Reading different formats
+df_parquet = spark.read.parquet("/data/file.parquet")
+df_orc = spark.read.orc("/data/file.orc")
+df_avro = spark.read.format("avro").load("/data/file.avro")
+
+# Save as Parquet
+df.write.parquet("/output/data.parquet", compression="snappy")
+```
+
+### Interview Tip
+For analytics: use **Parquet** (Spark) or **ORC** (Hive) — columnar formats achieve **10-100x** speedup through predicate pushdown and column pruning. For streaming/ETL: use **Avro** for schema evolution support (add/remove fields without breaking consumers).
 
 ---
 
@@ -1493,7 +1773,80 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **What isHadoop federation, and how can itscale a Hadoop cluster?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Hadoop Federation allows **multiple independent NameNodes** to share a pool of DataNodes, each managing its own namespace (directory tree). This overcomes the single-NameNode scalability bottleneck.
+
+### Architecture
+```
+Traditional (Single NameNode):
+  NameNode (single point of bottleneck)
+    └─ manages ALL files, blocks, metadata
+    └─ limited by single JVM heap
+
+Federated (Multiple NameNodes):
+  NameNode 1 (/user)    ──┐
+  NameNode 2 (/data)    ──┤──▶ Shared DataNode Pool
+  NameNode 3 (/logs)    ──┘
+  Each manages its own namespace independently
+```
+
+### Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Namespace** | Directory tree managed by one NameNode |
+| **Block Pool** | Set of blocks belonging to a namespace |
+| **Cluster ID** | Identifies the federated cluster |
+| **ViewFS** | Client-side mount table mapping paths to NameNodes |
+
+### Configuration
+```xml
+<!-- hdfs-site.xml -->
+<property>
+    <name>dfs.nameservices</name>
+    <value>ns1,ns2,ns3</value>
+</property>
+<property>
+    <name>dfs.namenode.rpc-address.ns1</name>
+    <value>nn1:8020</value>
+</property>
+<property>
+    <name>dfs.namenode.rpc-address.ns2</name>
+    <value>nn2:8020</value>
+</property>
+```
+
+```xml
+<!-- ViewFS client mount table (core-site.xml) -->
+<property>
+    <name>fs.viewfs.mounttable.default.link./user</name>
+    <value>hdfs://ns1/user</value>
+</property>
+<property>
+    <name>fs.viewfs.mounttable.default.link./data</name>
+    <value>hdfs://ns2/data</value>
+</property>
+```
+
+### Benefits
+- **Horizontal scalability**: Each NameNode manages a subset of metadata
+- **Isolation**: Workloads in different namespaces don't affect each other
+- **Performance**: Parallel metadata operations across NameNodes
+- **No single bottleneck**: Distributes NameNode memory pressure
+
+### Federation vs HA
+
+| Feature | Federation | HA |
+|---------|-----------|----|
+| **Purpose** | Scalability | Fault tolerance |
+| **NameNodes** | Multiple active | 1 active + 1 standby |
+| **Namespace** | Separate per NN | Same shared namespace |
+| **Can combine** | Yes — Federation + HA = each NN has a standby |
+
+### Interview Tip
+Federation solves the **NameNode memory bottleneck** — a single NameNode stores ~150 bytes per block in memory. With billions of files, one NameNode runs out of heap. Federation distributes metadata across NameNodes while DataNodes remain shared. It's complementary to HA (you can have federated NameNodes, each with an HA standby).
 
 ---
 
@@ -1501,6 +1854,68 @@ The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O
 
 **What are the implications ofsmall filesonHDFS performanceand how can this bemitigated?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### The Small Files Problem
+
+HDFS is designed for large files. Storing many small files creates significant performance problems.
+
+### Why Small Files Are Problematic
+
+| Problem | Explanation |
+|---------|-------------|
+| **NameNode memory** | Each file/block uses ~150 bytes of heap |
+| **1 million files** | ~300 MB NameNode memory consumed |
+| **1 billion files** | ~300 GB — exceeds practical NameNode heap |
+| **Mapper overhead** | 1 mapper per file → millions of short-lived mappers |
+| **Seek time** | Time to find file > time to read it |
+
+### Impact Example
+```
+1 million × 1 KB files = 1 GB data, but:
+  - NameNode memory: ~300 MB (for metadata)
+  - MapReduce: 1 million mappers (massive overhead)
+  - Seek time: dominates read time
+
+1 file × 1 GB = same data, but:
+  - NameNode memory: ~1.2 KB (8 blocks × 150 bytes)
+  - MapReduce: 8 mappers (efficient)
+  - Sequential read: optimal throughput
+```
+
+### Mitigation Strategies
+
+| Solution | How It Works | Best For |
+|----------|-------------|----------|
+| **HAR (Hadoop Archive)** | Pack small files into archive; NameNode sees 1 file | Archival, cold data |
+| **SequenceFile** | Merge files as key-value pairs in binary format | MapReduce processing |
+| **CombineFileInputFormat** | Multiple files per mapper input split | MapReduce jobs |
+| **HBase** | Store small records in columnar database | Random access patterns |
+| **Compaction** | Periodic merge of small files | Streaming/ingestion |
+
+### Code Examples
+```bash
+# Create Hadoop Archive
+hadoop archive -archiveName data.har -p /input/small_files /output/
+
+# Access archived files
+hdfs dfs -ls har:///output/data.har/
+```
+
+```java
+// Use CombineFileInputFormat in MapReduce
+job.setInputFormatClass(CombineTextInputFormat.class);
+// Set max split size (combine files up to 256 MB per mapper)
+CombineTextInputFormat.setMaxInputSplitSize(job, 268435456);
+```
+
+### Prevention Strategies
+- **Buffer and batch**: Collect data before writing to HDFS
+- **Use append**: Append to existing files instead of creating new ones
+- **Streaming frameworks**: Kafka + Spark Streaming to batch micro-files
+- **Compaction jobs**: Periodic jobs to merge small files
+
+### Interview Tip
+The small files problem is one of the **most common HDFS issues** in production. The root cause is that NameNode metadata is stored **in memory**. The best solution depends on the use case: **SequenceFile** for processing, **HAR** for archival, **HBase** for random access. Always mention that prevention (batching writes) is better than mitigation.
 
 ---
