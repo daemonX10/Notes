@@ -552,3 +552,99 @@ data_augmentation = tf.keras.Sequential([
 - Implement **early stopping** to prevent overtraining
 - Use **data augmentation** to increase training variety
 
+
+---
+
+## Question 11
+
+**Define a Variable in TensorFlow and its importance.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How do you perform batch processing in TensorFlow?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**How do you use TensorFlow Transformers for sequence modeling?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you approach optimizing TensorFlow model performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**What techniques are used in TensorFlow for graph optimizations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How do you perform memory optimization in TensorFlow?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you handle image data in TensorFlow?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How is TensorFlow deployed in mobile or edge devices?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Can you give an example of how TensorFlow is used in healthcare?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What steps would you take to investigate and fix a shape mismatch error in TensorFlow?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How is TensorFlow utilized in Natural Language Processing (NLP)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Present an approach for real-time object detection using TensorFlow.**
+
+**Answer:** _[To be filled]_

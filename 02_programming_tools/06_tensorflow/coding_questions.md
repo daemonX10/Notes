@@ -605,3 +605,59 @@ model.compile(
 # model.fit(X, y, epochs=50, callbacks=[reduce_lr, lr_scheduler])
 ```
 
+
+---
+
+## Question 11
+
+**Write a TensorFlow code to create two Tensors and perform element-wise multiplication.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Implement logistic regression using TensorFlow.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Write a TensorFlow script to normalize the features of a dataset.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Write a Python function using TensorFlow to compute the gradient of a given function.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Develop a code to save and load a trained TensorFlow model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Code a TensorFlow program that uses dataset shuffling, repetition, and batching.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How would you implement attention mechanisms in TensorFlow?**
+
+**Answer:** _[To be filled]_

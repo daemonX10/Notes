@@ -722,7 +722,52 @@ if __name__ == '__main__':
 
 **Explain howApache Flumehelps withlog and event datacollection forHadoop.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Apache Flume is a distributed, reliable service for collecting, aggregating, and moving **large amounts of log/event data** into HDFS or other centralized data stores.
+
+### Architecture
+
+| Component | Role |
+|-----------|------|
+| **Source** | Ingests data (log files, HTTP, Kafka, syslog) |
+| **Channel** | Buffers between source and sink (memory or file) |
+| **Sink** | Writes to destination (HDFS, HBase, Kafka) |
+| **Agent** | JVM process containing source → channel → sink |
+
+### Data Flow
+```
+Web Servers ──┐
+               ├──▶ Flume Agent (Source → Channel → Sink) ──▶ HDFS
+App Logs ─────┘
+```
+
+### Configuration Example
+```properties
+# flume-conf.properties
+agent.sources = weblog
+agent.channels = memchannel
+agent.sinks = hdfssink
+
+# Source: tail log files
+agent.sources.weblog.type = exec
+agent.sources.weblog.command = tail -F /var/log/apache/access.log
+agent.sources.weblog.channels = memchannel
+
+# Channel: in-memory buffer
+agent.channels.memchannel.type = memory
+agent.channels.memchannel.capacity = 10000
+
+# Sink: write to HDFS
+agent.sinks.hdfssink.type = hdfs
+agent.sinks.hdfssink.hdfs.path = /user/logs/%Y/%m/%d
+agent.sinks.hdfssink.hdfs.fileType = DataStream
+agent.sinks.hdfssink.channel = memchannel
+```
+
+### Interview Tip
+Flume provides **at-least-once delivery** with file channels (durable) or **best-effort** with memory channels (faster). In modern stacks, Apache Kafka has largely replaced Flume for event streaming, but Flume is still used for direct-to-HDFS ingestion.
 
 ---
 
@@ -730,7 +775,57 @@ if __name__ == '__main__':
 
 **What isApache Sqoopand how does it interact withHadoop?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Apache Sqoop (SQL-to-Hadoop) is a tool for efficiently transferring **bulk data between relational databases (RDBMS) and Hadoop** (HDFS, Hive, HBase).
+
+### Operations
+
+| Operation | Direction | Command |
+|-----------|-----------|--------|
+| **Import** | RDBMS → HDFS | `sqoop import` |
+| **Export** | HDFS → RDBMS | `sqoop export` |
+| **List databases** | Check RDBMS | `sqoop list-databases` |
+| **List tables** | Check RDBMS | `sqoop list-tables` |
+
+### Code Examples
+```bash
+# Import from MySQL to HDFS
+sqoop import \
+  --connect jdbc:mysql://dbserver/mydb \
+  --username root --password secret \
+  --table employees \
+  --target-dir /user/hadoop/employees \
+  --num-mappers 4 \
+  --split-by emp_id
+
+# Import into Hive table
+sqoop import \
+  --connect jdbc:mysql://dbserver/mydb \
+  --table sales \
+  --hive-import \
+  --hive-table sales_data \
+  --incremental append \
+  --check-column id \
+  --last-value 1000
+
+# Export from HDFS to MySQL
+sqoop export \
+  --connect jdbc:mysql://dbserver/mydb \
+  --table results \
+  --export-dir /user/hadoop/output \
+  --input-fields-terminated-by ','
+```
+
+### How It Works
+- Uses **MapReduce** for parallel data transfer
+- Each mapper handles a portion of the data
+- `--split-by` determines how to partition the import across mappers
+- Supports incremental imports (`--incremental append/lastmodified`)
+
+### Interview Tip
+Sqoop is being deprecated in favor of **Apache Spark JDBC** connectors and tools like **Apache NiFi**. However, it's still widely used in legacy Hadoop clusters. Key advantage: it uses MapReduce for parallelism, so a 4-mapper import is ~4x faster than a single JDBC connection.
 
 ---
 
@@ -738,7 +833,67 @@ if __name__ == '__main__':
 
 **How doesApache Ooziehelp inworkflow schedulinginHadoop?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Apache Oozie is a **workflow scheduler** for managing and orchestrating Hadoop jobs (MapReduce, Pig, Hive, Spark, etc.) as directed acyclic graphs (DAGs).
+
+### Workflow Types
+
+| Type | Purpose | Trigger |
+|------|---------|--------|
+| **Workflow** | Sequential/parallel job execution | Manual or programmatic |
+| **Coordinator** | Time/data-triggered recurring workflows | Cron-like schedule |
+| **Bundle** | Group of coordinators | Manage related pipelines |
+
+### Workflow XML Example
+```xml
+<workflow-app name="etl-pipeline" xmlns="uri:oozie:workflow:0.5">
+    <start to="extract"/>
+    
+    <action name="extract">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <command>import --connect jdbc:mysql://db/sales --table orders --target-dir /data/raw</command>
+        </sqoop>
+        <ok to="transform"/>
+        <error to="fail"/>
+    </action>
+    
+    <action name="transform">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <script>transform.hql</script>
+        </hive>
+        <ok to="load"/>
+        <error to="fail"/>
+    </action>
+    
+    <action name="load">
+        <spark xmlns="uri:oozie:spark-action:0.1">
+            <master>yarn</master>
+            <jar>analytics.jar</jar>
+        </spark>
+        <ok to="end"/>
+        <error to="fail"/>
+    </action>
+    
+    <kill name="fail"><message>Pipeline failed</message></kill>
+    <end name="end"/>
+</workflow-app>
+```
+
+### Coordinator (Scheduled)
+```xml
+<coordinator-app name="daily-etl" frequency="${coord:days(1)}">
+    <action>
+        <workflow>
+            <app-path>/user/oozie/etl-pipeline</app-path>
+        </workflow>
+    </action>
+</coordinator-app>
+```
+
+### Interview Tip
+Oozie is Hadoop-native but verbose (XML-based). Modern alternatives include **Apache Airflow** (Python DAGs, more flexible), **Luigi**, and **Prefect**. However, Oozie integrates tightly with Hadoop security (Kerberos) and YARN, making it still relevant in enterprise Hadoop clusters.
 
 ---
 
@@ -746,7 +901,54 @@ if __name__ == '__main__':
 
 **What isApache ZooKeeperand why is itimportantforHadoop?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Apache ZooKeeper is a centralized service for **distributed coordination** — it provides configuration management, naming, synchronization, and group services for distributed systems.
+
+### Role in Hadoop
+
+| Function | Description |
+|----------|-------------|
+| **Leader election** | NameNode HA (active/standby failover) |
+| **Configuration management** | Centralized config for cluster services |
+| **Distributed locking** | Prevent concurrent modifications |
+| **Service discovery** | Track which services are alive |
+| **Barrier synchronization** | Coordinate distributed processes |
+
+### Architecture
+```
+Client 1 ──┐                    ┌─ ZK Node 1 (Leader)
+Client 2 ──├─▶ ZooKeeper Ensemble ├─ ZK Node 2 (Follower)
+Client 3 ──┘                    └─ ZK Node 3 (Follower)
+```
+
+- **Ensemble**: Cluster of ZooKeeper nodes (odd number: 3, 5, 7)
+- **Quorum**: Majority must agree (3/5 nodes = tolerates 2 failures)
+- **ZNodes**: Hierarchical data nodes (like a file system)
+
+### Hadoop HA with ZooKeeper
+```xml
+<!-- hdfs-site.xml: NameNode HA configuration -->
+<property>
+    <name>dfs.ha.automatic-failover.enabled</name>
+    <value>true</value>
+</property>
+<property>
+    <name>ha.zookeeper.quorum</name>
+    <value>zk1:2181,zk2:2181,zk3:2181</value>
+</property>
+```
+
+### Services That Use ZooKeeper
+- **HDFS HA**: NameNode failover
+- **YARN HA**: ResourceManager failover
+- **HBase**: Region server coordination
+- **Kafka**: Broker management (legacy, now KRaft)
+- **Hive**: Lock management
+
+### Interview Tip
+ZooKeeper solves the fundamental problem of **distributed consensus** — how multiple nodes agree on state. In Hadoop HA, it detects NameNode failure and triggers automatic failover to the standby. Key fact: ZooKeeper requires an **odd number** of nodes to form a quorum.
 
 ---
 
@@ -754,7 +956,59 @@ if __name__ == '__main__':
 
 **How doesHadoop handlethefailure of a datanode?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Detection Mechanism
+The NameNode detects DataNode failures through **heartbeat signals**.
+
+| Step | What Happens |
+|------|--------------|
+| 1. **Heartbeat timeout** | DataNode stops sending heartbeats (default: every 3 seconds) |
+| 2. **Marked dead** | NameNode marks DataNode as dead after ~10 minutes (configurable) |
+| 3. **Under-replicated blocks** | NameNode identifies blocks that lost a replica |
+| 4. **Re-replication** | NameNode instructs other DataNodes to copy under-replicated blocks |
+| 5. **Rack awareness** | New replicas placed according to rack-aware policy |
+
+### Process Flow
+```
+DataNode X dies
+    ↓
+NameNode detects (no heartbeat for dfs.namenode.heartbeat.recheck-interval)
+    ↓
+NameNode scans block map for blocks stored on DataNode X
+    ↓
+Blocks with replicas < dfs.replication (default 3) are marked under-replicated
+    ↓
+NameNode schedules re-replication on healthy DataNodes
+    ↓
+Replication factor restored (transparent to clients)
+```
+
+### Configuration
+```xml
+<!-- hdfs-site.xml -->
+<property>
+    <name>dfs.heartbeat.interval</name>
+    <value>3</value>  <!-- Heartbeat every 3 seconds -->
+</property>
+<property>
+    <name>dfs.namenode.heartbeat.recheck-interval</name>
+    <value>300000</value>  <!-- 5 minutes recheck -->
+</property>
+<property>
+    <name>dfs.replication</name>
+    <value>3</value>  <!-- Default replication factor -->
+</property>
+```
+
+### Key Points
+- **No data loss** as long as at least 1 replica survives
+- **Rack awareness** ensures replicas are on different racks
+- **Automatic recovery** — no manual intervention needed
+- **Decommissioning** allows graceful removal of nodes
+
+### Interview Tip
+The NameNode doesn't immediately declare a DataNode dead after missing one heartbeat — it waits for `2 * heartbeat.recheck-interval + 10 * heartbeat.interval` (default ~10.5 minutes). This avoids false positives from network blips. Mention that this is why Hadoop favors **high replication** over single-copy storage.
 
 ---
 
@@ -762,7 +1016,63 @@ if __name__ == '__main__':
 
 **Explain the process ofdata replicationinHDFS.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+HDFS replicates each data block across multiple DataNodes to ensure **fault tolerance** and **data availability**.
+
+### Replication Process
+
+| Step | Action |
+|------|--------|
+| 1. **Client writes** | Client sends block to first DataNode |
+| 2. **Pipeline replication** | First DN forwards to second, second to third |
+| 3. **Acknowledgment** | ACKs flow back through pipeline |
+| 4. **NameNode metadata** | NameNode records block locations |
+
+### Pipeline Architecture
+```
+Client → DataNode 1 → DataNode 2 → DataNode 3
+              ← ACK  ←  ACK   ← ACK
+```
+
+### Rack-Aware Replica Placement
+```
+Default policy (replication factor = 3):
+- Replica 1: Same node as writer (or random node)
+- Replica 2: Different rack (fault tolerance across racks)
+- Replica 3: Same rack as Replica 2, different node (bandwidth optimization)
+```
+
+| Replica | Location | Reason |
+|---------|----------|--------|
+| **1st** | Local node/rack | Low latency write |
+| **2nd** | Remote rack | Rack-level fault tolerance |
+| **3rd** | Same rack as 2nd | Balance between safety and bandwidth |
+
+### Configuration
+```xml
+<!-- hdfs-site.xml -->
+<property>
+    <name>dfs.replication</name>
+    <value>3</value>  <!-- Default replication factor -->
+</property>
+<property>
+    <name>dfs.replication.max</name>
+    <value>512</value>  <!-- Maximum allowed -->
+</property>
+```
+
+```bash
+# Change replication for specific file
+hdfs dfs -setrep -w 5 /path/to/important_file
+
+# Check replication status
+hdfs fsck /path/to/file -files -blocks -locations
+```
+
+### Interview Tip
+The key design choice is the **pipeline replication** model — the client only sends data once, and DataNodes forward to each other. This minimizes client bandwidth usage. Also, the rack-aware placement policy balances **fault tolerance** (cross-rack) with **write performance** (intra-rack for later replicas).
 
 ---
 
@@ -770,7 +1080,53 @@ if __name__ == '__main__':
 
 **What isspeculative executioninHadoop, and why is itused?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Speculative execution is a Hadoop optimization where the framework launches **duplicate copies of slow-running tasks** on other nodes, using the output of whichever finishes first.
+
+### How It Works
+
+| Step | Action |
+|------|---------|
+| 1. **Monitor** | YARN tracks task progress across all mappers/reducers |
+| 2. **Detect straggler** | Task running significantly slower than average |
+| 3. **Launch backup** | Start duplicate task on a different node |
+| 4. **First wins** | Use output from whichever copy finishes first |
+| 5. **Kill duplicate** | Terminate the slower copy |
+
+```
+Node A (slow):  [=====...........]  ← Straggler detected
+Node B (backup): [============]     ← Backup launched, finishes first ✅
+Node A:          [killed]           ← Original killed
+```
+
+### Why It's Needed
+- **Hardware heterogeneity**: Some nodes are slower (disk issues, old hardware)
+- **Resource contention**: Competing workloads slow down tasks
+- **Data skew**: Some tasks process more data
+- **Network issues**: Slow rack switch or congestion
+
+### Configuration
+```xml
+<!-- mapred-site.xml -->
+<property>
+    <name>mapreduce.map.speculative</name>
+    <value>true</value>  <!-- Default: true -->
+</property>
+<property>
+    <name>mapreduce.reduce.speculative</name>
+    <value>true</value>  <!-- Default: true -->
+</property>
+```
+
+### When to Disable
+- **Non-idempotent tasks**: Writing to external databases (duplicates!)
+- **Resource-constrained clusters**: Backup tasks waste resources
+- **Tasks with side effects**: Email sending, API calls
+
+### Interview Tip
+Speculative execution trades **extra resources** for **lower latency**. It works because Hadoop clusters often have idle capacity. Disable it for tasks with side effects or when cluster utilization is already high (>80%).
 
 ---
 
@@ -778,7 +1134,61 @@ if __name__ == '__main__':
 
 **What is the significance of theinput splitinMapReduce jobs?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+An **input split** is a logical division of input data that defines the chunk of data processed by a single mapper. It determines parallelism and data locality.
+
+### Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Block** | Physical storage unit in HDFS (default 128 MB) |
+| **Input Split** | Logical division for MapReduce (usually = 1 block) |
+| **Mapper** | One mapper per input split |
+| **Data locality** | Split assigned to node storing the data |
+
+### Split vs Block
+```
+File (512 MB) stored in HDFS:
+  Block 1 (128 MB) → Split 1 → Mapper 1
+  Block 2 (128 MB) → Split 2 → Mapper 2
+  Block 3 (128 MB) → Split 3 → Mapper 3
+  Block 4 (128 MB) → Split 4 → Mapper 4
+```
+
+### How Splits Are Created
+```java
+// InputFormat.getSplits() determines split strategy
+// Default: FileInputFormat creates one split per block
+
+// Custom split size
+// mapreduce.input.fileinputformat.split.minsize = 256MB (fewer mappers)
+// mapreduce.input.fileinputformat.split.maxsize = 64MB  (more mappers)
+
+// Split size formula:
+// splitSize = max(minSize, min(maxSize, blockSize))
+```
+
+### Configuration
+```xml
+<property>
+    <name>mapreduce.input.fileinputformat.split.minsize</name>
+    <value>0</value>  <!-- Default: 0 (use block size) -->
+</property>
+<property>
+    <name>mapreduce.input.fileinputformat.split.maxsize</name>
+    <value>268435456</value>  <!-- 256 MB -->
+</property>
+```
+
+### Impact on Performance
+- **Too many splits** → Too many mappers → Overhead from task startup
+- **Too few splits** → Low parallelism → Underutilized cluster
+- **Optimal**: Split size ≈ HDFS block size (default behavior)
+
+### Interview Tip
+The key insight is that splits are **logical** (defined by InputFormat) while blocks are **physical** (stored in HDFS). By default, 1 split = 1 block, which maximizes **data locality** — the mapper runs on the node storing the data, avoiding network transfer.
 
 ---
 
@@ -786,7 +1196,59 @@ if __name__ == '__main__':
 
 **How doespartitioningwork inHadoop, and when is itused?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+Partitioning determines **which reducer receives which key** during the shuffle phase. The default `HashPartitioner` distributes keys evenly across reducers.
+
+### Partitioning Process
+```
+Mapper outputs (key, value) pairs
+    ↓
+Partitioner: partition = hash(key) % numReducers
+    ↓
+Each reducer gets all values for its assigned keys
+```
+
+### Default Partitioner
+```java
+public class HashPartitioner<K, V> extends Partitioner<K, V> {
+    public int getPartition(K key, V value, int numReduceTasks) {
+        return (key.hashCode() & Integer.MAX_VALUE) % numReduceTasks;
+    }
+}
+```
+
+### Custom Partitioner
+```java
+// Partition by country for geographic analysis
+public class CountryPartitioner extends Partitioner<Text, IntWritable> {
+    @Override
+    public int getPartition(Text key, IntWritable value, int numReduceTasks) {
+        String country = key.toString().split("_")[0];
+        if (country.equals("US")) return 0;
+        if (country.equals("EU")) return 1;
+        return 2;  // Rest of world
+    }
+}
+
+// Set in driver
+job.setPartitionerClass(CountryPartitioner.class);
+job.setNumReduceTasks(3);  // Must match partitioner logic
+```
+
+### When to Use Custom Partitioning
+
+| Scenario | Reason |
+|----------|--------|
+| **Data skew** | Default hash creates uneven distribution |
+| **Secondary sort** | Composite keys need custom partitioning |
+| **Data locality** | Group related keys to same reducer |
+| **Output organization** | Separate output files by category |
+| **Total order sort** | Range-based partitioning |
+
+### Interview Tip
+Data skew is the biggest partitioning problem — one reducer gets most of the data while others sit idle. The solution is a **custom partitioner** that distributes hot keys across multiple reducers, or using a **combiner** to pre-aggregate before shuffling.
 
 ---
 
@@ -794,7 +1256,56 @@ if __name__ == '__main__':
 
 **Explain howreducerswork inMapReduceand their interaction withshufflers.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Shuffle and Reduce Process
+
+| Phase | What Happens |
+|-------|--------------|
+| 1. **Map output** | Mappers produce (key, value) pairs |
+| 2. **Partition** | Partitioner assigns keys to reducers |
+| 3. **Sort** | Map outputs sorted by key (on mapper side) |
+| 4. **Shuffle** | Transfer sorted data from mappers to reducers over network |
+| 5. **Merge sort** | Reducer merges sorted data from all mappers |
+| 6. **Reduce** | Reducer processes all values for each key |
+
+### Shuffle and Sort in Detail
+```
+Mapper 1: (A,1) (B,2) (A,3)     Mapper 2: (B,4) (A,5) (C,6)
+    ↓ Sort                          ↓ Sort
+    (A,1)(A,3)(B,2)                (A,5)(B,4)(C,6)
+    ↓ Shuffle (network transfer)    ↓
+
+Reducer 0 (keys A):     (A, [1, 3, 5])  ─→ reduce() → (A, 9)
+Reducer 1 (keys B,C):   (B, [2, 4])     ─→ reduce() → (B, 6)
+                         (C, [6])       ─→ reduce() → (C, 6)
+```
+
+### Reducer Mechanics
+```java
+public class SumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    @Override
+    public void reduce(Text key, Iterable<IntWritable> values, Context context) {
+        int sum = 0;
+        for (IntWritable val : values) {
+            sum += val.get();  // Iterate through all values for this key
+        }
+        context.write(key, new IntWritable(sum));
+    }
+}
+```
+
+### Shuffle Optimization
+
+| Optimization | Description |
+|-------------|-------------|
+| **Combiner** | Mini-reducer on mapper side (reduces shuffle data) |
+| **Compression** | Compress map output before shuffle |
+| **Sort buffer** | `mapreduce.task.io.sort.mb` (default 100 MB) |
+| **Spill threshold** | `mapreduce.map.sort.spill.percent` (default 0.80) |
+
+### Interview Tip
+The shuffle phase is typically the **most expensive** part of MapReduce — it involves disk I/O (spilling), network transfer, and merge sorting. Using a **combiner** can reduce shuffle data by 10-100x. The combiner must be commutative and associative (e.g., sum, max, but not average).
 
 ---
 
@@ -802,7 +1313,67 @@ if __name__ == '__main__':
 
 **What areSequenceFilesinHadoop?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Definition
+SequenceFiles are Hadoop's **binary file format** that stores data as serialized key-value pairs. They are designed for efficient storage and processing within the Hadoop ecosystem.
+
+### Compression Modes
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| **Uncompressed** | No compression | Debugging, small files |
+| **Record compressed** | Each value compressed independently | General purpose |
+| **Block compressed** | Group of records compressed together | Best compression ratio |
+
+### Structure
+```
+SequenceFile Format:
+┌───────────────────────────┐
+│ Header (version, key/val classes) │
+├───────────────────────────┤
+│ Record 1: (key1, value1)          │
+│ Record 2: (key2, value2)          │
+│ Sync Marker (every ~2000 records) │  ← Enables splitting
+│ Record N: (keyN, valueN)          │
+└───────────────────────────┘
+```
+
+### Code Example
+```java
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.conf.Configuration;
+
+// Write SequenceFile
+Configuration conf = new Configuration();
+SequenceFile.Writer writer = SequenceFile.createWriter(conf,
+    SequenceFile.Writer.file(new Path("/output/data.seq")),
+    SequenceFile.Writer.keyClass(Text.class),
+    SequenceFile.Writer.valueClass(IntWritable.class),
+    SequenceFile.Writer.compression(CompressionType.BLOCK));
+
+writer.append(new Text("key1"), new IntWritable(100));
+writer.append(new Text("key2"), new IntWritable(200));
+writer.close();
+
+// Read SequenceFile
+SequenceFile.Reader reader = new SequenceFile.Reader(conf,
+    SequenceFile.Reader.file(new Path("/output/data.seq")));
+Text key = new Text();
+IntWritable val = new IntWritable();
+while (reader.next(key, val)) {
+    System.out.println(key + ": " + val);
+}
+```
+
+### Advantages
+- **Splittable** (sync markers enable MapReduce parallelism)
+- **Binary format** (efficient serialization)
+- **Compressible** (built-in compression support)
+- **Small file solution** (merge many small files into one SequenceFile)
+
+### Interview Tip
+SequenceFiles solve the **small files problem** in HDFS — instead of storing millions of small files (each consuming a NameNode metadata entry), you merge them into SequenceFiles. This dramatically reduces NameNode memory pressure.
 
 ---
 
@@ -810,7 +1381,63 @@ if __name__ == '__main__':
 
 **Describe the ways tooptimizeaMapReduce job.**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+### Optimization Categories
+
+| Category | Techniques |
+|----------|------------|
+| **Input** | Proper input format, split size tuning |
+| **Map phase** | Combiner, in-mapper combining, compression |
+| **Shuffle** | Compression, buffer tuning, partitioning |
+| **Reduce** | Fewer reducers, secondary sort |
+| **Output** | Compression, proper format |
+| **Cluster** | JVM reuse, speculative execution |
+
+### Key Optimizations
+```xml
+<!-- 1. Use Combiner (reduces shuffle data by 10-100x) -->
+job.setCombinerClass(SumReducer.class);
+
+<!-- 2. Compress map output (reduce shuffle traffic) -->
+<property>
+    <name>mapreduce.map.output.compress</name>
+    <value>true</value>
+</property>
+<property>
+    <name>mapreduce.map.output.compress.codec</name>
+    <value>org.apache.hadoop.io.compress.SnappyCodec</value>
+</property>
+
+<!-- 3. Tune sort buffer (reduce disk spills) -->
+<property>
+    <name>mapreduce.task.io.sort.mb</name>
+    <value>256</value>  <!-- Default: 100 MB -->
+</property>
+<property>
+    <name>mapreduce.map.sort.spill.percent</name>
+    <value>0.90</value>  <!-- Default: 0.80 -->
+</property>
+
+<!-- 4. JVM reuse (avoid JVM startup overhead) -->
+<property>
+    <name>mapreduce.job.jvm.numtasks</name>
+    <value>-1</value>  <!-- Reuse JVM for all tasks -->
+</property>
+
+<!-- 5. Optimal number of reducers -->
+job.setNumReduceTasks(cluster_nodes * reducers_per_node * 0.95);
+```
+
+### Advanced Optimizations
+1. **Use efficient file formats**: ORC, Parquet (columnar, compressed)
+2. **Avoid small files**: Merge with CombineFileInputFormat
+3. **Data locality**: Ensure splits align with HDFS blocks
+4. **Proper data types**: Use `Writable` types, not Java serialization
+5. **Pre-sort data**: If doing joins, pre-sort by join key
+
+### Interview Tip
+The three highest-impact optimizations are: 1) **Combiner** (reduces network I/O), 2) **Map output compression** (Snappy for speed, Gzip for ratio), 3) **Proper number of reducers** (rule of thumb: 0.95 * total reduce slots). Always profile before optimizing — use Hadoop counters to find bottlenecks.
 
 ---
 

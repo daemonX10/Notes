@@ -396,3 +396,107 @@ fprintf('Recall: %.4f\n', recall);
 fprintf('F1 Score: %.4f\n', f1);
 ```
 
+
+---
+
+## Question 6
+
+**How would you reshape a matrix in MATLAB without changing its data?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**Discuss the uses of the 'find' function in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**Discuss how categorical data is managed and manipulated in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Discuss MATLAB's exception handling capabilities.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss reading and writing binary data in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Discuss the steps involved in training a classification model in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Discuss the concept of Just-In-Time compilation in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Discuss interfacing MATLAB with SQL databases.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How would you import a pre-trained deep learning model into MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Discuss the process of fine-tuning a convolutional neural network in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How would you use MATLAB to preprocess a large dataset before applying machine learning algorithms?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Propose a method to use MATLAB for real-time data analysis and visualization.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Discuss recent advancements in MATLAB for machine learning and deep learning.**
+
+**Answer:** _[To be filled]_

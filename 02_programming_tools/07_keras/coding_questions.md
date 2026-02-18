@@ -668,3 +668,107 @@ def train_gan(epochs, batch_size=128):
 
 # train_gan(epochs=1000)
 ```
+
+---
+
+## Question 11
+
+**What is a custom layer in Keras and how would you implement one?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**What is early stopping in Keras and how do you implement it?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**How do you implement a multi-output model in Keras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Discuss the implementation of stateful LSTM networks in Keras.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Create a simple Keras model using the Sequential API for binary classification.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Write a script to load and preprocess image data for a CNN in Keras.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Code a Multi-Layer Perceptron (MLP) in Keras for a regression task.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Develop a custom callback in Keras that logs the predictions of a model at the end of each epoch.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Implement a Keras data generator to handle large datasets that cannot fit into memory.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Write a Python function using Keras to calculate and display a confusion matrix for a classification model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Create a script that fine-tunes a pre-trained convolutional neural network on a new dataset in Keras.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Explain how you can use Keras to implement a neural style transfer model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Discuss a strategy for implementing a real-time object detection system using Keras.**
+
+**Answer:** _[To be filled]_

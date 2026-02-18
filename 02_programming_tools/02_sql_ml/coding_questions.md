@@ -291,3 +291,99 @@ SELECT
 FROM products;
 ```
 
+
+---
+
+## Question 11
+
+**Write a SQL query to calculate moving averages.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How can you create lagged features in SQL?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Describe how to compute a ratio feature within groups using SQL.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**In SQL, how would you format strings or concatenate columns for text-based Machine Learning features?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Write a SQL stored procedure that calls a Machine Learning scoring function.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How would you construct a complex SQL query to extract time series features for a Machine Learning model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Discuss ways to implement regular expressions in SQL for natural language processing tasks.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**Write a SQL script to identify and replace missing values with the column mean.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Create a SQL query that normalizes a column (scales between 0 and 1).**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Generate a feature that is a count over a rolling time window using SQL.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Code an SQL function that categorizes continuous variables into bins.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Implement a SQL solution to compute the TF-IDF score for text data.**
+
+**Answer:** _[To be filled]_

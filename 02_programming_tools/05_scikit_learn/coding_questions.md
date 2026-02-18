@@ -508,3 +508,67 @@ model = RandomForestClassifier(random_state=42)
 plot_learning_curve(model, X, y)
 ```
 
+
+---
+
+## Question 11
+
+**How does Scikit-Learn implement logistic regression differently from linear regression?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Write a Python script using Scikit-Learn to train and evaluate a logistic regression model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Implement feature extraction from text using Scikit-Learn's CountVectorizer or TfidfVectorizer.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Normalize a given dataset using Scikit-Learn's preprocessing module, then train and test a Naive Bayes classifier.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Use Scikit-Learn to visualize the decision boundary of a SVM with a non-linear kernel.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Implement dimensionality reduction using PCA with Scikit-Learn and visualize the result.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Create a clustering analysis on a dataset using Scikit-Learn's DBSCAN method.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How do you save a trained Scikit-Learn model to disk and load it back for later use?**
+
+**Answer:** _[To be filled]_

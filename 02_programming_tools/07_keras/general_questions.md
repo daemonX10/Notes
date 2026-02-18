@@ -596,3 +596,107 @@ model = keras.Sequential([
 
 model.compile(optimizer='adam', loss='binary_crossentropy')
 ```
+
+---
+
+## Question 11
+
+**How do you configure a neural network in Keras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How can you add regularization to a model in Keras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**How do callbacks work in Keras and when would you use them?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**What methods does Keras provide for evaluating a model's performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How do you handle image data in Keras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What Keras functionality allows you to convert text to sequences or one-hot encoded vectors?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you troubleshoot a model that is not learning in Keras?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How do you interpret NaN values in loss during training and what steps would you take to address this?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**How do you deal with overfitting after early epochs in a Keras model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**What factors do you consider when deploying a Keras model to production?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How can you monitor and maintain Keras models in a production environment?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**How is Keras being used in the context of Graph Neural Networks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Present a framework for anomaly detection using autoencoders in Keras.**
+
+**Answer:** _[To be filled]_

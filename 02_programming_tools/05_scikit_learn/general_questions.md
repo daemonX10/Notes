@@ -426,3 +426,59 @@ pipeline = Pipeline([
 ])
 ```
 
+
+---
+
+## Question 11
+
+**What preprocessing steps would you take before inputting data into a machine learning algorithm?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How do you perform cross-validation using Scikit-Learn?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What metrics can be used in Scikit-Learn to assess the performance of a regression model versus a classification model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How are hyperparameters tuned in Scikit-Learn?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How do you monitor the performance of a Scikit-Learn model in production?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What recent advancements in machine learning are not yet fully supported by Scikit-Learn?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**What role do libraries like joblib play in the context of Scikit-Learn?**
+
+**Answer:** _[To be filled]_

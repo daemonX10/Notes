@@ -312,3 +312,83 @@ print(f"F1:        {f1_score(y_true, y_pred):.3f}")
 ### Interview Tip
 Always ask: "What is the business cost of different types of errors?" This determines which metric to prioritize.
 
+
+---
+
+## Question 7
+
+**Discuss the differences between supervised and unsupervised learning evaluation.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How would you approach feature selection in a large dataset?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Discuss strategies for dealing with imbalanced datasets.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Discuss the importance of model persistence and demonstrate how to save and load models in Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Discuss the impact of the GIL (Global Interpreter Lock) on Python concurrency in machine learning applications.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Discuss the role of the collections module in managing data structures for machine learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Discuss various options for deploying a machine learning model in Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Discuss strategies for effective logging and monitoring in machine-learning applications.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Discuss the implications of quantum computing on machine learning, with a Python perspective.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Discuss the integration of big data technologies with Python in machine learning projects.**
+
+**Answer:** _[To be filled]_

@@ -291,3 +291,139 @@ x_int = int32(1:1000);  % Integer type
 A_sparse = sparse(eye(10000));  % Much less memory
 ```
 
+
+---
+
+## Question 6
+
+**How do MATLAB scripts differ from functions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**How do you create 3D plots in MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How do you deal with time series data in MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**How do loops work in MATLAB, and when would you use them?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Demonstrate how to use conditional statements in MATLAB.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How do you create and use MATLAB cell arrays?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How to import data from a CSV file into MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What toolbox does MATLAB offer for machine learning, and what features does it include?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do neural networks work in MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**What functions does MATLAB provide for cross-validation?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How is parallel computing supported in MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you call a C/C++ library function from MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How can you run Python scripts within MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**How do you perform time-series analysis in MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**How do you train a Long Short-Term Memory (LSTM) network in MATLAB?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Present a strategy for using MATLAB to analyze genomic data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**How can you utilize MATLAB's App Designer to create interactive applications featuring machine learning models?**
+
+**Answer:** _[To be filled]_

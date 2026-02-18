@@ -460,3 +460,19 @@ df['risk_tier'] = pd.cut(df['churn_probability'],
 
 ---
 
+
+---
+
+## Question 76
+
+**How would you describe skewness and kurtosis in a dataset?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 77
+
+**How would you update a Bayesian model with new data?**
+
+**Answer:** _[To be filled]_

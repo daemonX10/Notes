@@ -403,3 +403,179 @@ print(f"λ * v: {lambda_1 * v}")
 ### Use Case in ML
 - PCA (Principal Component Analysis) uses eigendecomposition
 - Eigenvectors of covariance matrix = principal components
+
+---
+
+## Question 13
+
+**Explain how to invert a matrix in NumPy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you calculate the determinant of a matrix?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Describe how you would flatten a multi-dimensional array.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How can you reverse an array in NumPy?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you apply a conditional filter to a NumPy array?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How can you compute percentiles with NumPy?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**How do you calculate the correlation coefficient using NumPy?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Explain the use of the np.cumsum() and np.cumprod() functions.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**Describe the process for creating a structured array in NumPy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**How do you save and load NumPy arrays to and from disk?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Write a NumPy code to create a 3x3 identity matrix.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Code a function in NumPy to compute the moving average of a 1D array.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Generate a 2D NumPy array of random integers and normalize it between 0 and 1.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Create a NumPy code snippet to extract all odd numbers from an array.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Implement a routine to calculate the outer product of two vectors in NumPy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Write a NumPy program to create a checkerboard 8x8 matrix using the tile function.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Code a NumPy snippet to create a border around an existing array.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Write a function to compute the convolution of two matrices in NumPy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Implement a script that computes the Fibonacci sequence using a NumPy matrix.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**Write a code to replace all elements greater than a certain threshold in a NumPy array with a specific value.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**Implement an efficient rolling window calculation for a 1D array using NumPy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**Explain how you would implement gradient descent optimization with NumPy.**
+
+**Answer:** _[To be filled]_

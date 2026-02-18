@@ -366,3 +366,35 @@ import seaborn as sns
 sns.heatmap(df.corr(), annot=True)
 ```
 
+
+---
+
+## Question 12
+
+**What techniques can you use to improve the performance of Pandas operations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Compare and contrast the memory usage in Pandas for categories vs. objects.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you manage memory usage when working with large DataFrames?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How can you use chunking to process large CSV files with Pandas?**
+
+**Answer:** _[To be filled]_

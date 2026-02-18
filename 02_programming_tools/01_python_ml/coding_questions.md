@@ -799,3 +799,203 @@ print(f"F1 Score:  {f1_score(y_true, y_pred):.2f}")
 - Micro-average: Aggregate TP/FP/FN, then calculate (weight by class size)
 - Weighted-average: Weight by class support
 
+
+---
+
+## Question 8
+
+**Write a Python function that normalizes an array of data to the range [0, 1].**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**Construct a Python class structure for a simple perceptron model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**Create a Python script that performs linear regression on a dataset using NumPy.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**Write a function that optimizes a given cost function using gradient descent.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Use Pandas to read a CSV file, clean the data, and prepare it for analysis.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Develop a Python script that automates the process of hyperparameter tuning using grid search.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Explain the concept of a neural network, and how you would implement one in Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Discuss reinforcement learning and its implementation challenges.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**What is transfer learning, and how can you implement it using Python libraries?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you implement a recommendation system using Python?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**How would you develop a spam detection system using Python?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**Describe the steps to design a Python system that predicts house prices based on multiple features.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**Explain how you would create a sentiment analysis model with Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How would you build and deploy a machine-learning model for predicting customer churn?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**Discuss the development of a system to classify images using Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**Propose a method for detecting fraudulent transactions with Python-based machine learning.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**Create a Python generator that yields batches of data from a large dataset.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**Implement a convolutional neural network using PyTorch or TensorFlow in Python.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**Develop a Python function that uses genetic algorithms to optimize a simple problem.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Code a Python simulation that compares different optimization techniques on a fixed dataset.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Write a Python script that visualizes decision boundaries for a classification model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**Create a Python implementation of the A* search algorithm for pathfinding on a grid.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**Implement a simple reinforcement learning agent that learns to play a basic game.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**Use a Python library to perform time-series forecasting on stock market data.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**What is federated learning, and how can Python be used to implement it?**
+
+**Answer:** _[To be filled]_

@@ -245,3 +245,99 @@ FROM transactions;
 - Smoothed features (reduce noise)
 - Trend detection
 
+
+---
+
+## Question 7
+
+**How can you aggregate data in SQL (e.g., COUNT, AVG, SUM, MAX, MIN)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How can you extract time-based features from a SQL datetime field for use in a Machine Learning model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**How do you join transactional data to a dimension table in such a way that features for Machine Learning can be extracted?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**How can you deal with outliers in a SQL database before passing data to Machine Learning algorithms?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How can you execute a Machine Learning model stored in a database (such as a SQL Server with R or Python integration)?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Can you update a Machine Learning model directly from SQL? If so, how might you do it?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**What strategies can be used to efficiently update a large SQL-based Machine Learning model?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**How do you ensure the consistency and reliability of SQL data used for Machine Learning?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**What SQL features are there for report generation that might be useful for analyzing Machine Learning model performance?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**How can you use SQL to visualize the distribution of data points before feeding them into an ML algorithm?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Can SQL be used to visualize false positives and false negatives in classification models? If so, how?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What strategies might you use to automate the retraining and evaluation of Machine Learning models from within SQL?**
+
+**Answer:** _[To be filled]_

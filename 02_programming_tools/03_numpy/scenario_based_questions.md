@@ -436,3 +436,43 @@ print(f"Confusion Matrix:\n{cm}")
 # True 0: TN    FP
 # True 1: FN    TP
 ```
+
+---
+
+## Scenario 11
+
+**Discuss the performance benefits of using NumPy's in-place operations.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Scenario 12
+
+**How would you use NumPy to process image data for a convolutional neural network?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Scenario 13
+
+**Discuss the role of NumPy in managing data for training a machine learning model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Scenario 14
+
+**Discuss the potential issues when importing large datasets into NumPy arrays.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Scenario 15
+
+**Discuss the use of NumPy for operations on polynomials.**
+
+**Answer:** _[To be filled]_

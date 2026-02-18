@@ -894,3 +894,67 @@ quantized_model = torch.quantization.quantize_dynamic(
 )
 print(f"Quantized: {benchmark(quantized_model, x):.2f} ms")
 ```
+
+---
+
+## Question 11
+
+**How do you implement custom layers in PyTorch?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**How can you implement learning rate scheduling in PyTorch?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Explain transfer learning and its implementation in PyTorch.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Code a Python script that demonstrates tensor operations, such as slicing, indexing, concatenating, and transposing, using PyTorch.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Create a simple feedforward neural network in PyTorch that works on the MNIST dataset.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**Write a PyTorch function to manually compute the gradients for a basic linear regression model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**Write a Python script using PyTorch that saves and loads a trained model.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What are Graph Neural Networks (GNNs) and how can they be implemented in PyTorch?**
+
+**Answer:** _[To be filled]_

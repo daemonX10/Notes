@@ -217,3 +217,43 @@ np.nan == np.nan  # Returns False!
 np.isnan(np.nan)  # Returns True
 ```
 
+
+---
+
+## Question 7
+
+**How do you create a record array in NumPy?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**How can NumPy be used for audio signal processing?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**What methods are there in NumPy to deal with missing data?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**How do you find unique values and their counts in a NumPy array?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How can you use NumPy arrays with Cython for performance optimization?**
+
+**Answer:** _[To be filled]_

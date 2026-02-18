@@ -6983,3 +6983,408 @@ class DetectionALPipeline:
 **Answer:** _To be filled_
 
 ---
+
+---
+
+# --- OpenCV Questions (from source .txt) ---
+
+## Question 1
+
+**How do you optimize OpenCV performance for real-time computer vision applications with high frame rates?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 2
+
+**What are the best practices for integrating OpenCV with deep learning frameworks like PyTorch and TensorFlow?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 3
+
+**How do you implement efficient image preprocessing pipelines using OpenCV for ML model inputs?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 4
+
+**When should you use OpenCV's built-in algorithms versus implementing custom computer vision solutions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 5
+
+**How do you handle OpenCV memory management and optimization for large image processing workloads?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 6
+
+**What techniques help you implement OpenCV-based video processing for streaming applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 7
+
+**How do you use OpenCV for camera calibration and 3D computer vision applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 8
+
+**When would you choose OpenCV over other computer vision libraries like PIL or scikitimage?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 9
+
+**How do you implement OpenCV integration with GPU acceleration using CUDA or OpenCL?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 10
+
+**What strategies help you optimize OpenCV algorithms for mobile and embedded deployments?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 11
+
+**How do you handle OpenCV version compatibility and migration across different project requirements?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**When should you use OpenCV's machine learning module versus external ML frameworks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**How do you implement OpenCV-based object detection and tracking systems for production use?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**What techniques help you optimize OpenCV image I/O operations for high-throughput applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**How do you use OpenCV for image augmentation and data preprocessing in ML pipelines?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 16
+
+**When would you implement custom OpenCV filters and kernels versus using built-in functions?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 17
+
+**How do you handle OpenCV integration with cloud storage and distributed processing systems?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 18
+
+**What are the best practices for OpenCV error handling and debugging in production environments?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 19
+
+**How do you implement OpenCV-based feature extraction and descriptor matching workflows?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 20
+
+**When should you use OpenCV's Python bindings versus C++ implementation for performance-critical applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 21
+
+**How do you optimize OpenCV for batch image processing and parallel execution?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 22
+
+**What strategies help you manage OpenCV dependencies and build configurations across platforms?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 23
+
+**How do you implement OpenCV integration with video streaming protocols and real-time communication?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 24
+
+**When would you use OpenCV's image stitching and panorama creation capabilities in applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 25
+
+**How do you handle OpenCV-based image quality assessment and enhancement workflows?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 26
+
+**What techniques help you implement OpenCV integration with AR/VR and mixed reality applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**How do you use OpenCV for medical image processing and analysis applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**When should you combine OpenCV with other computer vision tools like MediaPipe or Detectron2?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 29
+
+**How do you implement OpenCV-based optical character recognition (OCR) and text detection systems?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 30
+
+**What are the considerations for OpenCV deployment in containerized and orchestrated environments?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 31
+
+**How do you handle OpenCV integration with hardware-specific optimizations like Intel MKL or ARM NEON?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 32
+
+**When would you use OpenCV's contribution modules versus core functionality for specialized tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 33
+
+**How do you implement OpenCV-based image registration and alignment workflows?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 34
+
+**What strategies help you optimize OpenCV for low-latency computer vision applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 35
+
+**How do you handle OpenCV integration with machine learning model serving frameworks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 36
+
+**When should you use OpenCV's drawing and annotation functions for visualization and debugging?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 37
+
+**How do you implement OpenCV-based color space conversions and image format handling?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 38
+
+**What techniques help you manage OpenCV performance profiling and bottleneck identification?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 39
+
+**How do you use OpenCV for geometric transformations and perspective correction in applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 40
+
+**When would you implement OpenCV custom data structures versus using standard containers?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 41
+
+**How do you handle OpenCV integration with web applications and browser-based computer vision?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 42
+
+**What are the best practices for OpenCV testing and validation in continuous integration pipelines?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 43
+
+**How do you implement OpenCV-based motion detection and analysis for surveillance applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 44
+
+**When should you use OpenCV's histogram analysis and statistical functions for image analysis?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 45
+
+**How do you handle OpenCV optimization for specific use cases like autonomous vehicles or robotics?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 46
+
+**What strategies help you manage OpenCV licensing and intellectual property considerations?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 47
+
+**How do you implement OpenCV integration with data annotation tools and ground truth generation?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 48
+
+**When would you use OpenCV's machine learning algorithms for clustering and classification tasks?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 49
+
+**How do you use OpenCV for stereo vision and depth estimation applications?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 50
+
+**What techniques help you integrate OpenCV workflows with automated testing and quality assurance systems?**
+
+**Answer:** _[To be filled]_
+
+---
+
