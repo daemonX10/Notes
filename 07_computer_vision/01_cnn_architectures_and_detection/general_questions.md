@@ -1,4 +1,8 @@
-# Co**What's the significance of depth perception in computer vision applications?**
+# Computer Vision Interview Questions - General Questions
+
+## Question 1
+
+**What's the significance of depth perception in computer vision applications?**
 
 **Answer:**
 
@@ -578,13 +582,7 @@ Depth perception is crucial for computer vision because it:
 5. **Enables Measurement**: Provides quantitative spatial measurements
 6. **Improves Accuracy**: Reduces ambiguity in object detection and tracking
 
-Modern depth perception techniques include stereo vision, structured light, time-of-flight cameras, and deep learning-based monocular depth estimation, each with specific advantages for different applications and environments.ter Vision Interview Questions - General Questions
-
-## Question 1
-
-**What’s the significance ofdepth perceptionin computer vision applications?**
-
-**Answer:** _[To be filled]_
+Modern depth perception techniques include stereo vision, structured light, time-of-flight cameras, and deep learning-based monocular depth estimation, each with specific advantages for different applications and environments.
 
 ---
 
@@ -3858,15 +3856,157 @@ The architectural innovations in CNNs represent a fundamental shift from generic
 
 ---
 
-## Question 4
+## Question 5
 
 **What’s the difference betweenobject detectionandimage classification?**
 
-**Answer:** _[To be filled]_
+**Answer:**
+
+Object detection and image classification are two fundamental computer vision tasks that serve different purposes and require distinct architectural approaches. Understanding their differences is essential for choosing the right approach for any given application.
+
+### Core Concept Comparison
+
+| Aspect | Image Classification | Object Detection |
+|--------|---------------------|-----------------|
+| **Task** | Assign a single label to the entire image | Locate and classify multiple objects within an image |
+| **Output** | Class label + confidence score | Bounding boxes + class labels + confidence scores |
+| **Granularity** | Image-level | Object-level |
+| **Multiple Objects** | Typically single-label (or multi-label) | Handles multiple objects natively |
+| **Spatial Info** | No location information | Precise location (x, y, width, height) |
+| **Complexity** | Lower computational cost | Higher computational cost |
+
+### Architectural Differences
+
+#### 1. **Image Classification Architecture**
+
+```python
+import torch
+import torch.nn as nn
+import torchvision.models as models
+
+class ImageClassifier(nn.Module):
+    """Standard image classification model"""
+    
+    def __init__(self, num_classes=10):
+        super().__init__()
+        self.backbone = models.resnet50(pretrained=True)
+        in_features = self.backbone.fc.in_features
+        self.backbone.fc = nn.Linear(in_features, num_classes)
+    
+    def forward(self, x):
+        # Output: [batch_size, num_classes]
+        return self.backbone(x)
+
+# Pipeline: Image -> CNN Backbone -> Global Average Pooling -> FC -> Class Probs
+# Example output: {"cat": 0.95, "dog": 0.03, "bird": 0.02}
+```
+
+#### 2. **Object Detection Architecture**
+
+```python
+import torchvision
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
+
+class ObjectDetector:
+    """Standard object detection model"""
+    
+    def __init__(self, num_classes=91):
+        self.model = fasterrcnn_resnet50_fpn(pretrained=True)
+        self.model.eval()
+    
+    def detect(self, image):
+        with torch.no_grad():
+            predictions = self.model([image])
+        # Output: boxes [N,4], labels [N], scores [N]
+        return predictions[0]
+
+# Pipeline: Image -> Backbone+FPN -> Region Proposals -> ROI Pooling -> Cls+Reg
+# Example output: [
+#   {"box": [100,50,300,400], "label": "cat", "score": 0.97},
+#   {"box": [400,100,550,350], "label": "dog", "score": 0.89}
+# ]
+```
+
+### Key Differences in Detail
+
+#### 1. **Loss Functions**
+
+```python
+# Image Classification: Single cross-entropy loss
+cls_loss = nn.CrossEntropyLoss()(predicted_logits, true_labels)
+
+# Object Detection: Multi-task loss
+def detection_loss(predictions, targets):
+    cls_loss = nn.CrossEntropyLoss()(pred_classes, true_classes)   # What is it?
+    loc_loss = nn.SmoothL1Loss()(pred_boxes, true_boxes)           # Where is it?
+    obj_loss = nn.BCELoss()(pred_objectness, true_objectness)      # Is there anything?
+    return cls_loss + loc_loss + obj_loss
+```
+
+#### 2. **Evaluation Metrics**
+
+| Metric | Classification | Detection |
+|--------|---------------|-----------|
+| **Primary** | Accuracy, Top-5 Accuracy | mAP (mean Average Precision) |
+| **Per-class** | Precision, Recall, F1 | AP per class at IoU thresholds |
+| **Threshold** | Confidence threshold | IoU threshold (0.5, 0.75) |
+| **Speed** | Throughput (images/sec) | FPS + latency |
+| **Standard** | ImageNet Top-1/Top-5 | COCO mAP@[0.5:0.95] |
+
+#### 3. **Training Data Format**
+
+```python
+# Classification: Image + Single Label
+classification_sample = {
+    "image": "cat_001.jpg",
+    "label": 3  # class index for "cat"
+}
+
+# Detection: Image + Multiple Annotations
+detection_sample = {
+    "image": "street_scene.jpg",
+    "annotations": [
+        {"bbox": [100, 50, 200, 300], "category_id": 1},  # person
+        {"bbox": [400, 100, 150, 200], "category_id": 3},  # car
+        {"bbox": [600, 200, 80, 120], "category_id": 2},   # bicycle
+    ]
+}
+```
+
+### When to Use Each
+
+| Scenario | Best Approach |
+|----------|--------------|
+| "Is this X-ray normal or abnormal?" | Classification |
+| "Where are all tumors in this X-ray?" | Detection |
+| "What breed is this dog?" | Classification |
+| "Find all dogs and cats in the park photo" | Detection |
+| "Identify product category" | Classification |
+| "Count people in a crowd" | Detection |
+| "Quality inspection on assembly line" | Detection |
+
+### Evolution and Relationship
+
+```
+Image Classification          Object Detection
+     |                              |
+     +-- LeNet (1998)               +-- Sliding Window + HOG/SVM
+     +-- AlexNet (2012)             +-- R-CNN (2014) <- Uses classifier!
+     +-- VGG (2014)                 +-- Fast R-CNN (2015)
+     +-- GoogLeNet (2014)           +-- Faster R-CNN (2015)
+     +-- ResNet (2015)              +-- SSD (2016)
+     +-- EfficientNet (2019)        +-- YOLOv1-v8 (2015-2023)
+     +-- ViT (2020)                 +-- DETR (2020)
+                                    +-- RT-DETR (2023)
+
+Classification backbones are often reused as feature extractors in detection!
+```
+
+> **Interview Tip:** Emphasize that object detection is essentially classification + localization combined. Detection models often use classification backbones (ResNet, EfficientNet) as their feature extractor, making classification a building block of detection. Also mention that modern unified architectures like DETR blur the line by treating detection as a set prediction problem.
 
 ---
 
-## Question 5
+## Question 6
 
 **What algorithms can you use forreal-time object detection?**
 
@@ -4629,7 +4769,7 @@ class RealTimePerformanceOptimization:
 
 ---
 
-## Question 6
+## Question 7
 
 **How doimage recognitionmodels deal withocclusion?**
 
@@ -5364,7 +5504,7 @@ Modern image recognition models handle occlusion through a combination of data a
 
 ---
 
-## Question 7
+## Question 8
 
 **Compare the use ofone-stagevs.two-stage detectorsfor object detection.**
 
@@ -6412,7 +6552,7 @@ The choice ultimately depends on the specific balance of speed, accuracy, and de
 
 ---
 
-## Question 8
+## Question 9
 
 **How candepth informationbe utilized insemantic segmentation?**
 
@@ -7582,7 +7722,7 @@ class PerformanceEvaluation:
 
 ---
 
-## Question 9
+## Question 10
 
 **How canreinforcement learningbe applied to problems incomputer vision?**
 
@@ -8647,7 +8787,7 @@ class RLApplicationBenchmarks:
 
 ---
 
-## Question 10
+## Question 11
 
 **How do you handleoverfittingin acomputer vision model?**
 
@@ -9825,7 +9965,7 @@ def example_training():
 
 ---
 
-## Question 11
+## Question 12
 
 **Outline the computer vision technologies involved in autonomous vehicle navigation.**
 
@@ -10595,7 +10735,7 @@ class PathPlanningSystem:
 
 ---
 
-## Question 12
+## Question 13
 
 **How might augmented reality (AR) applications benefit from advances in computer vision?**
 

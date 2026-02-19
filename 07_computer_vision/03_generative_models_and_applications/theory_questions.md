@@ -20244,7 +20244,7 @@ def speedup_summary():
 
 ## Question 3
 
-**Discuss separation of coarse, middle, fine styles along layers.**
+**Explain progressive growing in StyleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20252,7 +20252,7 @@ def speedup_summary():
 
 ## Question 4
 
-**Explain progressive growing in StyleGAN.**
+**Describe path-length regularisation in StyleGAN2.**
 
 **Answer:** _[To be filled]_
 
@@ -20260,7 +20260,7 @@ def speedup_summary():
 
 ## Question 5
 
-**Describe path-length regularisation in StyleGAN2.**
+**Explain weight demodulation and its purpose.**
 
 **Answer:** _[To be filled]_
 
@@ -20268,7 +20268,7 @@ def speedup_summary():
 
 ## Question 6
 
-**Explain weight demodulation and its purpose.**
+**Discuss removal of blob-shaped artifacts in StyleGAN2-ADA.**
 
 **Answer:** _[To be filled]_
 
@@ -20276,7 +20276,7 @@ def speedup_summary():
 
 ## Question 7
 
-**Discuss removal of blob-shaped artifacts in StyleGAN2-ADA.**
+**Explain Adaptive Discriminator Augmentation (ADA).**
 
 **Answer:** _[To be filled]_
 
@@ -20284,7 +20284,7 @@ def speedup_summary():
 
 ## Question 8
 
-**Explain Adaptive Discriminator Augmentation (ADA).**
+**Compare StyleGAN vs. ProGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20292,7 +20292,7 @@ def speedup_summary():
 
 ## Question 9
 
-**Compare StyleGAN vs. ProGAN.**
+**Describe style mixing regularisation.**
 
 **Answer:** _[To be filled]_
 
@@ -20300,7 +20300,7 @@ def speedup_summary():
 
 ## Question 10
 
-**Describe style mixing regularisation.**
+**Explain noise injection and stochastic variation.**
 
 **Answer:** _[To be filled]_
 
@@ -20308,7 +20308,7 @@ def speedup_summary():
 
 ## Question 11
 
-**Explain noise injection and stochastic variation.**
+**Discuss truncation trick and ψ parameter.**
 
 **Answer:** _[To be filled]_
 
@@ -20316,7 +20316,7 @@ def speedup_summary():
 
 ## Question 12
 
-**Discuss truncation trick and ψ parameter.**
+**Describe interface-GAN and latent editing.**
 
 **Answer:** _[To be filled]_
 
@@ -20324,7 +20324,7 @@ def speedup_summary():
 
 ## Question 13
 
-**Explain StyleGAN latent spaces: Z, W, W+, P.**
+**Explain StyleGAN inversion methods (e.g., e4e, pSp).**
 
 **Answer:** _[To be filled]_
 
@@ -20332,7 +20332,7 @@ def speedup_summary():
 
 ## Question 14
 
-**Describe interface-GAN and latent editing.**
+**Compare pixel-wise vs. channel-wise noise.**
 
 **Answer:** _[To be filled]_
 
@@ -20340,7 +20340,7 @@ def speedup_summary():
 
 ## Question 15
 
-**Explain StyleGAN inversion methods (e.g., e4e, pSp).**
+**Discuss StyleGAN3's alias-free design.**
 
 **Answer:** _[To be filled]_
 
@@ -20348,7 +20348,7 @@ def speedup_summary():
 
 ## Question 16
 
-**Compare pixel-wise vs. channel-wise noise.**
+**Explain 2-D fourier features in StyleGAN3.**
 
 **Answer:** _[To be filled]_
 
@@ -20356,7 +20356,7 @@ def speedup_summary():
 
 ## Question 17
 
-**Discuss StyleGAN3's alias-free design.**
+**Describe continuous depth translation invariance.**
 
 **Answer:** _[To be filled]_
 
@@ -20364,7 +20364,7 @@ def speedup_summary():
 
 ## Question 18
 
-**Explain 2-D fourier features in StyleGAN3.**
+**Discuss out-of-distribution generalisation and datasets.**
 
 **Answer:** _[To be filled]_
 
@@ -20372,7 +20372,7 @@ def speedup_summary():
 
 ## Question 19
 
-**Describe continuous depth translation invariance.**
+**Compare FID vs. Inception Score for generative quality.**
 
 **Answer:** _[To be filled]_
 
@@ -20380,7 +20380,7 @@ def speedup_summary():
 
 ## Question 20
 
-**Discuss out-of-distribution generalisation and datasets.**
+**Explain projector for identity-preserving face editing.**
 
 **Answer:** _[To be filled]_
 
@@ -20388,7 +20388,7 @@ def speedup_summary():
 
 ## Question 21
 
-**Compare FID vs. Inception Score for generative quality.**
+**Discuss attribute manipulations with GANSpace.**
 
 **Answer:** _[To be filled]_
 
@@ -20396,7 +20396,7 @@ def speedup_summary():
 
 ## Question 22
 
-**Explain projector for identity-preserving face editing.**
+**Explain GAN dissection and unit visualisation.**
 
 **Answer:** _[To be filled]_
 
@@ -20404,7 +20404,7 @@ def speedup_summary():
 
 ## Question 23
 
-**Discuss attribute manipulations with GANSpace.**
+**Describe style generalisation across datasets.**
 
 **Answer:** _[To be filled]_
 
@@ -20412,7 +20412,7 @@ def speedup_summary():
 
 ## Question 24
 
-**Explain GAN dissection and unit visualisation.**
+**Explain fine-tuning StyleGAN for few-shot generation.**
 
 **Answer:** _[To be filled]_
 
@@ -20420,7 +20420,7 @@ def speedup_summary():
 
 ## Question 25
 
-**Describe style generalisation across datasets.**
+**Discuss GAN-based data augmentation for downstream tasks.**
 
 **Answer:** _[To be filled]_
 
@@ -20428,7 +20428,7 @@ def speedup_summary():
 
 ## Question 26
 
-**Explain fine-tuning StyleGAN for few-shot generation.**
+**Explain CLIP-guided latent editing.**
 
 **Answer:** _[To be filled]_
 
@@ -20436,7 +20436,7 @@ def speedup_summary():
 
 ## Question 27
 
-**Discuss GAN-based data augmentation for downstream tasks.**
+**Describe training StyleGAN on non-aligned data.**
 
 **Answer:** _[To be filled]_
 
@@ -20444,7 +20444,7 @@ def speedup_summary():
 
 ## Question 28
 
-**Explain CLIP-guided latent editing.**
+**Explain hyperspherical latent space and spherical embeddings.**
 
 **Answer:** _[To be filled]_
 
@@ -20452,7 +20452,7 @@ def speedup_summary():
 
 ## Question 29
 
-**Describe training StyleGAN on non-aligned data.**
+**Discuss generative prior for image restoration.**
 
 **Answer:** _[To be filled]_
 
@@ -20460,7 +20460,7 @@ def speedup_summary():
 
 ## Question 30
 
-**Explain hyperspherical latent space and spherical embeddings.**
+**Explain StyleGAN for text-to-image via multi-modal alignment.**
 
 **Answer:** _[To be filled]_
 
@@ -20468,7 +20468,7 @@ def speedup_summary():
 
 ## Question 31
 
-**Discuss generative prior for image restoration.**
+**Describe Co-mod-GAN bridging StyleGAN with segmentation.**
 
 **Answer:** _[To be filled]_
 
@@ -20476,7 +20476,7 @@ def speedup_summary():
 
 ## Question 32
 
-**Explain StyleGAN for text-to-image via multi-modal alignment.**
+**Explain 3-D aware StyleGAN (StyleNeRF).**
 
 **Answer:** _[To be filled]_
 
@@ -20484,7 +20484,7 @@ def speedup_summary():
 
 ## Question 33
 
-**Describe Co-mod-GAN bridging StyleGAN with segmentation.**
+**Discuss hyper-style for high-quality editing.**
 
 **Answer:** _[To be filled]_
 
@@ -20492,7 +20492,7 @@ def speedup_summary():
 
 ## Question 34
 
-**Explain 3-D aware StyleGAN (StyleNeRF).**
+**Explain adversarial robustness of StyleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20500,7 +20500,7 @@ def speedup_summary():
 
 ## Question 35
 
-**Discuss hyper-style for high-quality editing.**
+**Describe model compression and distillation for mobile GANs.**
 
 **Answer:** _[To be filled]_
 
@@ -20508,7 +20508,7 @@ def speedup_summary():
 
 ## Question 36
 
-**Explain adversarial robustness of StyleGAN.**
+**Discuss fairness and demographic bias in face GANs.**
 
 **Answer:** _[To be filled]_
 
@@ -20516,7 +20516,7 @@ def speedup_summary():
 
 ## Question 37
 
-**Describe model compression and distillation for mobile GANs.**
+**Explain integrating diffusion loss into StyleGAN training.**
 
 **Answer:** _[To be filled]_
 
@@ -20524,7 +20524,7 @@ def speedup_summary():
 
 ## Question 38
 
-**Discuss fairness and demographic bias in face GANs.**
+**Describe watermarking generated images.**
 
 **Answer:** _[To be filled]_
 
@@ -20532,7 +20532,7 @@ def speedup_summary():
 
 ## Question 39
 
-**Explain integrating diffusion loss into StyleGAN training.**
+**Explain infinite zoom and out-painting with StyleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20540,7 +20540,7 @@ def speedup_summary():
 
 ## Question 40
 
-**Describe watermarking generated images.**
+**Discuss licensing and ethical concerns of dataset usage.**
 
 **Answer:** _[To be filled]_
 
@@ -20548,7 +20548,7 @@ def speedup_summary():
 
 ## Question 41
 
-**Explain infinite zoom and out-painting with StyleGAN.**
+**Explain style mixing latent interpolation.**
 
 **Answer:** _[To be filled]_
 
@@ -20556,7 +20556,7 @@ def speedup_summary():
 
 ## Question 42
 
-**Discuss licensing and ethical concerns of dataset usage.**
+**Describe transferring StyleGAN generator between domains.**
 
 **Answer:** _[To be filled]_
 
@@ -20564,7 +20564,7 @@ def speedup_summary():
 
 ## Question 43
 
-**Explain style mixing latent interpolation.**
+**Explain segmentation-guided GANs for part mixing.**
 
 **Answer:** _[To be filled]_
 
@@ -20572,7 +20572,7 @@ def speedup_summary():
 
 ## Question 44
 
-**Describe transferring StyleGAN generator between domains.**
+**Discuss real-time inference optimisation.**
 
 **Answer:** _[To be filled]_
 
@@ -20580,7 +20580,7 @@ def speedup_summary():
 
 ## Question 45
 
-**Explain segmentation-guided GANs for part mixing.**
+**Explain zero-shot generative domain adaptation.**
 
 **Answer:** _[To be filled]_
 
@@ -20588,7 +20588,7 @@ def speedup_summary():
 
 ## Question 46
 
-**Discuss real-time inference optimisation.**
+**Discuss adversarial detection of GAN-generated images.**
 
 **Answer:** _[To be filled]_
 
@@ -20596,29 +20596,13 @@ def speedup_summary():
 
 ## Question 47
 
-**Explain zero-shot generative domain adaptation.**
-
-**Answer:** _[To be filled]_
-
----
-
-## Question 48
-
-**Discuss adversarial detection of GAN-generated images.**
-
-**Answer:** _[To be filled]_
-
----
-
-## Question 49
-
 **Explain quality tuning via per-layer noise magnitude.**
 
 **Answer:** _[To be filled]_
 
 ---
 
-## Question 50
+## Question 48
 
 **Predict future of StyleGAN-like architectures.**
 
@@ -20635,7 +20619,7 @@ def speedup_summary():
 
 ## Question 1
 
-**Explain image-to-image translation without paired data.**
+**Describe adversarial loss and cycle-consistency loss.**
 
 **Answer:** _[To be filled]_
 
@@ -20643,7 +20627,7 @@ def speedup_summary():
 
 ## Question 2
 
-**Describe adversarial loss and cycle-consistency loss.**
+**Discuss identity loss and when needed.**
 
 **Answer:** _[To be filled]_
 
@@ -20651,7 +20635,7 @@ def speedup_summary():
 
 ## Question 3
 
-**Discuss identity loss and when needed.**
+**Explain role of PatchGAN discriminator.**
 
 **Answer:** _[To be filled]_
 
@@ -20659,7 +20643,7 @@ def speedup_summary():
 
 ## Question 4
 
-**Explain role of PatchGAN discriminator.**
+**Describe generator architecture in CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20667,7 +20651,7 @@ def speedup_summary():
 
 ## Question 5
 
-**Describe generator architecture in CycleGAN.**
+**Explain training stability challenges in CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20675,7 +20659,7 @@ def speedup_summary():
 
 ## Question 6
 
-**Explain training stability challenges in CycleGAN.**
+**Discuss mode collapse and mitigation.**
 
 **Answer:** _[To be filled]_
 
@@ -20683,7 +20667,7 @@ def speedup_summary():
 
 ## Question 7
 
-**Discuss mode collapse and mitigation.**
+**Explain mapping ambiguity problem.**
 
 **Answer:** _[To be filled]_
 
@@ -20691,7 +20675,7 @@ def speedup_summary():
 
 ## Question 8
 
-**Explain mapping ambiguity problem.**
+**Describe data augmentation strategies.**
 
 **Answer:** _[To be filled]_
 
@@ -20699,7 +20683,7 @@ def speedup_summary():
 
 ## Question 9
 
-**Describe data augmentation strategies.**
+**Explain CycleGAN for style transfer vs. domain transfer.**
 
 **Answer:** _[To be filled]_
 
@@ -20707,7 +20691,7 @@ def speedup_summary():
 
 ## Question 10
 
-**Explain CycleGAN for style transfer vs. domain transfer.**
+**Discuss applications in medical imaging.**
 
 **Answer:** _[To be filled]_
 
@@ -20715,7 +20699,7 @@ def speedup_summary():
 
 ## Question 11
 
-**Discuss applications in medical imaging.**
+**Explain CycleGAN in video translation and temporal consistency.**
 
 **Answer:** _[To be filled]_
 
@@ -20723,7 +20707,7 @@ def speedup_summary():
 
 ## Question 12
 
-**Explain CycleGAN in video translation and temporal consistency.**
+**Discuss evaluation with FID and LPIPS.**
 
 **Answer:** _[To be filled]_
 
@@ -20731,7 +20715,7 @@ def speedup_summary():
 
 ## Question 13
 
-**Discuss evaluation with FID and LPIPS.**
+**Explain spectral normalization in CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20739,7 +20723,7 @@ def speedup_summary():
 
 ## Question 14
 
-**Explain spectral normalization in CycleGAN.**
+**Describe attention-guided CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20747,7 +20731,7 @@ def speedup_summary():
 
 ## Question 15
 
-**Describe attention-guided CycleGAN.**
+**Explain multi-domain CycleGAN (StarGAN).**
 
 **Answer:** _[To be filled]_
 
@@ -20755,7 +20739,7 @@ def speedup_summary():
 
 ## Question 16
 
-**Explain multi-domain CycleGAN (StarGAN).**
+**Discuss geometry-consistent CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20763,7 +20747,7 @@ def speedup_summary():
 
 ## Question 17
 
-**Discuss geometry-consistent CycleGAN.**
+**Explain cut (contrastive unpaired translation) vs. CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20771,7 +20755,7 @@ def speedup_summary():
 
 ## Question 18
 
-**Explain cut (contrastive unpaired translation) vs. CycleGAN.**
+**Describe cyclic perceptual loss.**
 
 **Answer:** _[To be filled]_
 
@@ -20779,7 +20763,7 @@ def speedup_summary():
 
 ## Question 19
 
-**Describe cyclic perceptual loss.**
+**Discuss memory use with high-res images.**
 
 **Answer:** _[To be filled]_
 
@@ -20787,7 +20771,7 @@ def speedup_summary():
 
 ## Question 20
 
-**Discuss memory use with high-res images.**
+**Explain one-sided label smoothing in discriminators.**
 
 **Answer:** _[To be filled]_
 
@@ -20795,7 +20779,7 @@ def speedup_summary():
 
 ## Question 21
 
-**Explain one-sided label smoothing in discriminators.**
+**Discuss CubeGAN for 3-D domain translation.**
 
 **Answer:** _[To be filled]_
 
@@ -20803,7 +20787,7 @@ def speedup_summary():
 
 ## Question 22
 
-**Discuss CubeGAN for 3-D domain translation.**
+**Explain partial weight sharing across generators.**
 
 **Answer:** _[To be filled]_
 
@@ -20811,7 +20795,7 @@ def speedup_summary():
 
 ## Question 23
 
-**Explain partial weight sharing across generators.**
+**Describe training with mixed precision for CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20819,7 +20803,7 @@ def speedup_summary():
 
 ## Question 24
 
-**Describe training with mixed precision for CycleGAN.**
+**Explain patch-based training vs. full-image.**
 
 **Answer:** _[To be filled]_
 
@@ -20827,7 +20811,7 @@ def speedup_summary():
 
 ## Question 25
 
-**Explain patch-based training vs. full-image.**
+**Discuss CycleGAN for style untransferability issues.**
 
 **Answer:** _[To be filled]_
 
@@ -20835,7 +20819,7 @@ def speedup_summary():
 
 ## Question 26
 
-**Discuss CycleGAN for style untransferability issues.**
+**Explain domain adaptation using CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20843,7 +20827,7 @@ def speedup_summary():
 
 ## Question 27
 
-**Explain domain adaptation using CycleGAN.**
+**Describe unsupervised depth transfer via CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20851,7 +20835,7 @@ def speedup_summary():
 
 ## Question 28
 
-**Describe unsupervised depth transfer via CycleGAN.**
+**Explain CycleGAN failure cases.**
 
 **Answer:** _[To be filled]_
 
@@ -20859,7 +20843,7 @@ def speedup_summary():
 
 ## Question 29
 
-**Explain CycleGAN failure cases.**
+**Discuss cyclic consistency with contrastive loss.**
 
 **Answer:** _[To be filled]_
 
@@ -20867,7 +20851,7 @@ def speedup_summary():
 
 ## Question 30
 
-**Discuss cyclic consistency with contrastive loss.**
+**Explain multi-cycle synergy (double cycle).**
 
 **Answer:** _[To be filled]_
 
@@ -20875,7 +20859,7 @@ def speedup_summary():
 
 ## Question 31
 
-**Explain multi-cycle synergy (double cycle).**
+**Discuss GAN inversion for CycleGAN editing.**
 
 **Answer:** _[To be filled]_
 
@@ -20883,7 +20867,7 @@ def speedup_summary():
 
 ## Question 32
 
-**Discuss GAN inversion for CycleGAN editing.**
+**Describe face ageing with CycleGAN variations.**
 
 **Answer:** _[To be filled]_
 
@@ -20891,7 +20875,7 @@ def speedup_summary():
 
 ## Question 33
 
-**Describe face ageing with CycleGAN variations.**
+**Explain dual learning relationship.**
 
 **Answer:** _[To be filled]_
 
@@ -20899,7 +20883,7 @@ def speedup_summary():
 
 ## Question 34
 
-**Explain dual learning relationship.**
+**Discuss training time reduction via teacher-student.**
 
 **Answer:** _[To be filled]_
 
@@ -20907,7 +20891,7 @@ def speedup_summary():
 
 ## Question 35
 
-**Discuss training time reduction via teacher-student.**
+**Explain zero-shot translation with pre-trained CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20915,7 +20899,7 @@ def speedup_summary():
 
 ## Question 36
 
-**Explain zero-shot translation with pre-trained CycleGAN.**
+**Describe patch-swap enhancements.**
 
 **Answer:** _[To be filled]_
 
@@ -20923,7 +20907,7 @@ def speedup_summary():
 
 ## Question 37
 
-**Describe patch-swap enhancements.**
+**Explain dynamical cropping for training.**
 
 **Answer:** _[To be filled]_
 
@@ -20931,7 +20915,7 @@ def speedup_summary():
 
 ## Question 38
 
-**Explain dynamical cropping for training.**
+**Discuss CycleGAN for audio domain.**
 
 **Answer:** _[To be filled]_
 
@@ -20939,7 +20923,7 @@ def speedup_summary():
 
 ## Question 39
 
-**Discuss CycleGAN for audio domain.**
+**Explain progressive growing for CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20947,7 +20931,7 @@ def speedup_summary():
 
 ## Question 40
 
-**Explain progressive growing for CycleGAN.**
+**Describe multi-scale discriminators.**
 
 **Answer:** _[To be filled]_
 
@@ -20955,7 +20939,7 @@ def speedup_summary():
 
 ## Question 41
 
-**Describe multi-scale discriminators.**
+**Discuss regularization techniques specific to CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20963,7 +20947,7 @@ def speedup_summary():
 
 ## Question 42
 
-**Discuss regularization techniques specific to CycleGAN.**
+**Explain semantic consistency losses.**
 
 **Answer:** _[To be filled]_
 
@@ -20971,7 +20955,7 @@ def speedup_summary():
 
 ## Question 43
 
-**Explain semantic consistency losses.**
+**Describe cross-domain feature alignment.**
 
 **Answer:** _[To be filled]_
 
@@ -20979,7 +20963,7 @@ def speedup_summary():
 
 ## Question 44
 
-**Describe cross-domain feature alignment.**
+**Discuss conditional CycleGAN variants.**
 
 **Answer:** _[To be filled]_
 
@@ -20987,7 +20971,7 @@ def speedup_summary():
 
 ## Question 45
 
-**Discuss conditional CycleGAN variants.**
+**Explain deployment considerations for CycleGAN.**
 
 **Answer:** _[To be filled]_
 
@@ -20995,7 +20979,7 @@ def speedup_summary():
 
 ## Question 46
 
-**Explain deployment considerations for CycleGAN.**
+**Describe quality assessment metrics for unpaired translation.**
 
 **Answer:** _[To be filled]_
 
@@ -21003,7 +20987,7 @@ def speedup_summary():
 
 ## Question 47
 
-**Describe quality assessment metrics for unpaired translation.**
+**Discuss ethical considerations in domain transfer.**
 
 **Answer:** _[To be filled]_
 
@@ -21011,21 +20995,13 @@ def speedup_summary():
 
 ## Question 48
 
-**Discuss ethical considerations in domain transfer.**
-
-**Answer:** _[To be filled]_
-
----
-
-## Question 49
-
 **Explain recent improvements to CycleGAN architecture.**
 
 **Answer:** _[To be filled]_
 
 ---
 
-## Question 50
+## Question 49
 
 **Predict future directions for unpaired image translation.**
 
@@ -21511,286 +21487,279 @@ def speedup_summary():
 ---
 
 ## Question 10
-**Compare diffusion vs. GANs for image generation.**
-
-**Answer:** _To be filled_
-
----
-
-## Question 11
 **Describe noise prediction vs. score matching.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 12
+## Question 11
 **Explain timestep embedding and sinusoidal encoding.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 13
+## Question 12
 **Describe attention mechanisms in diffusion U-Net.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 14
+## Question 13
 **Explain sampling strategies (DDPM, DDIM, DPM-Solver).**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 15
+## Question 14
 **Compare deterministic vs. stochastic sampling.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 16
+## Question 15
 **Describe inpainting with diffusion models.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 17
+## Question 16
 **Explain outpainting and image extension.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 18
+## Question 17
 **Describe ControlNet for spatial conditioning.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 19
+## Question 18
 **Explain IP-Adapter for image prompting.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 20
+## Question 19
 **Compare different noise schedules (linear, cosine).**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 21
+## Question 20
 **Describe multi-scale diffusion architectures.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 22
+## Question 21
 **Explain video diffusion models.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 23
+## Question 22
 **Describe 3D diffusion for shape generation.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 24
+## Question 23
 **Explain audio diffusion models.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 25
+## Question 24
 **Compare continuous vs. discrete timesteps.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 26
+## Question 25
 **Describe training objective and loss functions.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 27
+## Question 26
 **Explain gradient accumulation strategies.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 28
+## Question 27
 **Describe mixed precision training benefits.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 29
+## Question 28
 **Explain EMA (Exponential Moving Average) in training.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 30
+## Question 29
 **Compare memory requirements during training/inference.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 31
+## Question 30
 **Describe progressive distillation techniques.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 32
+## Question 31
 **Explain consistency models for fast sampling.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 33
+## Question 32
 **Describe edit-friendly inversions (DDIM inversion).**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 34
+## Question 33
 **Explain self-attention guidance.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 35
+## Question 34
 **Describe cascading diffusion models.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 36
+## Question 35
 **Discuss spectrogram diffusion for audio generation.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 37
+## Question 36
 **Explain safe completions via policy guidance.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 38
+## Question 37
 **Describe hardware acceleration (FP8) for diffusion.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 39
+## Question 38
 **Explain mixture of experts diffusion.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 40
+## Question 39
 **Discuss evaluation metrics (CLIP-FID).**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 41
+## Question 40
 **Explain diffusion vs. GANs advantages.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 42
+## Question 41
 **Describe computational cost mitigation.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 43
+## Question 42
 **Discuss legal considerations of dataset copyright.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 44
+## Question 43
 **Explain multi-modal diffusion (image+depth).**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 45
+## Question 44
 **Describe timeline of diffusion research.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 46
+## Question 45
 **Explain diffusion for super-resolution.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 47
+## Question 46
 **Discuss slot diffusion for object compositionality.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 48
+## Question 47
 **Explain zero-shot human motion diffusion.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 49
+## Question 48
 **Describe guided diffusion in RL policy sampling.**
 
 **Answer:** _To be filled_
 
 ---
 
-## Question 50
+## Question 49
 **Predict future of diffusion in content creation.**
 
 **Answer:** _To be filled_

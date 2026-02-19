@@ -1,4 +1,8 @@
-# Co**Write a Python program to perform edge detection using the Canny filter.**
+# Computer Vision Interview Questions - Coding Questions
+
+## Question 1
+
+**Write a Python program to perform edge detection using the Canny filter.**
 
 **Answer:**
 
@@ -1181,21 +1185,7 @@ batch_process_images('input_folder/', 'output_folder/', method='adaptive')
 4. **Validation**: Visual inspection and quantitative metrics
 5. **Scale Invariance**: Use multi-scale approach for robust detection
 
-This implementation provides a comprehensive, production-ready solution for edge detection with multiple approaches, optimization strategies, and practical usage examples.ter Vision Interview Questions - Coding Questions
-
-## Question 1
-
-**Write a Python program to performedge detectionusing theCanny filter.**
-
-**Answer:** _[To be filled]_
-
----
-
-## Question 2
-
-**Implement a simpleimage classifierusing a pre-trainedCNNwithTensorFlow.**
-
-**Answer:** _[To be filled]_
+This implementation provides a comprehensive, production-ready solution for edge detection with multiple approaches, optimization strategies, and practical usage examples.
 
 ---
 
