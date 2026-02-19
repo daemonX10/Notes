@@ -2135,7 +2135,33 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **State the intuition behind "isolating anomalies" via random splits.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The core intuition behind Isolation Forest is that anomalies are few and different—they are easier to "isolate" from the rest of the data using random splits because they sit in sparse regions of feature space.
+
+**Key Insight:**
+- Normal points are dense → require many random splits to isolate
+- Anomalies are sparse → require very few random splits to isolate
+- The number of splits needed = path length from root to leaf in a random tree
+
+**Analogy:**
+Imagine randomly slicing a 2D scatter plot with lines. A point far from all others (anomaly) will be isolated after just 1-2 cuts. A point in the middle of a dense cluster requires many cuts to separate it from its neighbors.
+
+**Why Random Splits Work:**
+1. Random feature selection + random split point → unbiased isolation
+2. No need to model "normal" behavior (unlike density-based methods)
+3. Anomalies have short average path length across many trees
+4. The ensemble of random trees averages out noise from individual trees
+
+**Comparison with Other Approaches:**
+| Approach | Models | Anomaly = |
+|----------|--------|-----------|
+| Density-based (LOF) | Normal distribution | Low density region |
+| Distance-based (KNN) | Normal distances | Far from neighbors |
+| **Isolation Forest** | Nothing (isolation) | Easy to isolate |
+
+**Interview Tip:** Isolation Forest is unique because it explicitly isolates anomalies rather than modeling normal instances. This makes it fundamentally different from density or distance-based methods and gives it computational advantages.
 
 ---
 
@@ -2143,7 +2169,36 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe how isolation depth relates to anomaly scores.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+In Isolation Forest, the anomaly score of a point is derived from its average path length across all isolation trees—shorter paths indicate anomalies while longer paths indicate normal points.
+
+**Path Length Concept:**
+- Path length h(x) = number of edges from root to the leaf node containing x
+- Anomalies: short average path length (isolated quickly)
+- Normal points: long average path length (hard to isolate)
+
+**Anomaly Score Formula:**
+- s(x, n) = 2^(-E(h(x)) / c(n))
+- E(h(x)) = average path length across all trees
+- c(n) = average path length in a Binary Search Tree with n nodes
+- c(n) = 2*H(n-1) - 2*(n-1)/n, where H(i) is the harmonic number
+
+**Score Interpretation:**
+| Score s(x, n) | Interpretation |
+|---------------|----------------|
+| Close to 1 | Definite anomaly (very short paths) |
+| Close to 0.5 | Normal point (average path length) |
+| Close to 0 | Dense normal instance (very long paths) |
+| s > 0.5 | Likely anomalous |
+
+**Why Normalization with c(n)?**
+- c(n) is the expected path length if data were uniformly distributed
+- Normalizing by c(n) makes scores comparable across different sample sizes
+- Without normalization, scores depend on tree height and sample size
+
+**Interview Tip:** The anomaly score is between 0 and 1. The threshold for anomaly classification is typically set using the contamination parameter (expected proportion of anomalies). Points with score > threshold are flagged.
 
 ---
 
@@ -2151,7 +2206,50 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **How is an isolation tree (iTree) constructed?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+An isolation tree (iTree) is the base estimator in Isolation Forest, constructed by recursively partitioning data with random feature selections and random split values until each point is isolated or a maximum depth is reached.
+
+**Construction Algorithm:**
+```
+FUNCTION iTree(X, current_depth, max_depth):
+    IF len(X) <= 1 OR current_depth >= max_depth:
+        RETURN LeafNode(size=len(X))
+    
+    # Random feature selection
+    feature = random_choice(features)
+    
+    # Random split value between min and max of selected feature
+    split_value = uniform_random(min(X[feature]), max(X[feature]))
+    
+    # Partition data
+    X_left = X[X[feature] < split_value]
+    X_right = X[X[feature] >= split_value]
+    
+    RETURN InternalNode(
+        feature=feature,
+        split=split_value,
+        left=iTree(X_left, current_depth + 1, max_depth),
+        right=iTree(X_right, current_depth + 1, max_depth)
+    )
+```
+
+**Key Properties:**
+| Property | Value |
+|----------|-------|
+| Feature selection | Random (uniform) |
+| Split value | Random uniform between [min, max] |
+| Max depth | ceil(log2(subsample_size)) |
+| Stopping | Single point or max depth reached |
+| No pruning | Trees grown fully |
+
+**Why Random Splits (Not Optimal)?**
+- Optimal splits (like decision trees) would model normal behavior
+- Random splits specifically exploit the isolation-ease of anomalies
+- No target variable needed → truly unsupervised
+
+**Interview Tip:** The max depth is set to ceil(log2(psi)) where psi is the subsample size, because average path length in a random binary tree with psi external nodes is approximately log2(psi). Anomalies will be isolated well before this depth.
 
 ---
 
@@ -2159,7 +2257,40 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain average path length normalization.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Average path length normalization adjusts raw path lengths by the expected average path length of an unsuccessful search in a Binary Search Tree (BST), making anomaly scores comparable across different dataset sizes.
+
+**The Normalization Factor c(n):**
+- c(n) = 2*H(n-1) - 2*(n-1)/n
+- H(i) = ln(i) + 0.5772156649 (Euler-Mascheroni constant, harmonic number approximation)
+- This is the average path length of unsuccessful search in a BST built from n random elements
+
+**Why c(n)?**
+- Raw path length depends on sample size: larger samples → deeper trees → longer paths
+- c(n) provides a baseline "expected" path length for random data
+- Normalization: s(x, n) = 2^(-E(h(x)) / c(n)) ensures scores are in [0, 1]
+
+**Example Values:**
+| n (sample size) | c(n) |
+|-----------------|------|
+| 256 | ~9.21 |
+| 1024 | ~12.77 |
+| 4096 | ~15.87 |
+| 10000 | ~17.98 |
+
+**Effect on Scoring:**
+- If E(h(x)) << c(n): score → 1 (anomaly)
+- If E(h(x)) ≈ c(n): score → 0.5 (normal)
+- If E(h(x)) >> c(n): score → 0 (very dense normal)
+
+**Special Cases:**
+- c(1) = 0 (single element, no search needed)
+- c(2) = 1 (binary comparison)
+- For large n, c(n) ≈ 2*ln(n) + 2*γ - 2 where γ is Euler's constant
+
+**Interview Tip:** The BST normalization is borrowed from algorithm analysis literature. It provides a natural scale for "how many comparisons are expected" which maps perfectly to isolation path length.
 
 ---
 
@@ -2167,7 +2298,39 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Contrast Isolation Forest with Random Forest feature selection.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest and Random Forest are both tree ensemble methods, but they serve fundamentally different purposes and construct trees in completely different ways.
+
+**Core Differences:**
+| Aspect | Isolation Forest | Random Forest |
+|--------|-----------------|---------------|
+| **Purpose** | Anomaly detection | Classification/Regression |
+| **Supervised** | No (unsupervised) | Yes (needs labels) |
+| **Split criterion** | Random feature + random value | Best split (Gini/entropy/MSE) |
+| **Objective** | Isolate points quickly | Reduce impurity/error |
+| **Tree depth** | Shallow (ceil(log2(psi))) | Deep (full or limited) |
+| **Subsampling** | Small sample WITHOUT replacement | Bootstrap WITH replacement |
+| **Feature selection** | One random feature per split | sqrt(d) or d/3 per split |
+| **Output** | Anomaly score (path length) | Class probability / regression value |
+| **Ensemble** | Average path lengths | Majority vote / average prediction |
+
+**Feature Selection Comparison:**
+- **Random Forest:** Selects best split among random subset of features → learns patterns
+- **Isolation Forest:** Picks ONE random feature with random split → measures isolation difficulty
+
+**Why IF Doesn't Use Optimal Splits:**
+- Optimal splits would model the density of normal data
+- Random splits exploit that anomalies are isolated in ANY random partition
+- No target variable in anomaly detection → can't optimize for impurity
+
+**Feature Importance in IF:**
+- Not as straightforward as RF's feature importance
+- Can be computed by tracking which features contribute most to short paths for anomalies
+- Some implementations offer feature importance via permutation
+
+**Interview Tip:** Despite both being tree ensembles, IF and RF are solving fundamentally different problems. IF uses randomness as the core mechanism (isolation speed), while RF uses it for diversity (bagging + feature subsets).
 
 ---
 
@@ -2175,7 +2338,39 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Why does Isolation Forest handle high dimensionality better than distance-based methods?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest handles high dimensionality better than distance-based methods (LOF, KNN-based) because it relies on random partitioning rather than distance computation, avoiding the curse of dimensionality that plagues distance metrics.
+
+**Why Distance-Based Methods Struggle:**
+1. **Distance concentration:** In high dimensions, all pairwise distances become similar
+2. **Nearest neighbor degrades:** max(distance) ≈ min(distance) as d → ∞
+3. **Density estimation fails:** Reliable density requires exponential samples
+4. **Computational cost:** KNN search in high-d is expensive (O(nd))
+
+**Why Isolation Forest Copes Better:**
+1. **No distance computation:** Uses random axis-aligned splits, not distances
+2. **Single feature per split:** Each split uses only ONE feature, immune to distance concentration
+3. **Random projections:** Different trees use different random features, exploring all dimensions
+4. **Subspace isolation:** Anomalies that are extreme in ANY feature will be caught
+5. **Linear complexity:** O(n * psi * t) where psi = subsample, t = trees
+
+**Mathematical Argument:**
+- In d dimensions, an anomaly extreme in just 1 feature will have expected path length ≈ 1 in trees that select that feature
+- Probability of selecting the right feature = 1/d
+- With enough trees (t >> d), the feature will be selected multiple times
+- Average path length across all trees will still be short for the anomaly
+
+**Comparison:**
+| Method | High-d Performance | Reason |
+|--------|-------------------|--------|
+| LOF | Degrades | Relies on k-NN distances |
+| DBSCAN | Degrades | Epsilon neighborhood in high-d |
+| One-Class SVM | Moderate | Kernel helps but expensive |
+| **Isolation Forest** | Robust | Feature-wise random splits |
+
+**Interview Tip:** Isolation Forest's robustness to dimensionality comes from its fundamental approach: instead of computing distances in the full feature space, it isolates points one random feature at a time.
 
 ---
 
@@ -2183,7 +2378,38 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain sub-sampling and its role in anomaly detection quality.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Sub-sampling in Isolation Forest refers to drawing a small random subset of data (typically 256 samples) without replacement for building each isolation tree, and it is critical for both speed and detection quality.
+
+**Why Sub-sampling Helps:**
+1. **Swamping reduction:** In full data, "masking" occurs—anomalies hidden by numerous normal points
+2. **Masking reduction:** With fewer points, anomalies are more prominent and easier to isolate
+3. **Speed:** Each tree is built on psi << n points → fast construction
+4. **Memory:** Trees are shallow (log2(psi) depth) → small memory footprint
+
+**Sub-sampling Parameters:**
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| psi (max_samples) | Subsample size per tree | 256 |
+| t (n_estimators) | Number of trees | 100 |
+| Replacement | Without replacement | Yes (unlike bagging) |
+
+**Effect on Detection Quality:**
+| Subsample Size | Effect |
+|---------------|--------|
+| Very small (32-64) | May miss complex anomaly patterns |
+| Default (256) | Good balance for most datasets |
+| Larger (512-1024) | Better for subtle anomalies, slower |
+| Full dataset (n) | Masking/swamping problems, slow |
+
+**Swamping vs Masking:**
+- **Swamping:** Normal points wrongly identified as anomalies (FP) because too many in neighborhood
+- **Masking:** Anomalies hidden by nearby anomalies or dense normal regions (FN)
+- Sub-sampling reduces BOTH: fewer normal points → less masking; random subset → less swamping
+
+**Interview Tip:** The sub-sampling trick is what makes Isolation Forest both fast and effective. Using psi=256 means each tree is built in microseconds (depth ≈ 8), and the randomness combined with ensemble averaging provides robust detection.
 
 ---
 
@@ -2191,7 +2417,38 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss expected path length in a random binary tree.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The expected path length to isolate a point in a random binary tree provides the baseline for normalizing Isolation Forest anomaly scores, derived from Binary Search Tree (BST) theory.
+
+**Mathematical Result:**
+- For a random binary tree with n external nodes:
+- Expected path length E(h) = c(n) = 2*H(n-1) - 2*(n-1)/n
+- H(i) = sum(1/k for k=1 to i) ≈ ln(i) + γ (Euler-Mascheroni constant ≈ 0.5772)
+
+**Derivation Intuition:**
+- A BST built from n random keys has average search path ≈ 2*ln(n)
+- This is analogous to random partitioning in an isolation tree
+- Each random split roughly halves the data → log2(n) expected depth for uniform data
+- The constant factor (2*ln vs log2) accounts for unequal splits
+
+**Key Values:**
+| n | c(n) | Approx log2(n) |
+|---|------|----------------|
+| 2 | 1.0 | 1.0 |
+| 10 | 4.50 | 3.32 |
+| 100 | 9.21 | 6.64 |
+| 256 | 10.24 | 8.0 |
+| 1000 | 13.26 | 9.97 |
+| 10000 | 17.98 | 13.29 |
+
+**Why This Matters for IF:**
+- Points with path length << c(n) are anomalies (isolated much faster than expected)
+- Points with path length ≈ c(n) are normal (isolated at expected rate)
+- The ratio E(h(x))/c(n) gives a normalized isolation difficulty
+
+**Interview Tip:** This normalization ensures anomaly scores are meaningful regardless of subsample size. It connects random partitioning to classical BST analysis, a well-understood result from computer science.
 
 ---
 
@@ -2199,7 +2456,55 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **How do you set n_estimators and sample size?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The key hyperparameters for Isolation Forest are n_estimators (number of trees) and max_samples (subsample size), with well-established guidelines for setting both.
+
+**n_estimators (Number of Trees):**
+| Value | Effect |
+|-------|--------|
+| 50 | May have high variance in scores |
+| 100 (default) | Good balance for most datasets |
+| 200-500 | Slightly more stable, diminishing returns |
+| 1000+ | Rarely needed, slower with minimal improvement |
+
+**max_samples (Subsample Size):**
+| Value | Effect |
+|-------|--------|
+| 64-128 | Fast, may miss subtle anomalies |
+| 256 (default) | Standard, works well for most cases |
+| 512-1024 | Better for complex data, slower |
+| 'auto' = min(256, n) | Default sklearn behavior |
+
+**Setting Guidelines:**
+1. **n_estimators:** Start with 100; increase if anomaly scores are unstable across runs
+2. **max_samples:** Start with 256; increase if data has complex structure
+3. **contamination:** Estimate expected anomaly proportion (default='auto')
+4. **max_features:** Default 1.0 (all features); reduce for very high-dimensional data
+
+**Tuning Strategy:**
+```python
+from sklearn.ensemble import IsolationForest
+
+# Default configuration (good starting point)
+clf = IsolationForest(
+    n_estimators=100,     # Number of trees
+    max_samples=256,      # Subsample size
+    contamination=0.05,   # Expected 5% anomalies
+    max_features=1.0,     # All features
+    random_state=42
+)
+clf.fit(X_train)
+scores = clf.decision_function(X_test)
+```
+
+**Validation (without labels):**
+- Visual inspection: plot score distribution, check bimodality
+- Domain expertise: review top-scoring anomalies
+- With labels: precision@k, ROC-AUC
+
+**Interview Tip:** Isolation Forest is remarkably robust to hyperparameter choices. The default (100 trees, 256 samples) works well for most problems. The contamination parameter is the most impactful—set it based on domain knowledge of expected anomaly rate.
 
 ---
 
@@ -2207,7 +2512,48 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe contamination parameter and its effect on thresholding.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The contamination parameter in Isolation Forest specifies the expected proportion of anomalies in the dataset and is used to set the decision threshold on anomaly scores.
+
+**How It Works:**
+1. Compute anomaly scores for all training data
+2. Set threshold at the percentile corresponding to contamination
+3. Points with score below threshold → anomaly (-1)
+4. Points with score above threshold → normal (1)
+
+**Effect on Thresholding:**
+| Contamination | Threshold Effect | Result |
+|--------------|-----------------|--------|
+| 0.01 (1%) | High threshold | Very few flagged, high precision |
+| 0.05 (5%) | Moderate | Balanced |
+| 0.10 (10%) | Low threshold | More flagged, higher recall |
+| 0.50 (50%) | Very low | Half flagged, likely too aggressive |
+| 'auto' | Uses offset heuristic | Implementation-specific |
+
+**Setting Contamination:**
+- **Domain knowledge:** If you know ~2% of transactions are fraud → 0.02
+- **Conservative:** Start low (0.01) and increase until review capacity is met
+- **Auto:** sklearn uses an offset-based heuristic (not percentile-based)
+
+**Important Considerations:**
+- Contamination only affects the predict() threshold, NOT the model training
+- The decision_function() returns raw scores independent of contamination
+- Changing contamination doesn't require retraining
+
+```python
+from sklearn.ensemble import IsolationForest
+# Use raw scores for flexibility
+clf = IsolationForest(contamination='auto', random_state=42)
+clf.fit(X_train)
+scores = clf.decision_function(X_test)  # Raw scores
+# Set custom threshold
+threshold = np.percentile(scores, 5)  # Flag bottom 5%
+anomalies = X_test[scores < threshold]
+```
+
+**Interview Tip:** In practice, use decision_function() for raw anomaly scores and set the threshold separately based on business requirements (cost of false positives vs false negatives), rather than relying on the contamination parameter.
 
 ---
 
@@ -2215,7 +2561,47 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain why Isolation Forest is unsupervised yet can be semi-supervised.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest is fundamentally unsupervised (no labels needed) but can be adapted for semi-supervised learning when some labeled normal or anomalous examples are available.
+
+**Unsupervised Mode (Standard):**
+- Train on unlabeled data
+- Assumes majority of data is normal
+- Anomaly threshold set by contamination parameter
+- No knowledge of what constitutes "anomaly"
+
+**Semi-supervised Adaptations:**
+| Approach | Method | When to Use |
+|----------|--------|-------------|
+| **Train on normals only** | Fit IF on known normal data | Clean normal class available |
+| **Score calibration** | Use labels to set optimal threshold | Few labeled anomalies |
+| **Weighted scoring** | Weight trees by their detection of labeled anomalies | Labels for some anomalies |
+| **Feature feedback** | Use labels to weight features | Domain knowledge available |
+
+**Training on Clean Normal Data:**
+```python
+from sklearn.ensemble import IsolationForest
+# Semi-supervised: train only on normal data
+X_normal = X_train[y_train == 0]
+clf = IsolationForest(contamination=0.01, random_state=42)
+clf.fit(X_normal)  # Only normal examples
+# Score all test data
+scores = clf.decision_function(X_test)
+```
+
+**Why This Works Better:**
+- IF trained on pure normal data learns the "isolation profile" of normals
+- Any new pattern (anomaly type) will have shorter isolation paths
+- Avoids contamination of training set with anomalies
+
+**Threshold Optimization with Labels:**
+- Use labeled examples to find optimal score threshold
+- Optimize for F1, precision@k, or business-specific metric
+- Cross-validate threshold to avoid overfitting
+
+**Interview Tip:** The most practical semi-supervised approach is to train on verified normal data and use a small set of labeled anomalies only for threshold selection. This combines IF's unsupervised power with supervised threshold tuning.
 
 ---
 
@@ -2223,7 +2609,39 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Compare Isolation Forest with LOF (Local Outlier Factor).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest (IF) and Local Outlier Factor (LOF) are two popular anomaly detection methods with fundamentally different approaches—isolation-based vs density-based.
+
+**Core Comparison:**
+| Aspect | Isolation Forest | LOF |
+|--------|-----------------|-----|
+| **Approach** | Isolation (random partitioning) | Local density comparison |
+| **Model** | Ensemble of random trees | k-NN density estimation |
+| **Score** | Path length-based | Local density ratio |
+| **Speed (training)** | O(t * psi * log(psi)) | O(n^2) or O(n * k * log(n)) |
+| **Speed (prediction)** | O(t * log(psi)) | O(k * log(n)) |
+| **Memory** | O(t * psi) | O(n * k) |
+| **High dimensions** | Robust | Degrades (distance concentration) |
+| **Local anomalies** | May miss | Excellent detection |
+| **Global anomalies** | Excellent | Good |
+
+**LOF's Approach:**
+- For each point, compute local density (inverse of avg distance to k neighbors)
+- Compare each point's density to its neighbors' densities
+- LOF score > 1 → lower density than neighbors → anomaly
+
+**When to Choose:**
+| Choose IF | Choose LOF |
+|-----------|-----------|
+| Large datasets | Small-medium datasets |
+| High dimensions | Low-moderate dimensions |
+| Speed matters | Local anomaly detection critical |
+| Global anomalies | Contextual anomalies |
+| Streaming data | Static analysis |
+
+**Interview Tip:** IF is generally preferred for production systems due to speed and scalability. LOF excels at detecting contextual anomalies (points that are anomalous RELATIVE to their local neighborhood) which IF can miss.
 
 ---
 
@@ -2231,7 +2649,44 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss computational complexity and scalability.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest has favorable computational complexity compared to many anomaly detection methods, making it suitable for large-scale applications.
+
+**Training Complexity:**
+- Building one tree: O(psi * log(psi)) where psi = subsample size
+- Building t trees: O(t * psi * log(psi))
+- With default psi=256, t=100: O(100 * 256 * 8) ≈ O(200K) — very fast
+- **Independent of n** (dataset size) for training each tree due to subsampling
+
+**Prediction Complexity:**
+- Traversing one tree: O(log(psi)) per sample
+- All trees: O(t * log(psi)) per sample
+- n test samples: O(n * t * log(psi))
+
+**Memory Complexity:**
+- One tree: O(psi) nodes
+- All trees: O(t * psi) total nodes
+- Default: O(100 * 256) = O(25,600) — extremely lightweight
+
+**Scalability Comparison:**
+| Method | Training | Prediction | Memory |
+|--------|----------|-----------|--------|
+| **Isolation Forest** | O(t*psi*log(psi)) | O(n*t*log(psi)) | O(t*psi) |
+| LOF | O(n^2) | O(n*k) | O(n*k) |
+| One-Class SVM | O(n^2 ~ n^3) | O(n_sv * d) | O(n_sv * d) |
+| DBSCAN | O(n * log(n)) | N/A | O(n) |
+
+**Practical Scaling:**
+| n (samples) | IF Training | LOF Training |
+|------------|------------|-------------|
+| 10K | < 1s | ~1s |
+| 100K | ~1s | ~30s |
+| 1M | ~5s | ~1 hour |
+| 10M | ~30s | Infeasible |
+
+**Interview Tip:** Isolation Forest's key scalability advantage is that training cost is INDEPENDENT of dataset size n (due to subsampling). This makes it uniquely suited for streaming and big data anomaly detection.
 
 ---
 
@@ -2239,7 +2694,51 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain how categorical features are handled (one-hot, hashing).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest works with numerical features natively. Categorical features must be encoded before use, with one-hot encoding and hashing being the most common approaches.
+
+**Encoding Methods:**
+| Method | Approach | When to Use |
+|--------|----------|-------------|
+| **One-hot** | Binary column per category | < 20 categories |
+| **Ordinal** | Integer encoding | Ordinal categories |
+| **Target encoding** | Not applicable (unsupervised) | — |
+| **Frequency** | Replace with count/proportion | Frequency is informative |
+| **Hashing** | Hash to fixed-size vector | High cardinality |
+| **Binary** | Binary representation of ordinal | Moderate cardinality |
+
+**One-hot Encoding Issues:**
+- Inflates dimensionality (each category = new feature)
+- Random splits on one-hot features only create binary partitions
+- Many splits needed to isolate based on categorical patterns
+- May reduce IF effectiveness for categorical anomalies
+
+**Feature Hashing:**
+```python
+from sklearn.feature_extraction import FeatureHasher
+from sklearn.ensemble import IsolationForest
+
+# Hash categorical features to fixed dimensions
+h = FeatureHasher(n_features=20, input_type='string')
+X_hashed = h.transform(categorical_features)
+
+# Combine with numerical features
+import numpy as np
+X_combined = np.hstack([X_numerical, X_hashed.toarray()])
+
+# Apply Isolation Forest
+clf = IsolationForest(contamination=0.05)
+clf.fit(X_combined)
+```
+
+**Best Practice:**
+1. Encode categoricals with appropriate method
+2. Scale numerical features (optional for IF, but helps with interpretation)
+3. Use PCA if total dimensions become very high after encoding
+
+**Interview Tip:** Unlike gradient boosting models (CatBoost, LightGBM), Isolation Forest has no native categorical support. The encoding choice impacts detection quality—frequency encoding often works well because anomalous categories may have unusual frequencies.
 
 ---
 
@@ -2247,7 +2746,46 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **What are "extended" Isolation Forests and axis-parallel vs. oblique splits?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Extended Isolation Forest uses random hyperplanes (not axis-aligned) for splitting, addressing the bias that standard Isolation Forest has toward detecting anomalies along individual feature axes.
+
+**Standard IF Limitation:**
+- Splits are axis-aligned: pick one feature, split at random value
+- Cannot efficiently isolate anomalies that are unusual in COMBINATIONS of features
+- Creates rectangular decision regions
+- Bias toward anomalies extreme in single features
+
+**Extended Isolation Forest:**
+- Splits use random hyperplanes: n·x = p (where n is random normal vector, p is random intercept)
+- Can detect anomalies in any direction of feature space
+- Creates non-axis-aligned decision boundaries
+- More uniform isolation across all directions
+
+**Comparison:**
+| Aspect | Standard IF | Extended IF |
+|--------|-----------|------------|
+| Split type | Axis-aligned | Random hyperplane |
+| Boundaries | Rectangular | Oblique |
+| Multivariate anomalies | May miss | Better detection |
+| Speed | Slightly faster | Slightly slower |
+| Parameters | Same | + extension_level |
+
+**Extension Level:**
+- Level 0: Standard IF (axis-aligned, 1 feature per split)
+- Level 1: 2D hyperplanes
+- Level d-1: Full-dimensional hyperplanes (fully extended)
+- Higher levels → better at multivariate anomalies, slightly slower
+
+```python
+# Using eif library
+import eif
+forest = eif.iForest(X, ntrees=100, sample_size=256, ExtensionLevel=1)
+scores = forest.compute_paths(X_test)
+```
+
+**Interview Tip:** Extended IF addresses a real limitation of standard IF. If anomalies are defined by unusual combinations of features (not individual features), Extended IF significantly outperforms standard IF.
 
 ---
 
@@ -2255,7 +2793,47 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss bias when features have vastly different ranges.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+When features have vastly different ranges (e.g., age 0-100 vs income 0-1,000,000), standard Isolation Forest can be biased toward splitting on high-range features, since random split values span the full range.
+
+**The Bias:**
+- Random split value chosen uniformly between [min, max] of selected feature
+- Features with larger ranges have splits that are more likely to isolate outliers
+- Features with small ranges contribute less to isolation
+- This creates an implicit "importance weighting" based on range
+
+**Impact:**
+| Scenario | Effect |
+|----------|--------|
+| Features with similar ranges | Fair isolation across all features |
+| One feature dominates range | Anomalies on that feature detected more easily |
+| Important anomaly on small-range feature | May be missed |
+| Normalized features | Equal contribution from all features |
+
+**Mitigation Strategies:**
+1. **Feature scaling:** StandardScaler or MinMaxScaler before IF
+2. **Feature-wise normalization:** Ensure all features have similar ranges
+3. **Extended IF:** Random hyperplanes reduce axis-aligned bias
+4. **Max features:** Reduce max_features to increase feature diversity across trees
+
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import IsolationForest
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),  # Normalize features first
+    ('iforest', IsolationForest(contamination=0.05, random_state=42))
+])
+pipeline.fit(X_train)
+predictions = pipeline.predict(X_test)
+```
+
+**Note:** While IF is theoretically scale-invariant (random splits), the UNIFORM random split introduces scale dependency. Scaling is recommended as a best practice.
+
+**Interview Tip:** Unlike tree-based classifiers (where split quality metrics handle scale), IF's random split mechanism IS affected by feature scales. Always normalize features before applying Isolation Forest.
 
 ---
 
@@ -2263,7 +2841,59 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Provide pseudo-code for training one isolation tree.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Here is the pseudo-code for training a single isolation tree (iTree), the building block of Isolation Forest.
+
+**Pseudo-code:**
+```
+FUNCTION iTree(X, e, max_depth):
+    # X: input data (subsample)
+    # e: current tree depth
+    # max_depth: limit = ceil(log2(len(X_original)))
+    n = len(X)
+    
+    # Base case: leaf node
+    IF n <= 1 OR e >= max_depth:
+        RETURN ExternalNode(size=n, depth=e)
+    
+    # Step 1: Random feature selection
+    q = random_choice(X.columns)  # Pick one feature uniformly
+    
+    # Step 2: Random split value
+    x_min = min(X[q])
+    x_max = max(X[q])
+    p = uniform_random(x_min, x_max)  # Random value in feature range
+    
+    # Step 3: Partition data
+    X_left  = X[X[q] < p]
+    X_right = X[X[q] >= p]
+    
+    # Step 4: Recurse
+    RETURN InternalNode(
+        feature = q,
+        split_value = p,
+        left = iTree(X_left, e + 1, max_depth),
+        right = iTree(X_right, e + 1, max_depth)
+    )
+
+
+FUNCTION IsolationForest_Train(X, t=100, psi=256):
+    # X: training data (n samples)
+    # t: number of trees
+    # psi: subsample size
+    forest = []
+    FOR i = 1 TO t:
+        # Subsample WITHOUT replacement
+        X_sub = random_sample(X, size=min(psi, len(X)), replace=False)
+        max_depth = ceil(log2(psi))
+        tree = iTree(X_sub, e=0, max_depth=max_depth)
+        forest.append(tree)
+    RETURN forest
+```
+
+**Interview Tip:** Key points interviewers look for: (1) random feature selection, (2) random split value within feature range, (3) WITHOUT replacement subsampling, (4) max depth = ceil(log2(psi)), (5) no impurity criterion needed.
 
 ---
 
@@ -2271,7 +2901,50 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain score aggregation across trees.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The final anomaly score in Isolation Forest is computed by averaging the path lengths across all trees in the ensemble and normalizing by the expected path length c(n).
+
+**Score Aggregation Process:**
+1. For each tree t_i in the forest:
+   - Traverse point x from root to leaf
+   - Record path length h_i(x) (number of edges)
+   - If leaf has size > 1, add c(leaf_size) adjustment
+2. Compute average: E(h(x)) = (1/t) * sum(h_i(x) for all trees)
+3. Normalize: s(x) = 2^(-E(h(x)) / c(psi))
+
+**Path Length Adjustment at Leaves:**
+- If a leaf contains m > 1 samples (tree stopped at max depth): 
+- Add c(m) to the path length (estimated remaining isolation depth)
+- This accounts for the fact that the point wasn't fully isolated
+
+```
+FUNCTION PathLength(x, tree, current_depth=0):
+    IF tree.is_leaf:
+        RETURN current_depth + c(tree.size)  # Adjustment for unresolved leaves
+    
+    IF x[tree.feature] < tree.split_value:
+        RETURN PathLength(x, tree.left, current_depth + 1)
+    ELSE:
+        RETURN PathLength(x, tree.right, current_depth + 1)
+
+
+FUNCTION AnomalyScore(x, forest, psi):
+    total_path = 0
+    FOR tree IN forest:
+        total_path += PathLength(x, tree)
+    avg_path = total_path / len(forest)
+    score = 2 ** (-avg_path / c(psi))
+    RETURN score
+```
+
+**Why Averaging Works:**
+- Individual trees are noisy (random splits → high variance)
+- Averaging over 100+ trees stabilizes the path length estimate
+- Law of large numbers: average converges to expected isolation difficulty
+
+**Interview Tip:** Don't forget the c(leaf_size) adjustment for leaves with multiple samples. Without it, points that reach max depth early would have artificially short path lengths, biasing them toward appearing anomalous.
 
 ---
 
@@ -2279,7 +2952,37 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe early stopping in tree growth for efficiency.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Early stopping in isolation tree growth limits tree depth to ceil(log2(psi)) where psi is the subsample size, providing significant efficiency gains without sacrificing anomaly detection quality.
+
+**Why Early Stopping at ceil(log2(psi)):**
+- Average BST depth for random data ≈ O(log n)
+- Anomalies are isolated BEFORE average depth
+- Growing trees deeper than log2(psi) provides diminishing information
+- Every split beyond the expected depth mainly separates normal from normal
+
+**Efficiency Gains:**
+| Depth Limit | Nodes | Speed | Detection Quality |
+|------------|-------|-------|-------------------|
+| log2(psi) | ~2*psi | Fast | Optimal |
+| 2*log2(psi) | ~psi^2 | Slower | Minimal improvement |
+| No limit | Up to psi! | Very slow | No improvement |
+
+**Example (psi=256):**
+- Max depth = ceil(log2(256)) = 8
+- Max nodes per tree ≈ 512
+- Anomalies typically isolated at depth 1-4
+- Normal points at depth 6-8 (plus c(leaf_size) adjustment)
+
+**Leaf Size Handling:**
+- When max depth is reached with multiple points in a leaf
+- Store leaf size m
+- During scoring, add c(m) to path length as adjustment
+- This estimates remaining isolation depth without actually computing it
+
+**Interview Tip:** Early stopping is not just an optimization—it's a fundamental design choice. Growing trees deeper doesn't improve anomaly detection because anomalies are by definition isolated at shallow depths. The information beyond log2(psi) is about distinguishing normal instances from each other, which is irrelevant for anomaly detection.
 
 ---
 
@@ -2287,7 +2990,42 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Compare IF to One-Class SVM in memory usage.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest and One-Class SVM are both unsupervised anomaly detection methods, but they have dramatically different memory requirements and computational profiles.
+
+**Memory Comparison:**
+| Component | Isolation Forest | One-Class SVM |
+|-----------|-----------------|---------------|
+| Training storage | O(t * psi) tree nodes | O(n_sv * d) support vectors |
+| Model size | ~25,600 nodes (default) | n_sv * d floating points |
+| Prediction memory | O(1) per sample | O(n_sv * d) kernel eval |
+| Scales with data size? | No (fixed psi) | Yes (n_sv grows with n) |
+
+**Practical Memory Example (n=100K, d=50):**
+| Method | Model Memory | Prediction Speed |
+|--------|-------------|-----------------|
+| IF (100 trees, psi=256) | ~2 MB | Very fast |
+| One-Class SVM (10% SVs) | ~40 MB | Slow (kernel evaluations) |
+| One-Class SVM (50% SVs) | ~200 MB | Very slow |
+
+**Why One-Class SVM Uses More Memory:**
+- Stores all support vectors (can be large fraction of data)
+- Kernel matrix computation: O(n^2) during training
+- RBF kernel: each prediction requires comparison with all support vectors
+- Number of support vectors grows with dataset size
+
+**When to Choose:**
+| Choose IF | Choose One-Class SVM |
+|-----------|---------------------|
+| Large datasets (> 10K) | Small datasets |
+| Memory constrained | Non-linear decision boundary needed |
+| Real-time prediction | High precision required |
+| High-dimensional data | Low-dimensional data |
+| Streaming data | Static analysis |
+
+**Interview Tip:** Isolation Forest's memory footprint is essentially CONSTANT regardless of dataset size (controlled by psi and t), while One-Class SVM's memory grows with the number of support vectors. This makes IF far more practical for production deployment.
 
 ---
 
@@ -2295,7 +3033,49 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **How does noise in training data influence splits?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Noise in training data affects Isolation Forest's random splits by potentially creating split values in noisy regions, but IF is relatively robust to noise due to its ensemble approach and subsampling.
+
+**How Noise Affects Splits:**
+1. **Noisy feature values:** Random split values may isolate noise rather than true anomalies
+2. **Outlier noise:** Noisy normal points may appear as anomalies (false positives)
+3. **Feature noise:** Irrelevant noisy features waste splits
+4. **Label noise:** Not applicable (unsupervised)
+
+**IF's Natural Robustness:**
+| Mechanism | How It Helps |
+|-----------|-------------|
+| **Ensemble averaging** | Individual tree errors cancel out over 100+ trees |
+| **Subsampling** | Each tree sees different noise patterns |
+| **Random feature selection** | Noisy features selected less frequently than meaningful ones on average |
+| **Path length aggregation** | Single noisy splits don't dramatically change average path |
+
+**When Noise Is Problematic:**
+- Systematic noise that mimics anomaly patterns
+- Very high noise-to-signal ratio
+- Noise correlated across features
+
+**Mitigation:**
+```python
+from sklearn.ensemble import IsolationForest
+# Increase trees for better noise averaging
+clf = IsolationForest(
+    n_estimators=300,   # More trees → better averaging
+    max_samples=512,    # Larger subsample → more stable splits
+    contamination=0.01, # Conservative threshold
+    random_state=42
+)
+```
+
+**Best Practices:**
+1. Feature selection/PCA to remove noisy features before IF
+2. Increase n_estimators (more trees smooth out noise)
+3. Use conservative contamination threshold
+4. Validate flagged anomalies with domain experts
+
+**Interview Tip:** IF is more robust to noise than density-based methods because noise spreads randomly, and ensemble averaging naturally reduces its impact. However, preprocessing to remove known noisy features is still recommended.
 
 ---
 
@@ -2303,7 +3083,58 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss robustness to concept drift.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Concept drift—where the data distribution changes over time—is a significant challenge for Isolation Forest since it's trained on a static snapshot and cannot automatically adapt to evolving patterns.
+
+**Types of Drift and IF's Response:**
+| Drift Type | Description | IF Impact |
+|-----------|-------------|-----------|
+| **Gradual** | Distribution slowly changes | Scores gradually become less reliable |
+| **Sudden** | Abrupt distribution change | Model immediately outdated |
+| **Seasonal** | Recurring patterns | May flag seasonal patterns as anomalies |
+| **Incremental** | New normal emerges | Old model flags new normal as anomalous |
+
+**Challenges:**
+1. Static model doesn't update with new data
+2. Changing "normal" baseline → false positives increase
+3. New anomaly types may not be detected
+4. No built-in drift detection mechanism
+
+**Strategies for Handling Drift:**
+1. **Periodic retraining:** Rebuild model on recent data (sliding window)
+2. **Online Isolation Forest:** Incremental tree updates
+3. **Ensemble with age-weighting:** Give newer trees more weight
+4. **Drift detection:** Monitor score distribution for drift signals
+
+**Sliding Window Approach:**
+```python
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
+class DriftAwareIF:
+    def __init__(self, window_size=10000, retrain_interval=1000):
+        self.buffer = []
+        self.window_size = window_size
+        self.retrain_interval = retrain_interval
+        self.model = None
+        self.count = 0
+    
+    def fit_predict(self, X_new):
+        self.buffer.extend(X_new)
+        self.buffer = self.buffer[-self.window_size:]
+        self.count += len(X_new)
+        
+        if self.count >= self.retrain_interval or self.model is None:
+            self.model = IsolationForest(contamination=0.05)
+            self.model.fit(np.array(self.buffer))
+            self.count = 0
+        
+        return self.model.predict(X_new)
+```
+
+**Interview Tip:** Production anomaly detection systems must handle concept drift. The simplest effective approach is periodic retraining with a sliding window of recent data. More sophisticated systems use drift detection to trigger retraining only when needed.
 
 ---
 
@@ -2311,7 +3142,57 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain streaming Isolation Forest variants.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Streaming Isolation Forest variants adapt the standard batch algorithm for real-time data streams, where data arrives continuously and the model must update incrementally without full retraining.
+
+**Key Streaming Variants:**
+| Variant | Approach | Key Feature |
+|---------|----------|-------------|
+| **iForestASD** | Sliding window + anomaly-aware sampling | Replaces old trees periodically |
+| **HS-Trees** | Half-space trees with streaming updates | Constant memory, true streaming |
+| **RS-Forest** | Random subset trees with window | Incremental tree replacement |
+
+**Half-Space Trees (HS-Trees):**
+1. Pre-build tree structure with random splits (no data needed)
+2. As data flows: update counters at each leaf
+3. Anomaly = point landing in low-count leaf
+4. Periodic mass update: decay old counts, add new counts
+5. Memory: O(t * 2^max_depth) — fixed, constant
+
+**iForestASD Approach:**
+1. Build initial IF on first chunk
+2. New data arrives → score with current model
+3. Periodically: drop oldest trees, train new trees on recent data
+4. Ensemble evolves over time without full rebuild
+
+**Streaming Requirements:**
+| Requirement | Solution |
+|-------------|---------|
+| Fixed memory | Pre-built tree structure |
+| No retraining | Incremental count updates |
+| Drift handling | Decay old counts over time |
+| Real-time scoring | Single tree traversal |
+
+```python
+# Conceptual streaming IF
+class StreamingIF:
+    def __init__(self, n_trees=100, window_size=1000):
+        self.trees = [build_random_tree() for _ in range(n_trees)]
+        self.window = deque(maxlen=window_size)
+    
+    def score(self, x):
+        return np.mean([tree.path_length(x) for tree in self.trees])
+    
+    def update(self, X_new):
+        self.window.extend(X_new)
+        # Replace oldest trees with new ones trained on window
+        for i in range(n_replace):
+            self.trees[i] = train_itree(self.window)
+```
+
+**Interview Tip:** For true streaming anomaly detection, Half-Space Trees are preferred over Isolation Forest because they have O(1) update time and constant memory. Standard IF can be approximated in streaming settings using sliding window approaches.
 
 ---
 
@@ -2319,7 +3200,62 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe IF for image anomaly detection after embedding.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest can be applied to image anomaly detection by first converting images to embedding vectors using pre-trained deep learning models, then applying IF to detect outlier embeddings.
+
+**Pipeline:**
+1. **Feature extraction:** Pass images through pre-trained CNN (ResNet, VGG, EfficientNet)
+2. **Embedding:** Extract features from penultimate layer (before classification head)
+3. **Dimensionality reduction:** PCA to reduce embedding dimensions (optional)
+4. **Anomaly detection:** Train Isolation Forest on normal image embeddings
+5. **Detection:** Score new images; high scores = anomalous
+
+**Implementation:**
+```python
+import torch
+import torchvision.models as models
+from sklearn.ensemble import IsolationForest
+from sklearn.decomposition import PCA
+
+# Step 1: Extract CNN embeddings
+model = models.resnet50(pretrained=True)
+model = torch.nn.Sequential(*list(model.children())[:-1])
+model.eval()
+
+def extract_features(images):
+    with torch.no_grad():
+        features = model(images).squeeze()
+    return features.numpy()
+
+# Step 2: Build IF on normal images
+X_normal = extract_features(normal_images)  # (n, 2048)
+X_pca = PCA(n_components=100).fit_transform(X_normal)
+
+clf = IsolationForest(contamination=0.05, random_state=42)
+clf.fit(X_pca)
+
+# Step 3: Detect anomalous images
+X_test = extract_features(test_images)
+X_test_pca = pca.transform(X_test)
+scores = clf.decision_function(X_test_pca)
+```
+
+**Applications:**
+| Domain | Normal | Anomaly |
+|--------|--------|---------|
+| Manufacturing | Good products | Defects, damage |
+| Medical imaging | Healthy scans | Pathological findings |
+| Security | Known objects | Suspicious items |
+| Quality control | Standard appearance | Deformations |
+
+**Alternatives to IF for Image Anomaly:**
+- Autoencoder reconstruction error
+- GANomaly, f-AnoGAN
+- PatchCore, PaDiM (state-of-the-art)
+
+**Interview Tip:** While IF works reasonably well on CNN embeddings, specialized methods like PatchCore and PaDiM outperform it for image anomaly detection. IF is a good baseline and works well when you need a simple, fast solution.
 
 ---
 
@@ -2327,7 +3263,57 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss interpretability: how to trace a specific anomaly path.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Interpreting why Isolation Forest flags a specific point as anomalous requires tracing its isolation path through the trees to identify which features and split values contributed to its short path length.
+
+**Interpretability Methods:**
+1. **Path analysis:** Track which features split the anomaly early across trees
+2. **Feature importance:** Count how often each feature is used in early splits for anomalies
+3. **SHAP values:** Apply TreeSHAP for model-agnostic feature attribution
+4. **Anomaly path visualization:** Show the tree path for a specific flagged point
+
+**Feature Importance for Anomalies:**
+```python
+from sklearn.ensemble import IsolationForest
+import numpy as np
+
+clf = IsolationForest(n_estimators=100, random_state=42)
+clf.fit(X_train)
+
+# Custom feature importance
+def anomaly_feature_importance(clf, X_anomaly):
+    importances = np.zeros(X_anomaly.shape[1])
+    for tree in clf.estimators_:
+        # Get decision path
+        path = tree.decision_path(X_anomaly)
+        feature_ids = tree.tree_.feature
+        # Weight by inverse depth (early splits = more important)
+        for node in path.indices:
+            if feature_ids[node] >= 0:  # Internal node
+                depth = 1  # simplified
+                importances[feature_ids[node]] += 1.0 / depth
+    return importances / len(clf.estimators_)
+```
+
+**SHAP Integration:**
+```python
+import shap
+explainer = shap.TreeExplainer(clf)
+shap_values = explainer.shap_values(X_anomaly)
+shap.force_plot(explainer.expected_value, shap_values[0], X_anomaly[0])
+```
+
+**Visualization Approaches:**
+| Method | What It Shows | Complexity |
+|--------|-------------|-----------|
+| Feature importance bar chart | Which features drive anomaly score | Low |
+| SHAP waterfall | Feature contributions to individual score | Medium |
+| Path visualization | Tree traversal for specific point | Medium |
+| Scatter with highlight | Anomaly position in feature space | Low |
+
+**Interview Tip:** Explainability is increasingly important in production anomaly detection. SHAP values provide the most rigorous feature attribution for individual predictions. Always be prepared to explain WHY a point was flagged, not just that it was flagged.
 
 ---
 
@@ -2335,7 +3321,47 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain why Isolation Forest is suitable for large-scale credit-card fraud.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest is well-suited for large-scale credit card fraud detection due to its speed, scalability, unsupervised nature, and ability to handle the extreme class imbalance inherent in fraud datasets.
+
+**Why IF Excels for Credit Card Fraud:**
+1. **Extreme imbalance:** Fraud is < 0.1% of transactions → anomaly detection natural fit
+2. **Scalability:** Millions of transactions processed in seconds
+3. **No labels needed:** Can deploy without labeled fraud examples
+4. **Feature diversity:** Transaction amount, time, location, merchant type all captured
+5. **Real-time scoring:** Fast prediction (tree traversal) enables real-time blocking
+
+**Typical Pipeline:**
+```python
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+
+# Features: amount, time, merchant_category, distance_from_home, etc.
+features = ['amount', 'time_since_last_txn', 'distance_from_home',
+            'merchant_risk_score', 'frequency_24h', 'amount_deviation']
+
+X_scaled = StandardScaler().fit_transform(df[features])
+
+# Train on all transactions (mostly legit)
+clf = IsolationForest(contamination=0.001, n_estimators=200, random_state=42)
+clf.fit(X_scaled)
+
+# Score new transactions in real-time
+scores = clf.decision_function(new_transactions)
+# Flag bottom 0.1% as potential fraud
+```
+
+**Performance Considerations:**
+| Metric | Typical Value |
+|--------|--------------|
+| Precision @0.1% | 30-60% (depends on features) |
+| Recall | 40-70% |
+| Processing speed | >10,000 transactions/second |
+| Model update | Daily/weekly retraining |
+
+**Interview Tip:** In fraud detection, IF is typically part of a larger system: rule-based filters → IF scoring → human review queue. The contamination parameter maps directly to the review capacity (how many alerts can analysts review per day).
 
 ---
 
@@ -2343,7 +3369,56 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Provide methods to tune Isolation Forest hyper-parameters.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Tuning Isolation Forest hyperparameters requires unsupervised or semi-supervised validation strategies since traditional supervised metrics may not be available.
+
+**Tuning Methods:**
+| Method | Requirements | Approach |
+|--------|-------------|---------|
+| **Visual inspection** | None | Plot score distributions, check bimodality |
+| **Stability analysis** | None | Compare results across parameter settings |
+| **Semi-supervised** | Few labels | Optimize F1/precision using labeled examples |
+| **Domain validation** | Expert knowledge | Have experts review top anomalies |
+| **Synthetic anomalies** | None | Inject known anomalies, measure detection rate |
+
+**Parameter Priority:**
+1. **contamination** → Most impactful; set based on domain knowledge
+2. **n_estimators** → 100-300 usually sufficient; more = more stable
+3. **max_samples** → 256 default; increase for complex data
+4. **max_features** → 1.0 default; reduce if very high-dimensional
+
+**Synthetic Anomaly Validation:**
+```python
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
+# Inject synthetic anomalies
+np.random.seed(42)
+n_synthetic = int(0.05 * len(X_train))
+synthetic_anomalies = np.random.uniform(
+    X_train.min(axis=0) * 1.5, X_train.max(axis=0) * 1.5,
+    size=(n_synthetic, X_train.shape[1])
+)
+labels = np.concatenate([np.ones(len(X_train)), -np.ones(n_synthetic)])
+X_combined = np.vstack([X_train, synthetic_anomalies])
+
+# Grid search
+best_score = 0
+for n_est in [50, 100, 200]:
+    for max_samp in [128, 256, 512]:
+        clf = IsolationForest(n_estimators=n_est, max_samples=max_samp)
+        clf.fit(X_combined)
+        preds = clf.predict(X_combined)
+        from sklearn.metrics import f1_score
+        f1 = f1_score(labels, preds)
+        if f1 > best_score:
+            best_score = f1
+            best_params = (n_est, max_samp)
+```
+
+**Interview Tip:** The biggest practical challenge is setting the contamination parameter. A good approach is to start conservative (0.01), examine flagged instances with domain experts, and adjust based on the false positive rate they can tolerate.
 
 ---
 
@@ -2351,7 +3426,35 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Compare using Gini impurity vs. random split in IF.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Standard Isolation Forest uses random splits (no criterion), while traditional decision trees use Gini impurity or information gain. This fundamental difference is by design and essential to IF's anomaly detection capability.
+
+**Comparison:**
+| Aspect | Random Split (IF) | Gini Impurity (Decision Tree) |
+|--------|-------------------|------------------------------|
+| **Objective** | Isolate points | Classify/predict optimally |
+| **Split selection** | Random feature + random value | Best feature + best value |
+| **Supervised** | No | Yes (needs labels) |
+| **Computational cost** | O(1) per split | O(n * d) per split |
+| **Bias** | Unbiased (random) | Biased toward informative features |
+| **Anomaly detection** | Exploits isolation ease | N/A (not designed for AD) |
+
+**Why Random Splits Are Better for AD:**
+1. **No labels available:** Can't compute Gini without target variable
+2. **Isolation principle:** Anomalies are isolated quickly by ANY random partition
+3. **Unbiased exploration:** Every feature has equal chance of revealing anomalies
+4. **Speed:** O(1) per split decision vs O(n*d) for optimal split
+5. **Theory:** Provably, random splits isolate anomalies in O(log n) depth
+
+**If We Used Gini Splits in IF:**
+- Would need some proxy target (e.g., density estimate)
+- Would bias toward features with clear clusters (not anomalies)
+- Would be much slower per tree
+- Would NOT necessarily isolate anomalies faster
+
+**Interview Tip:** The randomness in IF is not a limitation—it's the core mechanism. The insight is that anomalies are so different from normal data that even random partitions isolate them quickly. This is why IF works without any optimization criterion.
 
 ---
 
@@ -2359,7 +3462,37 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss distance to normal instances in path length terms.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+In Isolation Forest, the path length to isolate a point can be interpreted as an inverse measure of its distance from normal instances—points far from the normal cluster have short paths (easily isolated), analogous to large distances in metric-based methods.
+
+**Correspondence:**
+| Path Length | Distance Analog | Interpretation |
+|-------------|----------------|----------------|
+| Very short (1-3) | Very far from all normals | Clear anomaly |
+| Short (3-5) | Far from most normals | Likely anomaly |
+| Medium (5-8) | Moderate distance | Borderline |
+| Long (8+) | Embedded in normal cluster | Normal point |
+
+**Mathematical Intuition:**
+- For a point at distance d from the nearest normal cluster in feature space:
+- Expected isolation depth ≈ log2(1/volume_at_distance_d)
+- Points in low-density regions (far from normals) have small local volume → short paths
+- Points in high-density regions have large local volume → many splits needed
+
+**Why Path Length Approximates Distance:**
+1. Each random split partitions the space
+2. Points far from the bulk are on the "edge" of the data distribution
+3. Random splits quickly separate edge points from the bulk
+4. Points in the center require many splits to separate from similar neighbors
+
+**Formal Connection:**
+- Path length h(x) correlates with -log(density(x)) approximately
+- Points with low density → short paths → high anomaly scores
+- This connects IF to density-based methods (LOF, KDE) conceptually
+
+**Interview Tip:** While IF doesn't explicitly compute distances, path length serves as a proxy for data density/distance. The equivalence is: short path ≈ low density ≈ far from normal ≈ anomaly. This connection helps explain IF to those familiar with distance-based methods.
 
 ---
 
@@ -2367,7 +3500,48 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain ensemble diversity importance.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Ensemble diversity—the degree to which individual isolation trees make different errors—is crucial for Isolation Forest's anomaly detection quality, as it ensures robust score estimation through aggregation.
+
+**Sources of Diversity in IF:**
+1. **Random subsampling:** Each tree sees a different subset of data (without replacement)
+2. **Random feature selection:** Each split uses a random feature
+3. **Random split values:** Split point is random within feature range
+4. **Different tree structures:** Combination of random choices creates unique trees
+
+**Why Diversity Matters:**
+| Diversity Level | Effect on Detection |
+|----------------|-------------------|
+| Low (similar trees) | Unstable scores, overfits to noise |
+| High (diverse trees) | Robust score estimates, better generalization |
+
+**Diversity Mechanisms:**
+| Mechanism | How It Creates Diversity |
+|-----------|------------------------|
+| Subsampling | Different data → different tree structures |
+| Random features | Different features explored by each tree |
+| Random splits | Different partitioning even on same data |
+| Together | Triple randomization → high diversity |
+
+**Measuring Diversity:**
+- Disagreement between trees on anomaly rankings
+- Correlation between tree path lengths for same point
+- Lower correlation → higher diversity → better ensemble
+
+**Improving Diversity:**
+```python
+# Reduce max_features for more feature diversity
+clf = IsolationForest(
+    n_estimators=200,
+    max_samples=256,
+    max_features=0.5,  # Each tree uses 50% of features
+    random_state=42
+)
+```
+
+**Interview Tip:** The triple randomization (data, feature, split) in IF provides excellent diversity "for free" compared to methods like Random Forest that must balance diversity with accuracy. This is why IF works well with relatively few trees (100) compared to RF's typical 500+.
 
 ---
 
@@ -2375,7 +3549,31 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **What is "SCiForest" (scalable clustered Isolation Forest)?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+SCiForest (Scalable Clustered Isolation Forest) is an extension that uses random hyperplanes and cluster-based anomaly detection to improve standard IF's performance on non-axis-aligned anomalies.
+
+**Key Innovations:**
+1. **Random hyperplane splits:** Instead of axis-aligned, uses random linear combinations of features
+2. **Split criterion:** Uses a criterion based on data dispersion rather than purely random
+3. **Cluster detection:** Can identify anomalies that deviate from cluster structure
+4. **Scalability:** Maintains sublinear complexity through subsampling
+
+**How SCiForest Differs:**
+| Aspect | Standard IF | SCiForest |
+|--------|-----------|-----------|
+| Split type | Axis-aligned | Random hyperplane |
+| Split selection | Purely random | Dispersion-based criterion |
+| Anomaly type | Point anomalies | Point + group anomalies |
+| Feature interaction | One feature at a time | Linear combinations |
+
+**When SCiForest Helps:**
+- Data has clusters with different orientations
+- Anomalies are defined by feature combinations
+- Standard IF's axis-aligned bias is problematic
+
+**Interview Tip:** SCiForest represents a middle ground between standard IF (purely random, axis-aligned) and Extended IF (purely random, hyperplane). It adds a modest amount of data-driven split selection while maintaining scalability.
 
 ---
 
@@ -2383,7 +3581,47 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe visualizing isolation paths in low dimensions.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Visualizing isolation paths helps explain WHY a point was flagged as anomalous by showing the sequence of feature splits that led to its rapid isolation.
+
+**Visualization Approaches:**
+1. **Decision path plot:** Show tree traversal as a flowchart
+2. **Feature contribution bar chart:** Which features contributed to short path
+3. **Parallel coordinates:** Show anomaly's position relative to split values
+4. **Scatter plots with decision boundaries:** 2D projections showing split regions
+
+**Implementation:**
+```python
+from sklearn.ensemble import IsolationForest
+import matplotlib.pyplot as plt
+import numpy as np
+
+clf = IsolationForest(n_estimators=100, random_state=42)
+clf.fit(X)
+
+# Visualize in 2D
+if X.shape[1] == 2:
+    xx, yy = np.meshgrid(
+        np.linspace(X[:, 0].min()-1, X[:, 0].max()+1, 100),
+        np.linspace(X[:, 1].min()-1, X[:, 1].max()+1, 100)
+    )
+    Z = clf.decision_function(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    
+    plt.contourf(xx, yy, Z, cmap='RdBu', alpha=0.5)
+    plt.scatter(X[:, 0], X[:, 1], c=clf.predict(X), cmap='coolwarm', s=10)
+    plt.colorbar(label='Anomaly Score')
+    plt.title('Isolation Forest Decision Boundary')
+```
+
+**For High-Dimensional Data:**
+- Project to 2D using PCA or t-SNE, overlay anomaly scores
+- Create feature-pair scatter plots with isolation regions
+- Show SHAP force plots for individual anomalous points
+
+**Interview Tip:** Visualization is essential for building trust in anomaly detection systems. The contour plot showing the decision function is the most intuitive visualization for stakeholders.
 
 ---
 
@@ -2391,7 +3629,44 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss effect of correlated features on split randomness.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Correlated features can reduce Isolation Forest's effectiveness because random splits on correlated features provide redundant information, reducing the diversity of isolation patterns across the ensemble.
+
+**Effect of Correlation:**
+| Correlation Level | Impact |
+|-------------------|--------|
+| Low (< 0.3) | Good diversity, optimal performance |
+| Moderate (0.3-0.7) | Some redundancy, slightly reduced efficiency |
+| High (> 0.7) | Redundant splits, reduced detection of anomalies on uncorrelated features |
+| Perfect (1.0) | Equivalent to reducing feature count |
+
+**Why Correlation Hurts:**
+1. Splits on correlated features produce similar partitions
+2. Anomalies defined by uncorrelated features get less attention
+3. Ensemble diversity decreases (trees look similar)
+4. More trees needed to compensate
+
+**Mitigation Strategies:**
+1. **PCA preprocessing:** Decorrelate features before IF
+2. **Feature selection:** Remove highly correlated features (keep one per correlated group)
+3. **max_features < 1.0:** Force trees to use smaller feature subsets
+4. **Extended IF:** Random hyperplanes naturally combine correlated features
+
+```python
+from sklearn.decomposition import PCA
+from sklearn.ensemble import IsolationForest
+
+# Decorrelate with PCA
+X_decorrelated = PCA(n_components=0.95).fit_transform(X_scaled)  # Keep 95% variance
+
+# Apply IF on decorrelated features
+clf = IsolationForest(contamination=0.05, random_state=42)
+clf.fit(X_decorrelated)
+```
+
+**Interview Tip:** Correlation reduces the effective dimensionality of IF's random splits. This is analogous to the problem in Random Forest where correlated features reduce tree diversity. PCA preprocessing is the simplest fix.
 
 ---
 
@@ -2399,7 +3674,53 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain IF adaptation to mixed numerical and textual features.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Adapting Isolation Forest for datasets with mixed numerical and textual features requires converting text to numerical representations before combining with numerical features.
+
+**Text Feature Handling:**
+| Method | Description | Best For |
+|--------|-------------|----------|
+| TF-IDF | Sparse term-frequency vectors | Short text |
+| Word embeddings (avg) | Dense semantic vectors | Sentences |
+| Sentence transformers | Pre-trained dense embeddings | Modern NLP |
+| Topic modeling (LDA) | Topic probability vectors | Documents |
+| Count vectorizer | Simple word counts | Bag-of-words |
+
+**Pipeline:**
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import IsolationForest
+from sklearn.decomposition import TruncatedSVD
+import numpy as np
+
+# Process text features
+tfidf = TfidfVectorizer(max_features=500)
+X_text = tfidf.fit_transform(text_data)
+# Reduce dimensionality
+svd = TruncatedSVD(n_components=50)
+X_text_reduced = svd.fit_transform(X_text)
+
+# Process numerical features
+scaler = StandardScaler()
+X_num = scaler.fit_transform(numerical_data)
+
+# Combine
+X_combined = np.hstack([X_num, X_text_reduced])
+
+# Apply Isolation Forest
+clf = IsolationForest(contamination=0.05, random_state=42)
+clf.fit(X_combined)
+```
+
+**Challenges:**
+- Feature scale mismatch between text embeddings and numerical features
+- High dimensionality from text vectorization
+- Sparse features from TF-IDF can be problematic for random splits
+
+**Interview Tip:** The key challenge is ensuring text embeddings and numerical features are on comparable scales. Dimensionality reduction (SVD/PCA) on text features followed by standard scaling on all features produces the best results for IF.
 
 ---
 
@@ -2407,7 +3728,60 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **How would you parallelize Isolation Forest on Spark?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Parallelizing Isolation Forest on Apache Spark enables processing of massive datasets (billions of records) by distributing tree construction and scoring across a cluster.
+
+**Parallel Strategy:**
+1. **Data-parallel tree building:** Each worker builds trees on different subsamples
+2. **Model-parallel scoring:** Distribute test data, all workers have full forest
+3. **Spark ML pipeline integration:** Fit into existing Spark workflows
+
+**Implementation Approach (PySpark):**
+```python
+from pyspark.sql import SparkSession
+from pyspark.ml.feature import VectorAssembler
+import numpy as np
+
+spark = SparkSession.builder.appName("IF_Distributed").getOrCreate()
+
+# Approach 1: Train separate models per partition, ensemble
+def train_if_partition(partition):
+    import numpy as np
+    from sklearn.ensemble import IsolationForest
+    data = np.array(list(partition))
+    if len(data) == 0:
+        return iter([])
+    clf = IsolationForest(n_estimators=10, max_samples=256)
+    clf.fit(data)
+    scores = clf.decision_function(data)
+    return iter(zip(data.tolist(), scores.tolist()))
+
+# Approach 2: Subsample centrally, train on driver, broadcast model
+sample = df.sample(fraction=0.01).toPandas()
+clf = IsolationForest(n_estimators=100, max_samples=256)
+clf.fit(sample[features])
+
+# Broadcast model to all workers
+model_bc = spark.sparkContext.broadcast(clf)
+
+# Score in parallel
+@udf(FloatType())
+def score_udf(*features):
+    model = model_bc.value
+    return float(model.decision_function([list(features)])[0])
+```
+
+**Scaling Properties:**
+| n (rows) | Workers | Time |
+|----------|---------|------|
+| 1M | 1 | ~30s |
+| 10M | 10 | ~30s |
+| 100M | 100 | ~30s |
+| 1B | 1000 | ~30s |
+
+**Interview Tip:** Since IF subsamples anyway (psi=256), the training itself is not the bottleneck—scoring is. Broadcasting the trained model and scoring in parallel across partitions is the most efficient Spark approach.
 
 ---
 
@@ -2415,7 +3789,49 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss GPU implementations for IF.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+GPU-accelerated Isolation Forest implementations leverage massively parallel GPU cores for both tree construction and batch scoring, providing significant speedups for large-scale anomaly detection.
+
+**Available GPU Implementations:**
+| Library | Backend | Speed Improvement |
+|---------|---------|-------------------|
+| **RAPIDS cuML** | CUDA | 10-100x |
+| **cuml.ForestInference** | CUDA | Fast inference only |
+| **Custom CUDA** | CUDA | Specialized use cases |
+
+**RAPIDS cuML Implementation:**
+```python
+from cuml.ensemble import ForestInference
+from cuml import ForestInference as FIL
+from sklearn.ensemble import IsolationForest
+import cudf
+
+# Train on CPU (sklearn)
+clf = IsolationForest(n_estimators=100, max_samples=256)
+clf.fit(X_train)
+
+# Convert to GPU-accelerated inference
+fil_model = ForestInference.load_from_sklearn(clf)
+X_gpu = cudf.DataFrame(X_test)
+scores = fil_model.predict(X_gpu)
+```
+
+**Speedup Areas:**
+| Operation | CPU | GPU | Speedup |
+|-----------|-----|-----|---------|
+| Tree building (100 trees) | ~1s | ~0.01s | 100x |
+| Scoring 1M points | ~10s | ~0.1s | 100x |
+| Scoring 100M points | ~1000s | ~10s | 100x |
+
+**GPU Memory Considerations:**
+- Model stored on GPU: ~few MB (forest is small)
+- Data transfer: main bottleneck for small batches
+- Batch scoring: efficient when batch size > 10,000
+- Data must fit in GPU memory or be processed in chunks
+
+**Interview Tip:** GPU acceleration is most impactful for the scoring phase (inference), especially in real-time production systems processing millions of events. Training is already fast on CPU due to subsampling.
 
 ---
 
@@ -2423,7 +3839,54 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain score calibration for probabilistic interpretation.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Score calibration transforms Isolation Forest's raw anomaly scores into well-calibrated probabilities, enabling meaningful probabilistic interpretation and threshold-independent comparisons.
+
+**Why Calibration is Needed:**
+- Raw IF scores are between [0, 1] but NOT true probabilities
+- Score of 0.7 doesn't mean 70% probability of being anomalous
+- Distribution of scores depends on data, contamination, and parameters
+- Business decisions often need probability estimates
+
+**Calibration Methods:**
+| Method | How It Works | Requirements |
+|--------|-------------|-------------|
+| **Platt scaling** | Sigmoid fit on scores | Some labeled data |
+| **Isotonic regression** | Non-parametric monotonic fit | More labeled data |
+| **Beta calibration** | Beta distribution fit | Some labeled data |
+| **Empirical CDF** | Transform to uniform via ECDF | No labels needed |
+
+**Implementation:**
+```python
+from sklearn.ensemble import IsolationForest
+from sklearn.calibration import CalibratedClassifierCV
+import numpy as np
+
+# Train IF
+clf = IsolationForest(contamination=0.05, random_state=42)
+clf.fit(X_train)
+raw_scores = clf.decision_function(X_train)
+
+# Simple empirical calibration (no labels)
+from scipy.stats import percentileofscore
+def calibrate_score(score, reference_scores):
+    return 1 - percentileofscore(reference_scores, score) / 100
+
+calibrated = [calibrate_score(s, raw_scores) for s in raw_scores]
+# Now 0.95 means "more anomalous than 95% of training data"
+```
+
+**Percentile-Based Interpretation:**
+| Percentile | Interpretation |
+|-----------|---------------|
+| > 99th | Highly anomalous |
+| 95-99th | Suspicious |
+| 50-95th | Normal range |
+| < 50th | Very normal |
+
+**Interview Tip:** In production, express anomaly scores as percentiles. Stakeholders understand "this transaction is more suspicious than 99.5% of all transactions" much better than "the anomaly score is 0.82".
 
 ---
 
@@ -2431,7 +3894,58 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **How to integrate Isolation Forest into MLOps pipelines.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Integrating Isolation Forest into MLOps pipelines involves model training automation, versioning, monitoring, retraining triggers, and robust serving infrastructure.
+
+**MLOps Pipeline Components:**
+```
+Data Ingestion → Feature Engineering → Model Training → Validation → 
+Deployment → Monitoring → Retraining Trigger → Loop
+```
+
+**Pipeline Architecture:**
+| Stage | Tool | Activity |
+|-------|------|----------|
+| Data | Airflow/Prefect | Schedule data pulls |
+| Features | Feast/dbt | Feature store management |
+| Training | MLflow | Track experiments, version models |
+| Validation | Custom | Test on holdout + synthetic anomalies |
+| Deployment | Docker/K8s | Containerized model serving |
+| Serving | FastAPI/Triton | REST API for scoring |
+| Monitoring | Prometheus/Grafana | Score distributions, latency |
+| Retraining | Airflow trigger | Schedule or drift-triggered |
+
+**Example MLflow Integration:**
+```python
+import mlflow
+from sklearn.ensemble import IsolationForest
+
+with mlflow.start_run():
+    clf = IsolationForest(n_estimators=100, max_samples=256, contamination=0.05)
+    clf.fit(X_train)
+    
+    # Log parameters
+    mlflow.log_params({'n_estimators': 100, 'max_samples': 256, 'contamination': 0.05})
+    
+    # Log metrics
+    scores = clf.decision_function(X_val)
+    mlflow.log_metric('mean_score', float(np.mean(scores)))
+    mlflow.log_metric('score_std', float(np.std(scores)))
+    
+    # Log model
+    mlflow.sklearn.log_model(clf, 'isolation_forest')
+```
+
+**Monitoring Checklist:**
+1. Score distribution shift (indicates data drift)
+2. Anomaly rate over time (should be stable)
+3. Feature distribution changes
+4. Prediction latency
+5. Memory usage
+
+**Interview Tip:** The most critical MLOps component for anomaly detection is monitoring the score distribution over time. A shift in the mean anomaly score is a reliable indicator of data drift requiring model retraining.
 
 ---
 
@@ -2439,7 +3953,60 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe incremental update strategies when new data arrives.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Incremental update strategies allow Isolation Forest to incorporate new data without full retraining, essential for production systems with continuous data streams.
+
+**Strategies:**
+| Strategy | Description | Complexity |
+|----------|-------------|-----------|
+| **Full retrain** | Rebuild entire forest on new data | O(t * psi * log(psi)) |
+| **Sliding window** | Retrain on most recent n samples | Same but on window |
+| **Tree replacement** | Replace oldest trees with new ones | O(k * psi * log(psi)) |
+| **Weighted ensemble** | Add new trees, weight by recency | Weight management |
+| **Online IF** | Incrementally update existing trees | O(1) per update |
+
+**Tree Replacement Strategy:**
+```python
+from sklearn.ensemble import IsolationForest
+import numpy as np
+
+class IncrementalIF:
+    def __init__(self, n_trees=100, max_samples=256, replace_fraction=0.2):
+        self.n_trees = n_trees
+        self.max_samples = max_samples
+        self.n_replace = int(n_trees * replace_fraction)
+        self.model = None
+        self.tree_ages = np.zeros(n_trees)
+    
+    def initial_fit(self, X):
+        self.model = IsolationForest(n_estimators=self.n_trees, 
+                                      max_samples=self.max_samples)
+        self.model.fit(X)
+    
+    def update(self, X_new):
+        # Build new trees on new data
+        new_model = IsolationForest(n_estimators=self.n_replace,
+                                     max_samples=self.max_samples)
+        new_model.fit(X_new)
+        
+        # Replace oldest trees
+        oldest_indices = np.argsort(self.tree_ages)[-self.n_replace:]
+        for i, idx in enumerate(oldest_indices):
+            self.model.estimators_[idx] = new_model.estimators_[i]
+            self.tree_ages[idx] = 0
+        
+        self.tree_ages += 1
+```
+
+**When to Trigger Updates:**
+- Time-based: daily/weekly retraining
+- Volume-based: after every N new samples
+- Drift-based: when score distribution shifts significantly
+- Performance-based: when flagged anomaly quality drops
+
+**Interview Tip:** Tree replacement is the most practical incremental strategy because it maintains the forest size while gradually adapting to new data. Replacing 10-20% of trees per update cycle provides a good balance between stability and adaptability.
 
 ---
 
@@ -2447,7 +4014,42 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss ethical implications of false positives in anomaly detection.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+False positives in anomaly detection—flagging normal instances as anomalies—can have serious ethical implications, particularly in domains affecting individuals' financial access, freedom, or reputation.
+
+**Key Ethical Concerns:**
+| Domain | False Positive Impact |
+|--------|---------------------|
+| Credit card fraud | Blocked legitimate transactions, customer frustration |
+| Healthcare | Unnecessary medical interventions, anxiety |
+| Criminal justice | Wrongful surveillance, bias amplification |
+| Employment | Unfair screening, missed opportunities |
+| Insurance | Denied claims, higher premiums |
+| Social media | Content removal, account suspension |
+
+**Bias Amplification:**
+- IF trained on historical data inherits biases in that data
+- Minority groups with different patterns may be flagged disproportionately
+- Rare but legitimate behaviors flagged more than common ones
+- Geographic, demographic, or behavioral stereotypes encoded in features
+
+**Mitigation Strategies:**
+1. **Fairness-aware features:** Exclude protected attributes (race, gender, age)
+2. **Equalized false positive rates:** Ensure FP rate is similar across groups
+3. **Human review:** Flag for human review rather than automatic rejection
+4. **Appeals process:** Allow flagged individuals to challenge decisions
+5. **Transparency:** Explain why a decision was flagged
+6. **Regular auditing:** Monitor FP rates across demographic groups
+
+**Best Practices:**
+- Set conservative thresholds (minimize false positives)
+- Implement tiered response (soft block → review → hard block)
+- Regular fairness audits across protected groups
+- Monitor disparate impact metrics
+
+**Interview Tip:** In production anomaly detection, the cost of a false positive often exceeds the cost of a false negative. A fraud detection system that blocks 10% of legitimate transactions will be abandoned regardless of its detection rate. Always discuss the impact of FPs on end-users.
 
 ---
 
@@ -2455,7 +4057,35 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain memory vs. accuracy trade-off with sub-sampling size.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The sub-sampling size (psi/max_samples) in Isolation Forest creates a direct trade-off between memory usage and anomaly detection accuracy—smaller samples use less memory but may miss complex anomaly patterns.
+
+**Trade-off Analysis:**
+| Sub-sample Size | Memory | Accuracy | Speed |
+|----------------|--------|----------|-------|
+| 32 | Very low | May miss subtle anomalies | Very fast |
+| 64 | Low | Basic anomalies detected | Fast |
+| 128 | Low | Good for most cases | Fast |
+| 256 (default) | Low | Good balance | Fast |
+| 512 | Moderate | Better for complex patterns | Moderate |
+| 1024 | Higher | Best for subtle anomalies | Slower |
+| Full data (n) | O(n) | Swamping/masking issues | Slow |
+
+**Memory Calculation:**
+- Per tree memory ≈ 2 * psi * (sizeof_node)
+- sizeof_node ≈ 24 bytes (feature_idx, split_value, pointers)
+- Total: t * 2 * psi * 24 bytes
+- Default (100 trees, psi=256): ~1.2 MB
+- Large (100 trees, psi=1024): ~4.8 MB
+
+**Accuracy vs Memory:**
+- Increasing psi improves detection of anomalies that require context (cluster structure)
+- Diminishing returns beyond psi=1024
+- Too large psi causes masking (anomalies hidden by surrounding normals)
+
+**Interview Tip:** In practice, the default psi=256 is almost always sufficient. The IF paper showed that increasing beyond 256 provides minimal improvement while increasing computational cost. Only increase for datasets with very complex structure.
 
 ---
 
@@ -2463,7 +4093,52 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Provide a case study of IF detecting bot traffic on websites.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest can effectively detect bot traffic by identifying anomalous browsing patterns that deviate from normal human behavior based on session-level features.
+
+**Case Study Setup:**
+- **Goal:** Detect automated bot traffic on e-commerce websites
+- **Data:** Web server logs aggregated into user sessions
+- **Features:** Behavioral patterns extracted per session
+
+**Feature Engineering:**
+| Feature | Normal User | Bot |
+|---------|------------|-----|
+| Pages per session | 5-20 | 100-1000+ |
+| Time between clicks | 3-30 seconds | < 0.5 seconds |
+| Unique URLs visited | Varied | Pattern (crawl all) |
+| Session duration | 2-30 minutes | Hours |
+| Error rate (404s) | Low | High (probing) |
+| User-agent entropy | Low | May rotate |
+| Request rate | Irregular | Constant |
+| JavaScript execution | Yes | Often no |
+
+**Implementation:**
+```python
+features = ['pages_per_session', 'avg_time_between_clicks', 
+            'unique_urls', 'session_duration', 'error_rate',
+            'request_rate', 'js_execution_ratio', 'click_entropy']
+
+X = StandardScaler().fit_transform(df[features])
+clf = IsolationForest(contamination=0.10, n_estimators=200, random_state=42)
+clf.fit(X)
+
+# Score sessions
+df['anomaly_score'] = clf.decision_function(X)
+df['is_bot'] = clf.predict(X)
+
+# Top suspicious sessions
+bots = df[df['is_bot'] == -1].sort_values('anomaly_score')
+```
+
+**Results Interpretation:**
+- Bots cluster in t-SNE visualization (distinct from human sessions)
+- SHAP analysis reveals: extremely high request rate + low click entropy are top indicators
+- Different bot types (scrapers, credential stuffers, SEO bots) form sub-clusters
+
+**Interview Tip:** Bot detection is an ideal IF use case because bots are few (anomalous), different (extreme behaviors), and evolving (new bots appear). The unsupervised nature means new bot types are detected without explicit labeling.
 
 ---
 
@@ -2471,7 +4146,45 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain how IF can initialize rare-class oversampling.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest can be used to identify rare-class instances in imbalanced datasets, and these identified rare points can serve as seeds for oversampling techniques like SMOTE.
+
+**Pipeline:**
+1. **Detect rare class:** Use IF to identify anomalous instances (potential rare class)
+2. **Validate:** Confirm detected anomalies correspond to the minority class
+3. **Resample:** Use detected rare instances as seeds for SMOTE or ADASYN
+4. **Train classifier:** Train on balanced dataset
+
+```python
+from sklearn.ensemble import IsolationForest
+from imblearn.over_sampling import SMOTE
+
+# Step 1: Use IF to identify rare instances
+clf = IsolationForest(contamination=0.05, random_state=42)
+clf.fit(X_train)
+rare_mask = clf.predict(X_train) == -1
+
+# Step 2: These are potential minority class instances
+X_rare = X_train[rare_mask]
+
+# Step 3: Use as seeds for sophisticated oversampling
+smote = SMOTE(
+    sampling_strategy='minority',
+    k_neighbors=5,
+    random_state=42
+)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+```
+
+**Why This Helps:**
+- IF identifies the most "unusual" minority samples → diverse seeds
+- Better than random oversampling which may duplicate non-informative examples
+- Focuses synthetic generation around the boundary of the rare class
+- Can identify rare instances even without labels (unsupervised prefiltering)
+
+**Interview Tip:** This technique bridges unsupervised anomaly detection with supervised imbalanced learning. It's particularly useful when you have unlabeled data that might contain rare events worth modeling.
 
 ---
 
@@ -2479,7 +4192,56 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Discuss performance on highly imbalanced industrial sensor data.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Industrial sensor data from manufacturing, energy, or infrastructure monitoring is often highly imbalanced (>99.9% normal) and presents unique challenges for Isolation Forest application.
+
+**Challenges in Industrial IoT:**
+| Challenge | Description |
+|-----------|-------------|
+| Extreme imbalance | < 0.01% anomalies |
+| High dimensionality | 100s of sensor channels |
+| Temporal dependencies | Sequential readings |
+| Noise levels | Sensor drift, measurement error |
+| Multivariate anomalies | Single sensor normal, combination anomalous |
+| Concept drift | Equipment aging, seasonal changes |
+
+**IF Configuration for Industrial Data:**
+```python
+from sklearn.ensemble import IsolationForest
+import pandas as pd
+import numpy as np
+
+# Feature engineering from sensor time series
+def extract_features(sensor_df, window='5T'):
+    return sensor_df.rolling(window).agg(['mean', 'std', 'min', 'max', 'skew'])
+
+features = extract_features(sensor_data)
+clf = IsolationForest(
+    n_estimators=300,       # More trees for stability
+    max_samples=512,        # Larger subsample for complex patterns
+    contamination=0.001,    # Very low anomaly rate
+    max_features=0.8,       # Feature diversity
+    random_state=42
+)
+clf.fit(features)
+```
+
+**Performance on Benchmark Datasets (typical):**
+| Dataset | Precision | Recall | F1 |
+|---------|-----------|--------|-----|
+| NAB (Numenta) | 0.60-0.80 | 0.40-0.70 | 0.48-0.74 |
+| SKAB (Skoltech) | 0.55-0.75 | 0.50-0.65 | 0.52-0.70 |
+| SWAT | 0.40-0.65 | 0.30-0.60 | 0.34-0.62 |
+
+**Best Practices:**
+1. Engineer temporal features (rolling statistics, trends)
+2. Use PCA to handle correlated sensors
+3. Retrain periodically for concept drift
+4. Use domain-specific thresholds per subsystem
+
+**Interview Tip:** Raw sensor readings are poor input for IF. Feature engineering (rolling statistics, Fourier features, trend features) is the key to good performance. Industrial anomaly detection success is 80% feature engineering, 20% model selection.
 
 ---
 
@@ -2487,7 +4249,62 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Explain adaptive isolation forests for drift detection.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Adaptive Isolation Forests extend the standard IF to detect concept drift—gradual or sudden changes in data distribution—by monitoring anomaly score patterns over time and adapting the model accordingly.
+
+**Drift Detection via IF:**
+1. Track mean anomaly score over sliding windows
+2. Sudden increase in mean score → distribution shift (fewer points match old model)
+3. Sudden decrease in mean score → new data may be more homogeneous
+4. Score distribution shape change → structural change in data
+
+**Implementation:**
+```python
+import numpy as np
+from collections import deque
+
+class AdaptiveIF:
+    def __init__(self, window_size=1000, drift_threshold=0.1):
+        self.window = deque(maxlen=window_size)
+        self.score_history = deque(maxlen=100)
+        self.model = None
+        self.baseline_score = None
+        self.drift_threshold = drift_threshold
+    
+    def detect_drift(self, new_scores):
+        current_mean = np.mean(new_scores)
+        if self.baseline_score is not None:
+            drift = abs(current_mean - self.baseline_score)
+            if drift > self.drift_threshold:
+                return True
+        return False
+    
+    def update(self, X_new):
+        self.window.extend(X_new)
+        scores = self.model.decision_function(X_new)
+        
+        if self.detect_drift(scores):
+            # Retrain on recent data
+            self.model = IsolationForest(n_estimators=100)
+            self.model.fit(np.array(self.window))
+            # Update baseline
+            self.baseline_score = np.mean(
+                self.model.decision_function(np.array(self.window))
+            )
+            print("Drift detected! Model retrained.")
+```
+
+**Drift Types and Detection:**
+| Drift Type | Score Signal | Adaptation |
+|-----------|-------------|-----------|
+| Sudden | Sharp score change | Immediate retrain |
+| Gradual | Slow score trend | Periodic retrain |
+| Seasonal | Cyclic score patterns | Multiple models per season |
+| Recurring | Score returns to old pattern | Model switching |
+
+**Interview Tip:** The key insight is that IF's anomaly scores themselves serve as a drift detector. When the average score changes significantly, it means the data no longer matches the model's learned distribution.
 
 ---
 
@@ -2495,7 +4312,41 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Compare IF to HBOS (Histogram-based outlier score).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+HBOS (Histogram-Based Outlier Score) is a fast anomaly detection method that computes outlier scores based on feature-wise histogram densities, offering O(n) training time but assuming feature independence.
+
+**Comparison:**
+| Aspect | Isolation Forest | HBOS |
+|--------|-----------------|------|
+| **Approach** | Isolation via random trees | Histogram-based density |
+| **Assumption** | None (non-parametric) | Feature independence |
+| **Complexity (train)** | O(t * psi * log(psi)) | O(n * d) |
+| **Complexity (score)** | O(t * log(psi)) | O(d) per point |
+| **Multivariate** | Yes (captures interactions) | No (univariate) |
+| **Speed** | Fast | Very fast |
+| **Accuracy** | Good | Good for independent features |
+
+**HBOS Algorithm:**
+1. For each feature, build a histogram
+2. For each point, compute density in each feature's histogram
+3. Anomaly score = product (or sum of log) of inverse densities
+4. Low density in ANY feature → high anomaly score
+
+**When to Choose:**
+| Choose IF | Choose HBOS |
+|-----------|------------|
+| Feature interactions matter | Features are independent |
+| Moderate speed needed | Maximum speed needed |
+| Complex anomaly patterns | Simple univariate anomalies |
+| General purpose | Quick baseline |
+
+**HBOS Weakness:**
+- Misses anomalies that are normal in each feature individually but anomalous in combination
+- Example: age=25 is normal, income=$500K is normal, but (25-year-old, $500K income) is anomalous
+
+**Interview Tip:** HBOS is an excellent fast baseline for anomaly detection. Use it for quick initial screening, then apply IF for more thorough detection. In production, HBOS → IF pipeline catches most anomalies while maintaining speed.
 
 ---
 
@@ -2503,7 +4354,60 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Describe combining IF with autoencoder reconstruction error.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Combining Isolation Forest with autoencoder reconstruction error creates a more robust anomaly detection system that captures both isolation-based and reconstruction-based anomaly signals.
+
+**Approach:**
+1. Train autoencoder on normal data
+2. Compute reconstruction error for all samples
+3. Use reconstruction error as an additional feature
+4. Feed original features + reconstruction error to Isolation Forest
+5. Or: ensemble the two methods' scores
+
+**Implementation:**
+```python
+import numpy as np
+from sklearn.ensemble import IsolationForest
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense
+
+# Step 1: Train autoencoder
+input_dim = X_train.shape[1]
+input_layer = Input(shape=(input_dim,))
+encoded = Dense(32, activation='relu')(input_layer)
+encoded = Dense(16, activation='relu')(encoded)
+decoded = Dense(32, activation='relu')(encoded)
+output = Dense(input_dim, activation='linear')(decoded)
+
+autoencoder = Model(input_layer, output)
+autoencoder.compile(optimizer='adam', loss='mse')
+autoencoder.fit(X_train_normal, X_train_normal, epochs=50, batch_size=32)
+
+# Step 2: Compute reconstruction error
+reconstructed = autoencoder.predict(X_all)
+recon_error = np.mean((X_all - reconstructed) ** 2, axis=1)
+
+# Step 3: Combine with IF
+# Method A: Add recon error as feature
+X_augmented = np.column_stack([X_all, recon_error])
+clf = IsolationForest(contamination=0.05)
+clf.fit(X_augmented)
+
+# Method B: Score fusion
+if_scores = clf.decision_function(X_all)
+combined_score = 0.5 * normalize(if_scores) + 0.5 * normalize(recon_error)
+```
+
+**Why Combination Works:**
+| Method | Detects | Misses |
+|--------|---------|--------|
+| IF alone | Point anomalies, global outliers | Subtle reconstruction patterns |
+| AE alone | Distribution anomalies, subtle deviations | Local outliers in low-density regions |
+| Combined | Both types | Less blind spots |
+
+**Interview Tip:** This combination is state-of-practice in production systems. IF catches obvious outliers while the autoencoder catches subtle distribution anomalies. The ensemble is more robust than either alone.
 
 ---
 
@@ -2511,7 +4415,51 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Predict emerging research on explainable anomaly detection.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Explainable anomaly detection is an emerging research area focused on providing human-interpretable explanations for why specific instances are flagged as anomalous, beyond simple scores.
+
+**Research Directions:**
+| Direction | Description | Status |
+|-----------|-------------|--------|
+| **SHAP for IF** | Feature attribution per prediction | Available (TreeSHAP) |
+| **Counterfactual explanations** | "What change makes this normal?" | Active research |
+| **Rule extraction** | Convert IF to interpretable rules | Active research |
+| **Attention-based AD** | Neural attention highlights anomalous features | Emerging |
+| **Causal anomaly detection** | Why did this anomaly occur? | Early stage |
+
+**Counterfactual Explanations:**
+- "This transaction scored as anomalous. If the amount were $50 instead of $50,000, it would be normal."
+- Find minimal change to features that changes the prediction
+- Very useful for actionable feedback
+
+**Rule-Based Explanations:**
+- Extract decision rules from IF paths
+- "Flagged because: amount > $10,000 AND time = 3AM AND country = unusual"
+- Approximate IF with interpretable rule lists
+
+**Feature Attribution Methods:**
+```python
+import shap
+# TreeSHAP for Isolation Forest
+explainer = shap.TreeExplainer(clf)
+shap_values = explainer.shap_values(X_anomalous)
+# Global feature importance
+shap.summary_plot(shap_values, X_anomalous)
+# Individual explanation
+shap.waterfall_plot(shap.Explanation(values=shap_values[0],
+                    base_values=explainer.expected_value,
+                    data=X_anomalous[0]))
+```
+
+**Future Trends:**
+1. Automatic explanation generation in natural language
+2. Integration with LLMs for explanation synthesis
+3. Interactive explanation interfaces
+4. Regulatory compliance-driven explainability (EU AI Act)
+
+**Interview Tip:** Explainability is increasingly a regulatory requirement (GDPR right to explanation, EU AI Act). Being able to explain anomaly detections is not optional in financial services, healthcare, or any high-stakes domain.
 
 ---
 
@@ -2519,7 +4467,50 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **List pitfalls when evaluating unsupervised anomaly detection.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Evaluating unsupervised anomaly detection is inherently challenging because ground truth labels are typically unavailable or unreliable, leading to several common pitfalls.
+
+**Major Pitfalls:**
+| Pitfall | Description | Mitigation |
+|---------|-------------|-----------|
+| **No ground truth** | Can't compute precision/recall without labels | Use domain experts, synthetic anomalies |
+| **Label contamination** | Training data contains unknown anomalies | Robust algorithms, contamination parameter |
+| **Threshold sensitivity** | Results change dramatically with threshold choice | Report ROC-AUC (threshold-independent) |
+| **Class imbalance** | Accuracy misleading (99% by predicting all normal) | Use precision@k, F1, AP |
+| **Evaluation bias** | Evaluating on training data | Holdout or temporal split |
+| **Metric selection** | Wrong metric for use case | Align metric with business objective |
+
+**Recommended Evaluation Protocol:**
+1. **If labels available:**
+   - ROC-AUC (threshold-independent overall performance)
+   - Precision@k (how many of top-k flags are true anomalies)
+   - Average Precision (area under precision-recall curve)
+   
+2. **If no labels:**
+   - Visual inspection of top-scoring anomalies
+   - Domain expert review of flags
+   - Stability analysis (consistent results across runs/parameters)
+   - Synthetic anomaly injection test
+
+**Synthetic Anomaly Evaluation:**
+```python
+# Inject known anomalies to test detection
+import numpy as np
+n_synthetic = 100
+synthetic = np.random.uniform(
+    X.min(axis=0) * 2, X.max(axis=0) * 2, size=(n_synthetic, X.shape[1])
+)
+X_test = np.vstack([X, synthetic])
+y_true = np.array([0]*len(X) + [1]*n_synthetic)
+
+from sklearn.metrics import roc_auc_score
+scores = -clf.decision_function(X_test)  # Negate: higher = more anomalous
+auc = roc_auc_score(y_true, scores)
+```
+
+**Interview Tip:** The most common mistake is reporting accuracy for anomaly detection. With 1% anomaly rate, a model predicting everything as normal achieves 99% accuracy. Always use ranking-based or precision-focused metrics.
 
 ---
 
@@ -2527,47 +4518,58 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 **Summarize pros/cons of IF compared to tree-based ensembles.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Isolation Forest is a tree-based ensemble, distinct from supervised tree ensembles like Random Forest and gradient boosting, with unique advantages and disadvantages for anomaly detection.
+
+**Pros:**
+| Advantage | Description |
+|-----------|-------------|
+| **Speed** | O(t*psi*log(psi)) training, constant w.r.t. n |
+| **Scalability** | Handles millions of points easily |
+| **Unsupervised** | No labels needed |
+| **Low memory** | Small fixed model size (~t*psi nodes) |
+| **Few hyperparameters** | n_estimators, max_samples, contamination |
+| **Robust to high-d** | Random feature selection handles many features |
+| **Linear time prediction** | O(t*log(psi)) per point |
+| **No distance computation** | Avoids curse of dimensionality |
+| **Easy to deploy** | Simple model, fast inference |
+
+**Cons:**
+| Disadvantage | Description |
+|-------------|-------------|
+| **Axis-aligned splits** | May miss multivariate anomalies |
+| **No local context** | Unlike LOF, doesn't compare with neighbors |
+| **No temporal modeling** | Doesn't handle time dependencies natively |
+| **Score interpretation** | Raw scores not calibrated probabilities |
+| **Feature scaling** | Sensitive to feature ranges (unlike tree classifiers) |
+| **No online learning** | Standard IF requires batch retraining |
+| **Explanability** | Limited out-of-box explanation for flags |
+
+**Comparison with Supervised Tree Ensembles:**
+| Aspect | IF | Random Forest | XGBoost |
+|--------|-----|--------------|---------|
+| Labels | ✗ | ✓ | ✓ |
+| Speed | ★★★★★ | ★★★★ | ★★★ |
+| Accuracy | ★★★ | ★★★★★ | ★★★★★ |
+| Interpretability | ★★ | ★★★★ | ★★★ |
+| Anomaly detection | ★★★★★ | ★★ | ★★ |
+
+**Bottom Line:**
+IF is the go-to choice for unsupervised anomaly detection when you need speed, scalability, and simplicity. For supervised tasks with labels, Random Forest or XGBoost are better. For local anomalies, complement IF with LOF.
+
+**Interview Tip:** A strong answer compares IF not just to other anomaly detectors but also to supervised tree ensembles, showing you understand the broader ML ecosystem. Mention IF's unique position as the "Random Forest of anomaly detection"—fast, robust, and a reliable baseline.
 
 ---
 
-## Question 36
 
-**Explain why Isolation Forest is unsupervised yet can be semi-supervised.**
 
-**Answer:** _[To be filled]_
 
----
 
-## Question 37
 
-**Compare Isolation Forest with LOF (Local Outlier Factor).**
 
-**Answer:** _[To be filled]_
 
----
 
-## Question 38
 
-**Discuss computational complexity and scalability.**
-
-**Answer:** _[To be filled]_
-
----
-
-## Question 39
-
-**Explain how categorical features are handled (one-hot, hashing).**
-
-**Answer:** _[To be filled]_
-
----
-
-## Question 40
-
-**What are "extended" Isolation Forests and axis-parallel vs. oblique splits?**
-
-**Answer:** _[To be filled]_
-
----
 

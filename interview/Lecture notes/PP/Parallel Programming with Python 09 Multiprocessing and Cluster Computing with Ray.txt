@@ -1,0 +1,4021 @@
+00:02 hi welcome again this is video number
+00:04 
+
+00:04 nine for our course parallel programming
+00:06 
+
+00:06 with python and today we are going to
+00:09 
+
+00:09 learn how to use multiple processors and
+00:12 
+
+00:12 i'm going to revisit our very first
+00:14 
+
+00:14 problem monte carlo pi problem you know
+00:17 
+
+00:17 which we find the value of pi by using
+00:20 
+
+00:20 monte carlo simulation and also at the
+00:22 
+
+00:22 second half of this video we are going
+00:24 
+
+00:24 to create a
+00:27 
+
+00:27 mini cluster including three computers
+00:31 
+
+00:31 actually a prototype
+00:33 
+
+00:33 so let me start very fast by creating a
+00:36 
+
+00:36 new folder
+00:38 
+
+00:38 and just creating a new python project
+00:42 
+
+00:42 in this folder
+00:45 
+
+00:45 like this
+00:48 
+
+00:48 and as i
+00:49 
+
+00:49 said today we are going to use multiple
+00:52 
+
+00:52 processors and
+00:55 
+
+00:55 also we are going to compare the
+00:57 
+
+00:57 performance of our pro
+00:59 
+
+00:59 of our program uh if we use just
+01:03 
+
+01:03 one cpu or two cpus or three four five
+01:08 
+
+01:08 six seven or eight because i have only
+01:11 
+
+01:11 eight
+01:12 
+
+01:12 processors
+01:13 
+
+01:13 on my pc actually four core but
+01:16 
+
+01:16 eight logical processors
+01:19 
+
+01:19 so we can continue uh we can compare the
+01:22 
+
+01:22 performance
+01:27 
+
+01:27 we gain when we add some cpus
+01:30 
+
+01:30 to our calculation
+01:33 
+
+01:33 so
+01:34 
+
+01:34 i'm going to
+01:37 
+
+01:37 create a virtual environment for this
+01:39 
+
+01:39 project first
+01:52 
+
+01:52 all right
+01:58 
+
+01:58 so let's start
+02:00 
+
+02:00 by using the multiple processors
+02:03 
+
+02:03 and
+02:04 
+
+02:04 we have learned how to solve this
+02:05 
+
+02:05 problem by using multiple threads
+02:08 
+
+02:08 but
+02:09 
+
+02:09 if we use
+02:11 
+
+02:11 just multiple threads then we can
+02:14 
+
+02:14 all of these threads can reach the same
+02:17 
+
+02:17 area of memory in our ram but
+02:20 
+
+02:20 when we use multiple processors then
+02:23 
+
+02:23 we are going to have a memory problem so
+02:27 
+
+02:27 i'm going to manage this problem also
+02:29 
+
+02:29 let's start with the python file with
+02:31 
+
+02:31 the name multi-process
+02:32 
+
+02:32 and i'm i'm going to do it very fast so
+02:37 
+
+02:37 first i'm going to create our tic toc
+02:40 
+
+02:40 class very fast because i'm going to use
+02:42 
+
+02:42 it to
+02:43 
+
+02:43 scale our to measure our performance
+02:46 
+
+02:46 so let's start with the name
+02:50 
+
+02:50 it's going to be tick tock again
+02:55 
+
+02:55 so an initializer of course
+02:58 
+
+02:58 constructor for our class
+03:00 
+
+03:00 and i'm going to use two
+03:03 
+
+03:03 variables with the name
+03:05 
+
+03:05 t1 and t2
+03:08 
+
+03:08 one for starting time and the other one
+03:10 
+
+03:10 will be for the ending time i'm going to
+03:13 
+
+03:13 start our timer by using the tick method
+03:16 
+
+03:16 and it should get the current time and
+03:19 
+
+03:19 save this
+03:21 
+
+03:21 into our t1 variable
+03:24 
+
+03:24 so it should use time library and time
+03:26 
+
+03:26 methods
+03:28 
+
+03:28 and at the end we are going to call the
+03:30 
+
+03:30 talk method and
+03:33 
+
+03:33 when this method is called then it's
+03:35 
+
+03:35 going to get the current time again and
+03:37 
+
+03:37 it's going to store it in the
+03:39 
+
+03:39 t2
+03:41 
+
+03:41 and also it's going to return the
+03:43 
+
+03:43 difference between these two time
+03:46 
+
+03:46 variables so let's return the difference
+03:49 
+
+03:49 between t2 and t1
+03:51 
+
+03:51 like this
+03:52 
+
+03:52 all right
+03:53 
+
+03:53 and also i'm going to create our find pi
+03:56 
+
+03:56 class very fast and very simple so i'm
+03:59 
+
+03:59 going to need the random library of
+04:01 
+
+04:01 course
+04:02 
+
+04:02 let's import it
+04:09 
+
+04:09 and the class find pi
+04:14 
+
+04:14 should include an initializer
+04:17 
+
+04:17 so let's define this double underscoring
+04:20 
+
+04:20 a double underscore
+04:21 
+
+04:21 and we are going to store the total
+04:24 
+
+04:24 number of points that we draw in our
+04:26 
+
+04:26 coordinate system if you don't know how
+04:29 
+
+04:29 to solve this problem by using the monte
+04:31 
+
+04:31 carlo simulation you can watch the
+04:34 
+
+04:34 first three videos
+04:36 
+
+04:36 and you can find the details on these
+04:38 
+
+04:38 videos so i'm going to get just i'm
+04:41 
+
+04:41 going to save the total number of points
+04:43 
+
+04:43 that we draw on this coordinate system
+04:45 
+
+04:45 and also i'm going to count the number
+04:47 
+
+04:47 of the inner points with the variable i
+04:51 
+
+04:51 so self.n and sef.i i'm going to use
+04:54 
+
+04:54 them for this purposes
+04:55 
+
+04:55 and also of course we are going to
+04:58 
+
+04:58 create our main methods and i'm going to
+05:00 
+
+05:00 use the same name
+05:03 
+
+05:03 as we always did draw points so
+05:07 
+
+05:07 this method should accept you some input
+05:11 
+
+05:11 arguments because uh it's going to be a
+05:13 
+
+05:13 multiprocessor uh structure so it's
+05:16 
+
+05:16 going to create some
+05:18 
+
+05:18 processes and send them to different
+05:20 
+
+05:20 processors so i'm going to
+05:23 
+
+05:23 use this input arguments to send some
+05:26 
+
+05:26 data to the memory of this processor so
+05:30 
+
+05:30 let's use them let's create them i'm
+05:33 
+
+05:33 going to use
+05:34 
+
+05:34 nn for the total number of points and
+05:37 
+
+05:37 also i'm going to use p
+05:38 
+
+05:38 to get the current uh
+05:41 
+
+05:41 process number
+05:42 
+
+05:42 all right so
+05:44 
+
+05:44 also to return the values i'm going to
+05:46 
+
+05:46 use two variables all i and also all n
+05:50 
+
+05:50 and
+05:52 
+
+05:52 the all i and all n should be some uh
+05:55 
+
+05:55 variables between the
+05:57 
+
+05:57 variables which is shared between the
+05:60 
+
+05:60 processors so i can uh i can make them
+06:03 
+
+06:03 just communicate between them all right
+06:05 
+
+06:05 to communicate each other so
+06:08 
+
+06:08 actually if we have more than one
+06:11 
+
+06:11 process
+06:12 
+
+06:12 so i think
+06:15 
+
+06:15 it should be some arrays some python
+06:17 
+
+06:17 lists so
+06:19 
+
+06:19 it should include the
+06:21 
+
+06:21 values i values and also n values for
+06:24 
+
+06:24 each processor so each processor can
+06:27 
+
+06:27 just
+06:28 
+
+06:28 change the
+06:30 
+
+06:30 actual value the current value of it
+06:33 
+
+06:33 their process id by using this p number
+06:37 
+
+06:37 so
+06:39 
+
+06:39 let's
+06:40 
+
+06:40 use it
+06:42 
+
+06:42 i'm going to throw n n number of points
+06:45 
+
+06:45 but i don't need to use the index so i'm
+06:47 
+
+06:47 going to use just four underscore in
+06:49 
+
+06:49 range
+06:50 
+
+06:50 n n
+06:53 
+
+06:53 like this and of course i'm going to
+06:55 
+
+06:55 create two
+06:56 
+
+06:56 coordinates one for x and one for y so
+06:59 
+
+06:59 random and let's use the method uniform
+07:03 
+
+07:03 between minus one and plus one and also
+07:06 
+
+07:06 for y-coordinates it should be random
+07:08 
+
+07:08 dot uniform minus one and plus one
+07:12 
+
+07:12 so
+07:13 
+
+07:13 it should increase the
+07:15 
+
+07:15 number of the total numbers so increase
+07:17 
+
+07:17 by one self.n
+07:20 
+
+07:20 and
+07:21 
+
+07:21 so we should just uh check if this
+07:24 
+
+07:24 number is inside our circle or outside
+07:28 
+
+07:28 so
+07:29 
+
+07:29 let's get this
+07:31 
+
+07:31 values and
+07:33 
+
+07:33 get the sum
+07:34 
+
+07:34 of square these numbers
+07:36 
+
+07:36 and check if it is less or equal
+07:40 
+
+07:40 to less than or equal to 1 then it means
+07:44 
+
+07:44 it's an inner number so
+07:45 
+
+07:45 inner point so increase the value of i
+07:48 
+
+07:48 by one like this
+07:50 
+
+07:50 right and also at the end
+07:54 
+
+07:54 after drawing all these points i'm going
+07:57 
+
+07:57 to change the
+07:59 
+
+07:59 change a value in this list all i and
+08:02 
+
+08:02 i'm going to use p the current number of
+08:05 
+
+08:05 process as an index all right like this
+08:08 
+
+08:08 so it should be equal to self.i
+08:11 
+
+08:11 and
+08:12 
+
+08:12 for all n
+08:14 
+
+08:14 also i'm going to do the same thing with
+08:17 
+
+08:17 the index p and also it should be equal
+08:19 
+
+08:19 to self.n like this
+08:21 
+
+08:21 so the class
+08:23 
+
+08:23 is done now so it should just generates
+08:26 
+
+08:26 the coordinates as always x and y and
+08:29 
+
+08:29 then check if
+08:31 
+
+08:31 this
+08:32 
+
+08:32 point is in the circle or
+08:35 
+
+08:35 outside the circle so
+08:37 
+
+08:37 uh at the end it's going to just
+08:40 
+
+08:40 communicate between the
+08:42 
+
+08:42 processes by using this
+08:45 
+
+08:45 shared array all right all i and all n
+08:49 
+
+08:49 so
+08:51 
+
+08:51 then we can just use these classes
+08:54 
+
+08:54 let's create the main block we can just
+08:57 
+
+08:57 use a function with the name main or
+08:60 
+
+08:60 something else or we can just use a main
+09:03 
+
+09:03 block like this so if someone runs this
+09:06 
+
+09:06 python file directly so this block will
+09:08 
+
+09:08 run so let's check if the under named
+09:12 
+
+09:12 under if it is equal to dander main
+09:14 
+
+09:14 thunder
+09:16 
+
+09:16 like this
+09:19 
+
+09:19 so
+09:20 
+
+09:20 i'm going to compare the performance if
+09:22 
+
+09:22 we use one two three four five
+09:26 
+
+09:26 six seven or eight processors so i'm
+09:29 
+
+09:29 going to create a
+09:30 
+
+09:30 main loop for this purpose so let's say
+09:33 
+
+09:33 for number
+09:35 
+
+09:35 of p number of processors
+09:38 
+
+09:38 in range
+09:41 
+
+09:41 starting from one and i should get the
+09:44 
+
+09:44 number of cpus which we have in this pc
+09:47 
+
+09:47 so i'm going to import the os
+09:50 
+
+09:50 library like this
+09:53 
+
+09:53 for the
+09:54 
+
+09:54 for to get access to our operating
+09:56 
+
+09:56 system so i'm going to get the number of
+09:59 
+
+09:59 cpus by using this method os.cpu count
+10:03 
+
+10:03 and if we start from one
+10:06 
+
+10:06 so we should
+10:07 
+
+10:07 use the upper limit as cpu count plus
+10:10 
+
+10:10 one
+10:11 
+
+10:11 because the end is not included in this
+10:15 
+
+10:15 python
+10:16 
+
+10:16 loop all right
+10:18 
+
+10:18 so i'm going to start our timer so let's
+10:21 
+
+10:21 create an instance to our tick tock plus
+10:24 
+
+10:24 like this
+10:26 
+
+10:26 and let's start timer by using tick
+10:28 
+
+10:28 glass tick method sorry
+10:31 
+
+10:31 of this class
+10:33 
+
+10:33 and if we use
+10:38 
+
+10:38 if we use the number of processors
+10:39 
+
+10:39 starting from one all the way up to
+10:42 
+
+10:42 eight
+10:42 
+
+10:42 so we should use
+10:44 
+
+10:44 a number for the total number of points
+10:47 
+
+10:47 which we draw which we are going to
+10:49 
+
+10:49 throw to our coordinate system it should
+10:52 
+
+10:52 be dividable by one
+10:54 
+
+10:54 and then two three four five six seven
+10:59 
+
+10:59 and eight because i'm going to use the
+11:01 
+
+11:01 fixed i'm going to use a fixed number of
+11:04 
+
+11:04 total number of points and then i'm
+11:06 
+
+11:06 going to use
+11:07 
+
+11:07 one cpu then i'm going to send all these
+11:11 
+
+11:11 points by using just one cpu but when i
+11:14 
+
+11:14 pass to the
+11:17 
+
+11:17 two cpus then i'm going to use the same
+11:20 
+
+11:20 number of points but this time i'm going
+11:22 
+
+11:22 to send half of them to one cpu and the
+11:26 
+
+11:26 other half to the other cpu right and if
+11:29 
+
+11:29 we pass to the
+11:31 
+
+11:31 three cpus then i'm going to divide this
+11:34 
+
+11:34 total number of points by three and uh
+11:37 
+
+11:37 one third for one cpu the one third for
+11:41 
+
+11:41 one cpu and one third for one cpu so
+11:44 
+
+11:44 it should be a number like one
+11:47 
+
+11:47 times two times three times four times
+11:50 
+
+11:50 five times six times seven times
+11:54 
+
+11:54 eight
+11:55 
+
+11:55 and if we use a number like this so it's
+11:59 
+
+11:59 it's gonna be guaranteed that we can
+12:01 
+
+12:01 divide this number by one two three four
+12:04 
+
+12:04 five six seven and eight and this number
+12:07 
+
+12:07 is
+12:09 
+
+12:09 forty thousand three hundred and twenty
+12:12 
+
+12:12 and it should be a
+12:14 
+
+12:14 larger number i think so i'm going to
+12:16 
+
+12:16 add some zeros at the end the end of
+12:19 
+
+12:19 this number so it's going to be still
+12:21 
+
+12:21 dividable by all these integers starting
+12:24 
+
+12:24 from one all the way up to eight so
+12:27 
+
+12:27 let's use for example
+12:30 
+
+12:30 uh
+12:31 
+
+12:31 all right all right four million and
+12:34 
+
+12:34 thirty two thousand this should be a
+12:36 
+
+12:36 good point to start
+12:38 
+
+12:38 and
+12:38 
+
+12:38 of course
+12:40 
+
+12:40 if we use a structure like this so i'm
+12:42 
+
+12:42 going to get the integer part
+12:45 
+
+12:45 of this number
+12:48 
+
+12:48 divided by number of p like this
+12:52 
+
+12:52 all right so i'm going to get the
+12:54 
+
+12:54 correct number of the total number of
+12:57 
+
+12:57 points for each cpu if we have one just
+13:01 
+
+13:01 one cpu then i'm going to get all the
+13:04 
+
+13:04 uh value
+13:07 
+
+13:07 all right then uh we should create some
+13:10 
+
+13:10 instances for each cpu and to do this
+13:14 
+
+13:14 i'm going to initialize
+13:16 
+
+13:16 an empty array an empty python list like
+13:19 
+
+13:19 this
+13:20 
+
+13:20 to create
+13:22 
+
+13:22 a find pi instances for each processors
+13:26 
+
+13:26 and of course i'm going to need the
+13:29 
+
+13:29 packages
+13:30 
+
+13:30 so let's
+13:31 
+
+13:31 from multiprocessing
+13:33 
+
+13:33 library
+13:34 
+
+13:34 i'm going to import of course the
+13:36 
+
+13:36 process class
+13:39 
+
+13:39 to create our processes and also to
+13:41 
+
+13:41 create our shared arrays between the
+13:44 
+
+13:44 processes i'm going to import the array
+13:46 
+
+13:46 class
+13:48 
+
+13:48 if you remember from the last week from
+13:50 
+
+13:50 the last video uh we have used the value
+13:53 
+
+13:53 class from the same library from
+13:56 
+
+13:56 multiprocessing
+13:57 
+
+13:57 import value like this and it's just one
+14:01 
+
+14:01 value which is shared between the
+14:03 
+
+14:03 processes but this time i'm going to use
+14:05 
+
+14:05 an array so i'm going to
+14:08 
+
+14:08 import the array class all right
+14:11 
+
+14:11 so
+14:13 
+
+14:13 let's
+14:14 
+
+14:14 create
+14:15 
+
+14:15 let's initialize processes
+14:19 
+
+14:19 which is an empty array now
+14:21 
+
+14:21 right then i'm going to append this
+14:24 
+
+14:24 lists append this arrays by using the
+14:27 
+
+14:27 process class and also let's create the
+14:30 
+
+14:30 shared underscore i
+14:34 
+
+14:34 as an array by using the array class
+14:36 
+
+14:36 from the multiprocessing library and i'm
+14:38 
+
+14:38 going to give that i'm going to define
+14:40 
+
+14:40 that i'm going to use the type of this
+14:42 
+
+14:42 array and similar to the value class we
+14:46 
+
+14:46 can use two types and one of them
+14:49 
+
+14:49 i for integers and the other one is d
+14:54 
+
+14:54 for the doubled for the double precision
+14:57 
+
+14:57 floating point numbers all right so this
+14:60 
+
+14:60 time i'm going to prefer just
+15:02 
+
+15:02 i
+15:03 
+
+15:03 and i'm going to do this i'm going to
+15:06 
+
+15:06 create this array as an integer array
+15:09 
+
+15:09 all right so at the beginning
+15:12 
+
+15:12 the all values for each processor should
+15:14 
+
+15:14 be zero
+15:16 
+
+15:16 then by using this
+15:18 
+
+15:18 line i'm going to
+15:20 
+
+15:20 get the current value get the correct
+15:22 
+
+15:22 value from the throw points methods all
+15:24 
+
+15:24 right so at the beginning all the values
+15:27 
+
+15:27 inside this array in this array should
+15:29 
+
+15:29 be zero so let's use
+15:32 
+
+15:32 this
+15:34 
+
+15:34 to make all of them zero so of course
+15:37 
+
+15:37 i'm going to make them multiplied by
+15:39 
+
+15:39 number of p like this
+15:41 
+
+15:41 right
+15:42 
+
+15:42 you can also just use a
+15:45 
+
+15:45 for loop like
+15:47 
+
+15:47 0 for underscore in
+15:50 
+
+15:50 range number of p it should be same
+15:52 
+
+15:52 thing but
+15:53 
+
+15:53 you can just
+15:56 
+
+15:56 use this
+15:60 
+
+15:60 and also
+16:01 
+
+16:01 i'm going to create another shared array
+16:04 
+
+16:04 this time shared underscore n to store
+16:07 
+
+16:07 the total number of points from each
+16:09 
+
+16:09 processor
+16:10 
+
+16:10 so let's use the same drill
+16:14 
+
+16:14 array with the type integer with the
+16:16 
+
+16:16 initial value zero
+16:20 
+
+16:20 multiplied by number of p right now we
+16:23 
+
+16:23 can append our
+16:25 
+
+16:25 empty lists for find pies and also for
+16:28 
+
+16:28 processes so let's append them for let's
+16:31 
+
+16:31 say for i in range
+16:34 
+
+16:34 number of p
+16:38 
+
+16:38 so find pies that appends
+16:43 
+
+16:43 with the class find pi
+16:46 
+
+16:46 like this all right
+16:51 
+
+16:51 also for the processes
+16:54 
+
+16:54 i'm going to use again the appends
+16:57 
+
+16:57 and with the class process
+17:01 
+
+17:01 and it just gets the same input
+17:05 
+
+17:05 arguments as we did in the threads so it
+17:09 
+
+17:09 should get a target function so it
+17:12 
+
+17:12 should be from the instances find pies
+17:15 
+
+17:15 with the index i
+17:17 
+
+17:17 alright
+17:18 
+
+17:18 and the name of the methods is throw
+17:22 
+
+17:22 underscore points like this
+17:27 
+
+17:27 and also we should give the arguments
+17:32 
+
+17:32 it should be a python tuple as always so
+17:35 
+
+17:35 we are going to give the total number of
+17:38 
+
+17:38 points which we are going to throw to
+17:40 
+
+17:40 our coordinate system and in this loop
+17:43 
+
+17:43 it's going to be n
+17:45 
+
+17:45 and also the current number of the
+17:47 
+
+17:47 process current id of the process which
+17:50 
+
+17:50 it's going to use to change the value
+17:53 
+
+17:53 inside the all underscore i array which
+17:56 
+
+17:56 is the shared array between the
+17:58 
+
+17:58 processes so i'm going to use i for this
+18:02 
+
+18:02 also i'm going to give them shared
+18:06 
+
+18:06 arrays two of them the first one is
+18:08 
+
+18:08 shared underscore i and the second one
+18:11 
+
+18:11 is shared underscore n
+18:13 
+
+18:13 like this
+18:15 
+
+18:15 i think we are okay
+18:17 
+
+18:17 then we can just
+18:19 
+
+18:19 start this processes so let's say for
+18:23 
+
+18:23 process
+18:24 
+
+18:24 in processes
+18:28 
+
+18:28 start
+18:29 
+
+18:29 all of them
+18:31 
+
+18:31 and at the end as always i'm going to
+18:34 
+
+18:34 join all of them so make our main thread
+18:38 
+
+18:38 wait
+18:39 
+
+18:39 to
+18:40 
+
+18:40 each process
+18:42 
+
+18:42 to complete its job all right so
+18:45 
+
+18:45 use the same look for process in
+18:47 
+
+18:47 processes
+18:49 
+
+18:49 process
+18:51 
+
+18:51 dot
+18:52 
+
+18:52 join
+18:54 
+
+18:54 like this
+18:55 
+
+18:55 so
+18:57 
+
+18:57 now we have all these instances find
+18:60 
+
+18:60 pies
+19:01 
+
+19:01 uh
+19:02 
+
+19:02 and also we have all these values inside
+19:07 
+
+19:07 our shared arrays all right shared i and
+19:10 
+
+19:10 share it and so i'm going to use this
+19:13 
+
+19:13 shares i and shared and elements
+19:16 
+
+19:16 all right i'm going to use the elements
+19:18 
+
+19:18 inside this arrays to find the total
+19:21 
+
+19:21 number of the inner points and also the
+19:24 
+
+19:24 total number of total points
+19:26 
+
+19:26 of course
+19:27 
+
+19:27 i'm going to get the total number of
+19:29 
+
+19:29 total points to just
+19:31 
+
+19:31 check if
+19:32 
+
+19:32 we have a raised condition or not
+19:35 
+
+19:35 so let's initialize two integer for this
+19:39 
+
+19:39 let's say inner is equal to zero and
+19:41 
+
+19:41 also the total equals to zero
+19:44 
+
+19:44 and i'm going to use a combined loop for
+19:47 
+
+19:47 this so let's say for i and n
+19:51 
+
+19:51 in
+19:52 
+
+19:52 zip
+19:53 
+
+19:53 shared i
+19:56 
+
+19:56 and shared n
+19:58 
+
+19:58 like this
+19:59 
+
+19:59 if we use a
+20:01 
+
+20:01 zip function here so i'm going to get
+20:04 
+
+20:04 the first element of these two arrays
+20:07 
+
+20:07 and then they get the both of the second
+20:09 
+
+20:09 elements inside these arrays and then
+20:12 
+
+20:12 the third one and then the
+20:14 
+
+20:14 fourth elements and then the fifth
+20:16 
+
+20:16 elements it goes like this all right so
+20:18 
+
+20:18 if we use a zip function inside the
+20:21 
+
+20:21 definition of the for loop so we should
+20:24 
+
+20:24 we are going to have a combined loop
+20:27 
+
+20:27 so let's increase the numbers
+20:30 
+
+20:30 inert
+20:31 
+
+20:31 by
+20:32 
+
+20:32 i
+20:35 
+
+20:35 and also the number of total
+20:38 
+
+20:38 by n
+20:40 
+
+20:40 so
+20:42 
+
+20:42 at this stage here now we have the total
+20:46 
+
+20:46 number of inner points and also total
+20:47 
+
+20:47 number of total points coming from the
+20:50 
+
+20:50 all processes so we can calculate the
+20:53 
+
+20:53 final value of pi here by using these
+20:55 
+
+20:55 two integers so let's say as always pi
+20:59 
+
+20:59 should be equal to four times inner
+21:03 
+
+21:03 divided by total
+21:05 
+
+21:05 the ratio between these two numbers
+21:08 
+
+21:08 then we can just
+21:09 
+
+21:09 write here to our screen by using an f
+21:12 
+
+21:12 string so let's use print
+21:15 
+
+21:15 f let's say let's get first the number
+21:19 
+
+21:19 of processes which we have used for this
+21:21 
+
+21:21 calculation and it should start from one
+21:24 
+
+21:24 all the way up to eight because we have
+21:26 
+
+21:26 eight processors
+21:27 
+
+21:27 in my pc now so let's say p
+21:30 
+
+21:30 is equal to number of p
+21:33 
+
+21:33 and also
+21:36 
+
+21:36 pi is calculated with this
+21:41 
+
+21:41 like pi
+21:43 
+
+21:43 let's see eight decimal digits
+21:47 
+
+21:47 and also let's see the ratio between the
+21:50 
+
+21:50 inner and the total numbers to check if
+21:53 
+
+21:53 we have a race condition or not
+21:58 
+
+21:58 so race condition is something about
+22:01 
+
+22:01 just the
+22:03 
+
+22:03 it's very common when we deal with the
+22:06 
+
+22:06 threats but if we are dealing with the
+22:09 
+
+22:09 processes like this race condition is
+22:11 
+
+22:11 not so common so don't worry about this
+22:15 
+
+22:15 so let's
+22:16 
+
+22:16 put the inner and total separately to
+22:20 
+
+22:20 see them
+22:22 
+
+22:22 and also let's put here the time then we
+22:27 
+
+22:27 can compare the usage of one two three
+22:30 
+
+22:30 or four processors
+22:32 
+
+22:32 so let's get
+22:34 
+
+22:34 it from the top methods
+22:37 
+
+22:37 from our tick tock class and also let's
+22:40 
+
+22:40 see eight decimal digits for time and
+22:43 
+
+22:43 that's right here two seconds
+22:46 
+
+22:46 like this
+22:48 
+
+22:48 all right i think we are done
+22:52 
+
+22:52 we are okay here as you can see
+22:59 
+
+22:59 all right
+23:02 
+
+23:02 i'm not going to run inside
+23:05 
+
+23:05 from the pycharm so let's
+23:10 
+
+23:10 all right let's
+23:14 
+
+23:14 run our ubuntu terminal inside this pc
+23:18 
+
+23:18 which we have windows 10
+23:21 
+
+23:21 let's make this we know like this
+23:26 
+
+23:26 and then get this and also i'm going to
+23:28 
+
+23:28 need another
+23:30 
+
+23:30 ubuntu terminal
+23:33 
+
+23:33 to see the performance
+23:37 
+
+23:37 so let's get it like this i'm going to
+23:40 
+
+23:40 run h tap inside the second
+23:43 
+
+23:43 terminal
+23:45 
+
+23:45 window
+23:52 
+
+23:52 so
+23:53 
+
+23:53 let's first get to this
+23:56 
+
+23:56 or let's put here the h top
+24:00 
+
+24:00 and i'm going to apply a filter to not
+24:03 
+
+24:03 see the other processes but just
+24:06 
+
+24:06 this python file so let's press f4
+24:09 
+
+24:09 and write the name of this python file
+24:12 
+
+24:12 and it's going to be multi-process
+24:16 
+
+24:16 so we can just watch the processes from
+24:20 
+
+24:20 this file
+24:21 
+
+24:21 so let's get to this folder
+24:27 
+
+24:27 sorry first users
+24:29 
+
+24:29 and then desktop
+24:31 
+
+24:31 and then this folder is monte carlo pi
+24:34 
+
+24:34 all right now we are here
+24:36 
+
+24:36 so let's run this
+24:38 
+
+24:38 file by typing more python 3
+24:41 
+
+24:41 multiprocess pi
+24:43 
+
+24:43 so it's going to start with just one
+24:46 
+
+24:46 cpu
+24:47 
+
+24:47 and then
+24:48 
+
+24:48 it's going to use two cpus and three
+24:50 
+
+24:50 cpus four five six seven and eight cpus
+24:54 
+
+24:54 so we should just see the main thread
+24:56 
+
+24:56 here and also the one just one sub
+24:59 
+
+24:59 process for
+25:01 
+
+25:01 one cpu
+25:03 
+
+25:03 and then the second one and then the
+25:04 
+
+25:04 third one so let's run
+25:18 
+
+25:18 all right
+25:21 
+
+25:21 all right
+25:24 
+
+25:24 now
+25:27 
+
+25:27 it's very fast
+25:31 
+
+25:31 so we cannot understand the real
+25:32 
+
+25:32 difference i'm going to increase the
+25:34 
+
+25:34 total number of
+25:36 
+
+25:36 points first let's use 40 million 320.
+25:42 
+
+25:42 000
+25:43 
+
+25:43 numbers
+25:45 
+
+25:45 for each step
+25:47 
+
+25:47 so let's
+25:50 
+
+25:50 let's first click
+25:53 
+
+25:53 and then run the file again
+25:55 
+
+25:55 so we have started with just one cpu as
+25:59 
+
+25:59 you can see
+25:60 
+
+25:60 this is with the process id 90 is the
+26:04 
+
+26:04 main thread of our program and the
+26:07 
+
+26:07 process id with 91 is the
+26:10 
+
+26:10 just
+26:11 
+
+26:11 one sub process from our program all
+26:15 
+
+26:15 right
+26:16 
+
+26:16 it's just using
+26:19 
+
+26:19 it's just running and using just 96
+26:21 
+
+26:21 percent of of course just one cpu
+26:26 
+
+26:26 so the cpu scheduler works
+26:31 
+
+26:31 so we cannot see just one cpu hits the
+26:35 
+
+26:35 100 percent
+26:38 
+
+26:38 wait for the output
+26:40 
+
+26:40 and the first
+26:43 
+
+26:43 part
+26:44 
+
+26:44 just takes 45 seconds for just one cpu
+26:48 
+
+26:48 and now it's going to use two cpus and
+26:50 
+
+26:50 of course we don't expect the
+26:53 
+
+26:53 half of time so something like
+26:57 
+
+26:57 22 or 23 seconds but i think it should
+26:60 
+
+26:60 uh take something like 30 seconds or
+27:04 
+
+27:04 something
+27:06 
+
+27:06 so let's wait
+27:07 
+
+27:07 until it completes
+27:11 
+
+27:11 you know some laws uh about the
+27:14 
+
+27:14 the performance of
+27:16 
+
+27:16 this type of gains
+27:19 
+
+27:19 so
+27:20 
+
+27:20 it just takes 38 seconds it's
+27:23 
+
+27:23 so much
+27:25 
+
+27:25 i think by using just three processors
+27:28 
+
+27:28 we should get a time about
+27:31 
+
+27:31 25 or 24 seconds
+27:34 
+
+27:34 so
+27:35 
+
+27:35 we can just
+27:40 
+
+27:40 two times performance improvement
+27:43 
+
+27:43 then we use something like three
+27:44 
+
+27:44 processors as you can see
+27:47 
+
+27:47 now we can see here in h tab
+27:52 
+
+27:52 with four processes
+27:54 
+
+27:54 or sub processes
+27:60 
+
+27:60 so it
+28:01 
+
+28:01 runs without an error
+28:05 
+
+28:05 and we can just
+28:07 
+
+28:07 monitor the
+28:09 
+
+28:09 performance improvement
+28:15 
+
+28:15 of course it's not just
+28:17 
+
+28:17 a suitable
+28:19 
+
+28:19 pc for calculating something because we
+28:21 
+
+28:21 have
+28:22 
+
+28:22 windows 10 now installed in this pc
+28:26 
+
+28:26 and we are using just uh
+28:30 
+
+28:30 ubuntu terminal inside this
+28:32 
+
+28:32 windows 10
+28:34 
+
+28:34 so
+28:38 
+
+28:38 it's just a bad thing about the
+28:40 
+
+28:40 performance
+28:55 
+
+28:55 it's even
+28:57 
+
+28:57 gets worse
+28:59 
+
+28:59 when we pass
+29:01 
+
+29:01 to the process
+29:02 
+
+29:02 process five processors to six
+29:04 
+
+29:04 processors
+29:07 
+
+29:07 so it's not guaranteed
+29:09 
+
+29:09 when you add some cpus to your
+29:11 
+
+29:11 calculation it's it should
+29:14 
+
+29:14 it doesn't have to get
+29:17 
+
+29:17 better and better
+29:23 
+
+29:23 but it works all right
+29:26 
+
+29:26 so now we can just
+29:29 
+
+29:29 use
+29:31 
+
+29:31 multiple processes
+29:33 
+
+29:33 and we can define multiple threads
+29:36 
+
+29:36 and
+29:37 
+
+29:37 as a next step i'm going to
+29:41 
+
+29:41 i'm going to use multiple pcs
+29:44 
+
+29:44 so i'm going to create now a
+29:47 
+
+29:47 very little cluster by using three pcs
+29:51 
+
+29:51 now
+29:53 
+
+29:53 which i have now i have a desktop
+29:55 
+
+29:55 computer
+29:56 
+
+29:56 and
+29:58 
+
+29:58 i'm going to use its
+30:00 
+
+30:00 wireless connection as a hotspot
+30:03 
+
+30:03 so
+30:05 
+
+30:05 we will create just an isolated network
+30:08 
+
+30:08 between these three
+30:10 
+
+30:10 pcs i have
+30:11 
+
+30:11 two laptops one this uh thinkpad
+30:18 
+
+30:18 t490 and one dell
+30:21 
+
+30:21 xps
+30:23 
+
+30:23 so
+30:24 
+
+30:24 let's check
+30:25 
+
+30:25 now
+30:32 
+
+30:32 all right
+30:33 
+
+30:33 i have connected now with this ip number
+30:37 
+
+30:37 and also i have connected the other
+30:40 
+
+30:40 laptop
+30:43 
+
+30:43 with the same method and also i have my
+30:46 
+
+30:46 desktop here
+30:51 
+
+30:51 as an hot spot right
+30:54 
+
+30:54 it's working so to create a cluster i'm
+30:58 
+
+30:58 going to use a package which has the
+31:00 
+
+31:00 name ray
+31:03 
+
+31:03 as you can see here ray
+31:05 
+
+31:05 so it's a multi-purpose it's a general
+31:08 
+
+31:08 purpose uh package to create clusters
+31:12 
+
+31:12 like this so
+31:15 
+
+31:15 let's clear our
+31:18 
+
+31:18 so to do this first i'm going to
+31:20 
+
+31:20 initialize this pc
+31:23 
+
+31:23 uh as an hat so it it's going to be the
+31:26 
+
+31:26 head of our cluster so let's
+31:30 
+
+31:30 write like this race start
+31:33 
+
+31:33 hat
+31:36 
+
+31:36 it should initialize our
+31:41 
+
+31:41 cluster
+31:44 
+
+31:44 all right
+31:45 
+
+31:45 in windows you can just get errors like
+31:48 
+
+31:48 this so it's just
+31:50 
+
+31:50 says
+31:53 
+
+31:53 it's just use it's just want to use
+31:56 
+
+31:56 10 000 ports
+31:59 
+
+31:59 but it says some other
+32:01 
+
+32:01 applications
+32:03 
+
+32:03 uses
+32:05 
+
+32:05 some of these ports so i'm going to
+32:07 
+
+32:07 exclude these ports
+32:10 
+
+32:10 if i can see the
+32:13 
+
+32:13 one which is the problem
+32:25 
+
+32:25 so what does it say
+32:27 
+
+32:27 it says
+32:29 
+
+32:29 all right it says this port number
+32:33 
+
+32:33 11691 is
+32:36 
+
+32:36 used by
+32:37 
+
+32:37 another application so i'm going to
+32:40 
+
+32:40 execute this number
+32:41 
+
+32:41 so let's see the options
+32:45 
+
+32:45 and
+32:46 
+
+32:46 let's
+32:47 
+
+32:47 say
+32:51 
+
+32:51 help
+32:52 
+
+32:52 all right what does it say
+32:55 
+
+32:55 it says
+33:01 
+
+33:01 here you can just give the
+33:03 
+
+33:03 minimum
+33:05 
+
+33:05 number for the ports and also the
+33:07 
+
+33:07 maximum number
+33:09 
+
+33:09 for the ports i'm going to use the
+33:10 
+
+33:10 minimum option so let's say
+33:14 
+
+33:14 min worker port all right
+33:17 
+
+33:17 let's use
+33:19 
+
+33:19 ads
+33:20 
+
+33:20 main
+33:22 
+
+33:22 worker
+33:24 
+
+33:24 ports
+33:27 
+
+33:27 with
+33:28 
+
+33:28 12 000
+33:32 
+
+33:32 and it should
+33:36 
+
+33:36 work without an error all right now we
+33:38 
+
+33:38 have an hat
+33:40 
+
+33:40 for our cluster with this pc and the
+33:44 
+
+33:44 local node ip is this number and we can
+33:48 
+
+33:48 just start ray
+33:51 
+
+33:51 on the other pieces by using this
+33:53 
+
+33:53 comment
+33:54 
+
+33:54 all right
+33:57 
+
+33:57 as you can see ray start with this
+33:59 
+
+33:59 address so it says uh
+34:02 
+
+34:02 you should start ray
+34:04 
+
+34:04 on these pcs as a
+34:08 
+
+34:08 as a just not all right and it should
+34:10 
+
+34:10 connect to this address as hats so
+34:15 
+
+34:15 let's we are going to need
+34:19 
+
+34:19 another terminal
+34:23 
+
+34:23 let's connect
+34:24 
+
+34:24 to the other pc
+34:28 
+
+34:28 and it has the ip number as
+34:32 
+
+34:32 10 42 0 and 1
+34:40 
+
+34:40 all right now we
+34:41 
+
+34:41 are
+34:42 
+
+34:42 inside the one of our
+34:46 
+
+34:46 pc
+34:53 
+
+34:53 with the name uh
+34:56 
+
+34:56 home station
+34:57 
+
+34:57 as you can see this is t
+35:01 
+
+35:01 490 this is home station so i'm going to
+35:04 
+
+35:04 use this comment
+35:06 
+
+35:06 for this pc now
+35:08 
+
+35:08 let's say ray
+35:09 
+
+35:09 starts
+35:12 
+
+35:12 address
+35:16 
+
+35:16 10
+35:19 
+
+35:19 42
+35:20 
+
+35:20 0
+35:21 
+
+35:21 94 and the port should be
+35:25 
+
+35:25 6379
+35:29 
+
+35:29 and the
+35:32 
+
+35:32 password
+35:36 
+
+35:36 52
+35:38 
+
+35:38 41
+35:39 
+
+35:39 59 and
+35:43 
+
+35:43 two four
+35:45 
+
+35:45 six eight and ten zeros
+35:50 
+
+35:50 all right now we have connected
+36:03 
+
+36:03 we have connected let's check
+36:05 
+
+36:05 here let's say ray
+36:08 
+
+36:08 status
+36:11 
+
+36:11 all right now we have 16 cpus eight from
+36:15 
+
+36:15 this laptop and the eight from the other
+36:18 
+
+36:18 pc so i'm going to do this for the other
+36:22 
+
+36:22 uh
+36:23 
+
+36:23 laptop also so let's
+36:27 
+
+36:27 get another terminal
+36:36 
+
+36:36 we are going to have
+36:38 
+
+36:38 a lot of windows
+36:40 
+
+36:40 so let's connect it
+36:43 
+
+36:43 and i think it's
+36:48 
+
+36:48 it should be
+36:50 
+
+36:50 10
+36:51 
+
+36:51 42
+36:52 
+
+36:52 0 and 40. i think
+36:55 
+
+36:55 all right it's working
+37:01 
+
+37:01 now we are on the dell xps which has
+37:04 
+
+37:04 which has the name millennium falcon and
+37:08 
+
+37:08 now i'm going to use the same command so
+37:10 
+
+37:10 let's say ray starts
+37:13 
+
+37:13 with the address
+37:16 
+
+37:16 10 42
+37:18 
+
+37:18 0 and 94
+37:23 
+
+37:23 of course wireless networks is not
+37:28 
+
+37:28 a good thing for this purpose to create
+37:31 
+
+37:31 some clusters like this it's it should
+37:33 
+
+37:33 be very bad
+37:36 
+
+37:36 let's i'm going to just create a
+37:39 
+
+37:39 prototype prototype
+37:41 
+
+37:41 of a cluster
+37:43 
+
+37:43 to show you 2 4 6 8 and 10
+37:48 
+
+37:48 0's
+37:51 
+
+37:51 and also it's ready let's check again
+37:56 
+
+37:56 ray status
+37:59 
+
+37:59 and now we have 24 cpus right we have
+38:03 
+
+38:03 this amount of memory and we have this
+38:06 
+
+38:06 amount of object store memory for just
+38:09 
+
+38:09 one object
+38:10 
+
+38:10 all right now we can modify our code to
+38:15 
+
+38:15 use this cluster right not just at the
+38:18 
+
+38:18 multi-process
+38:20 
+
+38:20 multiprocessors but just
+38:23 
+
+38:23 scale
+38:25 
+
+38:25 with this
+38:26 
+
+38:26 cluster that we have now all right we
+38:29 
+
+38:29 we are going to use all of 24 cpus so
+38:33 
+
+38:33 i'm going to create another python file
+38:35 
+
+38:35 for this purpose
+38:37 
+
+38:37 so let's
+38:40 
+
+38:40 create with the name multi
+38:42 
+
+38:42 node
+38:46 
+
+38:46 and of course we are going to use again
+38:49 
+
+38:49 the
+38:50 
+
+38:50 random library
+38:53 
+
+38:53 to solve our problem and also i'm going
+38:56 
+
+38:56 to import the os library
+38:60 
+
+38:60 and also i'm going to use the sys
+39:03 
+
+39:03 library
+39:04 
+
+39:04 and also i'm going to need of course the
+39:07 
+
+39:07 grey library
+39:14 
+
+39:14 right
+39:15 
+
+39:15 so can we
+39:17 
+
+39:17 install this to get rid of this error
+39:22 
+
+39:22 the network
+39:24 
+
+39:24 that we have now is very sensitive
+39:26 
+
+39:26 because
+39:29 
+
+39:29 it's just i think very weak so
+39:32 
+
+39:32 the communication between the processes
+39:35 
+
+39:35 of course is limited with
+39:37 
+
+39:37 this
+39:38 
+
+39:38 network quality
+39:40 
+
+39:40 also
+39:43 
+
+39:43 but again it's just going to be an
+39:47 
+
+39:47 prototype
+39:49 
+
+39:49 so it's not a big
+39:55 
+
+39:55 problem so
+39:57 
+
+39:57 i'm going to use
+39:60 
+
+39:60 a function first
+40:02 
+
+40:02 while we are waiting to install this
+40:05 
+
+40:05 package array
+40:07 
+
+40:07 i'm going to create a
+40:11 
+
+40:11 function
+40:13 
+
+40:13 with the name
+40:14 
+
+40:14 in its cluster
+40:16 
+
+40:16 to initialize our cluster
+40:19 
+
+40:19 and
+40:35 
+
+40:35 all right
+40:36 
+
+40:36 we got it
+40:40 
+
+40:40 we got the ray package so
+40:43 
+
+40:43 let's make it
+40:44 
+
+40:44 so we are going to use the init methods
+40:46 
+
+40:46 from the
+40:48 
+
+40:48 right
+40:49 
+
+40:49 library and i'm going to use the
+40:50 
+
+40:50 arguments address
+40:54 
+
+40:54 auto so we can just initialize a cluster
+40:58 
+
+40:58 inside our network
+41:01 
+
+41:01 with the address
+41:02 
+
+41:02 some ip number but i'm going to use just
+41:05 
+
+41:05 an auto because we have just one hat
+41:07 
+
+41:07 now inside our cluster so let's
+41:12 
+
+41:12 write to the screen and
+41:15 
+
+41:15 message so let's say this cluster check
+41:18 
+
+41:18 the numbers this cluster consists
+41:23 
+
+41:23 of
+41:24 
+
+41:24 length
+41:25 
+
+41:25 of
+41:25 
+
+41:25 the ray
+41:27 
+
+41:27 that
+41:28 
+
+41:28 notes
+41:29 
+
+41:29 [Music]
+41:32 
+
+41:32 and should be an integer of course
+41:36 
+
+41:36 notes
+41:37 
+
+41:37 and
+41:41 
+
+41:41 the number of cpus that we have
+41:44 
+
+41:44 obviously 24 i'm going to get this
+41:46 
+
+41:46 number so let's say the array
+41:50 
+
+41:50 uh that cluster resources and it should
+41:52 
+
+41:52 just return an array including some
+41:56 
+
+41:56 values about the some information about
+41:58 
+
+41:58 the cluster that we have now you can
+42:01 
+
+42:01 check all the values but now i just i'm
+42:05 
+
+42:05 just going to get the
+42:07 
+
+42:07 number of cpus so i'm going to use the
+42:09 
+
+42:09 index cpu
+42:12 
+
+42:12 right i'm going to continue with the
+42:15 
+
+42:15 let's say cpus
+42:17 
+
+42:17 in total so i'm going to check our
+42:20 
+
+42:20 clusters and also i'm going to return
+42:23 
+
+42:23 this
+42:23 
+
+42:23 number
+42:26 
+
+42:26 [Music]
+42:27 
+
+42:27 as an output argument of this function
+42:29 
+
+42:29 so let's return this number as an
+42:31 
+
+42:31 integer
+42:33 
+
+42:33 let's say ray cluster resources
+42:37 
+
+42:37 with the index cpu
+42:41 
+
+42:41 like this
+42:42 
+
+42:42 so by calling this function
+42:45 
+
+42:45 i
+42:46 
+
+42:46 i'm going to initialize the cluster and
+42:48 
+
+42:48 also i'm going to get the number of the
+42:51 
+
+42:51 cpus that we have in this cluster
+42:59 
+
+42:59 so
+43:01 
+
+43:01 of course we should
+43:03 
+
+43:03 create a class or just a function to
+43:06 
+
+43:06 calculate the number of pi or you can do
+43:09 
+
+43:09 something else uh i just go i'm just
+43:12 
+
+43:12 going to use some function with the same
+43:15 
+
+43:15 name so let's say throw underscore
+43:17 
+
+43:17 points
+43:19 
+
+43:19 and i'm going to throw n
+43:22 
+
+43:22 number of points
+43:23 
+
+43:23 and let's start with an output message
+43:25 
+
+43:25 and let's say
+43:27 
+
+43:27 if
+43:29 
+
+43:29 it's working
+43:31 
+
+43:31 perfect so let's say the os
+43:34 
+
+43:34 gets
+43:35 
+
+43:35 process id
+43:37 
+
+43:37 right it should return with process id
+43:40 
+
+43:40 it should write the process id on our
+43:42 
+
+43:42 screen and also i'm going to use the
+43:45 
+
+43:45 name of the machine that
+43:48 
+
+43:48 is running on so let's say on
+43:51 
+
+43:51 the os
+43:54 
+
+43:54 you name methods and the node name
+43:56 
+
+43:56 property of methods
+43:59 
+
+43:59 this
+44:01 
+
+44:01 all right so it should return with the
+44:04 
+
+44:04 t490 like this or the millennium falcon
+44:07 
+
+44:07 or the home station all right we have
+44:09 
+
+44:09 three
+44:10 
+
+44:10 pcs with these names
+44:12 
+
+44:12 so let's say is started
+44:17 
+
+44:17 so let's initialize an integer to count
+44:20 
+
+44:20 the inner number of points
+44:23 
+
+44:23 so
+44:25 
+
+44:25 let's create our loop
+44:29 
+
+44:29 in range n
+44:32 
+
+44:32 let's generate two coordinates
+44:35 
+
+44:35 random that's
+44:37 
+
+44:37 uniform
+44:38 
+
+44:38 starting from -1
+44:40 
+
+44:40 to plus one
+44:42 
+
+44:42 also for y
+44:43 
+
+44:43 random not uniform
+44:45 
+
+44:45 minus one and plus one
+44:48 
+
+44:48 and then check if this number in or out
+44:51 
+
+44:51 so
+44:52 
+
+44:52 x squared plus
+44:55 
+
+44:55 y square
+44:60 
+
+44:60 if it is less than or equal to one
+45:03 
+
+45:03 and i
+45:05 
+
+45:05 is increased by
+45:07 
+
+45:07 1
+45:08 
+
+45:08 if it is so
+45:10 
+
+45:10 so
+45:11 
+
+45:11 let's continue with
+45:14 
+
+45:14 and
+45:17 
+
+45:17 output to the screen
+45:19 
+
+45:19 with this similar
+45:21 
+
+45:21 message that we have created at the
+45:24 
+
+45:24 beginning
+45:25 
+
+45:25 so now we can just say is
+45:28 
+
+45:28 finished
+45:31 
+
+45:31 right and then let's return
+45:33 
+
+45:33 this
+45:34 
+
+45:34 integer
+45:35 
+
+45:35 turn i
+45:38 
+
+45:38 right then i'm going to create
+45:42 
+
+45:42 a main function
+45:45 
+
+45:45 and of course to
+45:48 
+
+45:48 make this function draw points uh
+45:52 
+
+45:52 to be
+45:53 
+
+45:53 to run on this cluster i'm going to use
+45:56 
+
+45:56 a decorator which comes from ray so it's
+45:60 
+
+45:60 going to be the ray
+46:02 
+
+46:02 that remote all right so this function
+46:06 
+
+46:06 the throw points function
+46:09 
+
+46:09 can run remote on this cluster by using
+46:12 
+
+46:12 this
+46:13 
+
+46:13 decorator we are going to make it
+46:16 
+
+46:16 possible
+46:17 
+
+46:17 all right so let's continue with the
+46:20 
+
+46:20 main function
+46:22 
+
+46:22 uh
+46:22 
+
+46:22 of course now we have a complicated
+46:25 
+
+46:25 cluster i have
+46:27 
+
+46:27 ubuntu 20.04
+46:31 
+
+46:31 on my
+46:33 
+
+46:33 desktop pc and also
+46:35 
+
+46:35 uh
+46:36 
+
+46:36 i have kubuntu 2004
+46:40 
+
+46:40 on my
+46:41 
+
+46:41 ps and also i have windows 10 on this pc
+46:46 
+
+46:46 so
+46:46 
+
+46:46 we can see just some ridiculous warnings
+46:49 
+
+46:49 so i'm going to just redirect these
+46:52 
+
+46:52 errors to the
+46:55 
+
+46:55 i don't want to see these errors all
+46:57 
+
+46:57 right i don't want to see this warning
+46:58 
+
+46:58 so i'm going to redirect to redirect all
+47:01 
+
+47:01 these messages to the the null
+47:04 
+
+47:04 so let's make it
+47:06 
+
+47:06 let's say sv
+47:08 
+
+47:08 sys
+47:09 
+
+47:09 dot s t
+47:12 
+
+47:12 d error
+47:14 
+
+47:14 and
+47:15 
+
+47:15 open the from ios
+47:19 
+
+47:19 dev null
+47:21 
+
+47:21 to write something right so basically
+47:26 
+
+47:26 it's just hides the errors and warnings
+47:29 
+
+47:29 all right
+47:30 
+
+47:30 and also i'm going to get the number of
+47:33 
+
+47:33 cpus
+47:35 
+
+47:35 by calling the init cluster function
+47:38 
+
+47:38 that we have written
+47:40 
+
+47:40 it's initialized it's initialized the
+47:43 
+
+47:43 our cluster and also returns with the
+47:46 
+
+47:46 number of cpu that we have inside this
+47:49 
+
+47:49 cluster
+47:50 
+
+47:50 and also i'm going to use a number of
+47:52 
+
+47:52 points
+47:54 
+
+47:54 let's use
+47:57 
+
+47:57 10 million for example
+47:59 
+
+47:59 all right
+48:01 
+
+48:01 and we are going to
+48:04 
+
+48:04 use the
+48:05 
+
+48:05 function
+48:06 
+
+48:06 uh throw points and it's going to return
+48:10 
+
+48:10 the
+48:11 
+
+48:11 i values for each
+48:13 
+
+48:13 cpu all right
+48:15 
+
+48:15 and i'm going to store all these values
+48:18 
+
+48:18 all these i values inside
+48:20 
+
+48:20 an array so
+48:22 
+
+48:22 the
+48:24 
+
+48:24 this variable inner
+48:26 
+
+48:26 is going to be this array so when we
+48:29 
+
+48:29 call
+48:30 
+
+48:30 the
+48:31 
+
+48:31 from the array
+48:32 
+
+48:32 library the get methods
+48:35 
+
+48:35 and also the
+48:37 
+
+48:37 we are going to call the draw underscore
+48:39 
+
+48:39 points function
+48:41 
+
+48:41 uh
+48:42 
+
+48:42 the
+48:44 
+
+48:44 times which is equal to
+48:47 
+
+48:47 24
+48:48 
+
+48:48 in this cluster all right so it should
+48:52 
+
+48:52 get the 24 elements
+48:54 
+
+48:54 from each
+48:56 
+
+48:56 these throw points functions so the
+48:59 
+
+48:59 inner array should be an array with 24
+49:03 
+
+49:03 elements at the end
+49:05 
+
+49:05 so let's call this function throw points
+49:12 
+
+49:12 throw
+49:14 
+
+49:14 points
+49:15 
+
+49:15 that
+49:16 
+
+49:16 remote
+49:17 
+
+49:17 to make it remote
+49:19 
+
+49:19 on our cluster
+49:21 
+
+49:21 and also the
+49:24 
+
+49:24 we are going to have our input argument
+49:27 
+
+49:27 and and also we are going to call this
+49:32 
+
+49:32 n times
+49:33 
+
+49:33 and n should be equal to not this end
+49:37 
+
+49:37 and times which is equal to number of
+49:39 
+
+49:39 cpus so let's say for underscore in
+49:43 
+
+49:43 range number of cpu like this
+49:48 
+
+49:48 all right
+49:53 
+
+49:53 so at the end we can just calculate the
+49:56 
+
+49:56 number of the value of pi by using all
+49:59 
+
+49:59 these elements which we have with the
+50:02 
+
+50:02 inner array so let's say pi is equal to
+50:06 
+
+50:06 4
+50:07 
+
+50:07 times
+50:08 
+
+50:08 of course
+50:09 
+
+50:09 we have this
+50:11 
+
+50:11 i numbers inside this array so we can
+50:15 
+
+50:15 just basically take a sum of all these
+50:18 
+
+50:18 numbers so let's say some
+50:20 
+
+50:20 inner
+50:22 
+
+50:22 and also
+50:23 
+
+50:23 uh we should calculate the total number
+50:26 
+
+50:26 of points and for each processor we we
+50:29 
+
+50:29 are going to use this value for n 10
+50:32 
+
+50:32 million so and also we have 24 cpu so we
+50:37 
+
+50:37 are going to use the number denominator
+50:40 
+
+50:40 here by taking a multiplication of
+50:43 
+
+50:43 number of cpu
+50:44 
+
+50:44 times n like this
+50:47 
+
+50:47 all right
+50:48 
+
+50:48 so this formula with this formulation we
+50:51 
+
+50:51 can just calculate the final value of pi
+50:54 
+
+50:54 so we can just basically write to our
+50:57 
+
+50:57 screen the estimated
+51:01 
+
+51:01 pi value
+51:03 
+
+51:03 is
+51:05 
+
+51:05 pi
+51:07 
+
+51:07 let's see again the eight decimal digits
+51:11 
+
+51:11 all right so if someone runs this python
+51:15 
+
+51:15 file directly
+51:18 
+
+51:18 the name should be equal to main then
+51:23 
+
+51:23 like this then call the main function
+51:29 
+
+51:29 do we have an error
+51:31 
+
+51:31 no we don't
+51:34 
+
+51:34 all rights
+51:38 
+
+51:38 you can find all these codes
+51:40 
+
+51:40 uh in my github account so you can just
+51:44 
+
+51:44 write github.com jumbler all right you
+51:48 
+
+51:48 can find it inside
+51:50 
+
+51:50 the
+51:51 
+
+51:51 monte carlo pie repository
+51:55 
+
+51:55 all right let's minimize this window
+51:59 
+
+51:59 and now i'm going to run
+52:01 
+
+52:01 h top
+52:02 
+
+52:02 for
+52:04 
+
+52:04 each cpu
+52:05 
+
+52:05 and also i'm going to apply a filter of
+52:08 
+
+52:08 course
+52:09 
+
+52:09 let's say ray
+52:12 
+
+52:12 like this
+52:14 
+
+52:14 then we can just see the
+52:16 
+
+52:16 processes which is coming from ray
+52:19 
+
+52:19 so the same thing for this machine so
+52:22 
+
+52:22 let's say
+52:25 
+
+52:25 ray
+52:28 
+
+52:28 all right
+52:36 
+
+52:36 also clear
+52:38 
+
+52:38 this filter
+52:42 
+
+52:42 and apply
+52:45 
+
+52:45 oops sorry
+52:52 
+
+52:52 all right now we are ready
+52:53 
+
+52:53 we have our thinkpad at the top left
+52:57 
+
+52:57 we have our
+52:60 
+
+53:00 desktop pc home station at the top right
+53:03 
+
+53:03 we have our dell xps millennium falcon
+53:06 
+
+53:06 at the top but
+53:07 
+
+53:07 right button right so i'm going to run
+53:10 
+
+53:10 the
+53:11 
+
+53:11 file now but first i'm going to check
+53:13 
+
+53:13 this array again check our cluster again
+53:17 
+
+53:17 so everything is perfect we have three
+53:19 
+
+53:19 notes as you can see
+53:22 
+
+53:22 right here
+53:25 
+
+53:25 we have three pieces and 24 cpus so
+53:29 
+
+53:29 let's
+53:30 
+
+53:30 run
+53:32 
+
+53:32 multi node dot pi now
+53:38 
+
+53:38 all right it says this cluster consists
+53:41 
+
+53:41 three nodes and 24 cpus and
+53:44 
+
+53:44 total
+53:45 
+
+53:45 so we have
+53:48 
+
+53:48 all right thinkpad started home station
+53:51 
+
+53:51 started million falcons started so you
+53:53 
+
+53:53 can see all these processes
+53:56 
+
+53:56 so all of them hits
+53:58 
+
+53:58 the 100 percent so all my three pcs now
+54:03 
+
+54:03 are working
+54:04 
+
+54:04 to calculate the value of pi
+54:07 
+
+54:07 with 10 million
+54:10 
+
+54:10 points
+54:14 
+
+54:14 so
+54:15 
+
+54:15 home station is finished milan falcon is
+54:18 
+
+54:18 finished
+54:19 
+
+54:19 we are waiting for thinkpad
+54:22 
+
+54:22 this pc itself it's the slowest one
+54:26 
+
+54:26 because it's
+54:27 
+
+54:27 with the
+54:28 
+
+54:28 windows 10 as you know so the final
+54:31 
+
+54:31 value estimated pi value is
+54:34 
+
+54:34 3.1415
+54:36 
+
+54:36 something
+54:39 
+
+54:39 it's good right
+54:41 
+
+54:41 it's good
+54:43 
+
+54:43 this is the point
+54:45 
+
+54:45 which i want you to come
+54:49 
+
+54:49 so i'm very happy now so
+54:53 
+
+54:53 i think
+54:55 
+
+54:55 i'm very happy with the output of this
+54:58 
+
+54:58 class
+54:59 
+
+54:59 so
+55:00 
+
+55:00 we have just
+55:02 
+
+55:02 one more week
+55:04 
+
+55:04 to cover some subjects
+55:06 
+
+55:06 tomorrow monday
+55:09 
+
+55:09 at the classroom at our library at our
+55:12 
+
+55:12 laboratory so see in the class right
+55:17 
+
+55:17 do you want me to run this again
+55:20 
+
+55:20 so let's
+55:21 
+
+55:21 increase this number
+55:24 
+
+55:24 by 10 so make it 100 million
+55:27 
+
+55:27 and do it again
+55:38 
+
+55:38 i hope
+55:39 
+
+55:39 it doesn't cause to any drop
+55:44 
+
+55:44 for recording this video
+55:48 
+
+55:48 of course the fastest one is the dell
+55:50 
+
+55:50 because it's
+55:51 
+
+55:51 it has just i7 with the tenth
+55:55 
+
+55:55 generation and uh desktop
+55:58 
+
+55:58 has the i7
+56:00 
+
+56:00 too but it's just uh third generation
+56:04 
+
+56:04 and so this pc has i5 with the eight uh
+56:09 
+
+56:09 generation eight
+56:11 
+
+56:11 so it's the slowest one
+56:17 
+
+56:17 all right
+56:18 
+
+56:18 let me just wait until the end
+56:21 
+
+56:21 and see the final value for pi then i'm
+56:24 
+
+56:24 going to stop the video
+56:31 
+
+56:31 for the last week
+56:34 
+
+56:34 i think we can
+56:36 
+
+56:36 use the containers or
+56:39 
+
+56:39 gpus
+56:42 
+
+56:42 we have just one more week
+56:50 
+
+56:50 still calculating
+56:54 
+
+56:54 you can see this ip numbers and also the
+56:58 
+
+56:58 names of the
+57:00 
+
+57:00 pcs
+57:10 
+
+57:10 of course some of the
+57:12 
+
+57:12 processes are
+57:15 
+
+57:15 slipping
+57:17 
+
+57:17 some of them are running because
+57:20 
+
+57:20 we have the operating systems running on
+57:23 
+
+57:23 on these cpus running on this pc so cpu
+57:27 
+
+57:27 scheduler
+57:28 
+
+57:28 cpu scheduler is working
+57:32 
+
+57:32 but as you can see from these columns
+57:35 
+
+57:35 all of them it's the 100 percent
+57:41 
+
+57:41 it's just a good practice to
+57:45 
+
+57:45 create clusters and calculate something
+57:48 
+
+57:48 of course you should use some
+57:50 
+
+57:50 very strong eternal connections
+57:55 
+
+57:55 station is
+57:57 
+
+57:57 first
+58:02 
+
+58:02 which is my main machine against
+58:05 
+
+58:05 years
+58:07 
+
+58:07 i have just got this pc
+58:10 
+
+58:10 in 2012
+58:13 
+
+58:13 nearly 10 years old
+58:16 
+
+58:16 but still working very good
+58:22 
+
+58:22 and the next one should be the
+58:25 
+
+58:25 millennium falcon the dell xps
+58:33 
+
+58:33 of course this is an i7 with the 10th
+58:37 
+
+58:37 generation but it's just the series u as
+58:40 
+
+58:40 you know
+58:43 
+
+58:43 processors with the ultrabooks
+58:47 
+
+58:47 so it's not
+58:50 
+
+58:50 very good
+58:56 
+
+58:56 so now this pc at right top
+58:59 
+
+58:59 is idle now
+59:05 
+
+59:05 all right name falcon is finished
+59:12 
+
+59:12 so now we are just waiting for the
+59:15 
+
+59:15 thinkpad
+59:17 
+
+59:17 itself which is the hat of our cluster
+59:38 
+
+59:38 and also for the last week
+59:41 
+
+59:41 we are going to have a
+59:43 
+
+59:43 quiz or
+59:45 
+
+59:45 i can give you an homework
+59:48 
+
+59:48 we should have just
+59:50 
+
+59:50 one more assignment for this class
+59:58 
+
+59:58 and with this cluster with the ray
+59:60 
+
+59:60 package this is uh also an auto skater
+60:03 
+
+60:03 you know so we can just use
+60:08 
+
+60:08 24 cpu or
+60:10 
+
+60:10 16 cpu so
+60:12 
+
+60:12 if we use just 8 cpu then it's just
+60:16 
+
+60:16 doesn't need to use another
+60:19 
+
+60:19 pc with this cluster but if you use more
+60:23 
+
+60:23 than 8 cpu then it's just auto scales
+60:27 
+
+60:27 your code all the skills your program to
+60:30 
+
+60:30 use more than one
+60:32 
+
+60:32 pc alright so
+60:35 
+
+60:35 it's just a cluster which auto scales
+60:41 
+
+60:41 your program
+60:52 
+
+60:52 i think now we are waiting for the
+60:56 
+
+60:56 communication or something
+61:04 
+
+61:04 because we cannot see the
+61:07 
+
+61:07 value of pi yet
+61:14 
+
+61:14 and
+61:15 
+
+61:15 as you can see it's still working
+61:18 
+
+61:18 with the 100 percent
+61:58 
+
+61:58 all right
+62:01 
+
+62:01 now it's coming
+62:06 
+
+62:06 thinkpad is very struggling
+62:08 
+
+62:08 so at the end of this semester i have
+62:11 
+
+62:11 just
+62:12 
+
+62:12 all right now we have this value which
+62:15 
+
+62:15 is very close to the
+62:19 
+
+62:19 value of the correct value of pi because
+62:22 
+
+62:22 it's
+62:23 
+
+62:23 it's just should be
+62:24 
+
+62:24 3.14159
+62:29 
+
+62:29 but
+62:29 
+
+62:29 it's just
+62:33 
+
+62:33 0 3.14160 close to the actual value so
+62:36 
+
+62:36 you can just try this
+62:39 
+
+62:39 with your pc with your if you have more
+62:41 
+
+62:41 than one pc or you can just try it with
+62:44 
+
+62:44 your friends
+62:46 
+
+62:46 so this is it for this week for this
+62:49 
+
+62:49 video yeah see you again all right
+62:52 
+
+62:52 see you again

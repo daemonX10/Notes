@@ -1,0 +1,2164 @@
+00:00 hi everyone welcome back to part three
+00:03 
+
+00:03 of this dimensionality reduction Series
+00:05 
+
+00:05 today we will have a look at
+00:07 
+
+00:07 multi-dimensional scaling or short MDS
+00:10 
+
+00:10 it might not be too popular in machine
+00:12 
+
+00:12 learning but it's definitely popular in
+00:14 
+
+00:14 statistics and has its roots in the
+00:16 
+
+00:16 1950s in a publication by Tuson since
+00:19 
+
+00:19 then there have been many significant
+00:21 
+
+00:21 improvements of the technique and
+00:23 
+
+00:23 therefore MDS can be viewed as a class
+00:25 
+
+00:25 of techniques instead of a single method
+00:28 
+
+00:28 in this video we will discuss three
+00:30 
+
+00:30 variants of MDS just like before we look
+00:33 
+
+00:33 into the algorithmic details and also
+00:35 
+
+00:35 some code for this video I've been
+00:37 
+
+00:37 digging into details on some pretty old
+00:40 
+
+00:40 websites and you might think why should
+00:42 
+
+00:42 I even bother looking at these old
+00:44 
+
+00:44 methods many of the ideas from last
+00:47 
+
+00:47 century are still relevant in even the
+00:49 
+
+00:49 basis for machine learning today I came
+00:52 
+
+00:52 across this quote by Shephard one of the
+00:54 
+
+00:54 MDS authors which says the idea of
+00:57 
+
+00:57 representing objects as points in space
+00:60 
+
+00:60 had a occurred to me while I was an
+01:01 
+
+01:01 undergraduate student in
+01:04 
+
+01:04 1951 the embeddings we use in large
+01:06 
+
+01:06 neuron networks today are nothing else
+01:08 
+
+01:08 but a modern version of this idea
+01:11 
+
+01:11 therefore I think it's important to
+01:13 
+
+01:13 familiarize with some of the classical
+01:15 
+
+01:15 methods because many ideas of today have
+01:17 
+
+01:17 their inspiration from the past let's
+01:19 
+
+01:19 start with a short introduction what
+01:22 
+
+01:22 multi-dimensional scaling is and what we
+01:24 
+
+01:24 need it for for most of the
+01:26 
+
+01:26 dimensionality reduction techniques the
+01:28 
+
+01:28 starting point is a data Matrix
+01:31 
+
+01:31 with features along the columns and
+01:33 
+
+01:33 observations in the rows for MDS it's a
+01:36 
+
+01:36 bit different because we assume to start
+01:38 
+
+01:38 with a distance Matrix this Matrix
+01:41 
+
+01:41 contains the distances between all
+01:43 
+
+01:43 points based on some distance function
+01:45 
+
+01:45 just like in the literature we can use
+01:47 
+
+01:47 Delta to refer to the entries of this
+01:49 
+
+01:49 Matrix of course we can always calculate
+01:52 
+
+01:52 the distance Matrix from the data but
+01:54 
+
+01:54 MDS also works if we don't have access
+01:57 
+
+01:57 to the raw features we will see in a
+01:59 
+
+01:59 second where this is assumption comes
+02:01 
+
+02:01 from then the idea is like for all
+02:03 
+
+02:03 dimensionality reduction techniques to
+02:05 
+
+02:05 map the data into a lower dimensional
+02:07 
+
+02:07 space but with the goal of preserving
+02:10 
+
+02:10 the distances between the observations
+02:13 
+
+02:13 so the spatial configuration on the
+02:15 
+
+02:15 right is supposed to reflect the
+02:16 
+
+02:16 distances in our distance
+02:18 
+
+02:18 Matrix this is also where the name comes
+02:21 
+
+02:21 from we want to scale our distances into
+02:24 
+
+02:24 the multi-dimensional space on the right
+02:26 
+
+02:26 let's use an example to understand why
+02:29 
+
+02:29 we start from distance
+02:31 
+
+02:31 MDS has its origins in psychometrics
+02:34 
+
+02:34 where it was proposed as a method that
+02:36 
+
+02:36 should help to better understand the
+02:38 
+
+02:38 human Judgment of similarity we can for
+02:41 
+
+02:41 example collect rankings of the
+02:43 
+
+02:43 similarity of different pairs of
+02:46 
+
+02:46 emotions here we have a surprised happy
+02:49 
+
+02:49 and sad face the numbers represent if
+02:52 
+
+02:52 people find two emotions similar or not
+02:56 
+
+02:56 for instance surprised and happy seem to
+02:58 
+
+02:58 be very similar with the value of 0.7 we
+03:01 
+
+03:01 don't have a data Matrix for these
+03:03 
+
+03:03 observations which means we don't have
+03:05 
+
+03:05 numeric features describing the emotions
+03:08 
+
+03:08 this means that the actual data space is
+03:10 
+
+03:10 latent to us using MDS we can now
+03:14 
+
+03:14 visualize the emotional space only based
+03:16 
+
+03:16 on these distances and this
+03:18 
+
+03:18 visualization might for example reveal
+03:21 
+
+03:21 that joy and surprise are often
+03:23 
+
+03:23 perceived as
+03:25 
+
+03:25 similar similarities can always be
+03:28 
+
+03:28 converted to dissimilarity
+03:31 
+
+03:31 and this similarities reflect distances
+03:33 
+
+03:33 which are used in MDS nowadays there are
+03:36 
+
+03:36 some mathematical differences between
+03:38 
+
+03:38 similarity and dissimilarity and also
+03:41 
+
+03:41 numerically similarity tends to have
+03:43 
+
+03:43 more close to zero values but we won't
+03:46 
+
+03:46 really discuss this further and just
+03:47 
+
+03:47 keep in mind that MDS typically operates
+03:50 
+
+03:50 on dissimilarities finally distance
+03:53 
+
+03:53 matrices always need to be symmetric for
+03:55 
+
+03:55 this method therefore we can just use
+03:57 
+
+03:57 the upper or lower triangular part part
+03:60 
+
+03:60 of this Matrix also the diagonal can be
+04:03 
+
+04:03 ignored as the distance of a point to
+04:05 
+
+04:05 itself is always zero so these entries
+04:08 
+
+04:08 are what we end up with the number of
+04:10 
+
+04:10 distances for n observations can also be
+04:13 
+
+04:13 calculated using the gausian sum formula
+04:16 
+
+04:16 on the right now that we have a rough
+04:18 
+
+04:18 idea what MDS is all about let's take a
+04:20 
+
+04:20 look at the mathematical framework for
+04:23 
+
+04:23 this we will use the standard example
+04:25 
+
+04:25 for all MDS tutorials flight distance
+04:28 
+
+04:28 between cities this is what Well Suited
+04:30 
+
+04:30 because it allows us to intuitively
+04:32 
+
+04:32 define the relationships as distances or
+04:35 
+
+04:35 dissimilarities here we have five cities
+04:38 
+
+04:38 and their distance in miles in a
+04:40 
+
+04:40 symmetric distance
+04:41 
+
+04:41 Matrix given such a distance Matrix the
+04:44 
+
+04:44 task is to find the optimal distance
+04:46 
+
+04:46 preserving low dimensional map finding
+04:50 
+
+04:50 such a map means that we need to find a
+04:52 
+
+04:52 set of vectors in a p dimensional space
+04:56 
+
+04:56 for the orange point we would for
+04:57 
+
+04:57 example look for these coordinates
+05:01 
+
+05:01 the challenging part is that we need to
+05:03 
+
+05:03 maintain the distance to all other
+05:05 
+
+05:05 points according to our distance Matrix
+05:08 
+
+05:08 and that's exactly what's meant by
+05:10 
+
+05:10 scaling the distances in
+05:12 
+
+05:12 MDS as mentioned at the beginning each
+05:15 
+
+05:15 of our distances in The Matrix is
+05:17 
+
+05:17 typically denoted with Lambda i j
+05:19 
+
+05:19 representing the distance from point I
+05:21 
+
+05:21 to J the low dimensional distances can
+05:24 
+
+05:24 also be displayed in the distance Matrix
+05:27 
+
+05:27 these distances are denoted with d
+05:31 
+
+05:31 IJ what we want to do in MDS is to
+05:34 
+
+05:34 approximate the distance Matrix such
+05:36 
+
+05:36 that each individual distance is
+05:38 
+
+05:38 approximately the distance of the
+05:40 
+
+05:40 original Matrix we can use an arrow
+05:43 
+
+05:43 measure like the square distances to
+05:45 
+
+05:45 optimize the approximation how to solve
+05:48 
+
+05:48 these approximations will be explained
+05:50 
+
+05:50 in the next
+05:51 
+
+05:51 minutes as mentioned in the beginning
+05:54 
+
+05:54 MDS is not one single algorithm but
+05:56 
+
+05:56 instead a collection of methods there
+05:59 
+
+05:59 are different ways ways to categorize
+06:01 
+
+06:01 them but on a high level there are these
+06:03 
+
+06:03 three
+06:04 
+
+06:04 subcategories the first one was
+06:06 
+
+06:06 independently published by Togos and go
+06:09 
+
+06:09 and is called the classical MDS it
+06:12 
+
+06:12 shares a lot with principal component
+06:14 
+
+06:14 analysis and that's why it's also termed
+06:17 
+
+06:17 PCA principal coordinate analysis under
+06:21 
+
+06:21 the hood it uses igen decomposition to
+06:23 
+
+06:23 find the optimal mapping this projection
+06:25 
+
+06:25 only works if we assume the distances to
+06:27 
+
+06:27 be
+06:28 
+
+06:28 ukian a more general form is called
+06:31 
+
+06:31 metric MDS mainly published by Shephard
+06:33 
+
+06:33 and koscal which uses an iterative
+06:36 
+
+06:36 algorithm to find a solution here the
+06:39 
+
+06:39 distances might be non- uclean and in
+06:42 
+
+06:42 the following we will also discuss
+06:44 
+
+06:44 different metrics and what a metric is
+06:46 
+
+06:46 in general classical MDS can be seen as
+06:49 
+
+06:49 a special case of metric MDS finally
+06:52 
+
+06:52 non-metric MDS can be used in the case
+06:55 
+
+06:55 of qualitative relationships this is the
+06:58 
+
+06:58 case when we have no direct distance
+07:00 
+
+07:00 information but just an ordinal ranking
+07:04 
+
+07:04 for this a monotonic function like
+07:06 
+
+07:06 ascending or descending is applied to
+07:09 
+
+07:09 the distances just like with metric MDS
+07:12 
+
+07:12 an iterative optimization algorithm is
+07:14 
+
+07:14 used to find the solution so this is the
+07:17 
+
+07:17 high level overview of what we will
+07:19 
+
+07:19 discuss in this video just one more
+07:21 
+
+07:21 remark if you look through the
+07:23 
+
+07:23 literature the notations can be quite
+07:25 
+
+07:25 confusing sometimes and I realize that
+07:28 
+
+07:28 they're not always consistent therefore
+07:30 
+
+07:30 here the explicit explanation for this
+07:32 
+
+07:32 video Lambda i j are the original
+07:36 
+
+07:36 distances DJ the distances in the
+07:39 
+
+07:39 mapping space and dij head are called
+07:43 
+
+07:43 disparities which will become relevant
+07:45 
+
+07:45 in the last part of this video let's
+07:48 
+
+07:48 begin with the classical
+07:49 
+
+07:49 multi-dimensional scaling which is also
+07:51 
+
+07:51 known as principal coordinate analysis
+07:54 
+
+07:54 or tus and go MDS to fully understand
+07:58 
+
+07:58 this first method it's recommended to
+07:60 
+
+07:60 watch the previous PCA video as there
+08:02 
+
+08:02 will be some
+08:03 
+
+08:03 overlaps just one note if you want to
+08:06 
+
+08:06 learn what is happening under the hood
+08:08 
+
+08:08 when using the good old psychic learn
+08:10 
+
+08:10 MDS implementation feel free to skip to
+08:13 
+
+08:13 the metric MDS part instead of the
+08:15 
+
+08:15 classical decomposition approach
+08:17 
+
+08:17 explained in the next minutes metric MDS
+08:20 
+
+08:20 uses an iterative algorithm therefore
+08:22 
+
+08:22 the following explanation of classical
+08:25 
+
+08:25 MDS will be rather high level and we
+08:27 
+
+08:27 will focus on the psychic learning
+08:30 
+
+08:30 implementation the classical MDS
+08:32 
+
+08:32 algorithm consists of three steps first
+08:34 
+
+08:34 we construct a so-called gram Matrix
+08:37 
+
+08:37 then we perform igen decomposition on
+08:39 
+
+08:39 this gram Matrix and finally we project
+08:42 
+
+08:42 the distances onto new coordinates let's
+08:45 
+
+08:45 understand this step by
+08:47 
+
+08:47 step what is a gram Matrix and why do we
+08:51 
+
+08:51 need it for classical MDS we assume that
+08:54 
+
+08:54 the distances are ukian distances for
+08:57 
+
+08:57 two vectors XI and XJ the ukian norm
+09:01 
+
+09:01 corresponds to the inner or scalar
+09:03 
+
+09:03 product of the distances as an exercise
+09:06 
+
+09:06 you can easily calculate the ukian
+09:09 
+
+09:09 distance for these two two-dimensional
+09:12 
+
+09:12 vectors now the twist is that our
+09:15 
+
+09:15 situation is exactly the other way
+09:17 
+
+09:17 around we have the distance and want to
+09:20 
+
+09:20 find the vectors so the numbers in
+09:22 
+
+09:22 Orange here that generate our distance
+09:26 
+
+09:26 Matrix in order to find these vectors we
+09:29 
+
+09:29 need to formulate this expression such
+09:31 
+
+09:31 that we can obtain the coordinates from
+09:33 
+
+09:33 it the inner product can be rearranged
+09:37 
+
+09:37 such that we have this equation and for
+09:39 
+
+09:39 details how to rearrange the inner
+09:41 
+
+09:41 product have a look at the links in the
+09:43 
+
+09:43 description here we however still have
+09:46 
+
+09:46 some dependencies on XI and XJ these
+09:49 
+
+09:49 dependencies are however the scalea
+09:52 
+
+09:52 product of XI and XJ with themselves
+09:56 
+
+09:56 this is nothing else than the distance
+09:58 
+
+09:58 to the origin of the coordinate system
+10:00 
+
+10:00 consequently we only have distances on
+10:03 
+
+10:03 the right side of the equation and are
+10:05 
+
+10:05 completely independent of the cordinates
+10:08 
+
+10:08 of x i and XJ with this simple trick of
+10:11 
+
+10:11 linear algebra we can find the
+10:13 
+
+10:13 coordinates by calculating the elements
+10:15 
+
+10:15 on the
+10:17 
+
+10:17 left if we do this for all points we end
+10:20 
+
+10:20 up with the inner product Matrix which
+10:22 
+
+10:22 is also called gram Matrix named after
+10:25 
+
+10:25 the Danish mathematician Jorgen Graham
+10:28 
+
+10:28 so here we have the close form equation
+10:30 
+
+10:30 that defines the gram Matrix S
+10:33 
+
+10:33 technically this is nothing else but the
+10:35 
+
+10:35 previous term written in Matrix
+10:37 
+
+10:37 representation the D squ is the result
+10:40 
+
+10:40 of the element wise multiplication of
+10:42 
+
+10:42 all distance elements additionally we
+10:45 
+
+10:45 can see that the so-called centering
+10:47 
+
+10:47 Matrix C is Multiplied twice it's simply
+10:50 
+
+10:50 removing the row and column averages
+10:53 
+
+10:53 such that the rows and columns are
+10:55 
+
+10:55 centered this centering is needed to
+10:58 
+
+10:58 incorporate transl ational invariance
+11:00 
+
+11:00 this means we want to be invariant to
+11:02 
+
+11:02 shifts of the points meaning that the
+11:05 
+
+11:05 distances should stay the same if the
+11:07 
+
+11:07 coordinate system moves as a summary we
+11:10 
+
+11:10 have to go in the reverse direction to
+11:12 
+
+11:12 recover the data Matrix from the
+11:15 
+
+11:15 distances because the gram Matrix is
+11:17 
+
+11:17 symmetric and positive definite it can
+11:20 
+
+11:20 be diagonalized through igen
+11:22 
+
+11:22 decomposition so the next step should be
+11:24 
+
+11:24 familiar to you we can use the igen
+11:27 
+
+11:27 vectors to project the data just like in
+11:29 
+
+11:29 the last video keep however in mind that
+11:32 
+
+11:32 this classical PCA approach only works
+11:34 
+
+11:34 if we have ukian distances because
+11:37 
+
+11:37 otherwise we can't do the reformulations
+11:39 
+
+11:39 we just did the final step is to use the
+11:42 
+
+11:42 igen vectors to project the gram Matrix
+11:44 
+
+11:44 to find the points of our
+11:46 
+
+11:46 configuration for this we multiply the
+11:49 
+
+11:49 IG vectors with the square root of the
+11:52 
+
+11:52 gram Matrix the square root naturally
+11:54 
+
+11:54 arises when we reformulate the igen
+11:57 
+
+11:57 problem in order to reduce dimension
+11:59 
+
+11:59 ality we can just keep the first and
+12:01 
+
+12:01 igen vectors belonging to the largest
+12:03 
+
+12:03 igen values here it's just like with PCA
+12:07 
+
+12:07 the first coordinate contains the
+12:09 
+
+12:09 largest variation and explains most of
+12:11 
+
+12:11 the distance
+12:14 
+
+12:14 relationship one remark about this
+12:16 
+
+12:16 solution it's not unique because the
+12:18 
+
+12:18 coordinates of the configuration can be
+12:20 
+
+12:20 rotated or reflected and still lead to
+12:23 
+
+12:23 the same distance Matrix so in this
+12:25 
+
+12:25 reverse process all information about
+12:27 
+
+12:27 location and orientation is lost when
+12:29 
+
+12:29 calculating the distances after this
+12:32 
+
+12:32 quick PCA refresher let's move on with
+12:35 
+
+12:35 the most widely used version of MDS
+12:37 
+
+12:37 called metric MDS it's based on a least
+12:40 
+
+12:40 squares loss function and sometimes also
+12:43 
+
+12:43 called least squares MDS previously we
+12:46 
+
+12:46 had the assumption that the distance
+12:47 
+
+12:47 Matrix is ukian but it turns out that
+12:50 
+
+12:50 there are plenty of other distance
+12:52 
+
+12:52 matric available so metric MDS is a more
+12:55 
+
+12:55 General algorithm that finds a mapping
+12:57 
+
+12:57 for any distance function the downside
+12:60 
+
+12:60 is that we can't make use of any closed
+13:02 
+
+13:02 form solution like in the previous
+13:04 
+
+13:04 section and therefore metric MDS uses an
+13:07 
+
+13:07 iterative optimization
+13:09 
+
+13:09 algorithm you can see a couple of common
+13:11 
+
+13:11 distance metrics beyond the ukian
+13:13 
+
+13:13 distance as we will see later we can
+13:16 
+
+13:16 pass the algorithm any distance Matrix
+13:18 
+
+13:18 and get a good low dimensional
+13:21 
+
+13:21 approximation before we however look at
+13:23 
+
+13:23 the details let's first Define the term
+13:25 
+
+13:25 distance more precisely mathematically a
+13:28 
+
+13:28 distance metric needs to satisfy three
+13:31 
+
+13:31 axum first distance needs to be positive
+13:34 
+
+13:34 and the distance to a point itself zero
+13:37 
+
+13:37 secondly distance needs to be symmetric
+13:40 
+
+13:40 so the distance from I to J is the same
+13:43 
+
+13:43 as from J to I and finally a distance
+13:46 
+
+13:46 matric needs to satisfy the triangle
+13:49 
+
+13:49 inequality which means that the sum of
+13:52 
+
+13:52 the shorter distances between three
+13:54 
+
+13:54 points always needs to be larger than
+13:56 
+
+13:56 the longest distance like visualized in
+13:58 
+
+13:58 this triangle
+13:60 
+
+13:60 importantly a distance function is
+14:02 
+
+14:02 called metric distance if it satisfies
+14:05 
+
+14:05 the triangle inequality if not it's
+14:09 
+
+14:09 called a non-metric distance that's also
+14:11 
+
+14:11 where the names metric MDS and nonmetric
+14:14 
+
+14:14 MDS come from if you want to learn more
+14:17 
+
+14:17 about metrics especially which metrics
+14:19 
+
+14:19 exist I've linked the great blog post in
+14:21 
+
+14:21 the video description now let's talk
+14:24 
+
+14:24 about the metric MDS algorithm as
+14:26 
+
+14:26 already mentioned it's an iterative
+14:28 
+
+14:28 method the steps can be outlined like
+14:31 
+
+14:31 this first we need to initialize the low
+14:33 
+
+14:33 dimensional points and this can happen
+14:35 
+
+14:35 randomly but there are also more
+14:37 
+
+14:37 advanced
+14:38 
+
+14:38 strategies then we need to calculate a
+14:41 
+
+14:41 distance Matrix for the low dimensional
+14:43 
+
+14:43 map and don't mix this up the original
+14:46 
+
+14:46 distances can still have any distance
+14:48 
+
+14:48 metric but the low dimensional
+14:49 
+
+14:49 approximation is usually displayed as
+14:52 
+
+14:52 ukian distances because this is simply
+14:55 
+
+14:55 most intuitive for
+14:56 
+
+14:56 humans in the next step a loss function
+14:59 
+
+14:59 called stress is calculated which
+15:02 
+
+15:02 compares the low dimensional distances
+15:04 
+
+15:04 with the provided distances and finally
+15:07 
+
+15:07 some optimization procedure like
+15:09 
+
+15:09 gradient descent is used to minimize the
+15:12 
+
+15:12 error step one and two don't need any
+15:15 
+
+15:15 further elaboration so let's talk about
+15:17 
+
+15:17 the loss function of this optimization
+15:20 
+
+15:20 procedure what is the stress function
+15:23 
+
+15:23 the raw stress function is defined
+15:25 
+
+15:25 through this equation it's a simple
+15:27 
+
+15:27 Square distance between the original
+15:29 
+
+15:29 distance Matrix and the distance Matrix
+15:33 
+
+15:33 of the low dimensional configuration the
+15:35 
+
+15:35 summation in the stress formula implies
+15:38 
+
+15:38 that we can exploit the
+15:41 
+
+15:41 symmetry so visually the above term is
+15:44 
+
+15:44 simply the square distance between the
+15:47 
+
+15:47 leftover Matrix elements pretty
+15:48 
+
+15:48 straightforward so far this stress
+15:51 
+
+15:51 function is one of the most significant
+15:53 
+
+15:53 improvements of MDS Shephard first
+15:56 
+
+15:56 presented the idea and his colleague
+15:58 
+
+15:58 cuscal finally proposed this loss
+15:60 
+
+15:60 function the word stress simply stands
+16:03 
+
+16:03 for standardized residual sum of squares
+16:06 
+
+16:06 and is a variance measure an improvement
+16:09 
+
+16:09 suggested by cuscal is to additionally
+16:12 
+
+16:12 normalize the stress this raw stress
+16:15 
+
+16:15 function is sensitive to the scaling of
+16:17 
+
+16:17 distances if another scale is applied
+16:20 
+
+16:20 the stress value changes to work around
+16:23 
+
+16:23 that the stress function has a
+16:25 
+
+16:25 normalization term which reduces the
+16:27 
+
+16:27 distances to the same unit the
+16:29 
+
+16:29 denominator is simply a scaling factor
+16:32 
+
+16:32 that makes the whole term invariant
+16:34 
+
+16:34 under uniform stretching or
+16:37 
+
+16:37 shrinking so this is another Improvement
+16:39 
+
+16:39 that makes the method more robust
+16:42 
+
+16:42 another convenient property is that
+16:44 
+
+16:44 normalized stress is between zero and
+16:47 
+
+16:47 one KCAL also provided an empirical
+16:50 
+
+16:50 evaluation that suggests which values of
+16:52 
+
+16:52 normalized stress are acceptable
+16:55 
+
+16:55 generally speaking every stress value
+16:57 
+
+16:57 higher than 20%
+16:59 
+
+16:59 indicates a very bad fit of the real
+17:01 
+
+17:01 distances there are several variants and
+17:04 
+
+17:04 extensions of the stress function the
+17:06 
+
+17:06 lve introduced weights WJ that indicates
+17:11 
+
+17:11 the importance of a distance a nice side
+17:13 
+
+17:13 effect is that these weights can be used
+17:16 
+
+17:16 to handle missing data for all missing
+17:19 
+
+17:19 entries the weights are simply set to
+17:21 
+
+17:21 zero salmon stress is another MDS Arrow
+17:24 
+
+17:24 function presented by John salmon in
+17:27 
+
+17:27 1969 and this loss function is better
+17:30 
+
+17:30 with preserving small distances by
+17:33 
+
+17:33 giving them more weights in the fitting
+17:35 
+
+17:35 procedure besides the empirical
+17:37 
+
+17:37 orientation using the stress values from
+17:40 
+
+17:40 koscal there's another way to assess the
+17:43 
+
+17:43 goodness of the MDS fit the Shephard
+17:45 
+
+17:45 diagram named after its inventor
+17:48 
+
+17:48 Shephard is a scatter plot between the
+17:50 
+
+17:50 actual distances and the distances in
+17:53 
+
+17:53 the low dimensional space an ideal fit
+17:55 
+
+17:55 would have all points on the diagonal
+17:58 
+
+17:58 let's discuss the last step of metric
+17:60 
+
+17:60 MDS how do we minimize the stress
+18:02 
+
+18:02 function in general pretty much any
+18:05 
+
+18:05 optimization algorithm of choice can be
+18:07 
+
+18:07 used KCAL originally proposed a gradient
+18:10 
+
+18:10 descent like algorithm similar like the
+18:13 
+
+18:13 one used in your networks gradient
+18:15 
+
+18:15 descent however doesn't guarantee a good
+18:17 
+
+18:17 solution as the stress objective
+18:20 
+
+18:20 function is non-convex one of the most
+18:23 
+
+18:23 important contributions of the to MDS is
+18:26 
+
+18:26 the smack of algorithm this optimization
+18:29 
+
+18:29 approach stands for scaling by
+18:31 
+
+18:31 majorizing a complicated function this
+18:35 
+
+18:35 class of methods can also be found under
+18:37 
+
+18:37 the name minimization by majorization
+18:40 
+
+18:40 and that's exactly what psychic learn
+18:42 
+
+18:42 uses when you call the fit function so
+18:45 
+
+18:45 what is this
+18:46 
+
+18:46 majorization in a nutshell this approach
+18:49 
+
+18:49 exploits the convexity of a function in
+18:52 
+
+18:52 order to find the minimum as stress is a
+18:55 
+
+18:55 non-convex function a convex surrogate
+18:58 
+
+18:58 function is defined to minimize the
+18:60 
+
+18:60 objective this means that stress is
+19:02 
+
+19:02 wrapped in a simpler function the
+19:04 
+
+19:04 algorithm then iteratively minimizes the
+19:07 
+
+19:07 majorized stress function through
+19:09 
+
+19:09 supporting points the advantage of
+19:12 
+
+19:12 smackoff is that it guarantees a
+19:14 
+
+19:14 monotone convergence you can think of it
+19:16 
+
+19:16 like sandwiching the stress function in
+19:19 
+
+19:19 order to minimize it without actually
+19:21 
+
+19:21 touching it the exact details of this
+19:23 
+
+19:23 method won't fit into this video but
+19:25 
+
+19:25 there are plenty of websites to read
+19:27 
+
+19:27 more about it there's also a
+19:29 
+
+19:29 visualization of metric MDS in kar's
+19:32 
+
+19:32 original paper from 1958 on the left is
+19:35 
+
+19:35 the starting configuration and on the
+19:37 
+
+19:37 right the final configuration after 50
+19:41 
+
+19:41 iterations as with all optimization
+19:43 
+
+19:43 algorithms local Minima are a problem
+19:46 
+
+19:46 and is recommended to run MDS several
+19:49 
+
+19:49 times with different starting
+19:51 
+
+19:51 configurations one last open question
+19:53 
+
+19:53 for metric MDS is how do we choose the
+19:56 
+
+19:56 optimal dimension for the low
+19:57 
+
+19:57 dimensional conf configuration here we
+19:60 
+
+19:60 find an answer again in the cuscal paper
+20:02 
+
+20:02 we simply run the algorithm several
+20:04 
+
+20:04 times and plot the stress values versus
+20:07 
+
+20:07 the
+20:08 
+
+20:08 dimension effectively this is a scre lot
+20:10 
+
+20:10 like in PCA and we can now make use of
+20:13 
+
+20:13 the elbow Criterion to find the
+20:15 
+
+20:15 dimension with a sufficient
+20:17 
+
+20:17 approximation it's natural that higher
+20:19 
+
+20:19 Dimension leads to smaller stress values
+20:22 
+
+20:22 because we have more space to position
+20:24 
+
+20:24 the points before we go ahead and
+20:26 
+
+20:26 Implement MDS for our custom data set
+20:29 
+
+20:29 let's have another look at the sponsor
+20:31 
+
+20:31 of this video series which is
+20:32 
+
+20:32 brilliant.org
+20:34 
+
+20:34 brilliant is a free and easy way to
+20:36 
+
+20:36 learn math computer science statistics
+20:39 
+
+20:39 coding and much more
+20:41 
+
+20:41 interactively let's say for example you
+20:43 
+
+20:43 need a refresher on linear algebra then
+20:46 
+
+20:46 you can simply go to the foundational
+20:48 
+
+20:48 math section and try the vectors
+20:51 
+
+20:51 course as brilliant is also available on
+20:53 
+
+20:53 your phone you can integrate these
+20:55 
+
+20:55 courses into your routine and become
+20:57 
+
+20:57 better day by day
+20:59 
+
+20:59 I'm a big fan of interactive courses as
+21:01 
+
+21:01 they simply maintain a much higher level
+21:03 
+
+21:03 of attention and as you can see here
+21:05 
+
+21:05 it's actually a lot of fun to go through
+21:07 
+
+21:07 the exercises another thing I really
+21:09 
+
+21:09 like about brilliant is that they have a
+21:11 
+
+21:11 variety of courses for very rare and
+21:14 
+
+21:14 interesting topics including Quantum
+21:16 
+
+21:16 Computing computational biology and many
+21:19 
+
+21:19 other Concepts in technology brilliant
+21:22 
+
+21:22 offers a free 30-day trial which is a
+21:24 
+
+21:24 great way to try it out you can use the
+21:26 
+
+21:26 link brilliant.org
+21:28 
+
+21:28 deepinder to get 20% off the premium
+21:32 
+
+21:32 subscription one thing I wanted to
+21:34 
+
+21:34 recommend is to take a look at the
+21:36 
+
+21:36 implementations of algorithms you are
+21:38 
+
+21:38 using for MDS for instance you can
+21:40 
+
+21:40 precisely see what is happening under
+21:42 
+
+21:42 the
+21:43 
+
+21:43 hood if you scroll up a bit you can see
+21:46 
+
+21:46 that there is a function called smackoff
+21:48 
+
+21:48 and also one called smackoff
+21:51 
+
+21:51 single and here you can see what exactly
+21:54 
+
+21:54 is happening when you fit this function
+21:57 
+
+21:57 so we will talk talk about non-metric
+21:59 
+
+21:59 MDS in a second but if you use metric
+22:02 
+
+22:02 MDS you simply use the the similarities
+22:05 
+
+22:05 or the distances and additionally you
+22:08 
+
+22:08 calculate the distances as ukian
+22:11 
+
+22:11 distances for the low dimensional
+22:13 
+
+22:13 configuration and down here you can see
+22:16 
+
+22:16 that the stress value is computed and we
+22:18 
+
+22:18 have a couple more steps optimizing the
+22:21 
+
+22:21 values and that's pretty much it so all
+22:23 
+
+22:23 that is happening is mainly what I've
+22:25 
+
+22:25 just described now as always let's have
+22:29 
+
+22:29 a look at this in action and again let's
+22:32 
+
+22:32 load the wine data set and the
+22:34 
+
+22:34 visualization functions that such that
+22:36 
+
+22:36 we can see what the embeddings look like
+22:41 
+
+22:41 going to the MDS section there's one
+22:44 
+
+22:44 detail which is quite useful you can
+22:47 
+
+22:47 pass the MDS algorithm
+22:51 
+
+22:51 precomputed um distances and this is
+22:54 
+
+22:54 what we will also do so we won't let the
+22:56 
+
+22:56 algorithm automatically calculate
+22:59 
+
+22:59 distances but instead we want to start
+23:01 
+
+23:01 with a distance Matrix so using our wi
+23:04 
+
+23:04 data set this calculates distance Matrix
+23:08 
+
+23:08 and this has a shape of 178 * 178
+23:12 
+
+23:12 because that's the number of samples we
+23:15 
+
+23:15 have and typically Manhattan distance
+23:18 
+
+23:18 which is the L1 Norm works better in
+23:21 
+
+23:21 higher Dimensions than the ukian
+23:23 
+
+23:23 distance and here is just um a heat map
+23:27 
+
+23:27 of the distances
+23:28 
+
+23:28 only visualizing the lower
+23:31 
+
+23:31 triangular and given that we can now
+23:34 
+
+23:34 pass that into the MDS implementation
+23:38 
+
+23:38 and for this we instantiate MDS and we
+23:41 
+
+23:41 say first we want a 3D um
+23:45 
+
+23:45 embedding and we say we don't want to
+23:47 
+
+23:47 use normalized stress but we use metric
+23:50 
+
+23:50 MDS and we pass in pre-computed because
+23:54 
+
+23:54 we want to give it the distance Matrix
+23:57 
+
+23:57 we've just calculated here and then what
+23:60 
+
+23:60 you give it when you fit the Matrix is
+24:02 
+
+24:02 exactly this distance Matrix so there
+24:04 
+
+24:04 are two modes either you pass it a
+24:07 
+
+24:07 pre-computed distance Matrix or you pass
+24:09 
+
+24:09 it the raw features then it will
+24:11 
+
+24:11 automatically calculate the metric you
+24:15 
+
+24:15 specify here for example you can put in
+24:17 
+
+24:17 ukle in here and it will calculate that
+24:19 
+
+24:19 for
+24:20 
+
+24:20 you okay so we when we run this it will
+24:24 
+
+24:24 give us this
+24:26 
+
+24:26 visualization and I think for higher
+24:28 
+
+24:28 dimensional data MDS is not perfectly
+24:32 
+
+24:32 suited because distances are simply a
+24:34 
+
+24:34 problem in higher spaces but this is
+24:37 
+
+24:37 still acceptable and as I put here
+24:40 
+
+24:40 Manhattan distance typically works
+24:42 
+
+24:42 better than ukan
+24:44 
+
+24:44 distance and there you can't use
+24:47 
+
+24:47 normalized stress and Metric MDS at the
+24:50 
+
+24:50 same time I'm not entirely sure why that
+24:53 
+
+24:53 is the case but because of that we have
+24:55 
+
+24:55 to print the raw stress it would be
+24:57 
+
+24:57 better if we we had the normalized
+25:00 
+
+25:00 stress which is between 0 and one but
+25:04 
+
+25:04 still this is the stress value so that's
+25:06 
+
+25:06 the overall deviation between the low
+25:09 
+
+25:09 dimensional mapping and the original
+25:12 
+
+25:12 distances and then we can run this for
+25:15 
+
+25:15 two Dimensions as well and we get this
+25:18 
+
+25:18 plot the last technique discussed in
+25:20 
+
+25:20 this video is the non-metric variant of
+25:24 
+
+25:24 MDS non-metric distances are distances
+25:27 
+
+25:27 that violate the triangle
+25:30 
+
+25:30 inequality we can easily construct such
+25:32 
+
+25:32 an example by defining the distance as
+25:35 
+
+25:35 zero whenever the same animal occurs on
+25:38 
+
+25:38 two images and one if the animal doesn't
+25:43 
+
+25:43 occur this certainly violates the
+25:45 
+
+25:45 inequality because the two upper
+25:47 
+
+25:47 distances are zero while the one on the
+25:50 
+
+25:50 bottom is
+25:51 
+
+25:51 one another common example is ordinal
+25:54 
+
+25:54 data whenever we rank data according to
+25:57 
+
+25:57 similar ilarity it can also happen
+25:60 
+
+25:60 easily that the triangle inequality is
+26:03 
+
+26:03 violated that's where the name
+26:05 
+
+26:05 non-metric MDS comes from ordinal data
+26:08 
+
+26:08 is however quite useful because it
+26:10 
+
+26:10 allows us to express distances simply
+26:13 
+
+26:13 based on
+26:15 
+
+26:15 comparisons and comparisons are most of
+26:17 
+
+26:17 the time easier to calculate than actual
+26:19 
+
+26:19 distance values the goal of ordinal MDS
+26:23 
+
+26:23 is therefore to find a configuration
+26:26 
+
+26:26 that preserves the order of the
+26:28 
+
+26:28 distances like in the original distance
+26:30 
+
+26:30 Matrix this order can be simply defined
+26:32 
+
+26:32 by arranging all distances in an
+26:34 
+
+26:34 increasing order in this example the
+26:37 
+
+26:37 distances between blue and yellow are
+26:40 
+
+26:40 the smallest in The Matrix and therefore
+26:42 
+
+26:42 also need to be the smallest in the low
+26:44 
+
+26:44 dimensional map the important question
+26:47 
+
+26:47 now is how do we ensure that the
+26:49 
+
+26:49 distances order is preserved for this
+26:52 
+
+26:52 KCAL has introduced a monotonic function
+26:55 
+
+26:55 that Maps the original distances to
+26:58 
+
+26:58 so-called disparities denoted by
+27:01 
+
+27:01 dad generally speaking a monotonic
+27:04 
+
+27:04 function is a function that preserves
+27:06 
+
+27:06 order given the original distances the
+27:09 
+
+27:09 function output should also yield the
+27:11 
+
+27:11 same order therefore the function f is
+27:14 
+
+27:14 always non-increasing or always non
+27:17 
+
+27:17 decreasing on the right you can see a
+27:19 
+
+27:19 collection of some monotonic functions
+27:21 
+
+27:21 and we are particularly interested in
+27:23 
+
+27:23 the ordinal one these functions of
+27:26 
+
+27:26 course have some par that need to be
+27:29 
+
+27:29 learned in the case of the ordinal
+27:31 
+
+27:31 function these parameters can be learned
+27:33 
+
+27:33 using least squares monotonic regression
+27:36 
+
+27:36 or also called isotonic regression
+27:38 
+
+27:38 fitting such an ordinal function looks
+27:40 
+
+27:40 like the red line in this image the
+27:43 
+
+27:43 monotonic regression can be solved using
+27:45 
+
+27:45 an iterative algorithm called pool
+27:48 
+
+27:48 adjacent violators algorithm but we
+27:50 
+
+27:50 won't go into further details here using
+27:53 
+
+27:53 the fitted line we can now compare the
+27:55 
+
+27:55 low dimensional distances against the
+27:58 
+
+27:58 disparities such that we optimize for
+27:60 
+
+27:60 the rank order and not the actual
+28:02 
+
+28:02 distance values the optimization
+28:04 
+
+28:04 procedure of MDS only changes slightly
+28:07 
+
+28:07 by using the disparities predicted from
+28:09 
+
+28:09 the monotonic regression model the rest
+28:12 
+
+28:12 basically stays the same meaning that we
+28:14 
+
+28:14 also use smackoff to optimize the stress
+28:16 
+
+28:16 function consequently in ordinal MDS we
+28:20 
+
+28:20 learn both the parameters of the
+28:22 
+
+28:22 monotonic function as well as the
+28:24 
+
+28:24 coordinates of the data points to finish
+28:27 
+
+28:27 this video Let's further extend our
+28:29 
+
+28:29 comparison table MDS is a global
+28:32 
+
+28:32 technique as we consider all points at
+28:34 
+
+28:34 the same time classical MDS is just like
+28:37 
+
+28:37 PCA a linear method the iterative metric
+28:41 
+
+28:41 and non-metric MDS are both nonlinear
+28:44 
+
+28:44 classical MDS or PCA is a projection
+28:47 
+
+28:47 based method the others are manifold
+28:49 
+
+28:49 learning techniques the main purpose is
+28:52 
+
+28:52 visualization of the distance Matrix but
+28:54 
+
+28:54 also mapping to the ukian space
+28:58 
+
+28:58 classical MDS is deterministic the other
+29:00 
+
+29:00 variants however aren't because of the
+29:03 
+
+29:03 randomly chosen starting points
+29:04 
+
+29:04 classical MDS has a cubic complexity as
+29:07 
+
+29:07 it needs to find the igen pairs of the
+29:09 
+
+29:09 gram Matrix the other variants are
+29:11 
+
+29:11 roughly quadratic most of the time MDS
+29:14 
+
+29:14 is just used on smaller data sets there
+29:17 
+
+29:17 are however also approximate versions of
+29:19 
+
+29:19 the algorithms available the main
+29:21 
+
+29:21 hyperparameters are the used metrics The
+29:24 
+
+29:24 Chosen dimensionality the number of
+29:26 
+
+29:26 iterations and the stress tolerance
+29:29 
+
+29:29 Epsilon the key ideas are igen
+29:32 
+
+29:32 composition in the case of classical MDS
+29:35 
+
+29:35 and an iterative algorithm that
+29:37 
+
+29:37 minimizes the square distances in the
+29:39 
+
+29:39 other cases finally MDS has many
+29:42 
+
+29:42 applications among others also Gene
+29:44 
+
+29:44 clustering in computational
+29:47 
+
+29:47 biology that's it for this video
+29:49 
+
+29:49 hopefully this helped you in some way to
+29:51 
+
+29:51 shed some light on multi-dimensional
+29:53 
+
+29:53 scaling of course I just scratched the
+29:55 
+
+29:55 surface in this video and therefore feel
+29:58 
+
+29:58 free to have a look at the links in the
+29:60 
+
+29:60 description if you want to learn more
+30:02 
+
+30:02 thanks for watching and see you soon in
+30:04 
+
+30:04 the next video where we will discuss
+30:08 
+
+30:08 [Music]
+30:11 
+
+30:11 tne

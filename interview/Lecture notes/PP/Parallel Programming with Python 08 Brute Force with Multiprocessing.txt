@@ -1,0 +1,4711 @@
+00:01 hi welcome again this is the second week
+00:04 
+
+00:04 after our midterm exam for our course uh
+00:07 
+
+00:07 parallel programming
+00:08 
+
+00:08 so today we are going to continue to
+00:11 
+
+00:11 solve our uh question three
+00:14 
+
+00:14 as you remember last week we have solved
+00:16 
+
+00:16 this problem by using just brute force
+00:19 
+
+00:19 as it wanted
+00:20 
+
+00:20 like in our question
+00:23 
+
+00:23 like you faced in the exam
+00:26 
+
+00:26 and
+00:27 
+
+00:27 we have a problem as you know so the
+00:30 
+
+00:30 problem is
+00:32 
+
+00:32 it consumes a lot of memory so if we
+00:35 
+
+00:35 remember the solution so
+00:37 
+
+00:37 first we have created so take let's take
+00:40 
+
+00:40 a look at the question first the
+00:42 
+
+00:42 question gives us a password which is
+00:45 
+
+00:45 encrypted with the md5 algorithm so we
+00:48 
+
+00:48 have all these characters which is
+00:49 
+
+00:49 encrypted with the md5 and it says write
+00:53 
+
+00:53 a python program which generates
+00:54 
+
+00:54 multiple threads
+00:57 
+
+00:57 which uses multiple threads of course
+00:60 
+
+00:60 and tries all possible combinations to
+01:02 
+
+01:02 guess the password and we have some
+01:05 
+
+01:05 rules so
+01:06 
+
+01:06 the length of the password should be
+01:08 
+
+01:08 eight characters and also
+01:11 
+
+01:11 the program should not cause any
+01:13 
+
+01:13 problems stated in pro question one so
+01:15 
+
+01:15 question one
+01:17 
+
+01:17 the these problems are the gill so
+01:19 
+
+01:19 so-called global interpreter rock for
+01:22 
+
+01:22 the python so it should
+01:25 
+
+01:25 really use all the processors all the
+01:28 
+
+01:28 resources that our pc has but we cannot
+01:31 
+
+01:31 do it uh for this problem by using the
+01:34 
+
+01:34 threads we should
+01:36 
+
+01:36 pass to the we should use the
+01:38 
+
+01:38 multi-process structure to do this so
+01:41 
+
+01:41 this is the first problem about this uh
+01:45 
+
+01:45 solution actually so we should just
+01:48 
+
+01:48 leave the multi-thread structure and
+01:50 
+
+01:50 pass through the multi-process structure
+01:52 
+
+01:52 to get rid of the global interpreter
+01:54 
+
+01:54 lock because
+01:55 
+
+01:55 the
+01:56 
+
+01:56 atomic part here
+01:59 
+
+01:59 we have in this solution
+02:01 
+
+02:01 is this function text to md5 so this
+02:04 
+
+02:04 text to md5 function uses the hash zip
+02:08 
+
+02:08 and
+02:09 
+
+02:09 we cannot use this kind of third-party
+02:12 
+
+02:12 libraries in the
+02:15 
+
+02:15 as you know we have just the salt the
+02:18 
+
+02:18 global interpreter lock by using the
+02:20 
+
+02:20 just-in-time compiler jit from the
+02:22 
+
+02:22 number package and we cannot use this
+02:25 
+
+02:25 third party libraries like hash lib
+02:28 
+
+02:28 by using number by using
+02:30 
+
+02:30 just in time compiler so uh we have this
+02:33 
+
+02:33 problem to remain unsolved so we cannot
+02:36 
+
+02:36 use the multi-thread structure we should
+02:39 
+
+02:39 use multi-process
+02:41 
+
+02:41 structure so this is the first problem
+02:43 
+
+02:43 and the second problem is
+02:46 
+
+02:46 uh causes from here the password is a
+02:48 
+
+02:48 combination of uppercase letter
+02:50 
+
+02:50 lowercase letters and digits and we have
+02:53 
+
+02:53 generated this uh
+02:55 
+
+02:55 combinations this
+02:57 
+
+02:57 character pool actually by using the
+02:59 
+
+02:59 string that ask letters
+03:02 
+
+03:02 including all these lowercase letters
+03:04 
+
+03:04 and uppercase letters and also the
+03:05 
+
+03:05 string that digits which gives us the
+03:08 
+
+03:08 all the digits starting from 0 to 9.
+03:11 
+
+03:11 so
+03:11 
+
+03:11 if we
+03:13 
+
+03:13 generate all the combinations so it
+03:15 
+
+03:15 means let me draw it for you it means
+03:20 
+
+03:20 we should
+03:34 
+
+03:34 we have as
+03:36 
+
+03:36 charts
+03:38 
+
+03:38 starting from
+03:41 
+
+03:41 uh lowercase letters a b
+03:43 
+
+03:43 c or something and
+03:45 
+
+03:45 continues with all these uppercase
+03:47 
+
+03:47 letters a b c and all the way up to
+03:51 
+
+03:51 digits 0 1 2 to the 8 and 9.
+03:56 
+
+03:56 so i think we have
+03:58 
+
+03:58 26 letters for lowercase letters and 26
+04:02 
+
+04:02 letters for uppercase ones and also we
+04:04 
+
+04:04 have 10 digits so approximately we have
+04:07 
+
+04:07 62
+04:09 
+
+04:09 characters 62 different characters for
+04:11 
+
+04:11 this and if we try to
+04:15 
+
+04:15 try to generate
+04:17 
+
+04:17 all the possible combinations
+04:19 
+
+04:19 like we did here with the line 11 self
+04:22 
+
+04:22 that charts indices then it means we
+04:25 
+
+04:25 should
+04:27 
+
+04:27 let me draw it for you we should have
+04:30 
+
+04:30 eight characters
+04:39 
+
+04:39 two
+04:43 
+
+04:43 and four
+04:45 
+
+04:45 and
+04:46 
+
+04:46 like this we will get eight characters
+04:51 
+
+04:51 and for example for the first one we can
+04:54 
+
+04:54 have all of uh we can have just one of
+04:57 
+
+04:57 these all these characters right so we
+05:00 
+
+05:00 can have the lowercase a lowercase b
+05:03 
+
+05:03 lowercase c or something like digits
+05:05 
+
+05:05 seven eight or nine it doesn't matter so
+05:08 
+
+05:08 we should have i think 62 possibilities
+05:14 
+
+05:14 for this
+05:15 
+
+05:15 first character right and all these
+05:19 
+
+05:19 possibilities
+05:20 
+
+05:20 we can have then for the second
+05:23 
+
+05:23 character we should have the same
+05:25 
+
+05:25 possibilities so
+05:26 
+
+05:26 for
+05:27 
+
+05:27 only these two characters we should have
+05:30 
+
+05:30 62 times 62 combinations right and
+05:34 
+
+05:34 as we advancing in this password
+05:37 
+
+05:37 for the third characters we should have
+05:39 
+
+05:39 another 62 combinations and another 62
+05:43 
+
+05:43 combinations and another 62 combinations
+05:46 
+
+05:46 and another
+05:48 
+
+05:48 and another
+05:51 
+
+05:51 so as a total of
+05:54 
+
+05:54 all the possibilities
+05:59 
+
+05:59 possibilities
+06:00 
+
+06:00 we should have
+06:02 
+
+06:02 62 to the power of 8 right let me
+06:06 
+
+06:06 calculate this number for you and
+06:08 
+
+06:08 see
+06:09 
+
+06:09 how big
+06:11 
+
+06:11 is this number
+06:31 
+
+06:31 62
+06:39 
+
+06:39 square
+06:41 
+
+06:41 and another square it
+06:42 
+
+06:42 it just
+06:44 
+
+06:44 gives us the fourth power
+06:46 
+
+06:46 and then this one is the eighth power
+06:49 
+
+06:49 all right so we have this number of
+06:51 
+
+06:51 possibilities for the
+06:53 
+
+06:53 uh combination of
+06:56 
+
+06:56 just from character pool including 62
+06:59 
+
+06:59 characters to generate a eight character
+07:02 
+
+07:02 long passwords right we have this number
+07:05 
+
+07:05 so
+07:07 
+
+07:07 it means uh
+07:09 
+
+07:09 to do this it's it's going to be
+07:11 
+
+07:11 impossible right so
+07:13 
+
+07:13 we cannot just produce all these
+07:16 
+
+07:16 uh combinations as in a regular pc so
+07:21 
+
+07:21 with the method that we have developed
+07:23 
+
+07:23 last week
+07:25 
+
+07:25 to solve this problem
+07:27 
+
+07:27 so we have used
+07:29 
+
+07:29 the indices for all these characters so
+07:31 
+
+07:31 starting from the lowercase a
+07:33 
+
+07:33 we started with the index number zero
+07:37 
+
+07:37 and of course for lowercase b we have
+07:39 
+
+07:39 one and lowercase c we have
+07:42 
+
+07:42 two and as increasing for the
+07:46 
+
+07:46 upper case a we should have something
+07:49 
+
+07:49 like 26 and 27 and 28 like this one and
+07:53 
+
+07:53 also to the end we should have uh
+07:56 
+
+07:56 60 and 61 right so we have all these
+07:60 
+
+07:60 numbers so we have this nested loop
+08:03 
+
+08:03 including the eight indices and total
+08:06 
+
+08:06 approach force so we just
+08:09 
+
+08:09 all these loops we just has we just have
+08:13 
+
+08:13 all these loops
+08:14 
+
+08:14 together to
+08:17 
+
+08:17 to generate all these combinations so it
+08:20 
+
+08:20 consumes a lot of memory and
+08:23 
+
+08:23 to prevent this we just use some
+08:29 
+
+08:29 we just use some characters not
+08:31 
+
+08:31 including all these
+08:33 
+
+08:33 characters but i just
+08:35 
+
+08:35 used this characters for example
+08:38 
+
+08:38 uppercase p and lowercase r and the
+08:40 
+
+08:40 numbers one three four because i know
+08:43 
+
+08:43 the password that i gave you include
+08:45 
+
+08:45 includes these characters so let me try
+08:48 
+
+08:48 it for you for example
+08:50 
+
+08:50 so including just five characters so it
+08:53 
+
+08:53 should be the combinations 5 to the 8 i
+08:55 
+
+08:55 think and
+08:58 
+
+08:58 let me run it for you
+08:60 
+
+09:00 and see the output
+09:04 
+
+09:04 so it generates all the combinations
+09:09 
+
+09:09 right like this
+09:11 
+
+09:11 and stops at one point so it uses all
+09:15 
+
+09:15 these eight processors that this pc has
+09:18 
+
+09:18 and then find our password
+09:23 
+
+09:23 with this right this was our password
+09:27 
+
+09:27 which is given in the exam paper so we
+09:30 
+
+09:30 can get
+09:32 
+
+09:32 a password by using this method but it
+09:34 
+
+09:34 consumes a lot of memory but this is the
+09:36 
+
+09:36 course parallel programming and we have
+09:39 
+
+09:39 a lot of cpus but we don't have a lot of
+09:43 
+
+09:43 memories
+09:44 
+
+09:44 so
+09:46 
+
+09:46 and also we don't
+09:48 
+
+09:48 we don't want to wait too much before
+09:51 
+
+09:51 starting to process so i want to
+09:54 
+
+09:54 first i want to
+09:58 
+
+09:58 transform
+09:59 
+
+09:59 this
+10:01 
+
+10:01 solution
+10:05 
+
+10:05 i want to transform this solution
+10:07 
+
+10:07 from a memory bond solution
+10:10 
+
+10:10 so we have a bottleneck
+10:12 
+
+10:12 in our memory as we apply this solution
+10:16 
+
+10:16 a memory bound
+10:19 
+
+10:19 solution
+10:20 
+
+10:20 to the
+10:22 
+
+10:22 cpu bound
+10:23 
+
+10:23 solution
+10:27 
+
+10:27 cpu bond solution and to do this
+10:30 
+
+10:30 i want to
+10:32 
+
+10:32 i want to just generate the combinations
+10:37 
+
+10:37 not
+10:38 
+
+10:38 at the beginning
+10:40 
+
+10:40 so i want to get them one by one for
+10:44 
+
+10:44 example i just want to
+10:46 
+
+10:46 get the first combination including all
+10:50 
+
+10:50 the indices equals to zero equal to zero
+10:54 
+
+10:54 like this including eight
+10:57 
+
+10:57 zeros
+10:60 
+
+10:60 and i want to try this combination and
+11:02 
+
+11:02 then i want to throw it away
+11:05 
+
+11:05 without saving to anywhere all right and
+11:08 
+
+11:08 then i want to pass to the second
+11:10 
+
+11:10 combination something like
+11:12 
+
+11:12 including
+11:13 
+
+11:13 zeros but at the end i want to get just
+11:16 
+
+11:16 one
+11:17 
+
+11:17 with the next combination all right then
+11:19 
+
+11:19 i want to try it and
+11:22 
+
+11:22 check if
+11:23 
+
+11:23 the encrypted version with the md5 if it
+11:26 
+
+11:26 is equal to the password which i gave
+11:28 
+
+11:28 you and if it is not then i want to
+11:30 
+
+11:30 throw it away without saving and try to
+11:32 
+
+11:32 pass the second
+11:34 
+
+11:34 third combination right like this one
+11:37 
+
+11:37 and
+11:39 
+
+11:39 of course to the end
+11:41 
+
+11:41 we should
+11:44 
+
+11:44 we should end up with a combination
+11:52 
+
+11:52 we should end up with a combination
+11:54 
+
+11:54 including the indices of course
+11:57 
+
+11:57 61
+11:58 
+
+11:58 because we have 62 characters
+12:03 
+
+12:03 all these combinations should be 61.
+12:07 
+
+12:07 so we have this number of combinations
+12:10 
+
+12:10 which i which we found with the
+12:14 
+
+12:14 calculator right so
+12:17 
+
+12:17 we should get this combinations one by
+12:19 
+
+12:19 one and to do this we cannot just uh we
+12:23 
+
+12:23 cannot just use a regular function which
+12:26 
+
+12:26 returns uh
+12:27 
+
+12:27 just a value right because if we do this
+12:30 
+
+12:30 we should use it like this as we have in
+12:33 
+
+12:33 the line 11 so
+12:35 
+
+12:35 we should generate all those indices at
+12:37 
+
+12:37 the beginning and then use them
+12:39 
+
+12:39 but
+12:41 
+
+12:41 instead of this
+12:43 
+
+12:43 i want to try
+12:44 
+
+12:44 to get all these combinations one by one
+12:46 
+
+12:46 and try to do something else and the
+12:49 
+
+12:49 solution
+12:51 
+
+12:51 of this problem
+12:53 
+
+12:53 is instead instead of returning just the
+12:57 
+
+12:57 value
+12:58 
+
+12:58 i want to get them by yielding all right
+13:01 
+
+13:01 so
+13:02 
+
+13:02 i want to
+13:03 
+
+13:03 just write a function instead of
+13:06 
+
+13:06 returning just one value yielding so it
+13:09 
+
+13:09 should be a generator instead of just a
+13:11 
+
+13:11 regular function all right so let me
+13:15 
+
+13:15 try it for you with a very small example
+13:18 
+
+13:18 let's say for example uh let me just get
+13:22 
+
+13:22 the
+13:24 
+
+13:24 squares
+13:25 
+
+13:25 of
+13:26 
+
+13:26 some integers let me create one
+13:29 
+
+13:29 python file with the name squares.pi and
+13:33 
+
+13:33 let's create a function with the name
+13:36 
+
+13:36 just square
+13:38 
+
+13:38 and i want to let's say that i want to
+13:40 
+
+13:40 get the squares of the integers up to
+13:43 
+
+13:43 one limit which is defined by n
+13:47 
+
+13:47 so i want to get the square of 1 square
+13:49 
+
+13:49 of 2 square of 3 squares or 4 up to the
+13:53 
+
+13:53 n all right so i want to do this i can
+13:56 
+
+13:56 do this just creating and lists a python
+13:59 
+
+13:59 list with the name for example squares
+14:03 
+
+14:03 so i can just use square brackets and
+14:05 
+
+14:05 let's say i square
+14:08 
+
+14:08 i square for i
+14:10 
+
+14:10 in range n it's very simple right so we
+14:14 
+
+14:14 can get all this
+14:16 
+
+14:16 squares of the integers starting from 0
+14:19 
+
+14:19 all the way up to n by using this list
+14:22 
+
+14:22 creation so
+14:24 
+
+14:24 at the end we can just return this lists
+14:28 
+
+14:28 squares
+14:29 
+
+14:29 like this and we can use it
+14:34 
+
+14:34 so let's say just squares
+14:40 
+
+14:40 of numbers
+14:43 
+
+14:43 and
+14:46 
+
+14:46 let's
+14:46 
+
+14:46 use this function up to
+14:49 
+
+14:49 some small number for example let's say
+14:51 
+
+14:51 that 100
+14:53 
+
+14:53 right
+14:57 
+
+14:57 and then we can just
+14:59 
+
+14:59 create a loop to see uh all these
+15:03 
+
+15:03 numbers
+15:04 
+
+15:04 so we can just take them
+15:07 
+
+15:07 let's say for s
+15:08 
+
+15:08 in
+15:09 
+
+15:09 squares
+15:11 
+
+15:11 of numbers like this
+15:12 
+
+15:12 and just print
+15:14 
+
+15:14 as
+15:17 
+
+15:17 very simple right let's run this
+15:20 
+
+15:20 file now
+15:27 
+
+15:27 all right then we get all these numbers
+15:30 
+
+15:30 starting from
+15:32 
+
+15:32 one
+15:33 
+
+15:33 starting from zero actually all the way
+15:35 
+
+15:35 up to
+15:36 
+
+15:36 uh square of the
+15:39 
+
+15:39 99 all right we just have 100 numbers
+15:44 
+
+15:44 and let me try it
+15:46 
+
+15:46 for
+15:47 
+
+15:47 a larger number
+15:50 
+
+15:50 let's make it
+15:52 
+
+15:52 1 million
+15:54 
+
+15:54 try again
+15:58 
+
+15:58 and now we have to wait
+16:00 
+
+16:00 a while
+16:01 
+
+16:01 before
+16:02 
+
+16:02 seeing the output all right so it was
+16:06 
+
+16:06 the same problem that we have faced
+16:08 
+
+16:08 in the solution of our question three
+16:12 
+
+16:12 so
+16:13 
+
+16:13 let me stop this we don't
+16:17 
+
+16:17 need to see all the numbers let's increa
+16:21 
+
+16:21 increase this number up to for example
+16:23 
+
+16:23 100 million
+16:25 
+
+16:25 like this
+16:26 
+
+16:26 is it true right
+16:27 
+
+16:27 all right 100 million
+16:30 
+
+16:30 let me run this
+16:37 
+
+16:37 so now we have to wait much more
+16:42 
+
+16:42 before seeing the output so we just add
+16:45 
+
+16:45 the point here
+16:48 
+
+16:48 with line six all right it just creates
+16:52 
+
+16:52 this python list now
+16:54 
+
+16:54 here
+16:56 
+
+16:56 so this is the same problem
+16:58 
+
+16:58 as we have in our question three
+18:31 
+
+18:31 all right we are still waiting and we
+18:33 
+
+18:33 don't get the
+18:35 
+
+18:35 list yet
+18:39 
+
+18:39 let me decrease this number 10 millions
+18:41 
+
+18:41 maybe just more functional
+18:52 
+
+18:52 let me do it again
+19:01 
+
+19:01 100 million is a lot
+19:03 
+
+19:03 for my pc at least
+19:12 
+
+19:12 so it just creates the list
+19:16 
+
+19:16 and then start to give the output let me
+19:20 
+
+19:20 also check the
+19:21 
+
+19:21 memory
+19:22 
+
+19:22 that
+19:24 
+
+19:24 this list gets from our ram so to do
+19:27 
+
+19:27 this to get the
+19:30 
+
+19:30 memory i'm going to import
+19:32 
+
+19:32 a library with the name sys
+19:35 
+
+19:35 so
+19:35 
+
+19:35 before
+19:37 
+
+19:37 think the output or we don't need to
+19:39 
+
+19:39 get the output now so let's just change
+19:43 
+
+19:43 this line to
+19:45 
+
+19:45 let's print
+19:47 
+
+19:47 sys
+19:49 
+
+19:49 get size of
+19:52 
+
+19:52 squares
+19:55 
+
+19:55 of numbers
+19:56 
+
+19:56 right i want
+19:57 
+
+19:57 i just want to see the
+20:00 
+
+20:00 memory size
+20:02 
+
+20:02 that this list consumes from our ram
+20:08 
+
+20:08 alright
+20:19 
+
+20:19 run again we have to wait for a while
+20:27 
+
+20:27 for creating the list
+20:29 
+
+20:29 and we have this
+20:32 
+
+20:32 number of bytes which consumes this
+20:35 
+
+20:35 let's this list in our memory and to
+20:38 
+
+20:38 prevent this usage
+20:40 
+
+20:40 i'm going to create another
+20:43 
+
+20:43 function
+20:48 
+
+20:48 and it's going to be a generator instead
+20:51 
+
+20:51 of just a regular function so let's give
+20:53 
+
+20:53 a name
+20:55 
+
+20:55 square generator for example
+20:59 
+
+20:59 up to same limit n
+21:02 
+
+21:02 and let's say for i
+21:04 
+
+21:04 in
+21:05 
+
+21:05 range
+21:06 
+
+21:06 n
+21:08 
+
+21:08 but not return all the lists but every
+21:12 
+
+21:12 time i'm going to yield the value of i
+21:15 
+
+21:15 square like this
+21:18 
+
+21:18 right then it means the first one
+21:21 
+
+21:21 this first function
+21:23 
+
+21:23 we just want from this function all
+21:25 
+
+21:25 right give me the squares of the
+21:27 
+
+21:27 integers
+21:29 
+
+21:29 up to n but by using this function
+21:33 
+
+21:33 every time by calling this function up
+21:36 
+
+21:36 to n actually
+21:38 
+
+21:38 it gives us the square of the next
+21:42 
+
+21:42 number so as the first time we when we
+21:45 
+
+21:45 call this function it gives us the
+21:47 
+
+21:47 square of zero
+21:49 
+
+21:49 then the second time if we call this
+21:52 
+
+21:52 function again then it's going to give
+21:55 
+
+21:55 us the square of one and then square
+21:58 
+
+21:58 root of 2 and then square root of 3 and
+21:60 
+
+21:60 then square root of 4 up to the value n
+22:04 
+
+22:04 so it's just
+22:05 
+
+22:05 what we want so we want to get the value
+22:10 
+
+22:10 and then throw it away and try to get
+22:12 
+
+22:12 the next value so
+22:14 
+
+22:14 we are going to solve this problem by
+22:16 
+
+22:16 using a generator like this one so
+22:19 
+
+22:19 instead of returning all the lists we
+22:21 
+
+22:21 every time we are going to yield the
+22:24 
+
+22:24 next number right just get
+22:27 
+
+22:27 from
+22:28 
+
+22:28 this one and let's say the squares for
+22:31 
+
+22:31 example generated
+22:33 
+
+22:33 and using this function this time square
+22:37 
+
+22:37 generator and use the same limit 10
+22:39 
+
+22:39 million i think
+22:46 
+
+22:46 right now we have our n as 10 million
+22:50 
+
+22:50 these are equal and also i'm going to
+22:52 
+
+22:52 get the
+22:54 
+
+22:54 size
+22:55 
+
+22:55 of
+22:57 
+
+22:57 this one
+22:58 
+
+22:58 so let's say squares generated
+23:03 
+
+23:03 like this and let me compare this size
+23:16 
+
+23:16 first
+23:17 
+
+23:17 the
+23:18 
+
+23:18 regular function runs square
+23:21 
+
+23:21 and then
+23:23 
+
+23:23 the generator
+23:24 
+
+23:24 is going to run
+23:31 
+
+23:31 all right we have this bytes of memory
+23:35 
+
+23:35 for the first one and we have just these
+23:37 
+
+23:37 bytes of memory for the second term for
+23:40 
+
+23:40 the generator so uh by using a generator
+23:43 
+
+23:43 instead of just a regular function we
+23:45 
+
+23:45 have solved the problem uh so our
+23:48 
+
+23:48 problem is no more a memory bond problem
+23:50 
+
+23:50 we can just transform
+23:52 
+
+23:52 this problem into cpu bond by using a
+23:55 
+
+23:55 generator so
+23:57 
+
+23:57 the second problem
+23:59 
+
+23:59 do we have to still
+24:01 
+
+24:01 wait for the outputs so
+24:04 
+
+24:04 let's just don't use this function
+24:06 
+
+24:06 anymore squares and also
+24:09 
+
+24:09 this one of course
+24:16 
+
+24:16 like this
+24:17 
+
+24:17 all right
+24:19 
+
+24:19 and i don't want to see the size anymore
+24:22 
+
+24:22 so i just want to
+24:24 
+
+24:24 see the output and let's say for square
+24:27 
+
+24:27 or just let's say for s don't use the
+24:30 
+
+24:30 name of the function for s in squares
+24:33 
+
+24:33 generated
+24:37 
+
+24:37 print
+24:38 
+
+24:38 s
+24:39 
+
+24:39 so
+24:40 
+
+24:40 if we
+24:41 
+
+24:41 do it correctly then we should see the
+24:44 
+
+24:44 output immediately all right
+24:47 
+
+24:47 let's run this
+24:51 
+
+24:51 and as you can see we can just get the
+24:54 
+
+24:54 outputs immediately so this one will
+24:58 
+
+24:58 solve our problem then
+25:00 
+
+25:00 all right so we just get the
+25:04 
+
+25:04 combinations and try this combination
+25:07 
+
+25:07 and throw it away
+25:09 
+
+25:09 let's stop this
+25:10 
+
+25:10 then we can just
+25:12 
+
+25:12 uh we can just
+25:13 
+
+25:13 start to
+25:15 
+
+25:15 solve our question tree now by using the
+25:19 
+
+25:19 generator
+25:25 
+
+25:25 on almonds please
+25:31 
+
+25:31 all right let me create a new one in our
+25:34 
+
+25:34 project a new file
+25:41 
+
+25:41 [Music]
+25:42 
+
+25:42 let's say
+25:43 
+
+25:43 q3
+25:45 
+
+25:45 yields
+25:54 
+
+25:54 all right
+25:55 
+
+25:55 now we should get the same libraries so
+25:58 
+
+25:58 the first one will string
+25:60 
+
+25:60 will be string and also we are going to
+26:02 
+
+26:02 need the hash slip of course
+26:07 
+
+26:07 we are going to use the os library to
+26:10 
+
+26:10 get the process ids
+26:13 
+
+26:13 and also from multiprocessing library
+26:17 
+
+26:17 i'm going to import the process
+26:22 
+
+26:22 and also i'm going to import the value
+26:24 
+
+26:24 so i'm going to
+26:27 
+
+26:27 talk about
+26:28 
+
+26:28 these ones
+26:29 
+
+26:29 just don't hurry
+26:32 
+
+26:32 and of course we are going to use our
+26:35 
+
+26:35 function
+26:36 
+
+26:36 which is given in the
+26:39 
+
+26:39 exam paper text to md5
+26:42 
+
+26:42 which encrypts
+26:43 
+
+26:43 encrypts a text into md5 algorithm so
+26:48 
+
+26:48 i'm going to use the same function and
+26:50 
+
+26:50 call the text
+26:52 
+
+26:52 hashtip
+26:54 
+
+26:54 dot md5
+26:56 
+
+26:56 text dot encode
+27:01 
+
+27:01 return
+27:05 
+
+27:05 text
+27:07 
+
+27:07 dot hacks
+27:09 
+
+27:09 biggest
+27:11 
+
+27:11 all right
+27:14 
+
+27:14 so
+27:19 
+
+27:19 now let's create a new
+27:22 
+
+27:22 function
+27:24 
+
+27:24 let's give a name generate
+27:27 
+
+27:27 text
+27:31 
+
+27:31 with the
+27:32 
+
+27:32 length
+27:36 
+
+27:36 n
+27:39 
+
+27:39 all right it will be
+27:41 
+
+27:41 with the length and characters and also
+27:43 
+
+27:43 it's going to use the character pool
+27:45 
+
+27:45 charts
+27:47 
+
+27:47 so i'm going to create this one
+27:49 
+
+27:49 so
+27:51 
+
+27:51 to do this
+27:53 
+
+27:53 i think
+27:55 
+
+27:55 let me write it for you
+27:58 
+
+27:58 now
+27:60 
+
+27:60 we still have the same
+28:04 
+
+28:04 character pool
+28:06 
+
+28:06 and it's going to be
+28:09 
+
+28:09 let me ride it with another color
+28:22 
+
+28:22 it's going to be 8 characters again
+28:42 
+
+28:42 like
+28:43 
+
+28:43 this
+28:44 
+
+28:44 and to yield the
+28:46 
+
+28:46 characters
+28:49 
+
+28:49 we should start from the last character
+28:52 
+
+28:52 so
+28:54 
+
+28:54 we have still the 62
+28:57 
+
+28:57 possibilities for this one so in this
+29:01 
+
+29:01 last character i'm going to
+29:03 
+
+29:03 have the possibilities starting from
+29:07 
+
+29:07 0
+29:10 
+
+29:10 1
+29:12 
+
+29:12 2
+29:13 
+
+29:13 all the way up to
+29:14 
+
+29:14 61 right so
+29:16 
+
+29:16 last three one
+29:18 
+
+29:18 will be 59
+29:21 
+
+29:21 60 and 61
+29:23 
+
+29:23 and to do this
+29:25 
+
+29:25 of course to make this loop in the last
+29:28 
+
+29:28 character
+29:30 
+
+29:30 we should have
+29:32 
+
+29:32 with just uh
+29:35 
+
+29:35 the left part right so in this generator
+29:38 
+
+29:38 i'm going to write something
+29:41 
+
+29:41 like
+29:44 
+
+29:44 if we have this character pool i'm going
+29:46 
+
+29:46 to write something like 4c
+29:48 
+
+29:48 in charts
+29:53 
+
+29:53 let's say yield something right so i'm
+29:56 
+
+29:56 going to yield
+29:59 
+
+29:59 c
+30:00 
+
+30:00 but i'm going to put them at the end of
+30:03 
+
+30:03 something right
+30:05 
+
+30:05 so let's use a variable like pw for
+30:08 
+
+30:08 example
+30:12 
+
+30:12 and i'm going to yield it like this
+30:14 
+
+30:14 so the pw here
+30:21 
+
+30:21 ew here
+30:23 
+
+30:23 this part
+30:24 
+
+30:24 the first
+30:25 
+
+30:25 seven
+30:27 
+
+30:27 characters
+30:29 
+
+30:29 all right and this is
+30:31 
+
+30:31 c
+30:33 
+
+30:33 and
+30:34 
+
+30:34 this list is
+30:39 
+
+30:39 i'll just use the left part
+30:42 
+
+30:42 this list
+30:45 
+
+30:45 is
+30:46 
+
+30:46 charts
+30:53 
+
+30:53 all right
+30:54 
+
+30:54 so of course with this
+30:56 
+
+30:56 indices we have the characters
+30:59 
+
+30:59 don't
+31:01 
+
+31:01 it's not
+31:03 
+
+31:03 misunderstood
+31:04 
+
+31:04 so
+31:06 
+
+31:06 these are the seven
+31:10 
+
+31:10 eight
+31:11 
+
+31:11 and nine
+31:13 
+
+31:13 all right we have this structure so we
+31:15 
+
+31:15 have this c which is iterating over this
+31:19 
+
+31:19 characters and we have this part as pw
+31:23 
+
+31:23 the first seven characters and we are
+31:25 
+
+31:25 doing this loop in the last character so
+31:28 
+
+31:28 we we need
+31:29 
+
+31:29 a pw part so to get this pw part i think
+31:35 
+
+31:35 we should just call the same function
+31:38 
+
+31:38 itself for this character or the
+31:41 
+
+31:41 character 7 right
+31:44 
+
+31:44 so
+31:47 
+
+31:47 this function will be a generator and
+31:50 
+
+31:50 also
+31:51 
+
+31:51 i think this function should be a
+31:53 
+
+31:53 recursive function so i'm going to call
+31:56 
+
+31:56 it again and again and again up to the
+31:59 
+
+31:59 first character to get the left part of
+32:03 
+
+32:03 all these combinations so
+32:07 
+
+32:07 before
+32:08 
+
+32:08 getting into this loop i'm going to just
+32:12 
+
+32:12 call
+32:13 
+
+32:13 them this
+32:15 
+
+32:15 is length eight all right this is
+32:19 
+
+32:19 let me write it like
+32:21 
+
+32:21 n equals eight
+32:25 
+
+32:25 and equals
+32:27 
+
+32:27 eight and it's going to call it n
+32:30 
+
+32:30 equals seven
+32:32 
+
+32:32 and then also this one to get the left
+32:35 
+
+32:35 part it's going to call the n equals six
+32:39 
+
+32:39 and also this one is going to call the n
+32:41 
+
+32:41 equals
+32:43 
+
+32:43 five and also this one is going to call
+32:47 
+
+32:47 n equals four
+32:50 
+
+32:50 to get the pw part
+32:52 
+
+32:52 and this one also is going to call the n
+32:55 
+
+32:55 equals three we get the pw
+32:58 
+
+32:58 and also this one is going to call the n
+33:01 
+
+33:01 equals two and this one is going to call
+33:04 
+
+33:04 the n equals
+33:06 
+
+33:06 one
+33:07 
+
+33:07 and
+33:08 
+
+33:08 at the last
+33:11 
+
+33:11 step
+33:12 
+
+33:12 finally this one is going to call
+33:15 
+
+33:15 n equals zero
+33:17 
+
+33:17 all right
+33:19 
+
+33:19 and then
+33:20 
+
+33:20 this
+33:22 
+
+33:22 n equals
+33:24 
+
+33:24 zero
+33:25 
+
+33:25 will give you the
+33:27 
+
+33:27 answer
+33:29 
+
+33:29 with an empty character
+33:33 
+
+33:33 like this
+33:35 
+
+33:35 it's going to give you an empty
+33:37 
+
+33:37 character and then
+33:39 
+
+33:39 n equals one gets the answer and
+33:43 
+
+33:43 generates all these characters to the
+33:46 
+
+33:46 right part to the end of this empty
+33:48 
+
+33:48 character
+33:50 
+
+33:50 so it's going to use the lowercase a
+33:54 
+
+33:54 lowercase b lowercase c
+33:57 
+
+33:57 like this all right then we should call
+34:00 
+
+34:00 this function again and again inside of
+34:03 
+
+34:03 this function up to the n equals
+34:06 
+
+34:06 zero
+34:08 
+
+34:08 and of course as you know it's called
+34:11 
+
+34:11 recursion so this function is
+34:14 
+
+34:14 going to be a recursive function to get
+34:18 
+
+34:18 this
+34:19 
+
+34:19 empty string then we are going to have
+34:22 
+
+34:22 this empty string
+34:23 
+
+34:23 here at the top
+34:26 
+
+34:26 all right
+34:28 
+
+34:28 with the level n equals zero and with
+34:31 
+
+34:31 the level n equals one
+34:34 
+
+34:34 we are going to have
+34:37 
+
+34:37 let me show it like this we are going to
+34:39 
+
+34:39 have a character like
+34:42 
+
+34:42 a to be added at the end of this empty
+34:45 
+
+34:45 character and also all the other
+34:47 
+
+34:47 possibilities like b
+34:49 
+
+34:49 and c
+34:51 
+
+34:51 and also all the other characters up to
+34:53 
+
+34:53 the digits eight and nine
+34:56 
+
+34:56 right and then
+34:58 
+
+34:58 the n equals two level
+35:02 
+
+35:02 we'll get first
+35:04 
+
+35:04 just lower case s as lowercase a as pw
+35:10 
+
+35:10 as the left part and it's going to add
+35:12 
+
+35:12 to the end with the same combinations a
+35:17 
+
+35:17 b
+35:19 
+
+35:19 and c like this and then
+35:22 
+
+35:22 when it's finished to the
+35:24 
+
+35:24 digits to the end with the 62 characters
+35:27 
+
+35:27 then it's going to
+35:29 
+
+35:29 get the
+35:31 
+
+35:31 first character b
+35:32 
+
+35:32 and then it's going to add the same
+35:35 
+
+35:35 combinations at the end of
+35:37 
+
+35:37 b now
+35:38 
+
+35:38 like this and then it's going to get c
+35:42 
+
+35:42 and it's going to add the combinations
+35:44 
+
+35:44 at the end of c
+35:47 
+
+35:47 and of course at the level n equals 3
+35:50 
+
+35:50 then they are going to have all these
+35:53 
+
+35:53 combinations like a
+35:56 
+
+35:56 b
+35:57 
+
+35:57 c for this one and also this one
+36:01 
+
+36:01 and
+36:02 
+
+36:02 this one
+36:03 
+
+36:03 all right
+36:04 
+
+36:04 and it goes like this
+36:07 
+
+36:07 so at the level n equals eight
+36:11 
+
+36:11 they are going to have this function is
+36:13 
+
+36:13 going to have all the combinations with
+36:16 
+
+36:16 the length of seven characters and it's
+36:18 
+
+36:18 going to add the
+36:19 
+
+36:19 uh all possible characters at the end of
+36:22 
+
+36:22 this seven characters so at the last
+36:26 
+
+36:26 stage
+36:26 
+
+36:26 so
+36:28 
+
+36:28 finally we are going to have this tree
+36:31 
+
+36:31 structure for our password combinations
+36:37 
+
+36:37 of course by using
+36:40 
+
+36:40 no memory no additional memory
+36:45 
+
+36:45 so
+36:47 
+
+36:47 it means we have to start
+36:50 
+
+36:50 the
+36:50 
+
+36:50 scenario which we have n equals 0
+36:54 
+
+36:54 instead of this loop
+36:56 
+
+36:56 all right
+36:57 
+
+36:57 so i'm going to start with it let's say
+36:60 
+
+36:60 if n
+37:01 
+
+37:01 equals 0 then it means we have at the
+37:04 
+
+37:04 final step so i'm just going to yield an
+37:07 
+
+37:07 empty character
+37:09 
+
+37:09 like this
+37:10 
+
+37:10 all right we have it means we have at
+37:12 
+
+37:12 the n equals zero level here
+37:15 
+
+37:15 so we just yield an empty character here
+37:18 
+
+37:18 and then we are going to get the n
+37:20 
+
+37:20 equals one level and it's going to add
+37:23 
+
+37:23 the possible characters at the end of
+37:25 
+
+37:25 this empty character so
+37:28 
+
+37:28 we should continue with the s
+37:32 
+
+37:32 combination and to call this function
+37:35 
+
+37:35 again call this recursive function again
+37:39 
+
+37:39 i'm going to
+37:40 
+
+37:40 call it like this let's say pw list
+37:43 
+
+37:43 it's going to be equal to our function
+37:46 
+
+37:46 again generate text
+37:48 
+
+37:48 of course with the arguments n equals uh
+37:51 
+
+37:51 n minus 1
+37:54 
+
+37:54 so we are at the n equals eight level
+37:56 
+
+37:56 now and we are going to call the
+37:59 
+
+37:59 function again with the n equals seven
+38:02 
+
+38:02 and then equals
+38:03 
+
+38:03 six n equals five four three two one and
+38:07 
+
+38:07 finally we are going going to call it
+38:10 
+
+38:10 with n equals zero and it's going to
+38:12 
+
+38:12 yield an empty character
+38:14 
+
+38:14 and then get here again with the n
+38:16 
+
+38:16 equals one so
+38:19 
+
+38:19 of course using the same character pool
+38:21 
+
+38:21 like this
+38:22 
+
+38:22 and if we get this pw list from our
+38:25 
+
+38:25 function
+38:26 
+
+38:26 uh
+38:28 
+
+38:28 so it can be an empty character also
+38:30 
+
+38:30 let's loop over these lists like for pw
+38:35 
+
+38:35 in pw lists like this
+38:38 
+
+38:38 and then in
+38:40 
+
+38:40 this loop for
+38:42 
+
+38:42 every possibilities as pws i'm going to
+38:46 
+
+38:46 now create my
+38:48 
+
+38:48 loop
+38:50 
+
+38:50 which iterates over all the character
+38:53 
+
+38:53 possibilities so let's say for c
+38:56 
+
+38:56 in charts
+38:60 
+
+38:60 this time i'm going to yield pw plus
+39:04 
+
+39:04 c
+39:05 
+
+39:05 right
+39:07 
+
+39:07 so this function
+39:10 
+
+39:10 will solve
+39:11 
+
+39:11 our
+39:13 
+
+39:13 problem we are going to generate all
+39:16 
+
+39:16 these combinations by using
+39:18 
+
+39:18 just this function
+39:20 
+
+39:20 but it's going to give us a tree
+39:23 
+
+39:23 structure like i draw at the right part
+39:27 
+
+39:27 so let's use it
+39:28 
+
+39:28 i'm going to create a main function
+39:32 
+
+39:32 and then
+39:34 
+
+39:34 i'm going to use this main function
+39:37 
+
+39:37 let's say if thunder named under
+39:41 
+
+39:41 and the remainder like this then call
+39:44 
+
+39:44 the main function
+39:48 
+
+39:48 all right
+39:51 
+
+39:51 of course we need a semicolon here
+39:53 
+
+39:53 so we are going to
+39:55 
+
+39:55 just
+39:57 
+
+39:57 create the character
+39:59 
+
+39:59 pool first let's say chars will be equal
+40:02 
+
+40:02 to string that
+40:05 
+
+40:05 escalators
+40:06 
+
+40:06 to get the all the
+40:08 
+
+40:08 lowercase and uppercase letters plus
+40:12 
+
+40:12 string dot digits
+40:16 
+
+40:16 so we have our character pool now
+40:18 
+
+40:18 uh
+40:20 
+
+40:20 we will have our length
+40:22 
+
+40:22 as eight
+40:25 
+
+40:25 we should get our password
+40:28 
+
+40:28 pwd
+40:34 
+
+40:34 let's get this passwords
+40:48 
+
+40:48 like this
+40:51 
+
+40:51 right let's first
+40:55 
+
+40:55 just
+40:56 
+
+40:56 use this
+40:58 
+
+40:58 function
+40:59 
+
+40:59 and we can say for example like for text
+41:03 
+
+41:03 in generate
+41:04 
+
+41:04 text
+41:07 
+
+41:07 with this lens
+41:09 
+
+41:09 and also
+41:10 
+
+41:10 with these characters like this
+41:13 
+
+41:13 we can just print out this combinations
+41:16 
+
+41:16 like this
+41:18 
+
+41:18 before creating our multi-structure
+41:21 
+
+41:21 multi-process structures let's just run
+41:25 
+
+41:25 this part now
+41:27 
+
+41:27 and see if our function generate text
+41:31 
+
+41:31 is running or not
+41:36 
+
+41:36 all right it just creates
+41:39 
+
+41:39 our combinations immediately
+41:42 
+
+41:42 without waiting
+41:44 
+
+41:44 any uh creation time so it just doesn't
+41:49 
+
+41:49 create any list before giving the output
+41:52 
+
+41:52 it's just uh doing it on the fly all
+41:55 
+
+41:55 right it just creates the just generates
+41:58 
+
+41:58 the next combination again and again and
+42:01 
+
+42:01 again
+42:03 
+
+42:03 so
+42:05 
+
+42:05 it's working
+42:08 
+
+42:08 and to make it
+42:10 
+
+42:10 to make it
+42:12 
+
+42:12 using multiprocessors
+42:14 
+
+42:14 i just i'm just going to
+42:18 
+
+42:18 i'm just going to i think modify this
+42:21 
+
+42:21 structure because
+42:23 
+
+42:23 how can i
+42:24 
+
+42:24 create this
+42:26 
+
+42:26 tree by using multiprocessors because it
+42:29 
+
+42:29 just starts with an empty text
+42:32 
+
+42:32 and then
+42:34 
+
+42:34 call it
+42:36 
+
+42:36 call itself again and again
+42:38 
+
+42:38 to be a recursive function
+42:40 
+
+42:40 and which is the atomic part here how
+42:43 
+
+42:43 can i divide this
+42:46 
+
+42:46 procedure
+42:48 
+
+42:48 into
+42:50 
+
+42:50 separate processors how can i do this
+42:53 
+
+42:53 and i want you to stop the video now and
+42:56 
+
+42:56 think about it
+42:58 
+
+42:58 how can you do this and
+43:00 
+
+43:00 to
+43:01 
+
+43:01 solve this problem to create a
+43:03 
+
+43:03 multi-structure multi-process structure
+43:06 
+
+43:06 we just
+43:08 
+
+43:08 when we create
+43:10 
+
+43:10 this
+43:12 
+
+43:12 combinations in the previous version of
+43:14 
+
+43:14 the solution
+43:16 
+
+43:16 then we have saved all these
+43:19 
+
+43:19 combinations into an python list
+43:22 
+
+43:22 which has the name char indices and of
+43:26 
+
+43:26 course all these combinations
+43:28 
+
+43:28 has their
+43:31 
+
+43:31 indices like 0
+43:34 
+
+43:34 1
+43:35 
+
+43:35 2
+43:36 
+
+43:36 and goes up up to that number we have
+43:40 
+
+43:40 calculated with
+43:41 
+
+43:41 our calculator so
+43:43 
+
+43:43 this number whatever it is all right
+43:46 
+
+43:46 this big number and then we have
+43:50 
+
+43:50 developed a structure like
+43:53 
+
+43:53 i'm going to use here
+43:56 
+
+43:56 we have developed a structure like
+43:59 
+
+43:59 we have written our indices
+44:03 
+
+44:03 like this
+44:04 
+
+44:04 3
+44:05 
+
+44:05 4
+44:06 
+
+44:06 5
+44:07 
+
+44:07 six and seven
+44:10 
+
+44:10 then uh let's continue from the next
+44:12 
+
+44:12 line like this eight
+44:15 
+
+44:15 nine
+44:16 
+
+44:16 ten
+44:17 
+
+44:17 eleven
+44:18 
+
+44:18 twelve
+44:19 
+
+44:19 thirteen
+44:21 
+
+44:21 fourteen
+44:23 
+
+44:23 15
+44:24 
+
+44:24 and
+44:26 
+
+44:26 16 here
+44:28 
+
+44:28 17
+44:30 
+
+44:30 18
+44:31 
+
+44:31 19 20 21
+44:35 
+
+44:35 22 23
+44:38 
+
+44:38 24 here
+44:45 
+
+44:45 and 7 28 29
+44:49 
+
+44:49 30 and 31 right it goes like this
+44:55 
+
+44:55 and then we have just
+44:59 
+
+44:59 use
+45:00 
+
+45:00 uh get a processor id
+45:03 
+
+45:03 like
+45:05 
+
+45:05 p for example and our
+45:07 
+
+45:07 first processor
+45:09 
+
+45:09 is
+45:11 
+
+45:11 process
+45:12 
+
+45:12 zero
+45:14 
+
+45:14 and the second one will be process one
+45:16 
+
+45:16 and the next one process two process
+45:18 
+
+45:18 three
+45:20 
+
+45:20 process four process five
+45:22 
+
+45:22 process six and process seven
+45:25 
+
+45:25 like this and we have given
+45:29 
+
+45:29 each column
+45:31 
+
+45:31 to a process
+45:34 
+
+45:34 so we have created our multi-process
+45:36 
+
+45:36 structure by giving this indices like
+45:39 
+
+45:39 this and we have created our loop like
+45:42 
+
+45:42 let's say for
+45:46 
+
+45:46 i for example
+45:48 
+
+45:48 in
+45:49 
+
+45:49 range
+45:52 
+
+45:52 in range
+45:54 
+
+45:54 let me do it
+46:01 
+
+46:01 can we delete
+46:07 
+
+46:07 my pc is struggling again so let's
+46:10 
+
+46:10 create a loop like 4i
+46:13 
+
+46:13 in
+46:15 
+
+46:15 range
+46:18 
+
+46:18 starting from
+46:20 
+
+46:20 zero
+46:21 
+
+46:21 plus
+46:22 
+
+46:22 p
+46:24 
+
+46:24 all the way up to length
+46:27 
+
+46:27 of this array so you should use the
+46:30 
+
+46:30 length of char indices here
+46:32 
+
+46:32 we don't have spaces so i'm not writing
+46:34 
+
+46:34 it right now
+46:36 
+
+46:36 so
+46:37 
+
+46:37 and the increment will be just eight all
+46:40 
+
+46:40 right
+46:41 
+
+46:41 if you want to create eight processes
+46:46 
+
+46:46 and in this pc i have eight processors
+46:48 
+
+46:48 so i have created eight processes by
+46:51 
+
+46:51 using this loop so
+46:52 
+
+46:52 we just
+46:54 
+
+46:54 start from here with the index 0 for
+46:57 
+
+46:57 process 0 and we have continued with the
+47:02 
+
+47:02 8 and then 16 and then 24
+47:06 
+
+47:06 like this all right
+47:07 
+
+47:07 and for process 1 we have started with
+47:10 
+
+47:10 just the zero plus one so it makes one
+47:14 
+
+47:14 so we have given this column
+47:16 
+
+47:16 to the process one and then
+47:19 
+
+47:19 using p equals two we have started with
+47:22 
+
+47:22 two and continue with 10 18 26
+47:27 
+
+47:27 and
+47:29 
+
+47:29 all
+47:30 
+
+47:30 each process
+47:33 
+
+47:33 get
+47:35 
+
+47:35 its column like this by using this loop
+47:39 
+
+47:39 right but
+47:41 
+
+47:41 this problem with this three structure
+47:44 
+
+47:44 we cannot divide the combinations like
+47:47 
+
+47:47 this but
+47:48 
+
+47:48 i think we can just give
+47:51 
+
+47:51 a first letter at this level
+47:56 
+
+47:56 at this level n equals one
+47:59 
+
+47:59 let's just don't start with an empty
+48:01 
+
+48:01 string but
+48:02 
+
+48:02 start with a fixed first letter like
+48:07 
+
+48:07 this
+48:07 
+
+48:07 with this level all right and let's just
+48:11 
+
+48:11 don't use a loop like this
+48:13 
+
+48:13 but
+48:14 
+
+48:14 give the first character a
+48:17 
+
+48:17 to the
+48:18 
+
+48:18 process
+48:20 
+
+48:20 0 for example
+48:25 
+
+48:25 sorry
+48:28 
+
+48:28 process 0 like this
+48:30 
+
+48:30 and then give the fixed first character
+48:33 
+
+48:33 b to the process one
+48:39 
+
+48:39 all right
+48:40 
+
+48:40 and then c to process three process two
+48:47 
+
+48:47 so we can give this note
+48:49 
+
+48:49 to a process
+48:51 
+
+48:51 p0 and get this node to process one and
+48:55 
+
+48:55 this node to process two so we can just
+48:59 
+
+48:59 give the rest of the tree a process and
+49:02 
+
+49:02 here the rest of the three to a process
+49:04 
+
+49:04 and here rest of the three to a process
+49:07 
+
+49:07 so we can do it all right
+49:13 
+
+49:13 so
+49:14 
+
+49:14 i will just do this and i'm going to fix
+49:17 
+
+49:17 the first character and then give the
+49:20 
+
+49:20 rest of the tree to a process and i'm
+49:22 
+
+49:22 going to create i think six to two
+49:24 
+
+49:24 processes and it doesn't matter so it
+49:26 
+
+49:26 can
+49:27 
+
+49:27 be it can work like this
+49:30 
+
+49:30 then to do this
+49:31 
+
+49:31 i just i'm just going to create another
+49:34 
+
+49:34 function to use my generator generator
+49:37 
+
+49:37 underscore test
+49:39 
+
+49:39 by
+49:40 
+
+49:40 giving it
+49:41 
+
+49:41 a fixed first character and call it for
+49:45 
+
+49:45 the rest of them
+49:46 
+
+49:46 so let's create this function now
+49:52 
+
+49:52 here before our main let's give a name
+49:55 
+
+49:55 for example single process
+49:59 
+
+49:59 and it should get an initial text
+50:03 
+
+50:03 which is our first character and should
+50:05 
+
+50:05 get our character pool charts
+50:08 
+
+50:08 and then the lens
+50:10 
+
+50:10 and then the pwd which
+50:13 
+
+50:13 holds our password
+50:16 
+
+50:16 or of course the md5 encrypted version
+50:19 
+
+50:19 and also i'm going to use a flag
+50:21 
+
+50:21 variable here with the name flag
+50:24 
+
+50:24 and i'm going to use this variable
+50:27 
+
+50:27 to
+50:28 
+
+50:28 stop all the processes when we find our
+50:33 
+
+50:33 password right because the
+50:35 
+
+50:35 uh opposite to the
+50:37 
+
+50:37 or different from the threads the
+50:40 
+
+50:40 processors cannot share a memory piece
+50:44 
+
+50:44 so you should you can just create a
+50:46 
+
+50:46 class and use the properties and make a
+50:50 
+
+50:50 boolean variable for example to stop all
+50:54 
+
+50:54 the processes and we should just create
+50:58 
+
+50:58 a shared variable between the processes
+51:00 
+
+51:00 so i'm going to use this value class for
+51:03 
+
+51:03 it
+51:05 
+
+51:05 right i'm going to create a shared
+51:08 
+
+51:08 variable between the processes and when
+51:11 
+
+51:11 some when one of the processes
+51:14 
+
+51:14 finds the password i'm going to change
+51:16 
+
+51:16 the value of this shared variable and
+51:20 
+
+51:20 it's going to make all the other
+51:22 
+
+51:22 processes stop all right so i'm going to
+51:25 
+
+51:25 use it
+51:26 
+
+51:26 use this flag variable for this purpose
+51:31 
+
+51:31 let's continue
+51:32 
+
+51:32 so
+51:34 
+
+51:34 also i'm going to
+51:36 
+
+51:36 i'm going to generate the
+51:38 
+
+51:38 password combinations for the 8
+51:40 
+
+51:40 characters for for example and
+51:43 
+
+51:43 to make it a more general solution i'm
+51:46 
+
+51:46 going to also
+51:48 
+
+51:48 create generate the one character
+51:51 
+
+51:51 combinations two characters combinations
+51:53 
+
+51:53 three characters combinations so called
+51:56 
+
+51:56 all the possible
+51:57 
+
+51:57 combinations up to eight characters all
+52:01 
+
+52:01 right so we should just try with the
+52:03 
+
+52:03 seven characters six characters five
+52:05 
+
+52:05 characters and make this solution more
+52:08 
+
+52:08 general and to do this i'm going to just
+52:11 
+
+52:11 create a loop let's say for i
+52:14 
+
+52:14 in range
+52:17 
+
+52:17 sorry in range starting from one
+52:19 
+
+52:19 character
+52:20 
+
+52:20 to the length plus one
+52:24 
+
+52:24 and
+52:30 
+
+52:30 all right we didn't write in
+52:33 
+
+52:33 for i in range
+52:36 
+
+52:36 one to the length plus one all right
+52:39 
+
+52:39 then we let's just call our generator
+52:44 
+
+52:44 like this for text in generate
+52:48 
+
+52:48 text
+52:50 
+
+52:50 with i characters long with the
+52:52 
+
+52:52 character pool charts again
+52:57 
+
+52:57 so now we can just have the combined
+53:01 
+
+53:01 text
+53:02 
+
+53:02 with the
+53:04 
+
+53:04 generated text and also with our first
+53:08 
+
+53:08 fixed character
+53:10 
+
+53:10 which we use them for every different
+53:13 
+
+53:13 processes so let's
+53:16 
+
+53:16 create this combine text
+53:17 
+
+53:17 our combined text
+53:19 
+
+53:19 will be our initial text which
+53:23 
+
+53:23 we get from our input argument initial
+53:26 
+
+53:26 text
+53:27 
+
+53:27 plus our text
+53:30 
+
+53:30 which is our generated text
+53:32 
+
+53:32 all right so this is our first character
+53:36 
+
+53:36 or of course with this solution it can
+53:38 
+
+53:38 be just two characters three characters
+53:40 
+
+53:40 four characters it doesn't matter and
+53:42 
+
+53:42 this one the rest of them which is
+53:45 
+
+53:45 generated from our generator
+53:49 
+
+53:49 so this one is the rest of the three
+53:53 
+
+53:53 right
+53:54 
+
+53:54 so let's continue
+53:57 
+
+53:57 and also i'm going to put
+53:59 
+
+53:59 this combined text screen with the
+54:02 
+
+54:02 f string let's say that
+54:04 
+
+54:04 now we have our processes
+54:07 
+
+54:07 and we have just a parent process of
+54:10 
+
+54:10 course which is the main thread so i'm
+54:12 
+
+54:12 going to get the
+54:14 
+
+54:14 process ids so by using the os library
+54:18 
+
+54:18 we can just get the process id by using
+54:20 
+
+54:20 get
+54:21 
+
+54:21 p i d method like this
+54:25 
+
+54:25 this one will give us the active process
+54:28 
+
+54:28 id which is the id of our created
+54:31 
+
+54:31 process and also we can just get the
+54:36 
+
+54:36 id of the main threads so it will be
+54:40 
+
+54:40 from os
+54:42 
+
+54:42 by using the get
+54:43 
+
+54:43 parent process id so it will be ppid
+54:47 
+
+54:47 like this
+54:49 
+
+54:49 all right and
+54:50 
+
+54:50 this one let me hide these writings for
+54:53 
+
+54:53 a moment
+54:57 
+
+54:57 this process now is going to try a
+55:00 
+
+55:00 password combination so let's say is
+55:03 
+
+55:03 trying
+55:05 
+
+55:05 the combine text
+55:09 
+
+55:09 like this
+55:10 
+
+55:10 i'm going to use a new line character at
+55:12 
+
+55:12 the end
+55:13 
+
+55:13 because the all the simultaneously
+55:15 
+
+55:15 running processes is going to put this
+55:18 
+
+55:18 output screen so sometimes we should we
+55:21 
+
+55:21 can just get the multiple outputs in the
+55:24 
+
+55:24 same line so this one will guarantee us
+55:27 
+
+55:27 to put this output in a new line
+55:31 
+
+55:31 so
+55:36 
+
+55:36 we just here
+55:38 
+
+55:38 check our flag value if some other
+55:41 
+
+55:41 process one of the other processes it
+55:43 
+
+55:43 finds the
+55:45 
+
+55:45 password then we are going to stop with
+55:47 
+
+55:47 this sub process so let's check it with
+55:50 
+
+55:50 the flag
+55:51 
+
+55:51 that value the value of this shared
+55:53 
+
+55:53 variable between the processes if it is
+55:56 
+
+55:56 it has the value one then we are going
+55:58 
+
+55:58 to break we are going to stop all right
+56:02 
+
+56:02 so break will run for this loop of
+56:04 
+
+56:04 course so it's just it just goes to the
+56:08 
+
+56:08 last step and
+56:10 
+
+56:10 quits from this loop so it's just
+56:12 
+
+56:12 basically it just stops
+56:14 
+
+56:14 right
+56:15 
+
+56:15 so
+56:18 
+
+56:18 at this stage we are going to check our
+56:20 
+
+56:20 password combination if it is equal to
+56:23 
+
+56:23 the pwd which is given in the question
+56:25 
+
+56:25 so let's say if text to
+56:29 
+
+56:29 md5 we are going to use the
+56:32 
+
+56:32 function which is given in the
+56:34 
+
+56:34 exam
+56:35 
+
+56:35 with our combined text
+56:38 
+
+56:38 like this
+56:40 
+
+56:40 if it is equal to the pwd
+56:42 
+
+56:42 like this
+56:43 
+
+56:43 then we are going to change the value of
+56:47 
+
+56:47 flag which is the shared variable
+56:49 
+
+56:49 between the processes so flag that value
+56:53 
+
+56:53 will be
+56:54 
+
+56:54 one
+56:55 
+
+56:55 and also let's put an output message to
+56:58 
+
+56:58 the screen with an f string again so
+56:60 
+
+56:60 let's say the password
+57:01 
+
+57:01 we have found the password and the
+57:03 
+
+57:03 password
+57:05 
+
+57:05 is
+57:06 
+
+57:06 our combine text
+57:09 
+
+57:09 like this
+57:11 
+
+57:11 all right this is our single process
+57:14 
+
+57:14 function so it just
+57:16 
+
+57:16 generates the
+57:19 
+
+57:19 password combinations by using our
+57:21 
+
+57:21 generator function generate text with an
+57:24 
+
+57:24 initial text which is a fixed character
+57:26 
+
+57:26 for every processor for each processes
+57:31 
+
+57:31 by using this character pool with this
+57:33 
+
+57:33 lens
+57:35 
+
+57:35 and check it with this pwd and also
+57:38 
+
+57:38 check the value of this flag and if it
+57:40 
+
+57:40 is needed then change the value of the
+57:42 
+
+57:42 flag
+57:43 
+
+57:43 right and also by using this loop it's
+57:45 
+
+57:45 going to
+57:46 
+
+57:46 create all these combined texts
+57:50 
+
+57:50 by starting from the one
+57:53 
+
+57:53 character length all the way up to the
+57:56 
+
+57:56 character length that we have wanted and
+57:58 
+
+57:58 in this question it's going to be eight
+58:01 
+
+58:01 all right then let's modify our main
+58:03 
+
+58:03 function
+58:06 
+
+58:06 and
+58:07 
+
+58:07 we don't need to
+58:09 
+
+58:09 call our generator here anymore
+58:13 
+
+58:13 so
+58:15 
+
+58:15 let's initialize
+58:17 
+
+58:17 an empty array an empty list
+58:20 
+
+58:20 with the
+58:22 
+
+58:22 name processes
+58:24 
+
+58:24 as we always do
+58:26 
+
+58:26 for the threads
+58:28 
+
+58:28 and also i'm going to create the flag
+58:29 
+
+58:29 variable here by using the value class
+58:32 
+
+58:32 from the multiprocessing library so the
+58:35 
+
+58:35 value and
+58:37 
+
+58:37 with an input argument i'm going to give
+58:39 
+
+58:39 the type of this variable so it's going
+58:42 
+
+58:42 to be an i and i stands for the integer
+58:46 
+
+58:46 and the types of the values here type of
+58:50 
+
+58:50 the shared variables between the
+58:51 
+
+58:51 processes by using the value class it
+58:54 
+
+58:54 can be an integer and it can be at d
+58:57 
+
+58:57 instead of i and d stands for the double
+59:00 
+
+59:00 precision and double precision as you
+59:02 
+
+59:02 know uses 64 bits
+59:04 
+
+59:04 to be stored in the ram by using the ipe
+59:07 
+
+59:07 754
+59:09 
+
+59:09 representation as you have learned in
+59:12 
+
+59:12 numerical analysis for computer
+59:13 
+
+59:13 engineers course
+59:16 
+
+59:16 all right so we are going to use an i
+59:18 
+
+59:18 here and the default value will be zero
+59:23 
+
+59:23 so it means we don't we didn't find the
+59:26 
+
+59:26 correct password combination yet
+59:29 
+
+59:29 and when we find the correct password
+59:31 
+
+59:31 then we are going to change this value
+59:33 
+
+59:33 to one
+59:34 
+
+59:34 and if it is one then all the other
+59:37 
+
+59:37 processes it's going they are going to
+59:39 
+
+59:39 stop immediately
+59:41 
+
+59:41 all right so we have this initial value
+59:44 
+
+59:44 and then
+59:47 
+
+59:47 to
+59:48 
+
+59:48 fix the first characters i'm going to
+59:50 
+
+59:50 iterate over the
+59:53 
+
+59:53 characters
+59:54 
+
+59:54 like for c in chars
+59:57 
+
+59:57 all right
+59:57 
+
+59:57 and then create
+59:60 
+
+59:60 a
+60:01 
+
+60:01 process for every character that we have
+60:05 
+
+60:05 in our character pool which consists
+60:07 
+
+60:07 with the letters and the digits
+60:10 
+
+60:10 all right so let's append this processes
+60:13 
+
+60:13 array
+60:17 
+
+60:17 append by using the process class and
+60:20 
+
+60:20 the usage of the process class is nearly
+60:23 
+
+60:23 the same
+60:25 
+
+60:25 which we have learned with the thread
+60:27 
+
+60:27 class all right so
+60:29 
+
+60:29 it just gets a target function
+60:34 
+
+60:34 and the target will be our single
+60:36 
+
+60:36 process function
+60:38 
+
+60:38 like this
+60:39 
+
+60:39 and of course
+60:40 
+
+60:40 it's going to have some input arguments
+60:43 
+
+60:43 so i'm going to use arcs and the
+60:45 
+
+60:45 arguments will be a tuple of course
+60:48 
+
+60:48 the initial text will be
+60:50 
+
+60:50 c for this loop for every step we are
+60:53 
+
+60:53 going to create a new process and the
+60:55 
+
+60:55 character pull is going to be chars
+60:58 
+
+60:58 and the lens
+61:01 
+
+61:01 of course will be the lens but
+61:03 
+
+61:03 be careful if we want to create eight
+61:06 
+
+61:06 characters and then
+61:08 
+
+61:08 with this loop we are going to fix the
+61:10 
+
+61:10 first character and the rest of them
+61:12 
+
+61:12 it's just going to be seven characters
+61:15 
+
+61:15 right
+61:16 
+
+61:16 because we have here the first character
+61:19 
+
+61:19 and the remain the rest of them is just
+61:23 
+
+61:23 seven characters long
+61:25 
+
+61:25 all right and then of course pwd
+61:31 
+
+61:31 and also the flag
+61:34 
+
+61:34 like this
+61:39 
+
+61:39 all right
+61:41 
+
+61:41 and then of course we are going to start
+61:44 
+
+61:44 all these processes so let's say for
+61:47 
+
+61:47 process
+61:48 
+
+61:48 and processes
+61:51 
+
+61:51 let's start them
+61:53 
+
+61:53 this is the same structure that
+61:55 
+
+61:55 we have used
+61:60 
+
+62:00 for threads
+62:06 
+
+62:06 all right
+62:07 
+
+62:07 and also wait for all the processes if
+62:11 
+
+62:11 we didn't find the
+62:14 
+
+62:14 password
+62:15 
+
+62:15 and then try to synchronize them by
+62:18 
+
+62:18 using the join methods from our process
+62:20 
+
+62:20 class
+62:21 
+
+62:21 so let's say for processing processes
+62:24 
+
+62:24 process.join
+62:28 
+
+62:28 like this
+62:33 
+
+62:33 i think we are done now
+62:35 
+
+62:35 we don't we don't have any errors
+62:43 
+
+62:43 let me check it
+62:46 
+
+62:46 one more time
+62:55 
+
+62:55 all right
+62:56 
+
+62:56 and to understand
+62:59 
+
+62:59 better how many processes
+63:02 
+
+63:02 we have or
+63:04 
+
+63:04 all of them are running or not i'm going
+63:06 
+
+63:06 to
+63:07 
+
+63:07 run
+63:08 
+
+63:08 our ubuntu terminal
+63:18 
+
+63:18 and also here i'm going to create a new
+63:20 
+
+63:20 terminal
+63:31 
+
+63:31 my pc is struggling again sorry for this
+64:17 
+
+64:17 let me close windows maybe it should
+64:19 
+
+64:19 help
+64:36 
+
+64:36 all right we have our ubuntu terminal
+64:39 
+
+64:39 and here
+64:44 
+
+64:44 also let's
+64:50 
+
+64:50 get here another one's terminal
+64:57 
+
+64:57 and run your nh top
+65:02 
+
+65:02 and i want to see these processes so i'm
+65:04 
+
+65:04 going to
+65:06 
+
+65:06 run this file run this python file and
+65:09 
+
+65:09 let's apply a filter here
+65:12 
+
+65:12 by pressing f4 writing all right and i'm
+65:16 
+
+65:16 going to give the name of the
+65:18 
+
+65:18 file and just typing q3 is
+65:23 
+
+65:23 works for us
+65:32 
+
+65:32 right
+65:34 
+
+65:34 let me just run this file
+65:38 
+
+65:38 by typing python3
+65:41 
+
+65:41 q3
+65:44 
+
+65:44 yields
+65:48 
+
+65:48 all right
+65:50 
+
+65:50 i hope it's going to work because
+65:52 
+
+65:52 my cpus are already full
+65:55 
+
+65:55 so let's
+65:57 
+
+65:57 type it
+66:08 
+
+66:08 all right now we have
+66:10 
+
+66:10 a lot of processes as you can see
+66:14 
+
+66:14 and we have the ids of the processes
+66:17 
+
+66:17 like this and the idea of the parent
+66:20 
+
+66:20 process
+66:22 
+
+66:22 is 38 so we can
+66:25 
+
+66:25 see it from the h top
+66:28 
+
+66:28 like here we have
+66:29 
+
+66:29 i think 62
+66:31 
+
+66:31 sub processors with all these ids and
+66:34 
+
+66:34 pid is the most left one
+66:36 
+
+66:36 so you can just see it from here let me
+66:39 
+
+66:39 find the
+66:40 
+
+66:40 parent process
+66:43 
+
+66:43 it's just a long list and so the last
+66:46 
+
+66:46 one
+66:46 
+
+66:46 is our
+66:48 
+
+66:48 parents id parent process
+66:50 
+
+66:50 so it's the main threads and we have all
+66:53 
+
+66:53 these sub threads
+66:55 
+
+66:55 sub processes sorry working so we have
+66:58 
+
+66:58 just all the resources are used now
+67:02 
+
+67:02 so
+67:03 
+
+67:03 my cpus are
+67:06 
+
+67:06 using in the 100 percent
+67:09 
+
+67:09 so
+67:10 
+
+67:10 we have a lot of
+67:13 
+
+67:13 if you look at the
+67:15 
+
+67:15 status column so
+67:17 
+
+67:17 most of them are slipping and the
+67:19 
+
+67:19 some of them are running simultaneously
+67:22 
+
+67:22 because we have now 62 processes and we
+67:24 
+
+67:24 have all the other things working on my
+67:26 
+
+67:26 pc now so pycharm and obs for recording
+67:30 
+
+67:30 so
+67:30 
+
+67:30 as as you know a cpu scheduler is
+67:33 
+
+67:33 working so uh it's just
+67:36 
+
+67:36 slipping and running but
+67:38 
+
+67:38 for now we don't have a global
+67:40 
+
+67:40 interpreter like problem for our
+67:44 
+
+67:44 processes so if we have enough resources
+67:48 
+
+67:48 then we can have all the
+67:50 
+
+67:50 other processes are running at the same
+67:52 
+
+67:52 time so
+67:54 
+
+67:54 this
+67:55 
+
+67:55 solution has not have the problem has
+67:58 
+
+67:58 not uh
+68:01 
+
+68:01 suffers from the problem of global
+68:04 
+
+68:04 interpreter luck all right
+68:06 
+
+68:06 so
+68:07 
+
+68:07 at this point we are just at the
+68:12 
+
+68:12 combinations with three characters long
+68:14 
+
+68:14 and then it's going to pass four
+68:16 
+
+68:16 characters long and then five and then
+68:18 
+
+68:18 six and a seven and then eight
+68:20 
+
+68:20 right and all the first characters
+68:23 
+
+68:23 is a
+68:25 
+
+68:25 separate process
+68:27 
+
+68:27 so
+68:28 
+
+68:28 of course we cannot wait uh waited to
+68:31 
+
+68:31 find uh the
+68:33 
+
+68:33 password which we are looking for with
+68:35 
+
+68:35 the 8 characters so i'm going to try
+68:38 
+
+68:38 with a
+68:39 
+
+68:39 smaller
+68:41 
+
+68:41 with a shorter password so i'm going to
+68:43 
+
+68:43 stop it right now
+68:47 
+
+68:47 by using the ctrl c
+68:50 
+
+68:50 all right now we have it stopped and let
+68:53 
+
+68:53 me
+68:56 
+
+68:56 get
+69:03 
+
+69:03 a website
+69:04 
+
+69:04 which generates an md5
+69:07 
+
+69:07 encrypted text for us
+69:13 
+
+69:13 let's search for md5 generators
+69:17 
+
+69:17 all right this one works md5
+69:19 
+
+69:19 generator.com
+69:28 
+
+69:28 let's generate
+69:30 
+
+69:30 the md5 encrypted text for for example
+69:33 
+
+69:33 my name
+69:34 
+
+69:34 bora with the capital b
+69:36 
+
+69:36 that's generated
+69:40 
+
+69:40 right this one so let's copy this
+69:43 
+
+69:43 password
+69:45 
+
+69:45 and put it into our file
+69:48 
+
+69:48 as pwd
+69:54 
+
+69:54 here
+69:56 
+
+69:56 right and of course the length should be
+69:59 
+
+69:59 3 now
+70:01 
+
+70:01 so we are going to fix the first
+70:04 
+
+70:04 character and the rest of them is just
+70:06 
+
+70:06 three characters so let's close this
+70:11 
+
+70:11 website
+70:12 
+
+70:12 we can just get all the outputs or we
+70:15 
+
+70:15 can just hide the outputs and make it
+70:19 
+
+70:19 faster
+70:20 
+
+70:20 to find our password so i'm going to
+70:22 
+
+70:22 just comment out this line and i don't
+70:25 
+
+70:25 want to see all these
+70:27 
+
+70:27 combinations
+70:28 
+
+70:28 trying i just want to see the password
+70:32 
+
+70:32 which is fun
+70:34 
+
+70:34 which is the combination which is found
+70:36 
+
+70:36 all right so let's save it and run it
+70:38 
+
+70:38 again
+70:44 
+
+70:44 again we have all the processes are
+70:46 
+
+70:46 working now and printing is just gets a
+70:50 
+
+70:50 lot of time all right so
+70:55 
+
+70:55 you don't want to see all the outputs if
+70:58 
+
+70:58 you just
+71:01 
+
+71:01 run so as you can see from the left
+71:04 
+
+71:04 window
+71:05 
+
+71:05 we have most of the processes running
+71:07 
+
+71:07 now but if we just gets the output from
+71:10 
+
+71:10 a process by using a print function then
+71:13 
+
+71:13 the most of them are slipping so it just
+71:15 
+
+71:15 consumes a lot of
+71:18 
+
+71:18 resources when you
+71:19 
+
+71:19 use the print
+71:21 
+
+71:21 right so this is the recommendation
+71:23 
+
+71:23 don't use prints just
+71:26 
+
+71:26 make sure your function is running your
+71:28 
+
+71:28 files or your script is running and then
+71:30 
+
+71:30 hide the printings and just
+71:35 
+
+71:35 see the final output
+71:37 
+
+71:37 so now it's working and try to
+71:41 
+
+71:41 find the password and now it has found
+71:45 
+
+71:45 our password and says the password is
+71:47 
+
+71:47 bora
+71:49 
+
+71:49 all right this is it
+71:51 
+
+71:51 for this problem
+71:53 
+
+71:53 and of course the version uh which i
+71:57 
+
+71:57 wanted from you in the midterm exam is
+71:60 
+
+72:00 not this
+72:02 
+
+72:02 so i just want to give
+72:05 
+
+72:05 full points the full 30 points for your
+72:08 
+
+72:08 solution if it includes just a random uh
+72:12 
+
+72:12 password generator by using multi
+72:14 
+
+72:14 threads so
+72:16 
+
+72:16 you don't
+72:18 
+
+72:18 you cannot solve the global interpreter
+72:21 
+
+72:21 lock by using just the threats if you
+72:23 
+
+72:23 use some third-party libraries like hash
+72:26 
+
+72:26 lib or something like this all right so
+72:28 
+
+72:28 this is the complete solution this is
+72:30 
+
+72:30 the most general solution
+72:33 
+
+72:33 so
+72:34 
+
+72:34 this is it for this week and let me see
+72:37 
+
+72:37 you in monday and i think we have three
+72:40 
+
+72:40 more
+72:41 
+
+72:41 lectures to the our final exam and we
+72:45 
+
+72:45 are going to continue with the
+72:49 
+
+72:49 multiple processing
+72:52 
+
+72:52 problems again so we have used multiple
+72:55 
+
+72:55 processes to solve our problems and i
+72:57 
+
+72:57 think the next week i'm going to revisit
+72:59 
+
+72:59 the problem which we have which we find
+73:03 
+
+73:03 the value of pi by using monte carlo
+73:05 
+
+73:05 simulation so i'm going to use the same
+73:08 
+
+73:08 problem and
+73:09 
+
+73:09 [Music]
+73:10 
+
+73:10 i'm going to let you to compare the
+73:12 
+
+73:12 multi-threaded solution and the
+73:14 
+
+73:14 multi-process solution all right and
+73:17 
+
+73:17 also we are going to
+73:20 
+
+73:20 do some investigations about the using
+73:23 
+
+73:23 more and more processes uh and is it
+73:27 
+
+73:27 really uh improving the performance
+73:30 
+
+73:30 right and i think we have
+73:33 
+
+73:33 we are going to do something with the
+73:34 
+
+73:34 adult's law
+73:36 
+
+73:36 all right this is it for this week let
+73:38 
+
+73:38 me see you again
+73:39 
+
+73:39 see you later
+73:42 
+
+73:42 [Music]

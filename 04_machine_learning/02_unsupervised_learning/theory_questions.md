@@ -641,25 +641,130 @@ This is now the **default approach** in modern deep learning for NLP and vision.
 
 ## Question 26
 
-**Explain howunsupervised learningcould assist in identifying patterns ingenomic data.**
+**Explain how unsupervised learning could assist in identifying patterns in genomic data.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+Unsupervised learning is extremely valuable in genomics because biological data is high-dimensional, complex, and often lacks clear labels.
+
+**Key Applications:**
+
+| Application | Technique | Purpose |
+|-------------|-----------|---------|
+| **Gene Expression Clustering** | K-means, Hierarchical Clustering | Group genes with similar expression profiles to identify co-regulated genes |
+| **Patient Subtyping** | NMF, Consensus Clustering | Discover disease subtypes (e.g., cancer subtypes) from molecular data |
+| **Dimensionality Reduction** | PCA, t-SNE, UMAP | Visualize high-dimensional genomic data (thousands of genes) in 2D/3D |
+| **Variant Detection** | Autoencoders, GMMs | Identify rare genetic variants or mutations |
+| **Pathway Discovery** | Network Clustering | Find functional modules in gene interaction networks |
+
+**Workflow Example:**
+```
+Raw Gene Expression Data (20,000+ genes)
+    → Preprocessing (normalization, filtering)
+    → Dimensionality Reduction (PCA to ~50 components)
+    → Clustering (K-means or DBSCAN)
+    → Biological Interpretation (pathway enrichment analysis)
+```
+
+**Why Unsupervised Over Supervised?**
+- **Labels are scarce**: Most genomic data lacks ground-truth annotations
+- **Discovery-driven**: The goal is to find *unknown* patterns, not predict known ones
+- **Heterogeneity**: Diseases like cancer have subtypes not yet fully catalogued
+- **High dimensionality**: Thousands of features with few samples (p >> n)
+
+**Real-World Impact:**
+- The Cancer Genome Atlas (TCGA) used unsupervised clustering to identify molecular subtypes of breast cancer (Luminal A, Luminal B, HER2-enriched, Basal-like)
+- Single-cell RNA sequencing uses UMAP + Leiden clustering to identify novel cell types
 
 ---
 
 ## Question 27
 
-**What are some of the latest advancements inclustering algorithms?**
+**What are some of the latest advancements in clustering algorithms?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+Clustering has evolved significantly beyond traditional K-means and hierarchical methods.
+
+**Modern Advancements:**
+
+| Advancement | Description | Key Benefit |
+|-------------|-------------|-------------|
+| **Deep Clustering** | Neural networks (autoencoders) learn representations optimized for clustering | Handles complex, non-linear structures |
+| **Spectral Clustering** | Uses eigenvalues of similarity matrix | Finds non-convex cluster shapes |
+| **HDBSCAN** | Hierarchical extension of DBSCAN | No need to specify number of clusters; handles varying densities |
+| **Mini-Batch K-means** | Processes random subsets per iteration | Scales to millions of data points |
+| **Gaussian Mixture Models (GMMs)** | Probabilistic soft clustering | Provides cluster membership probabilities |
+| **Self-Supervised Clustering** | Combines contrastive learning with clustering (e.g., SCAN, SwAV) | State-of-the-art on image clustering |
+
+**Deep Clustering Methods:**
+```
+Input Data → Encoder Network → Latent Space → Clustering Loss + Reconstruction Loss
+                                    ↓
+                             Cluster Assignments
+```
+
+| Method | Approach |
+|--------|----------|
+| **DEC (Deep Embedded Clustering)** | Autoencoder pretraining → fine-tune with KL divergence clustering loss |
+| **VaDE** | Variational autoencoder with GMM prior |
+| **SCAN** | Self-supervised contrastive learning → nearest neighbor clustering |
+| **DeepCluster** | Alternates between CNN feature extraction and K-means |
+
+**Scalability Innovations:**
+- **Approximate Nearest Neighbors** (FAISS, Annoy): Enable clustering on billions of points
+- **Distributed Clustering**: Frameworks like Spark MLlib for parallel K-means
+- **Online Clustering**: Algorithms that update clusters as new data arrives
+
+**Evaluation Advances:**
+- **Silhouette Score** remains standard for internal evaluation
+- **Adjusted Rand Index (ARI)** for external validation
+- **Stability-based** methods: Cluster solutions across bootstrap samples to assess robustness
 
 ---
 
 ## Question 28
 
-**What is the role ofunsupervised learninginBig Data analytics?**
+**What is the role of unsupervised learning in Big Data analytics?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+Unsupervised learning is essential in Big Data because most real-world data is **unlabeled** — labeling is expensive, slow, and often infeasible at scale.
+
+**Key Roles:**
+
+| Role | Technique | Big Data Application |
+|------|-----------|---------------------|
+| **Data Exploration** | PCA, t-SNE, UMAP | Understand structure of massive datasets before modeling |
+| **Customer Segmentation** | K-means, DBSCAN | Segment millions of users by behavior patterns |
+| **Anomaly Detection** | Isolation Forest, Autoencoders | Detect fraud, network intrusions, system failures |
+| **Topic Discovery** | LDA, NMF | Extract themes from millions of documents |
+| **Recommendation Systems** | Matrix Factorization, Collaborative Filtering | Discover user-item latent factors |
+| **Data Compression** | PCA, Autoencoders | Reduce storage/bandwidth for large datasets |
+
+**Why Unsupervised Learning for Big Data?**
+
+| Challenge | How Unsupervised Helps |
+|-----------|----------------------|
+| **Volume** | Processes data without requiring manual labels |
+| **Variety** | Discovers patterns across heterogeneous data types |
+| **Velocity** | Online clustering algorithms handle streaming data |
+| **Veracity** | Anomaly detection identifies noise/errors |
+| **Value** | Extracts actionable insights from raw data |
+
+**Scalable Implementations:**
+```
+Apache Spark MLlib  → Distributed K-means, PCA, LDA
+Google BigQuery ML  → K-means clustering on warehouse data
+AWS SageMaker       → Built-in algorithms for large-scale clustering
+TensorFlow/PyTorch  → Deep learning-based unsupervised methods on GPUs
+```
+
+**Real-World Examples:**
+- **Netflix**: Unsupervised clustering of viewing patterns → content recommendation
+- **Uber**: Anomaly detection in ride pricing and driver behavior
+- **Google**: Word2Vec (unsupervised) trained on billions of words → semantic understanding
+- **Twitter/X**: Topic modeling on millions of tweets for trend detection
 
 ---
 

@@ -1589,7 +1589,36 @@ vae = VAE(latent_dim=10)
 
 **Explain t-SNE cost function (KL divergence between P and Q).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE (t-distributed Stochastic Neighbor Embedding) minimizes the Kullback-Leibler (KL) divergence between two probability distributions: P (high-dimensional pairwise similarities) and Q (low-dimensional embedding similarities).
+
+**Core Concepts:**
+- **High-dimensional distribution P:** Pairwise similarities computed as conditional probabilities using Gaussian kernels
+- **Low-dimensional distribution Q:** Pairwise similarities computed using a Student's t-distribution (1 degree of freedom)
+- **KL Divergence:** Asymmetric measure; penalizes placing similar points far apart more than dissimilar points close together
+
+**Mathematical Formulation:**
+- Cost function: C = KL(P||Q) = sum_i sum_j p_ij * log(p_ij / q_ij)
+- High-dim affinity: p_j|i = exp(-||x_i - x_j||^2 / 2*sigma_i^2) / sum_{k!=i} exp(-||x_i - x_k||^2 / 2*sigma_i^2)
+- Symmetrized: p_ij = (p_j|i + p_i|j) / 2n
+- Low-dim affinity: q_ij = (1 + ||y_i - y_j||^2)^(-1) / sum_{k!=l} (1 + ||y_k - y_l||^2)^(-1)
+
+**Key Properties:**
+| Property | Description |
+|----------|-------------|
+| **Asymmetry** | KL(P||Q) != KL(Q||P); chosen direction emphasizes preserving local structure |
+| **Heavy-tail Q** | Student-t allows moderate distances in embedding for moderate similarities |
+| **Crowding problem** | t-distribution alleviates the crowding problem in lower dimensions |
+| **Non-convex** | Optimization landscape has multiple local minima |
+
+**Why KL divergence?**
+- Large p_ij with small q_ij incurs high cost (nearby points mapped far = bad)
+- Small p_ij with large q_ij incurs low cost (far points mapped near = tolerated)
+- This preserves local neighborhood structure effectively
+
+**Interview Tip:** Emphasize that t-SNE uses Student-t distribution in low-dim space specifically to solve the crowding problem that SNE faced with Gaussian kernels.
 
 ---
 
@@ -1597,7 +1626,37 @@ vae = VAE(latent_dim=10)
 
 **Describe computation of pairwise affinities in high-dim space.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Pairwise affinities in t-SNE measure the similarity between every pair of data points in the original high-dimensional space using Gaussian kernels centered at each point.
+
+**Core Concepts:**
+- Each point x_i has its own Gaussian kernel with bandwidth sigma_i
+- Conditional probability p_j|i represents how likely x_j is a neighbor of x_i
+- Sigma_i is chosen per point based on the perplexity parameter
+
+**Mathematical Formulation:**
+1. **Conditional probability:** p_j|i = exp(-||x_i - x_j||^2 / 2*sigma_i^2) / sum_{k!=i} exp(-||x_i - x_k||^2 / 2*sigma_i^2)
+2. **Symmetrization:** p_ij = (p_j|i + p_i|j) / 2n
+3. **Self-similarity:** p_ii = 0
+
+**Algorithm Steps:**
+1. For each point x_i, perform binary search on sigma_i to match desired perplexity
+2. Compute all conditional probabilities p_j|i
+3. Symmetrize to get joint probabilities p_ij
+4. Ensure minimum probability floor to avoid numerical issues
+
+**Perplexity-Sigma Relationship:**
+- Perplexity = 2^(H(P_i)) where H is Shannon entropy
+- High perplexity → larger sigma → more neighbors considered
+- Low perplexity → smaller sigma → fewer, closer neighbors
+
+**Computational Complexity:**
+- Naive: O(n^2) for all pairwise distances
+- With approximations (vantage-point trees): O(n log n)
+
+**Interview Tip:** The adaptive sigma per point means dense regions have smaller bandwidths and sparse regions have larger ones, making the similarity measure locally adaptive.
 
 ---
 
@@ -1605,7 +1664,36 @@ vae = VAE(latent_dim=10)
 
 **What is perplexity and how does it influence local vs. global structure?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Perplexity is a hyperparameter in t-SNE that controls the effective number of neighbors each point considers, balancing attention between local and global structure.
+
+**Core Concepts:**
+- Perplexity is related to the number of effective nearest neighbors
+- Typical values: 5-50 (commonly 30)
+- Controls the bandwidth sigma_i of each Gaussian kernel
+- Higher perplexity → more global view; lower → more local detail
+
+**Mathematical Formulation:**
+- Perplexity(P_i) = 2^(H(P_i))
+- H(P_i) = -sum_j p_j|i * log2(p_j|i) (Shannon entropy)
+- For each point, binary search finds sigma_i to match target perplexity
+
+**Influence on Structure:**
+| Perplexity | Local Structure | Global Structure | Effect |
+|------------|----------------|-----------------|--------|
+| Low (5-10) | Very detailed | Poor | Tight micro-clusters, fragmented |
+| Medium (30) | Good balance | Moderate | Standard recommendation |
+| High (50-100) | Smoothed | Better preserved | Larger clusters, less detail |
+
+**Practical Guidelines:**
+- Rule of thumb: perplexity should be less than n/3
+- Multiple perplexity values should be tried; stable structures are real
+- Dense clusters need lower perplexity; sparse data needs higher
+- Large datasets may benefit from higher perplexity (50-100)
+
+**Interview Tip:** Perplexity is NOT the exact number of neighbors—it's the effective number based on entropy. Always run t-SNE with multiple perplexity values to distinguish real structure from artifacts.
 
 ---
 
@@ -1613,7 +1701,37 @@ vae = VAE(latent_dim=10)
 
 **Explain early exaggeration phase and its purpose.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Early exaggeration is a phase during the first iterations of t-SNE optimization where the pairwise affinities p_ij are multiplied by a factor (typically 4-12), causing clusters to form more tightly before being allowed to spread out.
+
+**Core Concepts:**
+- Applied during initial iterations (typically first 250 of 1000)
+- Multiplication factor usually 4x or 12x on p_ij values
+- Creates attractive forces much stronger than repulsive forces initially
+- After early exaggeration phase, factor is removed to 1x
+
+**Purpose:**
+1. **Cluster formation:** Forces similar points tightly together early, creating well-separated clusters
+2. **Global structure:** Helps establish initial cluster positions before fine-tuning
+3. **Escape local minima:** Large initial gradients help escape poor configurations
+4. **Faster convergence:** Guides optimization toward good solutions quickly
+
+**Mathematical Effect:**
+- During exaggeration: gradients proportional to alpha * p_ij (alpha = exaggeration factor)
+- Creates strong "pull" for nearby points (large p_ij becomes very large)
+- Clusters compress and separate, then relax when exaggeration ends
+
+**Practical Impact:**
+| Setting | Effect |
+|---------|--------|
+| Higher factor (12x) | Tighter initial clusters, more separation |
+| Lower factor (4x) | Gentler clustering, less initial separation |
+| Longer duration | More time for global organization |
+| No exaggeration | Slower convergence, may miss cluster separation |
+
+**Interview Tip:** Think of early exaggeration as "overshooting" the attractive forces initially to set up the global layout, then fine-tuning with normal forces for local structure.
 
 ---
 
@@ -1621,7 +1739,38 @@ vae = VAE(latent_dim=10)
 
 **Discuss Barnes–Hut approximation for speed.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The Barnes-Hut approximation is a tree-based algorithm that reduces t-SNE's repulsive force computation from O(n^2) to O(n log n) by grouping distant points and treating them as single representative points.
+
+**Core Concepts:**
+- Builds a quad-tree (2D) or oct-tree (3D) over the embedding space
+- Distant groups of points are approximated as a single point at their center of mass
+- Controlled by theta parameter (trade-off between speed and accuracy)
+- Standard in most t-SNE implementations
+
+**Algorithm Steps:**
+1. Build spatial tree (quad/oct-tree) over current embedding positions
+2. For each point, traverse the tree
+3. If a node's cell width / distance to point < theta, use the cell's center of mass as approximation
+4. Otherwise, recurse into children nodes
+5. Accumulate repulsive forces from all nodes
+
+**Theta Parameter:**
+| Theta | Accuracy | Speed | Use Case |
+|-------|----------|-------|----------|
+| 0 | Exact (O(n^2)) | Slowest | Small datasets |
+| 0.5 | Good (default) | Fast | Standard usage |
+| 0.8 | Approximate | Very fast | Large datasets, exploration |
+| 1.0+ | Poor | Fastest | Not recommended |
+
+**Complexity Comparison:**
+- Exact t-SNE: O(n^2) per iteration
+- Barnes-Hut t-SNE: O(n log n) per iteration
+- FIt-SNE (FFT-based): O(n) per iteration
+
+**Interview Tip:** Barnes-Hut is the default in sklearn's t-SNE (method='barnes_hut'). For datasets > 10,000 points, it's essentially required for practical runtime.
 
 ---
 
@@ -1629,7 +1778,40 @@ vae = VAE(latent_dim=10)
 
 **Describe gradient descent optimization steps in t-SNE.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE optimizes its cost function (KL divergence) using gradient descent with momentum, iteratively adjusting the low-dimensional embedding positions to minimize the mismatch between high-dimensional and low-dimensional pairwise similarities.
+
+**Core Concepts:**
+- Uses gradient descent with momentum (not standard SGD)
+- Gradient has two components: attractive forces and repulsive forces
+- Learning rate and momentum are critical hyperparameters
+
+**Gradient Formula:**
+- dC/dy_i = 4 * sum_j (p_ij - q_ij) * (y_i - y_j) * (1 + ||y_i - y_j||^2)^(-1)
+- Attractive: points with high p_ij are pulled together
+- Repulsive: points with low p_ij are pushed apart
+
+**Optimization Steps:**
+1. Initialize embedding Y randomly (or from PCA)
+2. **Early exaggeration phase** (iterations 1-250): p_ij *= alpha
+3. For each iteration:
+   - Compute Q distribution from current Y
+   - Compute gradients dC/dy_i for all points
+   - Update: y_i(t+1) = y_i(t) + eta * dC/dy_i + alpha(t) * (y_i(t) - y_i(t-1))
+4. **Normal phase** (iterations 250-1000): remove exaggeration
+5. Momentum increases from 0.5 to 0.8 after exaggeration phase
+
+**Key Hyperparameters:**
+| Parameter | Typical Value | Effect |
+|-----------|--------------|--------|
+| Learning rate | 200 (auto) | Too low: slow; too high: oscillation |
+| Momentum (early) | 0.5 | Gentle initial updates |
+| Momentum (late) | 0.8 | Faster convergence in fine-tuning |
+| n_iter | 1000 | More iterations for larger datasets |
+
+**Interview Tip:** The gradient naturally decomposes into attraction (p_ij terms) and repulsion (q_ij terms), making t-SNE a force-directed algorithm similar to spring systems.
 
 ---
 
@@ -1637,7 +1819,42 @@ vae = VAE(latent_dim=10)
 
 **Compare t-SNE with PCA for visualization tasks.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE and PCA serve different purposes: PCA is a linear technique that preserves global variance structure, while t-SNE is a non-linear technique optimized for preserving local neighborhood structure in 2D/3D visualizations.
+
+**Core Comparison:**
+| Aspect | PCA | t-SNE |
+|--------|-----|-------|
+| **Type** | Linear | Non-linear |
+| **Objective** | Maximize variance | Preserve local neighborhoods |
+| **Global structure** | Preserved | Often distorted |
+| **Local structure** | May be lost | Well preserved |
+| **Speed** | O(min(n,d)^2 * max(n,d)) | O(n^2) or O(n log n) |
+| **Deterministic** | Yes | No (stochastic) |
+| **Scalable** | Very scalable | Limited (< 100K points) |
+| **Inverse transform** | Yes | No |
+| **New data** | Simple projection | Requires retraining |
+| **Output dims** | Any k ≤ d | Typically 2-3 only |
+
+**When to Use Each:**
+- **PCA first:** Always run PCA to reduce to 50-100 dims before t-SNE (recommended)
+- **PCA alone:** When you need interpretable components, preprocessing, or dimensionality > 3
+- **t-SNE alone:** When you need 2D visualization of cluster structure
+
+**Combined Pipeline:**
+```python
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+# PCA to 50 dims first (speed + denoising)
+X_pca = PCA(n_components=50).fit_transform(X)
+# t-SNE for visualization
+X_tsne = TSNE(n_components=2, perplexity=30).fit_transform(X_pca)
+```
+
+**Interview Tip:** PCA preserves distances globally (far points stay far) while t-SNE preserves local neighborhoods (nearby points stay nearby). Use PCA for analysis, t-SNE for visualization.
 
 ---
 
@@ -1645,7 +1862,39 @@ vae = VAE(latent_dim=10)
 
 **Explain why t-SNE is non-parametric.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE is non-parametric because it does not learn an explicit mapping function from input space to embedding space. Instead, it directly optimizes the positions of each data point in the low-dimensional space.
+
+**Core Concepts:**
+- No learned function f(x) → y that can be applied to new data
+- Each point's position is a free parameter optimized independently
+- The embedding is specific to the training data only
+- Adding new points requires re-running the entire algorithm
+
+**Parametric vs Non-parametric:**
+| Aspect | Non-parametric t-SNE | Parametric t-SNE |
+|--------|---------------------|------------------|
+| **Mapping** | No explicit function | Neural network f(x) → y |
+| **New data** | Must rerun entirely | Apply f(x_new) |
+| **Parameters** | 2n (n points × 2D) | Network weights |
+| **Training** | KL optimization on positions | KL + backprop through network |
+| **Implementation** | sklearn TSNE | Custom (TensorFlow/PyTorch) |
+
+**Implications:**
+1. **No out-of-sample extension:** Cannot embed new points without retraining
+2. **No learned features:** Embedding doesn't generalize
+3. **High parameter count:** 2n parameters for n points in 2D
+4. **Computational cost:** Must rerun for any data change
+
+**Parametric t-SNE Alternative:**
+- Uses a neural network to learn the mapping
+- Can embed new points via forward pass
+- Model: y = f_theta(x) where f is a neural network
+- Loss: KL divergence same as standard t-SNE
+
+**Interview Tip:** The non-parametric nature is both a strength (no model assumptions) and weakness (no generalization). For production systems needing to embed new data, use parametric t-SNE or UMAP (which has a transform method).
 
 ---
 
@@ -1653,7 +1902,40 @@ vae = VAE(latent_dim=10)
 
 **Discuss limitations: crowding problem, loss of global geometry.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE has several known limitations including the crowding problem, loss of global geometry, and sensitivity to hyperparameters that users must understand to avoid misinterpretation.
+
+**The Crowding Problem:**
+- In high dimensions, a point can have many equidistant neighbors
+- In 2D, there isn't enough area to place all those neighbors at equal distances
+- Moderate-distance points get "crowded" into a small area
+- **Solution:** t-distribution (heavy tails) allows moderate distances to be larger in embedding
+
+**Loss of Global Geometry:**
+| What is Preserved | What is Lost |
+|-------------------|-------------|
+| Local neighborhoods | Inter-cluster distances |
+| Cluster membership | Cluster sizes (relative) |
+| Dense vs sparse regions (roughly) | Global orientation |
+| Sub-cluster structures | Hierarchical relationships |
+
+**Key Limitations:**
+1. **Non-deterministic:** Different random seeds produce different embeddings
+2. **Cluster sizes meaningless:** t-SNE normalizes densities, so cluster sizes don't reflect real data
+3. **Distances between clusters meaningless:** Inter-cluster gaps are artifacts
+4. **Computational cost:** O(n^2) memory and time (or O(n log n) with Barnes-Hut)
+5. **Hyperparameter sensitive:** Perplexity, learning rate dramatically change output
+6. **Not suitable for >3D:** Designed for 2D/3D visualization only
+7. **No inverse mapping:** Cannot reconstruct original features from embedding
+
+**Common Misinterpretations:**
+- "These two clusters are far apart → they're very different" (FALSE)
+- "This cluster is bigger → more data points" (FALSE)
+- "The elongated shape means something" (FALSE)
+
+**Interview Tip:** Always caveat t-SNE visualizations: cluster presence is meaningful, but sizes, distances, and shapes are not. Run multiple times to verify stable structures.
 
 ---
 
@@ -1661,7 +1943,45 @@ vae = VAE(latent_dim=10)
 
 **How does initialization (PCA, random) affect embedding?**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Initialization in t-SNE determines the starting positions of points in the low-dimensional space, significantly affecting convergence speed, reproducibility, and quality of the final embedding.
+
+**Initialization Methods:**
+| Method | Description | Pros | Cons |
+|--------|-------------|------|------|
+| **Random** | Points drawn from N(0, 10^-4) | No bias | Non-deterministic, slower convergence |
+| **PCA** | First 2 PCA components | Deterministic, preserves global structure | May bias toward linear structure |
+| **Spectral** | From Laplacian eigenmaps | Good topology preservation | Computationally expensive |
+
+**Impact on Results:**
+1. **PCA initialization:**
+   - Produces more reproducible results
+   - Better preserves global structure
+   - Faster convergence (starts closer to good solution)
+   - Default in modern implementations (sklearn ≥ 0.22)
+   
+2. **Random initialization:**
+   - Different runs produce different layouts
+   - May converge to different local minima
+   - Useful for exploring multiple solutions
+   - Need to set random_state for reproducibility
+
+**Best Practices:**
+- Use `init='pca'` for reproducible, globally coherent embeddings
+- If using random init, run multiple times and compare
+- For very large datasets, PCA init is strongly recommended for convergence speed
+- Set `random_state=42` for reproducibility regardless of init method
+
+```python
+from sklearn.manifold import TSNE
+# PCA initialization (recommended)
+tsne = TSNE(n_components=2, init='pca', random_state=42)
+X_embedded = tsne.fit_transform(X)
+```
+
+**Interview Tip:** PCA initialization is now the default in sklearn because it produces more stable, reproducible, and globally coherent embeddings compared to random initialization.
 
 ---
 
@@ -1669,7 +1989,42 @@ vae = VAE(latent_dim=10)
 
 **Explain how to visualize high-dimensional clusters properly.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Proper visualization of high-dimensional clusters requires careful preprocessing, appropriate technique selection, and proper interpretation of the resulting plots to avoid misleading conclusions.
+
+**Step-by-Step Pipeline:**
+1. **Preprocessing:** Standardize features, handle missing values
+2. **Initial reduction:** PCA to 50 dims (removes noise, speeds up)
+3. **Visualization:** Apply t-SNE or UMAP for 2D/3D
+4. **Validation:** Color by known labels, metadata, or cluster assignments
+5. **Interpretation:** Focus on cluster presence, not sizes/distances
+
+**Technique Selection:**
+| Method | Best For | Limitation |
+|--------|----------|-----------|
+| PCA (2D) | Linear separability, quick overview | Misses non-linear structure |
+| t-SNE | Local cluster structure | Slow, no global distances |
+| UMAP | Both local and global structure | Hyperparameter sensitive |
+| MDS | Preserving pairwise distances | O(n^3) complexity |
+| Trimap | Large datasets | Newer, less established |
+
+**Best Practices:**
+- Always preprocess with PCA to 50 dims before t-SNE/UMAP
+- Use multiple perplexity values with t-SNE; stable clusters are real
+- Color points by different metadata columns to discover patterns
+- Use interactive plots (plotly, bokeh) for exploration
+- Show multiple views (different methods/parameters) side by side
+- Include explained variance ratio for PCA plots
+
+**Common Pitfalls:**
+- Interpreting t-SNE cluster sizes as meaningful
+- Running t-SNE on raw high-dimensional data (use PCA first)
+- Using only one visualization method
+- Not checking reproducibility (multiple random seeds)
+
+**Interview Tip:** The best approach is always multi-method: start with PCA for global structure, then use t-SNE/UMAP for local cluster discovery, and validate findings with domain knowledge.
 
 ---
 
@@ -1677,7 +2032,38 @@ vae = VAE(latent_dim=10)
 
 **Discuss pitfalls interpreting distances between t-SNE clusters.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Distances between clusters in t-SNE embeddings are generally NOT meaningful and should not be used to infer similarity or dissimilarity between groups.
+
+**Why Distances Are Misleading:**
+1. **KL divergence asymmetry:** Optimizes local neighborhood preservation, not global distances
+2. **Normalization:** Q distribution is normalized over ALL pairs, compressing inter-cluster distances
+3. **Repulsive forces:** Clusters separate until equilibrium, not based on actual dissimilarity
+4. **Perplexity effect:** Different perplexity values change inter-cluster distances dramatically
+5. **Stochastic nature:** Different runs produce different inter-cluster distances
+
+**What You CAN Trust:**
+| Reliable | Not Reliable |
+|----------|-------------|
+| Cluster existence | Cluster distances |
+| Points within same cluster | Cluster sizes |
+| Neighborhood relationships | Cluster shapes |
+| Dense vs sparse patterns (roughly) | Elongation/orientation |
+
+**Common Mistakes:**
+- "Cluster A is closer to B than C" → Cannot conclude this from t-SNE
+- "Cluster A is larger → more diverse" → Size is artifact of density normalization
+- "The gap between clusters means clear separation" → Gap size is meaningless
+
+**How to Properly Analyze Inter-cluster Relationships:**
+1. Use PCA/MDS for global distance preservation
+2. Compute actual distances in original high-dimensional space
+3. Use UMAP (better at preserving global structure than t-SNE)
+4. Create distance matrices between cluster centroids in original space
+
+**Interview Tip:** The golden rule of t-SNE interpretation: trust the clusters, distrust the distances. If someone asks about inter-cluster relationships, redirect to methods that preserve global structure like UMAP or MDS.
 
 ---
 
@@ -1685,7 +2071,44 @@ vae = VAE(latent_dim=10)
 
 **Explain multi-scale t-SNE (FIt-SNE, openTSNE).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Multi-scale t-SNE variants like FIt-SNE (Fast Interpolation-based t-SNE) and openTSNE are optimized implementations that drastically improve speed and enable analysis of larger datasets while maintaining embedding quality.
+
+**FIt-SNE (Fast Interpolation-based t-SNE):**
+- Uses FFT (Fast Fourier Transform) for repulsive force computation
+- Interpolates repulsive forces on a grid → O(n) per iteration
+- 10-100x faster than Barnes-Hut for large n
+- Developed by Linderman et al. (2019)
+
+**openTSNE:**
+- Python library built on FIt-SNE core
+- Supports incremental/out-of-sample embedding
+- Multi-scale perplexity (combines multiple perplexity values)
+- Callbacks for monitoring convergence
+
+**Speed Comparison:**
+| Method | Complexity | 50K points | 1M points |
+|--------|-----------|-----------|----------|
+| Exact t-SNE | O(n^2) | Hours | Infeasible |
+| Barnes-Hut | O(n log n) | Minutes | Hours |
+| FIt-SNE | O(n) | Seconds | Minutes |
+
+**Multi-scale t-SNE:**
+- Uses multiple perplexity values simultaneously
+- Combines P matrices from different scales: P_combined = (P_low + P_high) / 2
+- Captures both local (low perplexity) and global (high perplexity) structure
+- Available in openTSNE via `affinities.Multiscale`
+
+```python
+import openTSNE
+# Multi-scale embedding
+affinities = openTSNE.affinity.Multiscale(X, perplexities=[50, 500])
+embedding = openTSNE.TSNE().fit(affinities=affinities)
+```
+
+**Interview Tip:** For datasets > 50K points, recommend FIt-SNE or openTSNE over sklearn's implementation. Multi-scale approaches help preserve both local and global structure simultaneously.
 
 ---
 
@@ -1693,7 +2116,42 @@ vae = VAE(latent_dim=10)
 
 **Describe metric choice (cosine, Euclidean) effect.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The choice of distance metric in the high-dimensional space fundamentally affects t-SNE's pairwise affinity computation and consequently the embedding structure.
+
+**Common Metrics:**
+| Metric | Formula | Best For |
+|--------|---------|----------|
+| **Euclidean** | sqrt(sum((x_i - x_j)^2)) | Dense numerical data |
+| **Cosine** | 1 - (x·y)/(||x||·||y||) | Text/NLP, normalized data |
+| **Manhattan** | sum(|x_i - x_j|) | Sparse features |
+| **Correlation** | 1 - pearson(x, y) | Gene expression |
+| **Chebyshev** | max(|x_i - x_j|) | Grid-based data |
+
+**Impact on Embeddings:**
+1. **Euclidean:** Sensitive to feature scales; requires standardization
+2. **Cosine:** Direction-based; ignores magnitude; natural for TF-IDF, word embeddings
+3. **Correlation:** Captures shape similarity regardless of offset/scale
+4. **Hamming:** For binary/categorical data
+
+**When to Choose What:**
+- **Text data (TF-IDF, embeddings):** Cosine distance
+- **Gene expression:** Correlation distance
+- **Image features (CNN embeddings):** Euclidean or cosine
+- **Mixed data:** Gower distance (custom implementation)
+- **Default:** Euclidean (after standardization)
+
+**Practical Example:**
+```python
+from sklearn.manifold import TSNE
+# Using cosine metric
+tsne = TSNE(n_components=2, metric='cosine', perplexity=30)
+X_embedded = tsne.fit_transform(X)
+```
+
+**Interview Tip:** Always match the metric to your data type. For text embeddings, cosine is almost always better than Euclidean because it captures semantic direction rather than magnitude.
 
 ---
 
@@ -1701,7 +2159,46 @@ vae = VAE(latent_dim=10)
 
 **Explain how to embed new points post-hoc (parametric t-SNE).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Standard t-SNE cannot embed new (unseen) points because it's non-parametric. Parametric t-SNE solves this by learning a neural network mapping function f(x) → y that can be applied to new data.
+
+**Standard t-SNE Problem:**
+- Optimizes positions y_i directly (no learned function)
+- Adding one new point requires re-running on entire dataset
+- Not practical for production systems
+
+**Parametric t-SNE Approach:**
+1. Replace free position parameters with neural network output
+2. Network: f_theta(x) → y (maps input to 2D/3D)
+3. Loss: Same KL divergence as standard t-SNE
+4. Training: Backpropagate through network
+5. Inference: Simply call f_theta(x_new) for new points
+
+**Architecture:**
+```
+Input (d-dim) → FC(500) → ReLU → FC(500) → ReLU → FC(2000) → ReLU → FC(2) → Embedding
+```
+
+**Alternatives for Out-of-sample Extension:**
+| Method | Approach | Quality |
+|--------|----------|---------|
+| Parametric t-SNE | Train neural network | Good |
+| UMAP transform | Built-in transform method | Very good |
+| Kernel t-SNE | Kernel regression on embedding | Moderate |
+| Nearest-neighbor interpolation | Weighted avg of neighbors' positions | Simple |
+
+**Implementation (using openTSNE):**
+```python
+import openTSNE
+# Fit initial embedding
+embedding = openTSNE.TSNE().fit(X_train)
+# Embed new points
+new_embedding = embedding.transform(X_new)
+```
+
+**Interview Tip:** For production use cases requiring embedding of new data, prefer UMAP (has native transform) or parametric t-SNE. Standard t-SNE is best for one-time exploratory visualization only.
 
 ---
 
@@ -1709,7 +2206,37 @@ vae = VAE(latent_dim=10)
 
 **Discuss choosing perplexity for large datasets.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Perplexity should be scaled with dataset size because it controls the effective number of neighbors, and the optimal neighborhood size depends on data density and sample count.
+
+**General Guidelines:**
+| Dataset Size | Recommended Perplexity | Reasoning |
+|-------------|----------------------|-----------|
+| < 100 | 5-10 | Few neighbors available |
+| 100-1,000 | 15-30 | Standard range |
+| 1,000-10,000 | 30-50 | Default works well |
+| 10,000-100,000 | 50-100 | Need larger neighborhoods |
+| > 100,000 | 100-500 | Multi-scale recommended |
+
+**Rules of Thumb:**
+1. Perplexity should be less than n/3 (hard limit)
+2. Typical range: 5 to 50 (sklearn default: 30)
+3. Larger datasets can benefit from higher perplexity
+4. For very large datasets, use multi-scale perplexity
+
+**Impact of Wrong Perplexity:**
+- **Too low:** Fragmented clusters, noise amplified as structure
+- **Too high:** Clusters merge, lose local detail
+- **Way too high (> n/3):** Numerical instability, meaningless embedding
+
+**Best Practice:**
+- Run with 3-5 different perplexity values
+- Look for structures stable across perplexities (real patterns)
+- For large data: use multi-scale (e.g., openTSNE with [50, 500])
+
+**Interview Tip:** There's no universal optimal perplexity. Always perform a perplexity sweep and report structures that are consistent across settings. Stable structures across perplexities are the most trustworthy.
 
 ---
 
@@ -1717,7 +2244,36 @@ vae = VAE(latent_dim=10)
 
 **Explain learning rate effect on convergence.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The learning rate (eta) in t-SNE controls the step size during gradient descent optimization, significantly affecting convergence quality, speed, and embedding stability.
+
+**Impact of Learning Rate:**
+| Learning Rate | Effect |
+|--------------|--------|
+| Too low (< 50) | Slow convergence, may get stuck in local minimum, compressed embedding |
+| Optimal (100-1000) | Good convergence, well-separated clusters |
+| Too high (> 2000) | Oscillation, "ball" shape, no structure |
+| Auto (n/12) | Adaptive, works well for most datasets |
+
+**Heuristics:**
+- sklearn default: 200 (or 'auto' = max(n/early_exaggeration/4, 50))
+- Rule of thumb: n/12 where n is number of samples
+- For large datasets: higher learning rates (500-1000)
+- For small datasets: lower learning rates (50-200)
+
+**Signs of Wrong Learning Rate:**
+1. **Too low:** Points form a dense ball with no visible clusters
+2. **Too high:** Points scattered randomly or oscillating
+3. **Just right:** Clear cluster separation with smooth boundaries
+
+**Interaction with Other Parameters:**
+- High learning rate + low perplexity → noisy fragmentation
+- Low learning rate + high perplexity → blurred, merged clusters
+- Learning rate affects early exaggeration dynamics significantly
+
+**Interview Tip:** Modern implementations use adaptive learning rates. If you see a "ball" of points with no structure, first try increasing the learning rate. If clusters look fragmented and noisy, try decreasing it.
 
 ---
 
@@ -1725,7 +2281,47 @@ vae = VAE(latent_dim=10)
 
 **Describe using t-SNE for image embeddings after CNN features.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE is commonly used to visualize image embeddings extracted from CNN feature layers, providing intuitive 2D plots that reveal how neural networks organize visual concepts in their learned feature space.
+
+**Pipeline:**
+1. Pass images through pre-trained CNN (VGG, ResNet, etc.)
+2. Extract features from a specific layer (typically penultimate FC layer)
+3. Optionally reduce with PCA to 50 dims
+4. Apply t-SNE for 2D visualization
+5. Color points by class labels or other metadata
+
+**Implementation:**
+```python
+import torch
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# Extract CNN features (e.g., ResNet-50 penultimate layer)
+model = torchvision.models.resnet50(pretrained=True)
+model = torch.nn.Sequential(*list(model.children())[:-1])  # Remove FC
+features = model(images).squeeze().numpy()  # (n_images, 2048)
+
+# PCA preprocessing (recommended for speed)
+pca_features = PCA(n_components=50).fit_transform(features)
+
+# t-SNE visualization
+tsne = TSNE(n_components=2, perplexity=30, random_state=42)
+embeddings = tsne.fit_transform(pca_features)
+
+plt.scatter(embeddings[:, 0], embeddings[:, 1], c=labels, cmap='tab10')
+```
+
+**What You Can Learn:**
+- How well the CNN separates different classes
+- Which classes the network finds similar (overlapping clusters)
+- Feature space quality at different layers (early = texture, deep = semantic)
+- Impact of fine-tuning on feature organization
+
+**Interview Tip:** Always do PCA to 50 dims before t-SNE on CNN features—2048-dim features are too high for direct t-SNE and will be slow with unreliable results.
 
 ---
 
@@ -1733,7 +2329,36 @@ vae = VAE(latent_dim=10)
 
 **Explain relationship between t-SNE and SNE, symmetric SNE.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE evolved from the original SNE (Stochastic Neighbor Embedding) through symmetric SNE to address limitations in optimization and the crowding problem.
+
+**Evolution:**
+| Method | Year | Key Change |
+|--------|------|-----------|
+| **SNE** | 2002 (Hinton & Roweis) | Original: asymmetric KL, Gaussian Q |
+| **Symmetric SNE** | Intermediate | Symmetrized P, still Gaussian Q |
+| **t-SNE** | 2008 (van der Maaten & Hinton) | Student-t Q distribution |
+
+**Original SNE:**
+- Cost: C = sum_i KL(P_i || Q_i) (per-point KL divergences)
+- Q uses Gaussian: q_j|i = exp(-||y_i - y_j||^2) / sum_k exp(-||y_i - y_k||^2)
+- Problem: Difficult to optimize (asymmetric cost with different sigma per point)
+- Problem: Crowding problem (Gaussian tails too light for low-dim)
+
+**Symmetric SNE:**
+- Symmetrize: p_ij = (p_j|i + p_i|j) / 2n
+- Single cost: C = KL(P || Q) (simpler gradient)
+- Still Gaussian Q → crowding problem persists
+
+**t-SNE Innovation:**
+- Replace Gaussian with Student-t (1 df) for Q distribution
+- q_ij = (1 + ||y_i - y_j||^2)^(-1) / sum(...)
+- Heavy tails allow moderate distances in embedding
+- Solves crowding: similar points stay close, dissimilar can be far
+
+**Interview Tip:** The key insight of t-SNE is using heavier-tailed Student-t distribution in low-dim space. This single change from Gaussian to Student-t solved the critical crowding problem that made SNE embeddings difficult to interpret.
 
 ---
 
@@ -1741,7 +2366,39 @@ vae = VAE(latent_dim=10)
 
 **Discuss hierarchical or tree-based t-SNE variants.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Hierarchical or tree-based t-SNE variants extend standard t-SNE to handle multi-level structure, enabling visualization at different scales or providing faster computation through hierarchical decomposition.
+
+**Hierarchical SNE (HSNE):**
+- Builds a hierarchy of increasingly coarse representations
+- Users can explore data at different resolution levels
+- Scales to millions of points by summarizing at coarse levels
+- Interactive: drill down into interesting regions
+
+**How HSNE Works:**
+1. Build landmark hierarchy: select representative points at each level
+2. Compute similarities between landmarks at each level
+3. Visualize coarsest level first (overview)
+4. User selects cluster → zoom into finer level
+5. Repeat until individual point level
+
+**Tree-based Acceleration:**
+- VP-trees (Vantage-Point trees) for nearest neighbor search
+- Barnes-Hut trees for force approximation
+- Cover trees for metric space organization
+- These are not hierarchical t-SNE per se, but hierarchical data structures used by t-SNE
+
+**Other Variants:**
+| Variant | Key Feature |
+|---------|-------------|
+| **HSNE** | Multi-level exploration |
+| **A-tSNE** | Approximate, progressive refinement |
+| **Topological t-SNE** | Preserves topological features |
+| **Multi-scale t-SNE** | Multiple perplexities simultaneously |
+
+**Interview Tip:** HSNE is the most practical hierarchical approach for very large datasets (millions of points). It enables interactive exploration at multiple scales, which is impossible with standard t-SNE.
 
 ---
 
@@ -1749,7 +2406,36 @@ vae = VAE(latent_dim=10)
 
 **Explain exaggeration decay schedule.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The exaggeration decay schedule controls how the early exaggeration factor transitions from its amplified value back to 1.0 during t-SNE optimization, affecting cluster formation dynamics.
+
+**Standard Schedule:**
+1. **Iterations 1-250:** Exaggeration factor = 12 (or 4 in some implementations)
+2. **Iteration 251:** Factor drops to 1.0 (sharp cutoff)
+3. **Iterations 251-1000:** Normal optimization with factor = 1.0
+
+**Advanced Schedules:**
+| Schedule | Description | Effect |
+|----------|-------------|--------|
+| **Hard cutoff** | Drop from 12 to 1 instantly | Standard, may cause instability |
+| **Linear decay** | Gradually reduce 12 → 1 | Smoother transition |
+| **Exponential decay** | Rapid initial, slow final | Common in custom implementations |
+| **Late exaggeration** | Apply mild exaggeration (2-4x) in later iterations | Better global structure |
+
+**Late Exaggeration:**
+- Apply a mild exaggeration factor (1.5-4x) during the later phase
+- Helps maintain cluster separation during fine-tuning
+- Used in some UMAP-like t-SNE variants
+- Can improve visual clarity of clusters
+
+**Impact of Exaggeration Duration:**
+- **Too short:** Clusters don't form properly; poor separation
+- **Too long:** Over-compressed clusters; may not relax properly
+- **Standard (250 iters):** Good balance for most datasets
+
+**Interview Tip:** The abrupt transition from exaggeration to normal can sometimes cause embedding quality issues. Modern implementations may use gradual decay or late exaggeration for smoother, more stable embeddings.
 
 ---
 
@@ -1757,7 +2443,42 @@ vae = VAE(latent_dim=10)
 
 **Compare UMAP vs. t-SNE (speed, global structure).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+UMAP (Uniform Manifold Approximation and Projection) and t-SNE are both non-linear dimensionality reduction techniques for visualization, but they differ significantly in speed, global structure preservation, and theoretical foundations.
+
+**Core Comparison:**
+| Aspect | t-SNE | UMAP |
+|--------|-------|------|
+| **Speed** | O(n log n) Barnes-Hut | O(n) with approximations |
+| **Global structure** | Poor preservation | Better preservation |
+| **Local structure** | Excellent | Excellent |
+| **Theory** | Information theory (KL divergence) | Topological (Riemannian geometry) |
+| **New data** | Cannot embed | Has transform() method |
+| **Scalability** | ~100K points | ~1M+ points |
+| **Deterministic** | No | More reproducible (with seed) |
+| **Output dims** | 2-3 only | Any dimensionality |
+| **Hyperparameters** | Perplexity, learning rate | n_neighbors, min_dist |
+
+**Speed Comparison (approximate):**
+| Dataset Size | t-SNE | UMAP |
+|-------------|-------|------|
+| 10K | 30s | 5s |
+| 100K | 15min | 30s |
+| 1M | Infeasible | 5min |
+
+**When to Use Each:**
+- **t-SNE:** When local cluster structure is paramount; well-understood method
+- **UMAP:** When speed matters; need global structure; need to embed new data; general purpose
+
+**Key UMAP Advantages:**
+1. **Faster:** 10-100x faster for large datasets
+2. **Global structure:** Better preserves inter-cluster relationships
+3. **Transform method:** Can embed new unseen data
+4. **Versatile:** Supports supervised, semi-supervised mode
+
+**Interview Tip:** UMAP has largely replaced t-SNE as the go-to visualization tool due to speed and global structure preservation. However, t-SNE remains the standard reference and is well-understood theoretically.
 
 ---
 
@@ -1765,7 +2486,45 @@ vae = VAE(latent_dim=10)
 
 **Discuss GPU acceleration (t-SNE-CUDA).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+GPU-accelerated t-SNE implementations (like t-SNE-CUDA, RAPIDS cuML) leverage massively parallel GPU computation to speed up the most expensive operations: pairwise distance computation and force calculations.
+
+**Available GPU Implementations:**
+| Library | Backend | Speed Improvement |
+|---------|---------|-------------------|
+| **t-SNE-CUDA** | CUDA | 50-700x faster |
+| **RAPIDS cuML** | CUDA | 100x+ faster |
+| **TensorFlow.js** | WebGL | Browser-based |
+| **NVIDIA Rapids** | Multi-GPU | Linear scaling |
+
+**What Gets Accelerated:**
+1. **Pairwise distance computation:** Embarrassingly parallel (each pair independent)
+2. **KNN search:** GPU-accelerated approximate nearest neighbors
+3. **Repulsive forces:** Barnes-Hut tree traversal parallelized
+4. **Gradient updates:** All point positions updated simultaneously
+
+**Performance Example:**
+| Dataset Size | CPU (sklearn) | GPU (cuML) |
+|-------------|--------------|-----------|
+| 10K | 30s | 0.5s |
+| 100K | 15min | 5s |
+| 1M | Infeasible | 2min |
+
+**Usage (RAPIDS cuML):**
+```python
+from cuml.manifold import TSNE
+tsne = TSNE(n_components=2, perplexity=30, method='barnes_hut')
+embedding = tsne.fit_transform(X_gpu)  # cuDF or cuPy array
+```
+
+**Limitations:**
+- Requires NVIDIA GPU with CUDA
+- Memory limited by GPU VRAM
+- May have slight numerical differences from CPU version
+
+**Interview Tip:** For production visualization pipelines processing large datasets, GPU-accelerated t-SNE (or UMAP) is essential. RAPIDS cuML provides drop-in sklearn-compatible API with GPU acceleration.
 
 ---
 
@@ -1773,7 +2532,42 @@ vae = VAE(latent_dim=10)
 
 **Explain embedding timeseries by concatenated features.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Time series data can be embedded using t-SNE by transforming each time series into a fixed-length feature vector (via concatenation, statistics, or learned features) and then applying t-SNE to the resulting feature matrix.
+
+**Feature Extraction Approaches:**
+| Method | Description | When to Use |
+|--------|-------------|-------------|
+| **Concatenation** | Flatten time steps as features | Fixed-length, short series |
+| **Statistical features** | Mean, std, skew, etc. | Variable-length series |
+| **Sliding windows** | Overlapping windows as samples | Temporal patterns |
+| **DTW features** | Dynamic Time Warping distances | Variable-length, warped |
+| **Learned embeddings** | LSTM/CNN encoder output | Complex patterns |
+
+**Pipeline for Time Series t-SNE:**
+1. **Fixed-length:** Concatenate all time steps → feature vector per series
+2. **Variable-length:** Extract statistical summaries or use DTW distance matrix
+3. **Deep learning:** Train autoencoder, extract latent representations
+4. Apply PCA to reduce to 50 dims (optional but recommended)
+5. Run t-SNE with appropriate metric
+
+**Using DTW Distance Matrix:**
+```python
+from sklearn.manifold import TSNE
+# Pre-computed DTW distance matrix
+tsne = TSNE(n_components=2, metric='precomputed', perplexity=30)
+embedding = tsne.fit_transform(dtw_distance_matrix)
+```
+
+**Applications:**
+- Sensor data clustering and anomaly visualization
+- Financial time series regime identification
+- ECG/EEG signal pattern discovery
+- Manufacturing process monitoring
+
+**Interview Tip:** For time series, the feature extraction step is more important than the t-SNE parameters. Using a pre-computed distance matrix with DTW allows t-SNE to respect the temporal nature of the data.
 
 ---
 
@@ -1781,7 +2575,47 @@ vae = VAE(latent_dim=10)
 
 **Describe using t-SNE on word embeddings.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE is widely used to visualize word embeddings (Word2Vec, GloVe, FastText, BERT), revealing semantic relationships, clusters of similar words, and the structure of the learned embedding space.
+
+**Pipeline:**
+```python
+from gensim.models import KeyedVectors
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+
+# Load word embeddings (e.g., Word2Vec)
+model = KeyedVectors.load_word2vec_format('GoogleNews-vectors.bin', binary=True)
+
+# Select vocabulary subset (top 5000 words)
+words = list(model.key_to_index.keys())[:5000]
+vectors = [model[w] for w in words]
+
+# Apply t-SNE
+tsne = TSNE(n_components=2, perplexity=40, metric='cosine', random_state=42)
+embeddings_2d = tsne.fit_transform(vectors)
+
+# Visualize with interactive plot
+plt.scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], s=1)
+for i, word in enumerate(words[:100]):  # Label top words
+    plt.annotate(word, (embeddings_2d[i, 0], embeddings_2d[i, 1]), fontsize=6)
+```
+
+**Key Observations in Word Embedding t-SNE:**
+- Semantic clusters form (animals, countries, professions)
+- Analogies visible as parallel vectors (king-queen ≈ man-woman)
+- Polysemous words may appear between clusters
+- Frequency effects: common words cluster differently
+
+**Best Practices:**
+1. Use cosine distance (word embeddings are direction-based)
+2. Subset vocabulary (5K-50K words) for readability
+3. Use interactive tools (plotly) for exploration
+4. Color by POS tags, frequency, or domain
+
+**Interview Tip:** Using cosine metric is crucial for word embeddings since Word2Vec/GloVe optimize for directional similarity, not Euclidean distance. Always subset vocabulary to avoid over-crowding the visualization.
 
 ---
 
@@ -1789,7 +2623,37 @@ vae = VAE(latent_dim=10)
 
 **Explain perplexity scaling with dataset size.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Perplexity should scale with dataset size because it represents the effective number of neighbors, and the appropriate neighborhood size changes with data density and total sample count.
+
+**Scaling Relationship:**
+- Rule of thumb: perplexity ≈ sqrt(n) / 3 to sqrt(n) for large datasets
+- Must satisfy: perplexity < n / 3
+- For very large datasets, fixed perplexity may be too small
+
+**Mathematical Intuition:**
+- Perplexity defines effective number of neighbors ≈ 2^(H(P_i))
+- In dense datasets: same perplexity covers more actual neighbors proportionally
+- In large datasets: need larger perplexity to capture meaningful structure
+- Too small perplexity on large data → micro-clusters and noise
+
+**Practical Recommendations:**
+| n (samples) | Perplexity Range | Reasoning |
+|------------|-----------------|-----------|
+| 100 | 5-15 | Small dataset, few neighbors possible |
+| 1,000 | 15-50 | Standard range |
+| 10,000 | 30-100 | Larger neighborhoods beneficial |
+| 100,000 | 50-200 | Multi-scale recommended |
+| 1,000,000 | 100-500 | Must use approximations |
+
+**Important Caveat:**
+- Perplexity scaling is not linear with n
+- Optimal perplexity depends more on data structure than size alone
+- Always try multiple values and compare stability
+
+**Interview Tip:** There's no perfect formula for perplexity vs dataset size. The best approach is to use multi-scale perplexity (openTSNE) which combines multiple values automatically, or do a perplexity sweep on a subsample to find the right range.
 
 ---
 
@@ -1797,7 +2661,44 @@ vae = VAE(latent_dim=10)
 
 **Discuss reproducibility: random seeds and variance.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE is stochastic by nature—different random seeds produce different embeddings—which raises concerns about reproducibility and requires careful handling in scientific and production settings.
+
+**Sources of Randomness:**
+1. **Random initialization:** Starting positions of embedding points
+2. **Stochastic optimization:** Gradient descent with momentum involves randomness
+3. **Barnes-Hut approximation:** Tree construction introduces minor variations
+4. **Approximate nearest neighbors:** Non-deterministic in some implementations
+
+**Ensuring Reproducibility:**
+```python
+from sklearn.manifold import TSNE
+tsne = TSNE(
+    n_components=2,
+    random_state=42,    # Fixed seed
+    init='pca',         # Deterministic initialization
+    n_jobs=1            # Single thread (multi-thread adds randomness)
+)
+```
+
+**Variance Analysis:**
+- Run t-SNE 10+ times with different seeds
+- Compute alignment metrics (Procrustes analysis) between runs
+- Structures stable across runs are trustworthy
+- Structures that change significantly are artifacts
+
+**Best Practices:**
+| Practice | Purpose |
+|----------|---------|
+| Fix random_state | Same result on same data |
+| Use PCA init | More reproducible starting point |
+| Report multiple runs | Show stability of findings |
+| Compute stability metrics | Quantify reproducibility |
+| Use single thread | Avoid thread-level randomness |
+
+**Interview Tip:** Always set random_state for reproducibility, use PCA initialization, and ideally show that your findings are stable across multiple random seeds. If a cluster appears in 10/10 runs, it's real; if it appears in 3/10, it's an artifact.
 
 ---
 
@@ -1805,7 +2706,37 @@ vae = VAE(latent_dim=10)
 
 **Explain perplexity = k conceptually (effective neighbors).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Perplexity in t-SNE is conceptually equivalent to the effective number of nearest neighbors (k) that each point considers, but it's defined through information-theoretic entropy rather than a hard count.
+
+**Mathematical Definition:**
+- Perplexity(P_i) = 2^(H(P_i)) where H is Shannon entropy
+- H(P_i) = -sum_j p_j|i * log2(p_j|i)
+- If entropy is high → many neighbors with similar probabilities → high effective k
+- If entropy is low → few dominant neighbors → low effective k
+
+**Conceptual Interpretation:**
+- Perplexity = 30 means "each point effectively has about 30 neighbors"
+- BUT: it's a soft count, not a hard cutoff
+- The Gaussian kernel assigns non-zero probability to ALL other points
+- Perplexity controls the width (sigma_i) of the kernel
+
+**Comparison with Hard k-NN:**
+| Aspect | Perplexity (soft) | k-NN (hard) |
+|--------|------------------|-------------|
+| Neighborhood | Smooth Gaussian weights | Binary (in/out) |
+| Boundary | Gradual falloff | Sharp cutoff |
+| Adaptivity | Per-point sigma | Same k for all |
+| Robustness | More robust to noise | Sensitive to k choice |
+
+**Why Soft Neighborhood?**
+- Hard k-NN creates discontinuities in the similarity graph
+- Soft Gaussian makes the optimization landscape smoother
+- Adaptive sigma handles varying local densities naturally
+
+**Interview Tip:** Think of perplexity as a "soft k-NN" parameter. Setting perplexity=30 is roughly like using 30 nearest neighbors, but with smooth Gaussian weighting instead of a hard binary cutoff.
 
 ---
 
@@ -1813,7 +2744,42 @@ vae = VAE(latent_dim=10)
 
 **Describe control of output dimensionality > 2.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+While t-SNE is primarily used for 2D visualization, it can produce embeddings in higher dimensions (3D or more), though the benefits diminish and complications increase with output dimensionality.
+
+**Output Dimensionality Options:**
+| Dims | Use Case | Notes |
+|------|----------|-------|
+| 2 | Standard visualization | Most common, best studied |
+| 3 | Interactive 3D visualization | Moderate benefit, harder to display |
+| 5-10 | Preprocessing for clustering | Possible but alternatives better |
+| >10 | Not recommended | PCA/UMAP preferred |
+
+**Setting Output Dimensionality:**
+```python
+from sklearn.manifold import TSNE
+# 3D embedding
+tsne_3d = TSNE(n_components=3, perplexity=30).fit_transform(X)
+# Plot with plotly for interactive 3D
+import plotly.express as px
+fig = px.scatter_3d(x=tsne_3d[:,0], y=tsne_3d[:,1], z=tsne_3d[:,2], color=labels)
+```
+
+**Considerations for Higher Dims:**
+1. **Crowding problem lessens:** More room to arrange points in 3D+
+2. **Perplexity may need adjustment:** Different optimal values for different output dims
+3. **Visualization harder:** 3D plots require interactive tools; >3D needs further reduction
+4. **Quality may improve:** More dimensions allow better preservation of structure
+5. **Speed unchanged:** Complexity depends on n, not output dimensionality
+
+**When NOT to Use t-SNE for Higher Dims:**
+- For preprocessing before clustering → use UMAP or PCA instead
+- For feature extraction → use autoencoders
+- For dimensionality reduction > 3D → PCA or UMAP
+
+**Interview Tip:** t-SNE is fundamentally a visualization tool designed for 2D. While 3D works, going beyond 3D defeats the purpose. For dimension reduction to higher dimensions, UMAP or PCA are more appropriate.
 
 ---
 
@@ -1821,7 +2787,43 @@ vae = VAE(latent_dim=10)
 
 **Explain pitfalls of using t-SNE for clustering.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Using t-SNE output as input for clustering algorithms is a common but problematic practice that can lead to misleading results due to t-SNE's distortion of distances and densities.
+
+**Why It's Problematic:**
+1. **Distance distortion:** t-SNE doesn't preserve inter-cluster distances, so distance-based clustering may create false separations
+2. **Density normalization:** t-SNE equalizes density across clusters, so density-based clustering (DBSCAN) may miss real density differences
+3. **Stochastic nature:** Different runs produce different embeddings → different clusters
+4. **Dimensionality bias:** 2D embedding may not capture structure that exists in original space
+5. **Artifact clusters:** Visual clusters in t-SNE may not correspond to real groups
+
+**When It Might Be Acceptable:**
+- As a sanity check (validate clusters found in original space)
+- For interactive exploration (not final analysis)
+- When original space clustering fails due to curse of dimensionality
+- Combined with careful validation
+
+**Better Alternatives:**
+| Approach | Method |
+|----------|--------|
+| Cluster in original space | K-means, DBSCAN on original or PCA-reduced data |
+| UMAP + HDBSCAN | UMAP preserves structure better for clustering |
+| Use t-SNE for validation | Cluster first, then visualize with t-SNE |
+| Consensus clustering | Run t-SNE multiple times, cluster each, find stable groups |
+
+**Recommended Pipeline:**
+```python
+# DO: Cluster in original space, validate with t-SNE
+from sklearn.cluster import KMeans
+clusters = KMeans(n_clusters=5).fit_predict(X_pca)
+# Visualize clustering result with t-SNE
+tsne = TSNE(n_components=2).fit_transform(X_pca)
+plt.scatter(tsne[:, 0], tsne[:, 1], c=clusters)
+```
+
+**Interview Tip:** Never cluster on t-SNE output as a final result. Cluster in the original (or PCA-reduced) space, then use t-SNE to visualize and validate those clusters.
 
 ---
 
@@ -1829,7 +2831,41 @@ vae = VAE(latent_dim=10)
 
 **Discuss trustworthiness and continuity metrics.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Trustworthiness and continuity are quantitative metrics that evaluate the quality of dimensionality reduction embeddings by measuring how well local neighborhoods are preserved.
+
+**Trustworthiness:**
+- Measures: How many points in the low-dim neighborhood are actually neighbors in high-dim?
+- High trustworthiness = embedding neighborhoods are "trustworthy" (no false neighbors)
+- Penalizes: Points that are NOT neighbors in high-dim but ARE neighbors in low-dim
+
+**Formula:**
+T(k) = 1 - (2 / (nk(2n - 3k - 1))) * sum_i sum_{j in U_k(i)} (r(i,j) - k)
+- U_k(i): points in k-nearest neighbors in low-dim but NOT in high-dim
+- r(i,j): rank of j w.r.t. i in high-dim
+
+**Continuity:**
+- Measures: How many points that are neighbors in high-dim remain neighbors in low-dim?
+- High continuity = original neighborhoods are "continued" in embedding (no missing neighbors)
+- Penalizes: Points that ARE neighbors in high-dim but NOT neighbors in low-dim
+
+**Comparison:**
+| Metric | Measures | Penalizes |
+|--------|----------|-----------|
+| **Trustworthiness** | Precision of neighborhoods | False neighbors (intrusions) |
+| **Continuity** | Recall of neighborhoods | Missing neighbors (extrusions) |
+| **Both = 1.0** | Perfect preservation | Nothing lost or gained |
+
+**Implementation:**
+```python
+from sklearn.manifold import trustworthiness
+T = trustworthiness(X_high, X_low, n_neighbors=12)
+# Continuity requires custom implementation or use sklearn metrics
+```
+
+**Interview Tip:** Trustworthiness is the more commonly reported metric. A value > 0.95 indicates excellent local neighborhood preservation. Report both metrics at multiple k values for thorough evaluation.
 
 ---
 
@@ -1837,7 +2873,54 @@ vae = VAE(latent_dim=10)
 
 **Provide pseudo-code outline of t-SNE loop.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The t-SNE optimization loop iteratively refines embedding positions by computing affinities, calculating gradients, and updating positions using momentum-based gradient descent.
+
+**Pseudo-code:**
+```
+FUNCTION t_SNE(X, n_dims=2, perplexity=30, n_iter=1000, lr=200):
+    # Step 1: Compute high-dim affinities
+    P = compute_pairwise_affinities(X, perplexity)  # O(n^2) or O(n log n)
+    P = (P + P.T) / (2 * n)  # Symmetrize
+    
+    # Step 2: Initialize embedding
+    Y = PCA(X, n_dims)  # or random N(0, 1e-4)
+    velocity = zeros_like(Y)
+    
+    # Step 3: Early exaggeration
+    P = P * 12  # Exaggeration factor
+    
+    FOR iter = 1 TO n_iter:
+        # Step 4: Compute low-dim affinities
+        dists = pairwise_squared_distances(Y)
+        Q_num = (1 + dists) ^ (-1)
+        diag(Q_num) = 0
+        Q = Q_num / sum(Q_num)
+        
+        # Step 5: Compute gradients
+        PQ_diff = P - Q
+        grad = zeros_like(Y)
+        FOR i = 1 TO n:
+            grad[i] = 4 * sum_j(PQ_diff[i,j] * (Y[i] - Y[j]) * Q_num[i,j])
+        
+        # Step 6: Update with momentum
+        IF iter <= 250:
+            momentum = 0.5
+        ELSE:
+            momentum = 0.8
+        velocity = momentum * velocity - lr * grad
+        Y = Y + velocity
+        
+        # Step 7: Remove exaggeration after 250 iters
+        IF iter == 250:
+            P = P / 12
+    
+    RETURN Y
+```
+
+**Interview Tip:** The key computational bottlenecks are pairwise distance computation (Step 4) and gradient calculation (Step 5), which Barnes-Hut approximation reduces from O(n^2) to O(n log n).
 
 ---
 
@@ -1845,7 +2928,44 @@ vae = VAE(latent_dim=10)
 
 **Explain t-SNE embedding for gene expression scRNA-seq data.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE is the standard visualization tool for single-cell RNA sequencing (scRNA-seq) data, enabling researchers to identify cell types, states, and trajectories in high-dimensional gene expression space.
+
+**scRNA-seq t-SNE Pipeline:**
+1. **Quality control:** Filter low-quality cells and genes
+2. **Normalization:** Library size normalization + log transform
+3. **Feature selection:** Select top 2000-5000 highly variable genes (HVGs)
+4. **PCA:** Reduce to 30-50 principal components (critical step)
+5. **t-SNE/UMAP:** Visualize in 2D
+
+**Why t-SNE Works Well for scRNA-seq:**
+- scRNA-seq data has discrete cell types → clear clusters
+- High dimensionality (20K+ genes) needs reduction
+- Local structure preservation reveals cell type neighborhoods
+- Widely adopted → standard in Scanpy, Seurat pipelines
+
+**Implementation (Scanpy):**
+```python
+import scanpy as sc
+adata = sc.read_h5ad('data.h5ad')
+sc.pp.normalize_total(adata, target_sum=1e4)
+sc.pp.log1p(adata)
+sc.pp.highly_variable_genes(adata, n_top_genes=2000)
+sc.tl.pca(adata, n_comps=50)
+sc.tl.tsne(adata, perplexity=30)
+sc.pl.tsne(adata, color=['cell_type'])
+```
+
+**Important Considerations:**
+- Always use PCA preprocessing (50 PCs is standard)
+- UMAP has largely replaced t-SNE in modern scRNA-seq analysis
+- Cluster in PCA space (Leiden/Louvain), visualize with t-SNE
+- Perplexity 30 is standard; try 50 for large datasets
+- Multiple runs to verify cluster stability
+
+**Interview Tip:** In bioinformatics, t-SNE was revolutionary for scRNA-seq visualization. While UMAP is now preferred, t-SNE established the standard workflow and remains widely used. The Scanpy/Seurat pipelines are essential to know.
 
 ---
 
@@ -1853,7 +2973,48 @@ vae = VAE(latent_dim=10)
 
 **Describe how to color points by metadata for insight.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Coloring t-SNE scatter plots by different metadata variables is a fundamental technique for deriving insights from embeddings, enabling identification of which factors drive cluster structure.
+
+**Types of Metadata to Color By:**
+| Metadata Type | Examples | Visualization |
+|--------------|---------|---------------|
+| **Categorical** | Cell type, batch, treatment | Discrete color palette (tab10, tab20) |
+| **Continuous** | Gene expression, age, score | Color gradient (viridis, plasma) |
+| **Ordinal** | Disease stage, quality tier | Sequential colormap |
+| **Multi-label** | Multiple annotations per point | Multiple plots side by side |
+
+**Implementation:**
+```python
+import matplotlib.pyplot as plt
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+# Color by cluster label
+axes[0].scatter(tsne[:, 0], tsne[:, 1], c=cluster_labels, cmap='tab10', s=5)
+axes[0].set_title('Cluster Assignment')
+# Color by continuous feature
+axes[1].scatter(tsne[:, 0], tsne[:, 1], c=feature_values, cmap='viridis', s=5)
+axes[1].set_title('Feature Value')
+# Color by batch (check for batch effects)
+axes[2].scatter(tsne[:, 0], tsne[:, 1], c=batch_ids, cmap='Set1', s=5)
+axes[2].set_title('Batch ID')
+```
+
+**Insights You Can Derive:**
+1. **Cluster identity:** Which known labels correspond to visual clusters?
+2. **Batch effects:** Do samples cluster by batch rather than biology?
+3. **Continuous gradients:** Do features vary smoothly across the embedding?
+4. **Sub-populations:** Are there sub-clusters within known groups?
+5. **Outliers:** Are isolated points from a specific condition?
+
+**Best Practices:**
+- Create a grid of plots with different colorings
+- Use consistent point size and transparency for large datasets
+- Include legends/colorbars for interpretability
+- Check for confounding variables (batch, technical artifacts)
+
+**Interview Tip:** The most valuable t-SNE analysis comes from systematically coloring by different metadata columns. This reveals whether clusters correspond to known biology, technical artifacts (batch effects), or novel sub-populations.
 
 ---
 
@@ -1861,7 +3022,40 @@ vae = VAE(latent_dim=10)
 
 **Explain computation of pairwise probability matrix P.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+The pairwise probability matrix P in t-SNE encodes the similarity structure of the entire dataset in the original high-dimensional space, serving as the target distribution that the embedding tries to match.
+
+**Computation Steps:**
+1. **Conditional probabilities:** For each point i, compute p_j|i for all j
+   - p_j|i = exp(-||x_i - x_j||^2 / 2*sigma_i^2) / sum_{k!=i} exp(-||x_i - x_k||^2 / 2*sigma_i^2)
+2. **Binary search for sigma_i:** Find sigma_i such that perplexity matches target
+   - Perplexity = 2^(H(P_i)) where H = -sum_j p_j|i * log2(p_j|i)
+3. **Symmetrization:** p_ij = (p_j|i + p_i|j) / 2n
+4. **Self-similarity:** p_ii = 0
+
+**Properties of P:**
+| Property | Value |
+|----------|-------|
+| Size | n × n symmetric matrix |
+| Sum | 1.0 (valid probability distribution) |
+| Diagonal | 0 (no self-similarity) |
+| Sparsity | Most entries near 0 (only neighbors significant) |
+| Per row | Sums differ (but symmetrized over N) |
+
+**Memory Footprint:**
+- Full P matrix: O(n^2) memory
+- Sparse P (only k neighbors per point): O(nk) memory
+- Barnes-Hut uses sparse representation for efficiency
+
+**Numerical Considerations:**
+- Very small p_ij values can cause log(p_ij/q_ij) to be undefined
+- Minimum probability floor applied (e.g., 1e-12)
+- Double precision recommended for stability
+- Symmetrization ensures no point is an "orphan"
+
+**Interview Tip:** The P matrix computation is often the most expensive part of t-SNE. Using approximate nearest neighbors (annoy, pynndescent) to compute only the k nearest neighbors makes this step O(n log n) instead of O(n^2).
 
 ---
 
@@ -1869,7 +3063,37 @@ vae = VAE(latent_dim=10)
 
 **Discuss memory footprint scaling.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Memory footprint of t-SNE scales quadratically O(n^2) for exact computation and near-linearly O(n · k) for approximate methods, where n is the number of samples and k is the effective number of neighbors.
+
+**Memory Breakdown:**
+| Component | Exact | Barnes-Hut | FIt-SNE |
+|-----------|-------|-----------|---------|
+| P matrix | O(n^2) | O(n·k) sparse | O(n·k) sparse |
+| Q matrix | O(n^2) | Not stored | Not stored |
+| Embedding Y | O(n·d_out) | O(n·d_out) | O(n·d_out) |
+| Tree structure | N/A | O(n) | O(n) |
+| Gradients | O(n·d_out) | O(n·d_out) | O(n·d_out) |
+| **Total** | **O(n^2)** | **O(n·k)** | **O(n)** |
+
+**Practical Memory Requirements:**
+| n (samples) | Exact | Barnes-Hut (k=30) |
+|------------|-------|-------------------|
+| 10,000 | ~800 MB | ~50 MB |
+| 50,000 | ~20 GB | ~120 MB |
+| 100,000 | ~80 GB | ~240 MB |
+| 500,000 | Infeasible | ~1.2 GB |
+
+**Memory Optimization Strategies:**
+1. PCA preprocessing reduces input dimensionality
+2. Sparse P matrix (only store k neighbors per point)
+3. Barnes-Hut: compute forces without storing Q explicitly
+4. FIt-SNE: FFT-based interpolation with O(n) memory
+5. Subsample large datasets, use out-of-sample extension for rest
+
+**Interview Tip:** For datasets > 50K points, exact t-SNE is impractical due to O(n^2) memory. Barnes-Hut (default in sklearn) handles up to ~500K, while FIt-SNE/openTSNE can handle millions.
 
 ---
 
@@ -1877,7 +3101,32 @@ vae = VAE(latent_dim=10)
 
 **Explain why t-SNE may form spurious "rings".**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Spurious ring or circular patterns in t-SNE embeddings are artifacts that occur when the data has continuous gradients rather than discrete clusters, causing points to arrange in ring-like structures.
+
+**Why Rings Form:**
+1. **Continuous manifolds:** Data lying on a smooth manifold (e.g., a progression) has no natural clusters
+2. **Repulsive-attractive balance:** t-SNE's forces equilibrate into circular arrangements for continuous distributions
+3. **Perplexity mismatch:** Wrong perplexity can create artificial ring patterns
+4. **Uniform distribution:** Uniformly distributed data in high-dim often maps to rings/circles in 2D
+
+**Common Scenarios:**
+| Scenario | Likely Cause | fix |
+|----------|-------------|-----|
+| Single ring | Continuous gradient in data | Color by metadata to verify |
+| Concentric rings | Multiple density levels | Try different perplexity |
+| Ring within cluster | Local density variations | Increase perplexity |
+| Ring for all perplexities | True continuous structure | Use alternative methods |
+
+**How to Detect Artifacts:**
+- Run with multiple perplexity values—real structures are stable
+- Color by known features—rings colored by gradient suggest real continuity
+- Compare with UMAP—if UMAP shows different topology, t-SNE artifact likely
+- Check with PCA 2D—if PCA shows no ring, t-SNE is creating it
+
+**Interview Tip:** When you see rings in t-SNE, don't immediately assume it's an artifact. First color by continuous metadata—if the ring represents a real biological/temporal gradient, it's meaningful. If coloring reveals no pattern, it's likely an artifact of the optimization.
 
 ---
 
@@ -1885,7 +3134,41 @@ vae = VAE(latent_dim=10)
 
 **Discuss strategies to preserve global structures (global t-SNE).**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Standard t-SNE is optimized for local structure preservation and often distorts global relationships between clusters. Several strategies exist to improve global structure preservation.
+
+**Strategies to Preserve Global Structure:**
+1. **PCA initialization:** Start from PCA to inherit global layout
+2. **Large perplexity:** Higher perplexity captures more global relationships
+3. **Multi-scale t-SNE:** Combine low and high perplexity simultaneously
+4. **Late exaggeration:** Apply mild exaggeration in later iterations
+5. **UMAP instead:** UMAP inherently preserves global structure better
+
+**Multi-scale Approach:**
+```python
+import openTSNE
+# Multi-scale: combines local (50) and global (500) neighborhoods
+affinities = openTSNE.affinity.Multiscale(X, perplexities=[50, 500])
+embedding = openTSNE.TSNE(initialization='pca').fit(affinities=affinities)
+```
+
+**Global t-SNE Modifications:**
+| Modification | Effect | Implementation |
+|-------------|--------|---------------|
+| PCA init | Preserves global layout as starting point | `init='pca'` |
+| High perplexity | Larger neighborhoods include global info | `perplexity=100+` |
+| Multi-scale | Balances local and global | openTSNE Multiscale |
+| Late exaggeration | Maintains cluster separation | Custom training loop |
+| Modified KL | Changes cost to weight global distances | Research variants |
+
+**Why t-SNE Loses Global Structure:**
+- KL(P||Q) penalizes mapping close points far more than mapping far points close
+- Q normalization compresses all inter-cluster distances
+- Local optimization naturally ignores global relationships
+
+**Interview Tip:** The simplest way to improve global structure is: (1) use PCA initialization, (2) set perplexity higher than default, and (3) use multi-scale if available. If global structure is critical, consider UMAP which is designed for it.
 
 ---
 
@@ -1893,7 +3176,50 @@ vae = VAE(latent_dim=10)
 
 **Explain using PCA pre-processing before t-SNE.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+PCA preprocessing before t-SNE is a strongly recommended best practice that improves speed, reduces noise, and can improve embedding quality by removing uninformative variance.
+
+**Why PCA Before t-SNE:**
+1. **Speed improvement:** Reduces pairwise distance computation from O(n·d) to O(n·k) where k << d
+2. **Noise reduction:** Removes low-variance components that add noise
+3. **Curse of dimensionality:** Distance metrics work better in lower dimensions
+4. **Memory reduction:** Smaller feature vectors need less memory
+
+**Recommended Pipeline:**
+```python
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+# Step 1: PCA to 50 dimensions (standard)
+X_pca = PCA(n_components=50).fit_transform(X_scaled)
+
+# Step 2: t-SNE on PCA output
+tsne = TSNE(n_components=2, perplexity=30, init='pca', random_state=42)
+X_embedded = tsne.fit_transform(X_pca)
+```
+
+**How Many PCA Components?**
+| Original Dims | Recommended PCA | Reasoning |
+|--------------|----------------|-----------|
+| < 50 | Skip PCA | Already low-dimensional |
+| 50-500 | 30-50 | Moderate reduction |
+| 500-5000 | 50 | Standard recommendation |
+| > 5000 | 50-100 | May need more for complex data |
+
+**Impact Analysis:**
+- Speed: 10-100x improvement for high-dimensional data
+- Quality: Usually improved (noise removal) or unchanged
+- Information loss: Minimal if explained variance > 80-90%
+- Check: `sum(pca.explained_variance_ratio_[:50])` should be > 0.8
+
+**When NOT to Use PCA First:**
+- Data has non-linear structure that PCA destroys
+- Using cosine/custom metric (PCA changes metric properties)
+- Already low-dimensional (< 50 features)
+
+**Interview Tip:** This is a standard best practice recommended by the t-SNE authors themselves. Always mention PCA preprocessing when discussing t-SNE pipelines. 50 components is the standard choice.
 
 ---
 
@@ -1901,7 +3227,47 @@ vae = VAE(latent_dim=10)
 
 **Describe "opt-SNE" parameter heuristic.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+"opt-SNE" refers to automated heuristics for selecting optimal t-SNE hyperparameters (perplexity, learning rate, early exaggeration), removing the need for manual parameter tuning.
+
+**Automated Parameter Selection:**
+| Parameter | Heuristic | Formula/Rule |
+|-----------|-----------|-------------|
+| **Learning rate** | Scale with n | lr = max(n / early_exag / 4, 50) |
+| **Perplexity** | Scale with n | perp ∈ [sqrt(n)/3, sqrt(n)] |
+| **Early exaggeration** | Fixed or adaptive | 12 (standard) or n/50 |
+| **n_iter** | Until convergence | Monitor KL divergence plateau |
+| **Exaggeration duration** | % of total | First 25% of iterations |
+
+**opt-SNE Approach (Belkina et al., 2019):**
+1. Set learning rate = n / early_exaggeration_factor
+2. Use early exaggeration = 12 (standard)
+3. Stop early exaggeration when embedding stabilizes 
+4. Continue until KL divergence plateaus
+5. Adaptively adjust based on dataset characteristics
+
+**Auto-tuning in Practice:**
+```python
+from sklearn.manifold import TSNE
+# sklearn v1.2+ uses auto learning rate
+tsne = TSNE(
+    n_components=2,
+    perplexity=30,
+    learning_rate='auto',  # n / early_exaggeration / 4
+    init='pca',
+    n_iter=1000
+)
+```
+
+**Key Insights:**
+- Learning rate too low → compressed ball; too high → scattered points
+- The auto learning rate (n/12/4 = n/48) works well across dataset sizes
+- For very large datasets (>100K), increase perplexity proportionally
+- Monitor KL divergence: flat curve = converged
+
+**Interview Tip:** Modern t-SNE implementations (sklearn ≥ 1.2) use 'auto' learning rate by default, which eliminates the most common source of poor embeddings. Always use `learning_rate='auto'` and `init='pca'`.
 
 ---
 
@@ -1909,7 +3275,43 @@ vae = VAE(latent_dim=10)
 
 **Explain effect of outliers on embedding.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Outliers can significantly distort t-SNE embeddings because they affect the sigma_i computation, pull cluster structures, and may create misleading isolated points or compressed clusters.
+
+**Effects of Outliers:**
+1. **Sigma distortion:** Outliers are far from all other points → very large sigma_i → fuzzy probability distribution
+2. **Embedding distortion:** Outlier points claim embedding space, compressing real clusters
+3. **Visual misleading:** Isolated points may appear as clusters or distort nearby clusters
+4. **Perplexity sensitivity:** Outliers are especially problematic with low perplexity
+
+**How t-SNE Handles Outliers:**
+| Scenario | Effect on Embedding |
+|----------|-------------------|
+| Few outliers | Isolated points at periphery |
+| Many outliers | Compressed central clusters, scattered periphery |
+| Extreme outliers | May dominate embedding layout |
+| Inlier near outlier | Inlier may be pulled toward outlier |
+
+**Mitigation Strategies:**
+1. **Remove outliers before t-SNE:** Use Isolation Forest, DBSCAN, or Z-score filtering
+2. **Robust scaling:** Use RobustScaler instead of StandardScaler
+3. **Winsorize:** Clip extreme values to percentile limits
+4. **Higher perplexity:** Makes the algorithm less sensitive to individual points
+5. **PCA preprocessing:** May reduce outlier influence by projecting to principal directions
+
+```python
+from sklearn.ensemble import IsolationForest
+# Remove outliers before t-SNE
+iso = IsolationForest(contamination=0.05)
+inlier_mask = iso.fit_predict(X) == 1
+X_clean = X[inlier_mask]
+# Now apply t-SNE
+tsne_result = TSNE(n_components=2).fit_transform(X_clean)
+```
+
+**Interview Tip:** Always preprocess for outliers before t-SNE. Unlike linear methods, t-SNE can be heavily affected by even a few extreme outliers because they distort the adaptive sigma computation for neighboring points.
 
 ---
 
@@ -1917,7 +3319,46 @@ vae = VAE(latent_dim=10)
 
 **Discuss interactive t-SNE visual analytics tools.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Interactive t-SNE visualization tools allow users to explore embeddings dynamically through zooming, hovering, filtering, and selecting points, providing much richer insight than static plots.
+
+**Popular Interactive Tools:**
+| Tool | Type | Key Features |
+|------|------|-------------|
+| **TensorBoard Projector** | Web app | 3D t-SNE, hover labels, search |
+| **Plotly/Dash** | Python library | Zoom, hover, click callbacks |
+| **Bokeh** | Python library | Linked plots, widgets |
+| **Embedding Projector** | Google web tool | Multiple methods, real-time |
+| **Cellxgene** | Bioinformatics | scRNA-seq specific, fast |
+| **HSNE/Cytosplore** | Desktop | Hierarchical exploration |
+| **HiPlot** | Meta library | Parallel coordinates + scatter |
+
+**Plotly Implementation:**
+```python
+import plotly.express as px
+import pandas as pd
+
+df = pd.DataFrame({
+    'x': tsne_result[:, 0], 'y': tsne_result[:, 1],
+    'label': labels, 'sample_id': ids, 'score': scores
+})
+fig = px.scatter(df, x='x', y='y', color='label', 
+                 hover_data=['sample_id', 'score'],
+                 title='Interactive t-SNE')
+fig.update_traces(marker_size=3)
+fig.show()
+```
+
+**Key Interactive Features:**
+1. **Hover:** Show metadata for individual points
+2. **Zoom:** Focus on specific clusters
+3. **Lasso select:** Select points to examine as a group
+4. **Color switching:** Dynamically change coloring variable
+5. **Linked views:** Click a point to see original data/image
+
+**Interview Tip:** Static t-SNE plots are useful for publication, but interactive exploration tools are essential for actual data analysis. TensorBoard Projector is the most accessible tool for quick exploration.
 
 ---
 
@@ -1925,7 +3366,41 @@ vae = VAE(latent_dim=10)
 
 **Explain gradient clipping in t-SNE optimization.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Gradient clipping in t-SNE limits the magnitude of gradient updates to prevent unstable jumps during optimization, especially in early iterations or when dealing with outliers.
+
+**Why Gradient Clipping:**
+- t-SNE gradients can be very large for points with extreme differences between p_ij and q_ij
+- Large gradients cause points to jump far, destabilizing the embedding
+- Especially problematic during early iterations with exaggeration
+
+**Implementation:**
+```
+grad = compute_gradient(P, Q, Y)
+# Clip gradients to maximum norm
+max_norm = 10.0
+grad_norm = ||grad||
+if grad_norm > max_norm:
+    grad = grad * (max_norm / grad_norm)
+Y = Y + learning_rate * grad + momentum * velocity
+```
+
+**Types of Clipping:**
+| Type | Method | When Used |
+|------|--------|-----------|
+| **Norm clipping** | Scale gradient if norm exceeds threshold | Most common |
+| **Value clipping** | Clip each coordinate to [-max, max] | Simpler |
+| **Adaptive** | Adjust threshold based on iteration | Advanced |
+
+**Impact on Embedding Quality:**
+- Too aggressive clipping → slow convergence, poor structure
+- Too lenient → instability persists
+- Standard practice: clip gradients to prevent exploding updates
+- Some implementations use adaptive learning rate instead of clipping
+
+**Interview Tip:** Gradient clipping is an implementation detail rather than a core algorithmic feature. Most library implementations handle it internally. The momentum-based update scheme in t-SNE provides implicit gradient regularization.
 
 ---
 
@@ -1933,7 +3408,48 @@ vae = VAE(latent_dim=10)
 
 **Describe perplexity sweep and plot to choose stable regions.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+A perplexity sweep involves running t-SNE with multiple perplexity values and plotting results side by side to identify the optimal range where cluster structure is stable and meaningful.
+
+**Sweep Protocol:**
+1. Choose perplexity values: [5, 10, 20, 30, 50, 100, 200]
+2. Run t-SNE for each perplexity (fix random_state across all)
+3. Plot all embeddings in a grid
+4. Identify structures stable across perplexities
+5. Select perplexity range where pattern is clearest
+
+**Implementation:**
+```python
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+
+perplexities = [5, 10, 20, 30, 50, 100]
+fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+for ax, perp in zip(axes.flat, perplexities):
+    tsne = TSNE(n_components=2, perplexity=perp, random_state=42, init='pca')
+    Y = tsne.fit_transform(X_pca)
+    ax.scatter(Y[:, 0], Y[:, 1], c=labels, cmap='tab10', s=3)
+    ax.set_title(f'Perplexity = {perp}')
+plt.tight_layout()
+```
+
+**Interpreting the Sweep:**
+| Observation | Interpretation |
+|-------------|---------------|
+| Cluster present at all perplexities | Real, stable structure |
+| Cluster only at low perplexity | Possibly noise/artifact |
+| Cluster only at high perplexity | Global structure feature |
+| Different cluster count at different perplexities | Multi-scale structure |
+| Stable from perp=20 to perp=100 | Robust clustering, choose from this range |
+
+**Reporting Best Practices:**
+- Always show at least 3 perplexity values in publications
+- Mention which structures are stable vs perplexity-dependent
+- Include silhouette analysis on original space to validate
+
+**Interview Tip:** A perplexity sweep is the most important validation step for t-SNE. Any finding that only appears at one perplexity value should be treated with extreme skepticism.
 
 ---
 
@@ -1941,7 +3457,37 @@ vae = VAE(latent_dim=10)
 
 **Discuss trade-offs between FIt-SNE and UMAP.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+FIt-SNE (Fast Interpolation-based t-SNE) and UMAP are both modern alternatives to standard Barnes-Hut t-SNE, each with distinct trade-offs in speed, quality, and feature set.
+
+**Head-to-Head Comparison:**
+| Aspect | FIt-SNE | UMAP |
+|--------|---------|------|
+| **Speed** | O(n) per iter | O(n) amortized |
+| **Typical speed** | Fast | Faster for most datasets |
+| **Global structure** | Poor (same as t-SNE) | Better preservation |
+| **Local structure** | Excellent | Excellent |
+| **Out-of-sample** | Via openTSNE | Native transform() |
+| **Theory** | Information theory | Algebraic topology |
+| **Output dims** | 2-3 | Any |
+| **Determinism** | Stochastic | More reproducible |
+| **Parameters** | Perplexity, lr | n_neighbors, min_dist |
+| **For clustering** | Not recommended | Better suited |
+
+**Speed Benchmark (approximate):**
+| n | FIt-SNE | UMAP |
+|---|---------|------|
+| 10K | 5s | 3s |
+| 100K | 30s | 15s |
+| 1M | 5min | 2min |
+
+**When to Choose:**
+- **FIt-SNE:** When you specifically need t-SNE aesthetics/behavior for publication; comparison with prior t-SNE results
+- **UMAP:** General purpose; when speed, global structure, or out-of-sample embedding matters; production systems
+
+**Interview Tip:** For most practical purposes, UMAP has replaced t-SNE. FIt-SNE is preferred when you need exact t-SNE behavior with better speed. In bioinformatics, UMAP is now the standard for scRNA-seq visualization.
 
 ---
 
@@ -1949,7 +3495,47 @@ vae = VAE(latent_dim=10)
 
 **Explain embedding discrete categorical variables with t-SNE.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Embedding discrete categorical variables with t-SNE requires converting categories to numerical representations while preserving meaningful relationships between categories.
+
+**Encoding Strategies:**
+| Method | Description | When to Use |
+|--------|-------------|-------------|
+| **One-hot** | Binary vector per category | Few categories, no ordinal relationship |
+| **Target encoding** | Replace with target mean | Supervised task, few categories |
+| **Embedding layer** | Learned dense vectors (neural net) | Many categories, deep learning |
+| **Entity embedding** | Pre-trained categorical embeddings | Tabular data, transfer learning |
+| **Frequency encoding** | Replace with count/frequency | When frequency is informative |
+
+**Mixed Data Pipeline:**
+```python
+import numpy as np
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.manifold import TSNE
+
+# Separate numerical and categorical
+num_features = StandardScaler().fit_transform(X_numerical)
+cat_encoded = OneHotEncoder(sparse=False).fit_transform(X_categorical)
+
+# Combine
+X_combined = np.hstack([num_features, cat_encoded])
+
+# Optional: PCA to reduce dimensionality
+from sklearn.decomposition import PCA
+X_pca = PCA(n_components=50).fit_transform(X_combined)
+
+# t-SNE
+tsne = TSNE(n_components=2, perplexity=30).fit_transform(X_pca)
+```
+
+**Distance Metric Considerations:**
+- One-hot + Euclidean: treats all categories as equidistant
+- Gower distance: handles mixed types natively
+- Hamming distance for pure categorical data
+
+**Interview Tip:** One-hot encoding inflates dimensionality, making PCA preprocessing essential. For high-cardinality categoricals, entity embeddings from a trained neural network produce much better representations for t-SNE visualization.
 
 ---
 
@@ -1957,7 +3543,50 @@ vae = VAE(latent_dim=10)
 
 **Provide a case study using t-SNE in cybersecurity.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE can be applied in cybersecurity for visualizing network traffic patterns, identifying anomalous behavior, clustering attack types, and exploring malware families in feature space.
+
+**Case Study: Network Intrusion Detection**
+1. **Data:** Network flow features (bytes, packets, duration, flags, ports)
+2. **Features:** Extract 40+ flow-level features (similar to NSL-KDD dataset)
+3. **Preprocessing:** StandardScaler + PCA to 50 dims
+4. **t-SNE:** 2D embedding colored by traffic type
+
+**Pipeline:**
+```python
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+# Load network traffic data (e.g., CICIDS2017)
+df = pd.read_csv('traffic_flows.csv')
+features = ['duration', 'bytes_sent', 'bytes_recv', 'packets', 'src_port', ...]
+X = StandardScaler().fit_transform(df[features])
+X_pca = PCA(n_components=50).fit_transform(X)
+X_tsne = TSNE(n_components=2, perplexity=50, random_state=42).fit_transform(X_pca)
+
+# Visualize
+plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=df['label'].map({'benign':0, 'attack':1}), s=1)
+```
+
+**Insights Revealed:**
+- Normal traffic clusters separately from attack traffic
+- Different attack types (DDoS, brute force, port scan) form distinct sub-clusters
+- Emerging/novel attacks appear as outliers or new clusters
+- Helps analysts understand attack patterns and feature relationships
+
+**Real-world Applications:**
+| Application | What t-SNE Reveals |
+|-----------|-------------------|
+| Malware analysis | Malware family clusters in behavior space |
+| Phishing detection | Phishing vs legitimate URL feature patterns |
+| Insider threat | Anomalous user behavior patterns |
+| IoT security | Device type clustering, anomaly detection |
+
+**Interview Tip:** t-SNE is used as an exploration and presentation tool in cybersecurity, not as a detection algorithm itself. The workflow is: extract features → reduce dimensionality → visualize to gain understanding → build detection model based on insights.
 
 ---
 
@@ -1965,7 +3594,34 @@ vae = VAE(latent_dim=10)
 
 **Predict research trends in faster, more faithful t-SNE variants.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Research in t-SNE is evolving toward faster algorithms, better global structure preservation, theoretical understanding, and integration with modern deep learning and interactive analysis workflows.
+
+**Current Research Directions:**
+| Direction | Description | Examples |
+|-----------|-------------|---------|
+| **Speed** | Sub-linear complexity algorithms | FFT-based (FIt-SNE), GPU t-SNE |
+| **Quality** | Better global + local preservation | Global t-SNE, multi-scale |
+| **Scalability** | Millions of points | HSNE, hierarchical approaches |
+| **Theory** | Understanding convergence, guarantees | Optimization landscape analysis |
+| **Integration** | Combining with deep learning | Parametric t-SNE, contrastive learning |
+| **Interpretability** | Explaining embeddings | Feature attribution for embeddings |
+
+**Emerging Trends:**
+1. **Contrastive learning embeddings:** Using t-SNE-like objectives as training losses for deep networks (SimCLR, MoCo share neighborhood-preserving goals)
+2. **Differentiable t-SNE:** End-to-end trainable dimensionality reduction within neural networks
+3. **Topological methods:** Incorporating persistent homology to preserve topological features
+4. **Streaming t-SNE:** Real-time embedding updates as new data arrives
+5. **Explainable embeddings:** Methods to trace which features drive cluster structure
+
+**UMAP Competition:**
+- UMAP has taken much of t-SNE's user base
+- t-SNE research focuses on areas where it still excels (local structure quality)
+- Hybrid approaches combining t-SNE and UMAP ideas emerging
+
+**Interview Tip:** The field is moving toward unified frameworks that combine the strengths of multiple methods. Awareness of UMAP, contrastive learning, and interactive/hierarchical approaches shows you're up to date with the latest developments.
 
 ---
 
@@ -1973,7 +3629,50 @@ vae = VAE(latent_dim=10)
 
 **Explain combining t-SNE with clustering for insight.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+Combining t-SNE visualization with clustering algorithms is a powerful analytical workflow—but the correct approach is to cluster in the original (or PCA-reduced) space and visualize clusters using t-SNE, not to cluster on the t-SNE output.
+
+**Correct Workflow:**
+1. Preprocess data (standardize, handle missing values)
+2. PCA to 50 dims (optional but recommended)
+3. Cluster in original/PCA space (K-means, DBSCAN, Leiden)
+4. Apply t-SNE for 2D visualization
+5. Color t-SNE plot by cluster labels
+6. Analyze: do visual clusters match algorithmic clusters?
+
+**Implementation:**
+```python
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# Step 1: Reduce and cluster in original space
+X_pca = PCA(n_components=50).fit_transform(X_scaled)
+clusters = KMeans(n_clusters=5, random_state=42).fit_predict(X_pca)
+
+# Step 2: Visualize with t-SNE
+X_tsne = TSNE(n_components=2, perplexity=30, random_state=42).fit_transform(X_pca)
+plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=clusters, cmap='tab10', s=3)
+plt.title('K-Means Clusters Visualized with t-SNE')
+```
+
+**What to Look For:**
+| Pattern | Interpretation |
+|---------|---------------|
+| Clean cluster separation in t-SNE matching labels | Strong cluster structure |
+| Mixed colors within t-SNE clusters | Clustering algorithm may be wrong |
+| t-SNE sub-clusters within one label | May need more clusters |
+| Single t-SNE cluster spanning multiple labels | Over-clustering in original space |
+
+**Validation Metrics (compute in original space):**
+- Silhouette score, Calinski-Harabasz index
+- Adjusted Rand Index (if ground truth available)
+- Visual coherence in t-SNE (qualitative validation)
+
+**Interview Tip:** The golden rule: cluster in the original space, visualize with t-SNE. This avoids artifacts from t-SNE's distance distortion while leveraging its excellent ability to reveal visual structure.
 
 ---
 
@@ -1981,6 +3680,49 @@ vae = VAE(latent_dim=10)
 
 **Summarize t-SNE strengths and weaknesses.**
 
-**Answer:** _[To be filled]_
+### Answer
+
+**Definition:**
+t-SNE is a powerful non-linear dimensionality reduction technique primarily used for visualization of high-dimensional data in 2D/3D space, with well-known strengths and limitations.
+
+**Strengths:**
+| Strength | Description |
+|----------|-------------|
+| **Local structure** | Excellent preservation of neighborhood relationships |
+| **Cluster revelation** | Discovers and reveals natural groupings |
+| **Non-linear** | Captures complex manifold structures linear methods miss |
+| **Adaptive** | Per-point sigma adapts to local density |
+| **Flexible** | Works with any distance metric |
+| **Widely adopted** | Standard in bioinformatics, NLP, computer vision |
+
+**Weaknesses:**
+| Weakness | Description |
+|----------|-------------|
+| **Global structure** | Inter-cluster distances not preserved |
+| **Speed** | O(n^2) exact, O(n log n) Barnes-Hut; UMAP is faster |
+| **Stochastic** | Different runs → different results |
+| **Non-parametric** | Cannot embed new data without rerunning |
+| **Hyperparameter sensitive** | Perplexity, learning rate affect results |
+| **2-3D only** | Designed for visualization, not general reduction |
+| **Crowding artifacts** | Can create misleading patterns |
+| **No inverse** | Cannot reconstruct original features |
+
+**When to Use t-SNE:**
+- Exploratory visualization of cluster structure
+- Validating clustering results from other methods
+- Communicating high-dimensional patterns to non-technical audiences
+- Comparing feature representations (CNN layers, word embeddings)
+
+**When NOT to Use t-SNE:**
+- Dimensionality reduction for modeling (use PCA, UMAP)
+- Measuring inter-cluster distances (use MDS)
+- Embedding new data (use UMAP or parametric methods)
+- Very large datasets > 500K (use UMAP)
+- Real-time/production embedding (use UMAP with transform)
+
+**Summary:**
+t-SNE remains the gold standard for revealing local cluster structure in 2D visualizations. For a well-rounded workflow: PCA for preprocessing → t-SNE/UMAP for visualization → cluster in original space → validate with visualization.
+
+**Interview Tip:** A mature answer acknowledges both t-SNE's power and its limitations. Knowing when NOT to use t-SNE (and suggesting UMAP, PCA, or MDS as alternatives) demonstrates deeper understanding than simply knowing how it works.
 
 ---

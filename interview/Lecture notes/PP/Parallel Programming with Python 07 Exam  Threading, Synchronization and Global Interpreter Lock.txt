@@ -1,0 +1,6286 @@
+00:01 hi welcome again this is another
+00:03 
+
+00:03 supplementary video for our course
+00:05 
+
+00:05 parallel programming
+00:07 
+
+00:07 and today this is the
+00:09 
+
+00:09 first week after our midterm exam so
+00:12 
+
+00:12 today i'm going to solve your questions
+00:15 
+
+00:15 which we have in your midterm exam
+00:19 
+
+00:19 let's get started very quickly
+00:21 
+
+00:21 and i'm gonna start with question one of
+00:23 
+
+00:23 course
+00:24 
+
+00:24 so
+00:25 
+
+00:25 in question one
+00:27 
+
+00:27 for 50 points
+00:29 
+
+00:29 we have asked you
+00:31 
+
+00:31 very easy questions
+00:33 
+
+00:33 about the descriptions about the
+00:35 
+
+00:35 definitions actually
+00:37 
+
+00:37 so let's get started with question one
+00:41 
+
+00:41 and
+00:44 
+
+00:44 let's rename these parts with a b c d
+00:49 
+
+00:49 and e and in a we gave the description
+00:53 
+
+00:53 we can use this primitive for
+00:55 
+
+00:55 synchronization instead of locks right
+00:57 
+
+00:57 this is a primitive
+00:59 
+
+00:59 which
+01:00 
+
+01:00 we are using
+01:03 
+
+01:03 for synchronizing synchronization
+01:05 
+
+01:05 synchronization
+01:07 
+
+01:07 and
+01:08 
+
+01:08 we are using this
+01:11 
+
+01:11 for
+01:12 
+
+01:12 instead of locks
+01:14 
+
+01:14 all right
+01:15 
+
+01:15 and what is the definition when we want
+01:18 
+
+01:18 our resources to be used by more than
+01:20 
+
+01:20 one threat
+01:21 
+
+01:21 so
+01:22 
+
+01:22 this is semaphore right
+01:25 
+
+01:25 because
+01:26 
+
+01:26 with sum of words
+01:30 
+
+01:30 we can use this resource
+01:33 
+
+01:33 by
+01:34 
+
+01:34 more than one threads so we have an
+01:37 
+
+01:37 integer with with the sum of four and
+01:41 
+
+01:41 uh with the default value one so
+01:44 
+
+01:44 if we leave that
+01:46 
+
+01:46 with this default value so only one
+01:48 
+
+01:48 thread can use the semaphore but we can
+01:50 
+
+01:50 initialize our semaphore by using an
+01:52 
+
+01:52 integer like two three four or five then
+01:56 
+
+01:56 it means
+01:57 
+
+01:57 five threads can use this summer for
+01:58 
+
+01:58 five threads can use these resources
+02:01 
+
+02:01 which is protected by this semaphore so
+02:03 
+
+02:03 the answer for part a will be
+02:06 
+
+02:06 sum of four
+02:07 
+
+02:07 and part b it's a lock that allows only
+02:09 
+
+02:09 one thread to hold the control of the
+02:11 
+
+02:11 python interpreter so this is a question
+02:14 
+
+02:14 which is specialized specialized for the
+02:17 
+
+02:17 python interpreter and this lock has its
+02:21 
+
+02:21 spatial name which we call it
+02:24 
+
+02:24 gill
+02:25 
+
+02:25 and this abbreviation stands for global
+02:31 
+
+02:31 interpreter
+02:34 
+
+02:34 locked
+02:36 
+
+02:36 global interpreter lock all right and
+02:39 
+
+02:39 this lock allows only one thread to hold
+02:42 
+
+02:42 the control of the python interpreter
+02:44 
+
+02:44 and it means you can have
+02:48 
+
+02:48 a lot of threads you can have multiple
+02:49 
+
+02:49 threads and actually they are not
+02:52 
+
+02:52 running simultaneously for python
+02:55 
+
+02:55 so they are running at the same time but
+02:58 
+
+02:58 not
+02:59 
+
+02:59 really simultaneously and we have solved
+03:02 
+
+03:02 this situation by using number
+03:04 
+
+03:04 and
+03:06 
+
+03:06 actually the just in time compiler from
+03:07 
+
+03:07 number as you remember
+03:10 
+
+03:10 and also this was a lock which has the
+03:13 
+
+03:13 name of global interpreter lock
+03:16 
+
+03:16 part c is a little bit
+03:19 
+
+03:19 harder among these questions and
+03:23 
+
+03:23 it is the term embarrassing the parallel
+03:25 
+
+03:25 and we have talked about this term in
+03:29 
+
+03:29 actually in the classroom in the lab and
+03:31 
+
+03:31 it means
+03:33 
+
+03:33 you can
+03:36 
+
+03:36 you can
+03:40 
+
+03:40 realize
+03:45 
+
+03:45 this solution
+03:52 
+
+03:52 with
+03:54 
+
+03:54 very little
+03:56 
+
+03:56 or actually with no effort
+03:59 
+
+03:59 no additional effort
+04:02 
+
+04:02 so it means
+04:05 
+
+04:05 you have
+04:07 
+
+04:07 an algorithm you will have a solution
+04:10 
+
+04:10 and you can parallelize this solution
+04:13 
+
+04:13 this algorithm using more than one
+04:15 
+
+04:15 threat using multiple threads or using
+04:17 
+
+04:17 multiple processors
+04:19 
+
+04:19 and
+04:21 
+
+04:21 you you can do it very easily
+04:24 
+
+04:24 so as you remember when we try to solve
+04:26 
+
+04:26 the monte carlo simulation for pi
+04:29 
+
+04:29 and
+04:30 
+
+04:30 we have developed our algorithm we have
+04:33 
+
+04:33 developed our solution by using the
+04:36 
+
+04:36 object-oriented programming and then we
+04:38 
+
+04:38 can easily parallelize our solution all
+04:42 
+
+04:42 right
+04:43 
+
+04:43 but when you find uh an algorithm a
+04:46 
+
+04:46 solution when some other person some
+04:49 
+
+04:49 other developers wrote and then you you
+04:53 
+
+04:53 cannot parallelize maybe this solution
+04:56 
+
+04:56 and it's very very it's very hard to
+04:59 
+
+04:59 parallelize this solution then it means
+05:01 
+
+05:01 it's not embarrassing the parallel but
+05:03 
+
+05:03 when you parallelize the solution with a
+05:06 
+
+05:06 very little or even no additional effort
+05:08 
+
+05:08 then it means it's an embarrassingly
+05:11 
+
+05:11 parallel problem
+05:12 
+
+05:12 all right
+05:14 
+
+05:14 so part d we have this description and
+05:16 
+
+05:16 says we have two threads and two
+05:18 
+
+05:18 resources and says thread 0 have
+05:21 
+
+05:21 resource 0 and waiting for the other
+05:24 
+
+05:24 resource resource one but at the same
+05:26 
+
+05:26 time thread one is holding the resource
+05:28 
+
+05:28 one
+05:29 
+
+05:29 and it's also waiting for resource zero
+05:31 
+
+05:31 to be released so
+05:32 
+
+05:32 each threats has one of the resources
+05:36 
+
+05:36 and waiting for the other resource and
+05:38 
+
+05:38 we call this situation as deadlock
+05:45 
+
+05:45 and we have
+05:46 
+
+05:46 learned about this situation
+05:50 
+
+05:50 when we try to solve the dining
+05:52 
+
+05:52 philosopher's problem as you remember
+05:55 
+
+05:55 and part e it says multiple threads try
+05:58 
+
+05:58 to change the value of a shared variable
+06:00 
+
+06:00 simultaneously but produce an
+06:02 
+
+06:02 unpredictable result and t is here the
+06:05 
+
+06:05 unpredictable result so there's a bug
+06:08 
+
+06:08 with this solution it says so we call
+06:12 
+
+06:12 this situation as we call this error as
+06:16 
+
+06:16 race condition as you remember
+06:23 
+
+06:23 so for question one i think the
+06:26 
+
+06:26 embracing the parallel is a
+06:28 
+
+06:28 a little bit harder among these
+06:31 
+
+06:31 questions but
+06:33 
+
+06:33 there is a very easy 40 points coming
+06:36 
+
+06:36 from here coming from this first
+06:39 
+
+06:39 question for you
+06:45 
+
+06:45 all right
+06:46 
+
+06:46 now
+06:48 
+
+06:48 let's try to solve the question two
+06:52 
+
+06:52 and for question two
+06:55 
+
+06:55 we have
+06:57 
+
+06:57 a very familiar problem because we have
+06:60 
+
+06:60 dealt this solution we have the monte
+07:02 
+
+07:02 carlo simulation for pi
+07:04 
+
+07:04 at least maybe two weeks or three weeks
+07:07 
+
+07:07 so you are fam we are very familiar with
+07:09 
+
+07:09 this problem
+07:11 
+
+07:11 uh and it says the value of pi can be
+07:14 
+
+07:14 estimated by using multi-color
+07:15 
+
+07:15 simulation and you can find the example
+07:18 
+
+07:18 code below all right we have this code
+07:20 
+
+07:20 snippet code class we have this class
+07:24 
+
+07:24 and it says write a python program that
+07:26 
+
+07:26 calculates p using only four threads
+07:30 
+
+07:30 it's a fixed number so we are going to
+07:32 
+
+07:32 use four threads
+07:37 
+
+07:37 say
+07:38 
+
+07:38 question two
+07:39 
+
+07:39 and we are going to use four threads
+07:46 
+
+07:46 all right
+07:48 
+
+07:48 and also it says each thread should use
+07:50 
+
+07:50 different quadrants
+07:52 
+
+07:52 and the program should not cause any
+07:55 
+
+07:55 problem stated in question one so these
+07:58 
+
+07:58 problems
+08:01 
+
+08:01 i think the race condition this is a
+08:03 
+
+08:03 problem
+08:08 
+
+08:08 so it should not suffer from the race
+08:10 
+
+08:10 condition or that luck this is also a
+08:13 
+
+08:13 problem
+08:17 
+
+08:17 all right and also the global
+08:18 
+
+08:18 interpreter luck is a problem for python
+08:22 
+
+08:22 so it's a problem
+08:24 
+
+08:24 so our code should not suffer from these
+08:27 
+
+08:27 three problems
+08:29 
+
+08:29 it doesn't include
+08:30 
+
+08:30 it should not include the race condition
+08:33 
+
+08:33 or it should not cause a deadlocked or
+08:35 
+
+08:35 global interpreter lock all right
+08:38 
+
+08:38 we have to be careful about these three
+08:41 
+
+08:41 problems
+08:42 
+
+08:42 all right we have this
+08:45 
+
+08:45 figure we have these drawings and
+08:47 
+
+08:47 it says these are the quadrants quadrant
+08:50 
+
+08:50 one quadrant two quadrant three and
+08:52 
+
+08:52 quadrant four and we will have four
+08:55 
+
+08:55 threads for these each quadrant
+08:58 
+
+08:58 all right so
+09:00 
+
+09:00 let me look at the code we have this a
+09:03 
+
+09:03 very simple class which is initialized
+09:05 
+
+09:05 with the number of the points that we
+09:08 
+
+09:08 are going to throw
+09:09 
+
+09:09 in this area in this square
+09:12 
+
+09:12 and also we have to count the number of
+09:15 
+
+09:15 the inner points to find the value of pi
+09:19 
+
+09:19 in this monte carlo simulation all right
+09:21 
+
+09:21 then we are going to initialize this
+09:23 
+
+09:23 inner
+09:24 
+
+09:24 number of inner points with zero
+09:28 
+
+09:28 and then we have a method which has the
+09:31 
+
+09:31 name throw underscore points and
+09:35 
+
+09:35 it includes a loop in the range of the
+09:38 
+
+09:38 self.n so the number of the points that
+09:41 
+
+09:41 we are going to throw in this square and
+09:43 
+
+09:43 then for each point we are going to
+09:46 
+
+09:46 generate two coordinates
+09:49 
+
+09:49 e x and y
+09:50 
+
+09:50 and to generate these coordinates we are
+09:54 
+
+09:54 using the range between minus one and
+09:58 
+
+09:58 plus one
+09:59 
+
+09:59 right so we are going to generate four
+10:02 
+
+10:02 quadrants
+10:03 
+
+10:03 and we are going to change this limits
+10:06 
+
+10:06 we are going to change this range into
+10:09 
+
+10:09 some other range to
+10:11 
+
+10:11 make it only one thread works in one
+10:15 
+
+10:15 quadrant
+10:16 
+
+10:16 and then we are going to count the
+10:18 
+
+10:18 number of the inner points by checking
+10:20 
+
+10:20 the x square plus y squared if it is
+10:23 
+
+10:23 less than one then it means it's an
+10:26 
+
+10:26 inner point so it means we have a point
+10:28 
+
+10:28 in the circle right this is an inner
+10:31 
+
+10:31 point and this is an outer point
+10:33 
+
+10:33 and then we are going to of course we
+10:35 
+
+10:35 are going to create an instance by using
+10:37 
+
+10:37 this class and then by using this object
+10:40 
+
+10:40 we are going to call our method throw
+10:42 
+
+10:42 underscore points
+10:44 
+
+10:44 and then we are going to calculate the
+10:46 
+
+10:46 value of pi by multiplying it
+10:49 
+
+10:49 multiplying by 4 the ratio between the
+10:52 
+
+10:52 inner points over total points and then
+10:55 
+
+10:55 we are going to write to our screen to
+10:59 
+
+10:59 with the total number of points and also
+11:01 
+
+11:01 the inner points and then the estimated
+11:03 
+
+11:03 value of pi
+11:04 
+
+11:04 this is a very easy question but
+11:06 
+
+11:06 we are going to implement the difference
+11:10 
+
+11:10 to use this
+11:12 
+
+11:12 uh to use this
+11:14 
+
+11:14 different quadrants so i'm going to
+11:18 
+
+11:18 write something here we are going to
+11:20 
+
+11:20 have four
+11:22 
+
+11:22 threads
+11:24 
+
+11:24 and these four threads will be let's say
+11:27 
+
+11:27 thread 0
+11:31 
+
+11:31 right thread 0
+11:34 
+
+11:34 and thread 1
+11:38 
+
+11:38 thread 2.
+11:43 
+
+11:43 and thread three
+11:44 
+
+11:44 so it makes four threads for us
+11:48 
+
+11:48 and thread zero will use quadrant
+11:50 
+
+11:50 one
+11:53 
+
+11:53 let's say just cut one
+11:56 
+
+11:56 and trade one will use threat one is
+11:59 
+
+11:59 going to use quadrant two and thread two
+12:02 
+
+12:02 is going to use the quadrant three
+12:06 
+
+12:06 and
+12:07 
+
+12:07 at last thread four
+12:09 
+
+12:09 is that not four sorry thread three it's
+12:11 
+
+12:11 going to be thread three
+12:13 
+
+12:13 let me delete this
+12:17 
+
+12:17 it has the id because you know the in
+12:19 
+
+12:19 python
+12:20 
+
+12:20 indexes indices start from zero so
+12:24 
+
+12:24 thread
+12:24 
+
+12:24 three
+12:25 
+
+12:25 is going to use the quadrant four
+12:28 
+
+12:28 all right
+12:29 
+
+12:29 then we are going to have a range for
+12:33 
+
+12:33 x
+12:34 
+
+12:34 and y coordinates for these each
+12:37 
+
+12:37 quadrant right let me check it for
+12:40 
+
+12:40 quadrant one
+12:41 
+
+12:41 x is going to be in this range so
+12:46 
+
+12:46 and this range
+12:49 
+
+12:49 is between
+12:50 
+
+12:50 0
+12:52 
+
+12:52 and one
+12:53 
+
+12:53 and also y is going to be in this range
+12:57 
+
+12:57 and this range is between also zero and
+12:60 
+
+13:00 one
+13:01 
+
+13:01 right then we can use for x for quadrant
+13:04 
+
+13:04 one we are going to use the range 0 and
+13:08 
+
+13:08 1 starting from 0 and enter to 0.1 for x
+13:11 
+
+13:11 and also for y we are going to use the
+13:13 
+
+13:13 same range between 0 and 1. for quadrant
+13:16 
+
+13:16 2 then the range of the x
+13:20 
+
+13:20 are going to change and we are going to
+13:22 
+
+13:22 use the range this time starting from -1
+13:26 
+
+13:26 to 0.
+13:28 
+
+13:28 and also
+13:29 
+
+13:29 i have written
+13:31 
+
+13:31 this
+13:32 
+
+13:32 coordinates to help you when you try to
+13:35 
+
+13:35 find these range in the
+13:38 
+
+13:38 exam so for x for quadrant 2 i'm going
+13:42 
+
+13:42 to use the range starting from -1 to
+13:45 
+
+13:45 0
+13:46 
+
+13:46 but for y we are going to use the same
+13:49 
+
+13:49 range with quadrant one so
+13:51 
+
+13:51 the range of y
+13:53 
+
+13:53 is not going to change so i'm going to
+13:55 
+
+13:55 use 0 and 1 again
+13:57 
+
+13:57 for quadrant 2 we are here now
+13:59 
+
+13:59 and again for x we are going to use
+14:04 
+
+14:04 -1 and 0
+14:06 
+
+14:06 and for y this time it's going to change
+14:09 
+
+14:09 and we have the range now minus 1 to 0
+14:14 
+
+14:14 like this right for quadrant
+14:18 
+
+14:18 four
+14:19 
+
+14:19 again we have a range between zero and
+14:22 
+
+14:22 one for x
+14:24 
+
+14:24 zero and one and
+14:27 
+
+14:27 for y we are going we are in the
+14:31 
+
+14:31 negative areas so we are going to use
+14:32 
+
+14:32 the range starting from -1 to 0. all
+14:36 
+
+14:36 right
+14:37 
+
+14:37 then
+14:38 
+
+14:38 we are going to implement
+14:41 
+
+14:41 this
+14:42 
+
+14:42 range
+14:43 
+
+14:43 to solve
+14:45 
+
+14:45 this
+14:47 
+
+14:47 question
+14:49 
+
+14:49 now let me run the pycharm
+15:03 
+
+15:03 all right first
+15:06 
+
+15:06 put this
+15:17 
+
+15:17 yeah
+15:19 
+
+15:19 all right
+15:21 
+
+15:21 we
+15:23 
+
+15:23 first
+15:24 
+
+15:24 we should clear
+15:27 
+
+15:27 its writings
+15:30 
+
+15:30 and
+15:31 
+
+15:31 minimize this pdf
+15:35 
+
+15:35 all right
+15:37 
+
+15:37 we have a new project in pycharm and
+15:39 
+
+15:39 also we have our q
+15:42 
+
+15:42 two that's pi five for question two for
+15:45 
+
+15:45 the solution of question two
+15:47 
+
+15:47 and i have written the same codes
+15:50 
+
+15:50 which we have in the pdf file which you
+15:54 
+
+15:54 had in the
+15:56 
+
+15:56 midterm exam and i'm going to implement
+15:59 
+
+15:59 this quadrants
+16:02 
+
+16:02 and also the multiple thread structures
+16:05 
+
+16:05 to our codes
+16:11 
+
+16:11 all right let's get started
+16:14 
+
+16:14 of course we have
+16:16 
+
+16:16 we have used the random library but also
+16:21 
+
+16:21 we are going to use the trading library
+16:25 
+
+16:25 and import trading library import from
+16:27 
+
+16:27 the training library our class threads
+16:30 
+
+16:30 and also
+16:31 
+
+16:31 we are going to deal with the global
+16:33 
+
+16:33 interpreter log so
+16:35 
+
+16:35 at one point we should include our
+16:38 
+
+16:38 number
+16:39 
+
+16:39 library and also import the just in time
+16:42 
+
+16:42 compiler from number but at this time i
+16:44 
+
+16:44 just implement the quadrants and the
+16:46 
+
+16:46 threads
+16:48 
+
+16:48 so i'm not going to
+16:49 
+
+16:49 import this number library now
+16:53 
+
+16:53 and
+16:54 
+
+16:54 let's say
+16:57 
+
+16:57 in this area before using our monte
+17:00 
+
+17:00 carlo pi class i'm going to create the
+17:03 
+
+17:03 quadrants
+17:05 
+
+17:05 so
+17:06 
+
+17:06 let's say
+17:08 
+
+17:08 we
+17:08 
+
+17:08 create a list a python list
+17:12 
+
+17:12 which includes all this
+17:14 
+
+17:14 coordinates
+17:16 
+
+17:16 and let's say
+17:18 
+
+17:18 start with question one so
+17:21 
+
+17:21 let's include
+17:23 
+
+17:23 zero and one for x coordinates and also
+17:27 
+
+17:27 zero and one
+17:28 
+
+17:28 for the y coordinates for quadrant one
+17:32 
+
+17:32 and for the next line in the next line
+17:34 
+
+17:34 i'm going to define the second quadrant
+17:37 
+
+17:37 and it has the coordinates for x minus
+17:40 
+
+17:40 one and
+17:41 
+
+17:41 zero
+17:42 
+
+17:42 and for y
+17:44 
+
+17:44 it's going to be zero and 1
+17:47 
+
+17:47 and quadrant
+17:49 
+
+17:49 3
+17:50 
+
+17:50 will be
+17:52 
+
+17:52 -1
+17:54 
+
+17:54 and 0 for x
+17:57 
+
+17:57 and minus 1 and 0 for y
+18:02 
+
+18:02 and for quadrant 4 the last quadrant we
+18:06 
+
+18:06 are going to have 0 and 1
+18:08 
+
+18:08 for x
+18:10 
+
+18:10 and also minus 1 and 0 for y and this is
+18:15 
+
+18:15 the end right
+18:16 
+
+18:16 so we have these quadrants
+18:20 
+
+18:20 and
+18:22 
+
+18:22 it means we have to
+18:26 
+
+18:26 implement these quadrants also into our
+18:29 
+
+18:29 class
+18:30 
+
+18:30 so let's say
+18:31 
+
+18:31 in the initializer in the constructor of
+18:34 
+
+18:34 this class we
+18:36 
+
+18:36 are going to get an input arguments
+18:40 
+
+18:40 input argument with the name limits and
+18:42 
+
+18:42 let's
+18:43 
+
+18:43 save this
+18:45 
+
+18:45 argument in a property of clause with
+18:49 
+
+18:49 the name self.limits
+18:53 
+
+18:53 all right and then use this
+18:55 
+
+18:55 argument in
+18:57 
+
+18:57 our
+18:58 
+
+18:58 throw underscore points methods
+19:01 
+
+19:01 let's say we are going to get the all
+19:04 
+
+19:04 the
+19:05 
+
+19:05 limits
+19:08 
+
+19:08 like this for example for this number
+19:12 
+
+19:12 let's use a variable with the name x
+19:15 
+
+19:15 underscore lower
+19:16 
+
+19:16 and for this limit for this number let's
+19:20 
+
+19:20 use a variable with the name x
+19:22 
+
+19:22 underscore upper and also for this one
+19:26 
+
+19:26 we are going to use a variable with the
+19:27 
+
+19:27 name y underscore lover and for this i'm
+19:31 
+
+19:31 going to use a variable with the name y
+19:33 
+
+19:33 underscore upper
+19:35 
+
+19:35 so to show you
+19:37 
+
+19:37 discretely to show you separately i'm
+19:39 
+
+19:39 going to use four different variables
+19:42 
+
+19:42 which gets there which get which are
+19:46 
+
+19:46 going to get their values from this
+19:50 
+
+19:50 python list
+19:51 
+
+19:51 all right so let's do this
+19:56 
+
+19:56 with the name x underscore lover it's
+19:58 
+
+19:58 going to get
+20:01 
+
+20:01 self.limits
+20:03 
+
+20:03 with the argument
+20:05 
+
+20:05 0 and
+20:08 
+
+20:08 0
+20:10 
+
+20:10 like this
+20:11 
+
+20:11 and also x underscore upper
+20:14 
+
+20:14 will be self dot limits
+20:17 
+
+20:17 0 and 1
+20:20 
+
+20:20 and y
+20:22 
+
+20:22 underscore lower
+20:24 
+
+20:24 will be
+20:25 
+
+20:25 surf dot limits
+20:28 
+
+20:28 one
+20:29 
+
+20:29 and zero
+20:32 
+
+20:32 and y underscore upper
+20:36 
+
+20:36 will be self.limits
+20:38 
+
+20:38 one and one
+20:41 
+
+20:41 all right then we are going to use these
+20:43 
+
+20:43 variables
+20:44 
+
+20:44 in these lines so x underscore lovers x
+20:48 
+
+20:48 underscore upper
+20:52 
+
+20:52 and y underscore lower
+20:55 
+
+20:55 and y on the score upper like this
+20:59 
+
+20:59 all right
+21:03 
+
+21:03 so
+21:04 
+
+21:04 it means we have to use this
+21:07 
+
+21:07 list
+21:08 
+
+21:08 in the constructor
+21:10 
+
+21:10 or by creating the instance so i'm going
+21:14 
+
+21:14 to use this questions lists
+21:17 
+
+21:17 so let's say
+21:18 
+
+21:18 i'm not going to use just one instance
+21:21 
+
+21:21 but i'm going to create four different
+21:24 
+
+21:24 instance
+21:26 
+
+21:26 like we did earlier in our lectures so
+21:29 
+
+21:29 i'm going to create a lists which
+21:33 
+
+21:33 includes
+21:34 
+
+21:34 the i'm going to create a list with the
+21:37 
+
+21:37 name find pies which includes the
+21:40 
+
+21:40 instances which with different quadrants
+21:44 
+
+21:44 all right so
+21:45 
+
+21:45 let's do it with this square brackets to
+21:48 
+
+21:48 make it a list
+21:50 
+
+21:50 our class has done a multi-color pi
+21:53 
+
+21:53 and let's draw 100 points
+21:56 
+
+21:56 but use the quadrants
+21:58 
+
+21:58 so
+21:59 
+
+21:59 for
+22:00 
+
+22:00 each
+22:01 
+
+22:01 quadrant i'm going to
+22:04 
+
+22:04 send
+22:07 
+
+22:07 this line or the next line or the next
+22:11 
+
+22:11 line
+22:12 
+
+22:12 all right
+22:13 
+
+22:13 so
+22:14 
+
+22:14 it's
+22:15 
+
+22:15 going to be
+22:18 
+
+22:18 quadrant zero quadrants one quadrant two
+22:21 
+
+22:21 or quadrants three right so i'm going to
+22:24 
+
+22:24 use an
+22:25 
+
+22:25 index here with the name i
+22:27 
+
+22:27 and also i'm going to iterate this value
+22:31 
+
+22:31 in range 4 right because we have a fixed
+22:36 
+
+22:36 number of threads and also we have a
+22:38 
+
+22:38 fixed number of quadrants which is equal
+22:41 
+
+22:41 to four
+22:43 
+
+22:43 so for each instance i'm going to send
+22:47 
+
+22:47 the different
+22:48 
+
+22:48 line so this line is quadrants
+22:52 
+
+22:52 zero all right and also in this line
+22:57 
+
+22:57 so it's going to be self.limits
+22:60 
+
+22:60 when we create this instance when we
+23:03 
+
+23:03 call this clause
+23:04 
+
+23:04 so
+23:05 
+
+23:05 this inner lists now self that limits
+23:10 
+
+23:10 with the index 0
+23:13 
+
+23:13 and this number is going to be self that
+23:17 
+
+23:17 limits
+23:18 
+
+23:18 0 and 0
+23:21 
+
+23:21 and this one is going to be self that
+23:23 
+
+23:23 limits 0 and 1
+23:25 
+
+23:25 and this inner list
+23:28 
+
+23:28 will be self that limits
+23:30 
+
+23:30 with the index 1
+23:32 
+
+23:32 and this number will be self.limits
+23:36 
+
+23:36 one and zero
+23:38 
+
+23:38 and this
+23:39 
+
+23:39 inner number will be
+23:42 
+
+23:42 self.limits one and one
+23:44 
+
+23:44 so be careful
+23:46 
+
+23:46 you don't have to do it like this but
+23:49 
+
+23:49 i'm going to use this to show you the
+23:52 
+
+23:52 each step separately
+23:55 
+
+23:55 right so now we have four
+23:59 
+
+23:59 instances
+24:01 
+
+24:01 in this list
+24:03 
+
+24:03 find underscore pies and also of course
+24:07 
+
+24:07 i'm going to create the threads now so
+24:09 
+
+24:09 let's say threads will be equal to a
+24:12 
+
+24:12 list so i'm going to use the square
+24:14 
+
+24:14 brackets and i'm going to use the thread
+24:16 
+
+24:16 class of course from the trading library
+24:18 
+
+24:18 and let's say the targets will be
+24:22 
+
+24:22 from our instance find pies
+24:26 
+
+24:26 of course i'm going to use an index to
+24:28 
+
+24:28 reach the instance with the correct
+24:31 
+
+24:31 quadrant so this instance
+24:35 
+
+24:35 dot
+24:36 
+
+24:36 throw points
+24:38 
+
+24:38 like this
+24:39 
+
+24:39 right and of course i have to iterate
+24:42 
+
+24:42 this value this index i
+24:45 
+
+24:45 in range
+24:46 
+
+24:46 with the same number four
+24:49 
+
+24:49 because i have four instances in find
+24:52 
+
+24:52 pies i have four quadrants and also i
+24:54 
+
+24:54 have i will have i'm going to have four
+24:57 
+
+24:57 threads
+24:59 
+
+24:59 right now i'm okay and also i don't need
+25:02 
+
+25:02 to use this part anymore so i can delete
+25:05 
+
+25:05 this part it's just single threaded
+25:09 
+
+25:09 all right then it's time to start the
+25:13 
+
+25:13 threats
+25:14 
+
+25:14 and also
+25:16 
+
+25:16 uh
+25:17 
+
+25:17 do the synchronization thing between the
+25:19 
+
+25:19 threads so let's save for threads
+25:22 
+
+25:22 portrait
+25:23 
+
+25:23 actually in threads
+25:26 
+
+25:26 so i'm going to iterate over the
+25:28 
+
+25:28 elements in this list
+25:31 
+
+25:31 and let's say thread
+25:33 
+
+25:33 dot start
+25:35 
+
+25:35 so it makes all our threads start
+25:39 
+
+25:39 and at the end
+25:43 
+
+25:43 let's do the same thing for threading
+25:45 
+
+25:45 threads
+25:47 
+
+25:47 and let's say thread that join
+25:50 
+
+25:50 so this line makes us to wait
+25:54 
+
+25:54 for every class to complete their job
+25:57 
+
+25:57 all right
+25:59 
+
+25:59 so
+25:60 
+
+25:60 of course now we have four threats
+26:03 
+
+26:03 and
+26:05 
+
+26:05 it's the point that we are dealing with
+26:08 
+
+26:08 the race condition so if we don't
+26:11 
+
+26:11 implement
+26:13 
+
+26:13 a solution which gets the value of the
+26:17 
+
+26:17 inner points and total points for each
+26:19 
+
+26:19 thread then we will have we are going to
+26:22 
+
+26:22 have the race condition problem
+26:24 
+
+26:24 right then we cannot calculate the
+26:27 
+
+26:27 estimated value of pi at one line like
+26:30 
+
+26:30 this so i'm going to get
+26:33 
+
+26:33 i'm going to initialize
+26:36 
+
+26:36 two integers like this let's say inner
+26:39 
+
+26:39 will be equal to zero and also the total
+26:41 
+
+26:41 number of points will be equal to zero
+26:43 
+
+26:43 and
+26:44 
+
+26:44 iterate over the elements
+26:47 
+
+26:47 and find pi's again so let's say for
+26:50 
+
+26:50 find pi in find pies
+26:54 
+
+26:54 like this
+26:56 
+
+26:56 iterate over
+26:59 
+
+26:59 this
+26:60 
+
+27:00 list and let's say inner
+27:03 
+
+27:03 will
+27:04 
+
+27:04 increase
+27:07 
+
+27:07 for every element
+27:09 
+
+27:09 we have in find pi dot
+27:12 
+
+27:12 i
+27:13 
+
+27:13 all right
+27:14 
+
+27:14 and also the total number of points will
+27:16 
+
+27:16 increase by the number
+27:18 
+
+27:18 which we have in
+27:20 
+
+27:20 each
+27:22 
+
+27:22 instance
+27:24 
+
+27:24 the property find underscore pi dot n
+27:29 
+
+27:29 all right
+27:31 
+
+27:31 so
+27:32 
+
+27:32 now we have the total number of inner
+27:35 
+
+27:35 points and also the total number of
+27:36 
+
+27:36 total points then we can use them to
+27:40 
+
+27:40 calculate the actual value the final
+27:43 
+
+27:43 value of the pi so i'm going to change
+27:46 
+
+27:46 this variable to inner and also i'm
+27:49 
+
+27:49 going to change this variable to total
+27:53 
+
+27:53 all right
+27:55 
+
+27:55 and also let's use let's do the same
+27:58 
+
+27:58 thing for this points maybe we can
+28:01 
+
+28:01 combine these two lines
+28:04 
+
+28:04 like
+28:07 
+
+28:07 let's say points
+28:09 
+
+28:09 will be the ratio between the inner
+28:14 
+
+28:14 to total
+28:17 
+
+28:17 and also this solution includes the f
+28:19 
+
+28:19 strings you can use the formats or
+28:23 
+
+28:23 print with the percentage symbol format
+28:26 
+
+28:26 it doesn't matter
+28:27 
+
+28:27 i just use the
+28:28 
+
+28:28 different things for every question to
+28:31 
+
+28:31 make you familiar with the
+28:33 
+
+28:33 output formatting all right
+28:35 
+
+28:35 so this is the
+28:37 
+
+28:37 f string solution
+28:39 
+
+28:39 to put something to the screen to write
+28:41 
+
+28:41 something to the screen all right i
+28:43 
+
+28:43 think now we are okay
+28:45 
+
+28:45 let's
+28:46 
+
+28:46 run this code
+28:48 
+
+28:48 and also check our solution to the to
+28:52 
+
+28:52 the problems
+28:54 
+
+28:54 uh which are the deadlock and the race
+28:56 
+
+28:56 condition and at this stage we have
+28:58 
+
+28:58 still the problem with global
+28:60 
+
+29:00 interpreter lock all right
+29:03 
+
+29:03 let's run
+29:07 
+
+29:07 all right this is a very rough
+29:10 
+
+29:10 solution
+29:11 
+
+29:11 because we have a very little number of
+29:14 
+
+29:14 total points 100
+29:17 
+
+29:17 so it's not the best solution we don't
+29:20 
+
+29:20 expect something to
+29:22 
+
+29:22 close to the actual value to the true
+29:24 
+
+29:24 relative correct value of the pi
+29:27 
+
+29:27 so
+29:27 
+
+29:27 we just check the solution to the raised
+29:31 
+
+29:31 condition and
+29:33 
+
+29:33 if we have the
+29:35 
+
+29:35 400 total 400 points so it means we
+29:40 
+
+29:40 don't have a race condition all right
+29:42 
+
+29:42 because we have sent
+29:44 
+
+29:44 the total of 400
+29:47 
+
+29:47 points
+29:48 
+
+29:48 so 100 for each and we have four threads
+29:51 
+
+29:51 so it makes four hundred at two
+29:54 
+
+29:54 and we have this inner
+29:56 
+
+29:56 numbers
+29:57 
+
+29:57 and also
+29:59 
+
+29:59 it runs and completes without the
+30:02 
+
+30:02 problem without an issue so we don't
+30:04 
+
+30:04 have that luck
+30:07 
+
+30:07 all right
+30:09 
+
+30:09 so we don't use any locks we don't use
+30:11 
+
+30:11 any sum of rows we don't use any
+30:13 
+
+30:13 primitives so
+30:15 
+
+30:15 we don't expect to have that lock
+30:17 
+
+30:17 actually
+30:18 
+
+30:18 all right now we have still a problem we
+30:22 
+
+30:22 have the problem the global interpreter
+30:25 
+
+30:25 back so we are going to solve this but
+30:27 
+
+30:27 before this maybe we can be sure
+30:32 
+
+30:32 that we have the global interpreter lock
+30:35 
+
+30:35 problem
+30:37 
+
+30:37 to do this let me run
+30:40 
+
+30:40 our
+30:43 
+
+30:43 terminal
+30:49 
+
+30:49 all right
+30:54 
+
+30:54 now we have our terminal here
+30:60 
+
+30:60 let's
+31:01 
+
+31:01 run the h-top
+31:07 
+
+31:07 right
+31:10 
+
+31:10 also i'm going to run the terminal from
+31:12 
+
+31:12 here
+31:18 
+
+31:18 make it an ubuntu terminal
+31:22 
+
+31:22 all right and i'm going to increase this
+31:24 
+
+31:24 increase this number to
+31:27 
+
+31:27 take some time so we can understand what
+31:30 
+
+31:30 happens actually so let's
+31:33 
+
+31:33 make it
+31:38 
+
+31:38 a number
+31:39 
+
+31:39 100 000 for example
+31:41 
+
+31:41 and let's run this file now let's say
+31:43 
+
+31:43 python 3
+31:46 
+
+31:46 two that pie
+31:49 
+
+31:49 all right now it's runs
+31:52 
+
+31:52 now we can
+31:54 
+
+31:54 it's not enough actually let's make it
+31:56 
+
+31:56 10 millions
+32:04 
+
+32:04 all right
+32:06 
+
+32:06 we have this python 3 q2 pi lines here
+32:10 
+
+32:10 processes
+32:11 
+
+32:11 so actually the threads as you can see
+32:14 
+
+32:14 in the h top
+32:15 
+
+32:15 and let me
+32:18 
+
+32:18 to let me apply a filter
+32:23 
+
+32:23 to see better let's say
+32:26 
+
+32:26 show the threads only includes the q two
+32:30 
+
+32:30 so we have this five threads
+32:33 
+
+32:33 and
+32:36 
+
+32:36 all right we have these five threads
+32:38 
+
+32:38 because we have a main thread
+32:40 
+
+32:40 which is this one this highlighted one
+32:43 
+
+32:43 at the top
+32:44 
+
+32:44 and also we have the four subtracts
+32:47 
+
+32:47 which we have created
+32:49 
+
+32:49 right and i want you to see this column
+32:54 
+
+32:54 the stutters
+32:56 
+
+32:56 and we have uh four s's so s
+33:01 
+
+33:01 means sleeping
+33:03 
+
+33:03 and r means running so we have our four
+33:06 
+
+33:06 threads slipping and only one threat is
+33:09 
+
+33:09 running let me do it one more time
+33:14 
+
+33:14 so again
+33:16 
+
+33:16 we have four subtracts running but only
+33:19 
+
+33:19 one of them is running
+33:22 
+
+33:22 at one time all right so we don't have
+33:24 
+
+33:24 the four of them running simultaneously
+33:27 
+
+33:27 so
+33:28 
+
+33:28 it uses the cpu scheduler so uh
+33:32 
+
+33:32 all of the four threads is advancing
+33:35 
+
+33:35 in the time scale but
+33:37 
+
+33:37 only one of them is running at one time
+33:40 
+
+33:40 so
+33:41 
+
+33:41 it runs in an order it runs with a
+33:44 
+
+33:44 scheduler right so it's advancing
+33:47 
+
+33:47 together but
+33:49 
+
+33:49 actually they are not running
+33:51 
+
+33:51 simultaneously so at this stage we are
+33:54 
+
+33:54 going to solve this problem
+34:01 
+
+34:01 and to solve this
+34:03 
+
+34:03 as you remember we are going to use a
+34:05 
+
+34:05 just-in-time compiler from the number
+34:07 
+
+34:07 library so i'm going to import this
+34:11 
+
+34:11 let's
+34:12 
+
+34:12 from number
+34:15 
+
+34:15 import the just in time compiler
+34:18 
+
+34:18 and we can stop
+34:21 
+
+34:21 this
+34:24 
+
+34:24 the ctrl c
+34:26 
+
+34:26 all right
+34:28 
+
+34:28 also minimize
+34:30 
+
+34:30 all right
+34:31 
+
+34:31 we have to
+34:33 
+
+34:33 install this package into our virtual
+34:36 
+
+34:36 environment to get rid of this error we
+34:38 
+
+34:38 are going to use the
+34:40 
+
+34:40 ubuntu terminal so we have already this
+34:43 
+
+34:43 package but i just want to get rid of
+34:46 
+
+34:46 this error
+34:47 
+
+34:47 so i'm going to install the number
+34:51 
+
+34:51 to my virtual environment which i have
+34:54 
+
+34:54 in this project
+34:56 
+
+34:56 and also to use the
+34:58 
+
+34:58 number to use the just in time compiler
+35:00 
+
+35:00 we have to create a static method
+35:04 
+
+35:04 as you remember so i'm going to make
+35:07 
+
+35:07 this
+35:08 
+
+35:08 method
+35:09 
+
+35:09 throw underscore points to
+35:13 
+
+35:13 just turn it to an interface
+35:17 
+
+35:17 and then
+35:19 
+
+35:19 use it
+35:21 
+
+35:21 and then use another static method in
+35:24 
+
+35:24 this interface so i'm going to create
+35:29 
+
+35:29 another method with the same name let's
+35:31 
+
+35:31 say throw on the score points because i
+35:34 
+
+35:34 don't want to change anything in this
+35:36 
+
+35:36 main area so i want it still use the
+35:40 
+
+35:40 same methods find pies with index i that
+35:45 
+
+35:45 throw underscore points i just want to
+35:47 
+
+35:47 change something in the class so i'm
+35:50 
+
+35:50 going to create a
+35:52 
+
+35:52 method with the same name
+35:55 
+
+35:55 and then
+35:56 
+
+35:56 let's
+35:57 
+
+35:57 take this part
+36:04 
+
+36:04 take this part
+36:06 
+
+36:06 into this
+36:10 
+
+36:10 all right we have the number now into
+36:12 
+
+36:12 this interface methods
+36:14 
+
+36:14 around the score points
+36:16 
+
+36:16 and also we are going to
+36:20 
+
+36:20 change this method
+36:23 
+
+36:23 to
+36:25 
+
+36:25 let's use the name throw underscore
+36:27 
+
+36:27 points underscore static
+36:29 
+
+36:29 and of course it's going to be aesthetic
+36:31 
+
+36:31 method so it's not going to use
+36:34 
+
+36:34 anything from self
+36:36 
+
+36:36 and let's use a decorator
+36:39 
+
+36:39 static methods
+36:42 
+
+36:42 all right
+36:43 
+
+36:43 and we are going to use this so
+36:47 
+
+36:47 uh
+36:48 
+
+36:48 it is not going to have the access to
+36:52 
+
+36:52 also the self.i or self dot n
+36:55 
+
+36:55 so i'm going to
+36:57 
+
+36:57 send the self that and and also the x
+36:60 
+
+36:60 lower x upper y over and while upper by
+37:02 
+
+37:02 upper in the input arguments and also
+37:06 
+
+37:06 i'm going to get the self.i as an output
+37:09 
+
+37:09 argument from this certain clause static
+37:12 
+
+37:12 method sorry
+37:13 
+
+37:13 so let's add some input arguments for
+37:18 
+
+37:18 this static method let's use and first
+37:22 
+
+37:22 and
+37:23 
+
+37:23 also all the variables you can uh you
+37:27 
+
+37:27 can use some solution different from
+37:29 
+
+37:29 mine so you can just give all these
+37:32 
+
+37:32 values in lists it it will be easier but
+37:36 
+
+37:36 i want to show you separately so i'm
+37:39 
+
+37:39 going to use the four
+37:41 
+
+37:41 different variables for this job so
+37:44 
+
+37:44 let's use the white hour
+37:46 
+
+37:46 and also wire proof
+37:50 
+
+37:50 all right so i'm going to change this
+37:53 
+
+37:53 range from self.n to n
+37:57 
+
+37:57 and of course
+37:58 
+
+37:58 i cannot use self.i directly so let's
+38:03 
+
+38:03 initialize a variable with the name i
+38:07 
+
+38:07 with the value zero and in this loop
+38:10 
+
+38:10 i don't have to use any index because i
+38:13 
+
+38:13 don't need it so let's change it to the
+38:15 
+
+38:15 underscore so let's say for underscoring
+38:18 
+
+38:18 range n
+38:19 
+
+38:19 all right we are going to generate the x
+38:22 
+
+38:22 and y
+38:24 
+
+38:24 and if we
+38:26 
+
+38:26 get an inner point let's increase the
+38:29 
+
+38:29 value of pi by one
+38:32 
+
+38:32 and then at the end of course we are
+38:34 
+
+38:34 going to return
+38:36 
+
+38:36 the value of i
+38:39 
+
+38:39 all right then we are going to use this
+38:43 
+
+38:43 static method in our interface through
+38:46 
+
+38:46 our underscore points and let's say
+38:48 
+
+38:48 self.i
+38:50 
+
+38:50 will be
+38:53 
+
+38:53 self.draw underscore points on the
+38:55 
+
+38:55 source static with the input arguments
+38:58 
+
+38:58 of course self.n
+39:01 
+
+39:01 and
+39:02 
+
+39:02 all this forwards
+39:12 
+
+39:12 like
+39:13 
+
+39:13 this all right now we have it
+39:18 
+
+39:18 all right
+39:19 
+
+39:19 and we are going to add another
+39:21 
+
+39:21 decorator to use this subject method
+39:24 
+
+39:24 with the just in time compiler so i'm
+39:26 
+
+39:26 going to add at
+39:28 
+
+39:28 jits just in time
+39:30 
+
+39:30 with the arguments no python true
+39:35 
+
+39:35 because we have to
+39:38 
+
+39:38 make it
+39:39 
+
+39:39 just
+39:41 
+
+39:41 with the llvm just c codes
+39:44 
+
+39:44 so make it very fast
+39:46 
+
+39:46 and also of course we don't want
+39:49 
+
+39:49 any guild global interpreter lock so
+39:52 
+
+39:52 we are going to use no gail argument
+39:54 
+
+39:54 with the value true
+39:57 
+
+39:57 all right i think now we are ready
+40:04 
+
+40:04 now in the
+40:06 
+
+40:06 first run
+40:08 
+
+40:08 it just
+40:09 
+
+40:09 compiles and then runs in the second run
+40:13 
+
+40:13 it just
+40:14 
+
+40:14 runs
+40:15 
+
+40:15 all right
+40:16 
+
+40:16 so
+40:17 
+
+40:17 the
+40:18 
+
+40:18 first run
+40:19 
+
+40:19 will be a little bit faster but the
+40:22 
+
+40:22 second run will be much faster
+40:25 
+
+40:25 so let's use
+40:27 
+
+40:27 let's
+40:31 
+
+40:31 in the terminal
+40:33 
+
+40:33 let's run this file again and i think it
+40:36 
+
+40:36 will be very fast
+40:42 
+
+40:42 right now we have
+40:51 
+
+40:51 it compiles
+40:55 
+
+40:55 and runs
+41:01 
+
+41:01 now let's run again
+41:08 
+
+41:08 now it just runs all right the second
+41:11 
+
+41:11 round will be much faster now i'm going
+41:13 
+
+41:13 to increase the number of total points
+41:16 
+
+41:16 to understand what happens
+41:20 
+
+41:20 our solution let's use
+41:22 
+
+41:22 100 million
+41:25 
+
+41:25 and then run again
+41:34 
+
+41:34 all right we have our main threads and
+41:37 
+
+41:37 we have to increase a little more
+41:41 
+
+41:41 let's use one billion
+41:42 
+
+41:42 points
+41:44 
+
+41:44 and also we have a very close value for
+41:46 
+
+41:46 pi as you can see
+41:49 
+
+41:49 so we have we are going to have the main
+41:52 
+
+41:52 threads and also we are going to have
+41:53 
+
+41:53 sub
+41:54 
+
+41:54 four subtracts all of them running as
+41:57 
+
+41:57 you can see all right and we
+41:59 
+
+41:59 are using
+42:00 
+
+42:00 all the resources which i have in my pc
+42:06 
+
+42:06 so now we don't have the race condition
+42:09 
+
+42:09 problem we don't have the deadlock
+42:11 
+
+42:11 problem and we don't have the global
+42:13 
+
+42:13 interpreter log problem guild
+42:15 
+
+42:15 all right so this is the solution
+42:19 
+
+42:19 which i want to
+42:21 
+
+42:21 see
+42:23 
+
+42:23 at your
+42:24 
+
+42:24 papers
+42:25 
+
+42:25 so
+42:26 
+
+42:26 this is for 20 points
+42:29 
+
+42:29 and the implementing the quadrants will
+42:32 
+
+42:32 be five points
+42:34 
+
+42:34 and the
+42:38 
+
+42:38 all right
+42:39 
+
+42:39 and generating four threads will be
+42:43 
+
+42:43 five another five points and
+42:46 
+
+42:46 uh to
+42:48 
+
+42:48 solve the race condition problem uh by
+42:51 
+
+42:51 getting the inner and total points
+42:53 
+
+42:53 separately like this will be another
+42:56 
+
+42:56 five points and to solve the global
+42:58 
+
+42:58 interpreter luck by using jit from
+43:01 
+
+43:01 number will be another five points so
+43:03 
+
+43:03 you are going to have 5 10 15 or 20
+43:07 
+
+43:07 points
+43:08 
+
+43:08 for this
+43:09 
+
+43:09 question and i think it's uh it was uh
+43:13 
+
+43:13 an easy question also
+43:16 
+
+43:16 all right this was the question two so
+43:19 
+
+43:19 let's
+43:21 
+
+43:21 go for the question three
+43:35 
+
+43:35 all right in question three it says we
+43:38 
+
+43:38 have a password which is encrypted with
+43:39 
+
+43:39 the md5 algorithm
+43:44 
+
+43:44 and we can
+43:47 
+
+43:47 cancel this filter
+43:51 
+
+43:51 all right
+43:53 
+
+43:53 we have a password which is encrypted
+43:54 
+
+43:54 with the md5 algorithm and we have this
+43:57 
+
+43:57 password all right write a python
+43:59 
+
+43:59 program it generates multiple threads
+44:02 
+
+44:02 and tries all possible combinations to
+44:04 
+
+44:04 guest password
+44:06 
+
+44:06 the rules are given below the number of
+44:08 
+
+44:08 threads should be equal to the number of
+44:10 
+
+44:10 cpus so we should get the number of cpus
+44:13 
+
+44:13 which we have in our pc
+44:16 
+
+44:16 so
+44:17 
+
+44:17 the per the program should not cause any
+44:20 
+
+44:20 problems stated in question one all
+44:22 
+
+44:22 right we
+44:23 
+
+44:23 are not going to suffer from race
+44:25 
+
+44:25 condition or deadlock and global
+44:26 
+
+44:26 interpreter like i think it's more
+44:29 
+
+44:29 it's more than a tricky problem
+44:32 
+
+44:32 so the length of the password is going
+44:34 
+
+44:34 to be eight characters all right it's a
+44:37 
+
+44:37 limited number it's good and then
+44:40 
+
+44:40 the password is a combination of
+44:42 
+
+44:42 uppercase letters and lowercase letters
+44:44 
+
+44:44 and also the digits
+44:46 
+
+44:46 so it's going to include some numbers
+44:48 
+
+44:48 and some letters and all threads should
+44:50 
+
+44:50 stop immediately when a threat finds the
+44:53 
+
+44:53 password
+44:54 
+
+44:54 all right you should use the libraries
+44:56 
+
+44:56 given below hash flip of course to
+44:58 
+
+44:58 generate the md5
+45:01 
+
+45:01 encrypted text and string to get these
+45:05 
+
+45:05 letters and digits
+45:07 
+
+45:07 and os to find the number of cpu
+45:10 
+
+45:10 and also the random maybe we can use it
+45:13 
+
+45:13 and threading to create multiple threads
+45:15 
+
+45:15 and also the number
+45:17 
+
+45:17 to solve the global interpreter log
+45:20 
+
+45:20 problem
+45:21 
+
+45:21 all right and also it says you can use
+45:23 
+
+45:23 the code snippets or functions which are
+45:25 
+
+45:25 given below
+45:27 
+
+45:27 and they are string that ask letters to
+45:30 
+
+45:30 get all the lowercase and uppercase
+45:32 
+
+45:32 letters together and also the string
+45:34 
+
+45:34 that digits to get the numbers
+45:37 
+
+45:37 and also we have a function which is
+45:39 
+
+45:39 given in the
+45:40 
+
+45:40 exam paper and it says it's a function
+45:44 
+
+45:44 text underscore to underscore md5 which
+45:47 
+
+45:47 generates
+45:48 
+
+45:48 the encrypted text for any text so we
+45:52 
+
+45:52 are going to generate
+45:54 
+
+45:54 some
+45:55 
+
+45:55 adobe passwords which is
+45:58 
+
+45:58 equal to the eight characters and also
+46:01 
+
+46:01 and then we are going to generate the
+46:05 
+
+46:05 encrypted text with the md5 algorithm
+46:08 
+
+46:08 and then we are going to compare this
+46:10 
+
+46:10 generated text
+46:11 
+
+46:11 with this password which is given in the
+46:13 
+
+46:13 question and we are going to use
+46:17 
+
+46:17 all the cpus
+46:19 
+
+46:19 that's good
+46:21 
+
+46:21 all right let's let's start
+46:24 
+
+46:24 sorry
+46:33 
+
+46:33 let's create a new file
+46:40 
+
+46:40 let me check the text again
+46:49 
+
+46:49 all right
+46:50 
+
+46:50 let's
+46:51 
+
+46:51 import the mandatory libraries first
+46:55 
+
+46:55 hash flip
+46:58 
+
+46:58 os
+47:01 
+
+47:01 and from trading of course
+47:04 
+
+47:04 threats
+47:13 
+
+47:13 i'm going to get text
+47:20 
+
+47:20 all right let's use random
+47:23 
+
+47:23 also string we are going to need it
+47:25 
+
+47:25 string
+47:27 
+
+47:27 and random
+47:30 
+
+47:30 i think it's
+47:31 
+
+47:31 enough for
+47:35 
+
+47:35 now
+47:37 
+
+47:37 let's create a class
+47:41 
+
+47:41 with the name let's use brute force
+47:45 
+
+47:45 i'm going to create a constructor
+47:47 
+
+47:47 thunder in under
+47:50 
+
+47:50 and i'm going to get the
+47:51 
+
+47:51 password
+47:52 
+
+47:52 from outside there's an input argument
+47:55 
+
+47:55 and answer the length which is equal to
+47:57 
+
+47:57 8 i think for this question
+47:59 
+
+47:59 and let's say the propertyself.pwd
+48:03 
+
+48:03 will be equal to password
+48:05 
+
+48:05 and also the self.charts
+48:08 
+
+48:08 we are going to use to generate some
+48:11 
+
+48:11 random passwords and as given in the
+48:14 
+
+48:14 question
+48:16 
+
+48:16 so we are going to use the uppercase and
+48:18 
+
+48:18 lowercase letters and also the digits
+48:20 
+
+48:20 the numbers so i'm going to create a
+48:24 
+
+48:24 character pool by using these two
+48:28 
+
+48:28 functions string that ascii letters
+48:31 
+
+48:31 plus
+48:32 
+
+48:32 string dot digits
+48:36 
+
+48:36 all right so it gives me
+48:39 
+
+48:39 a bunch of characters which includes the
+48:41 
+
+48:41 lowercase letters uppercase letters and
+48:43 
+
+48:43 also additions
+48:45 
+
+48:45 so i'm going to use it
+48:48 
+
+48:48 and at one point we are going to stop
+48:51 
+
+48:51 all these threats
+48:53 
+
+48:53 if we find the correct
+48:56 
+
+48:56 password so let's say self.font
+48:60 
+
+48:60 it's going to be a control variable and
+49:03 
+
+49:03 it's
+49:04 
+
+49:04 false at the beginning when we find the
+49:06 
+
+49:06 password it's going to change to true
+49:11 
+
+49:11 and stops all the threads all the other
+49:14 
+
+49:14 threads so and also we are going to need
+49:17 
+
+49:17 the length
+49:20 
+
+49:20 which is going to be eight
+49:24 
+
+49:24 all right
+49:27 
+
+49:27 let's
+49:28 
+
+49:28 create a method
+49:30 
+
+49:30 we generate some random combinations
+49:34 
+
+49:34 with the name random
+49:35 
+
+49:35 combination
+49:46 
+
+49:46 and in this method i'm going to use the
+49:50 
+
+49:50 function which is given in question so
+49:54 
+
+49:54 with the name text to md5 so i'm just
+49:59 
+
+49:59 going to use this function text to md5
+50:01 
+
+50:01 in just this method so i'm going to put
+50:04 
+
+50:04 this function into this method
+50:07 
+
+50:07 i just want to make it usable by just
+50:11 
+
+50:11 this method so let's put them here you
+50:14 
+
+50:14 can put this function whatever you want
+50:16 
+
+50:16 whenever you whatever you want all right
+50:18 
+
+50:18 so you can put this function at the
+50:20 
+
+50:20 outside of the class or as a method of
+50:23 
+
+50:23 the class but i just put it in the
+50:26 
+
+50:26 methods
+50:29 
+
+50:29 text to md5 for
+50:32 
+
+50:32 text
+50:34 
+
+50:34 as given in the question
+50:36 
+
+50:36 let's say encoded underscore text will
+50:39 
+
+50:39 be equal to hash slip
+50:43 
+
+50:43 dot
+50:44 
+
+50:44 md5
+50:47 
+
+50:47 tags that
+50:48 
+
+50:48 encode
+50:51 
+
+50:51 like this
+50:52 
+
+50:52 and then return
+50:54 
+
+50:54 encoded text
+50:56 
+
+50:56 that
+50:57 
+
+50:57 hacks
+50:59 
+
+50:59 biggest so it's going to return a
+51:03 
+
+51:03 32 character md5 encrypted password like
+51:08 
+
+51:08 given in the question so you can use it
+51:12 
+
+51:12 as is all right as given in the question
+51:16 
+
+51:16 directly
+51:18 
+
+51:18 and
+51:24 
+
+51:24 let's generate some
+51:27 
+
+51:27 password i'm going to initialize a text
+51:30 
+
+51:30 and empty text
+51:32 
+
+51:32 and then add some random characters at
+51:34 
+
+51:34 the end of this text
+51:37 
+
+51:37 so let's create let's initialize a
+51:40 
+
+51:40 variable with the name generated
+51:41 
+
+51:41 underscore text
+51:44 
+
+51:44 like this
+51:47 
+
+51:47 and then for
+51:48 
+
+51:48 underscore in range
+51:52 
+
+51:52 of course the length
+51:54 
+
+51:54 because i will do this thing
+51:57 
+
+51:57 for every character in the password and
+52:01 
+
+52:01 it says in the question it's going to be
+52:04 
+
+52:04 eight characters
+52:06 
+
+52:06 so let's use self.lengths here
+52:13 
+
+52:13 all right
+52:15 
+
+52:15 so how can
+52:17 
+
+52:17 i uh
+52:18 
+
+52:18 how can i add
+52:20 
+
+52:20 at the end of this generated text a
+52:23 
+
+52:23 random character from our self. charts
+52:28 
+
+52:28 lists
+52:30 
+
+52:30 so
+52:31 
+
+52:31 we can generate
+52:33 
+
+52:33 a position
+52:34 
+
+52:34 and index
+52:36 
+
+52:36 to get it from the surf dot chart so
+52:40 
+
+52:40 let's generate a random integer and
+52:42 
+
+52:42 let's use the variable r
+52:44 
+
+52:44 from random library i'm going to use the
+52:47 
+
+52:47 random methods
+52:50 
+
+52:50 and between zero
+52:52 
+
+52:52 and
+52:53 
+
+52:53 to the number
+52:55 
+
+52:55 which is equal to the length of the self
+52:58 
+
+52:58 dot charts right so i'm going to say len
+53:02 
+
+53:02 self dot charts
+53:05 
+
+53:05 so it's going to give me a random
+53:07 
+
+53:07 integer between zero and the length
+53:10 
+
+53:10 between the length of the self.charge so
+53:13 
+
+53:13 how many characters do we have in the
+53:16 
+
+53:16 self.just maybe uh
+53:18 
+
+53:18 26 letters for uppercase 26 that are for
+53:21 
+
+53:21 the lowercase it makes 52 and also we
+53:24 
+
+53:24 have 10 digits and it's going to be
+53:26 
+
+53:26 equal to something between the something
+53:28 
+
+53:28 around the sixty two
+53:30 
+
+53:30 all right but uh i want to be careful
+53:32 
+
+53:32 about one thing the random method will
+53:35 
+
+53:35 be use will use the limits
+53:38 
+
+53:38 both of them included so it's going to
+53:42 
+
+53:42 generate some random integer between
+53:44 
+
+53:44 zero and the line of self.charts but
+53:47 
+
+53:47 it's going to be an index so the upper
+53:50 
+
+53:50 limit should be length
+53:52 
+
+53:52 from the self.jars minus one
+53:56 
+
+53:56 all right
+53:57 
+
+53:57 it's not important in the exam if you
+53:60 
+
+53:60 don't use the minus one so i don't
+54:04 
+
+54:04 i don't care about so much so but i'm
+54:07 
+
+54:07 going to do it correct at this point so
+54:09 
+
+54:09 i'm going to use
+54:11 
+
+54:11 a charge minus one like this so it
+54:14 
+
+54:14 generates
+54:15 
+
+54:15 for us a random
+54:18 
+
+54:18 index
+54:23 
+
+54:23 all right then i'm going to get this
+54:26 
+
+54:26 random character from the self.charge so
+54:28 
+
+54:28 let's say generate the text
+54:32 
+
+54:32 put it
+54:33 
+
+54:33 at the end so add
+54:35 
+
+54:35 a random character at the end of this
+54:37 
+
+54:37 generated text
+54:39 
+
+54:39 from the self.charts
+54:42 
+
+54:42 with the index r
+54:44 
+
+54:44 like this
+54:49 
+
+54:49 all right
+54:50 
+
+54:50 i'm going to do this
+54:53 
+
+54:53 uh
+54:54 
+
+54:54 to the
+54:55 
+
+54:55 point that we have the
+54:58 
+
+54:58 uh correct number of characters which is
+55:01 
+
+55:01 going to be eight for this question so
+55:03 
+
+55:03 i'm going to do it eight
+55:05 
+
+55:05 times at the end after finishing after
+55:09 
+
+55:09 completing this loop i'm going to check
+55:12 
+
+55:12 the text and let's say if text 2md5
+55:16 
+
+55:16 are generated text
+55:20 
+
+55:20 if it's going to be equal to self.pwd
+55:25 
+
+55:25 which is the password
+55:27 
+
+55:27 which we gave
+55:29 
+
+55:29 then we can stop all the threads and
+55:32 
+
+55:32 let's say self.found
+55:35 
+
+55:35 2.
+55:41 
+
+55:41 all right
+55:43 
+
+55:43 and if we use this variable ceph.font so
+55:48 
+
+55:48 we should i think the
+55:51 
+
+55:51 and also we can just use the quit here
+55:54 
+
+55:54 to complete
+55:57 
+
+55:57 all right
+56:01 
+
+56:01 and also i think we are
+56:04 
+
+56:04 going to add here a condition
+56:09 
+
+56:09 like
+56:10 
+
+56:10 let's say the while
+56:12 
+
+56:12 not
+56:13 
+
+56:13 serve that's fonts
+56:16 
+
+56:16 to make it safer
+56:19 
+
+56:19 like this
+56:22 
+
+56:22 it makes us immediately stop for each
+56:26 
+
+56:26 threads
+56:27 
+
+56:27 if
+56:28 
+
+56:28 one of the threats
+56:30 
+
+56:30 finds the correct password
+56:34 
+
+56:34 all right i think we are okay
+56:38 
+
+56:38 and also we can
+56:44 
+
+56:44 add here an output to show you the if it
+56:47 
+
+56:47 is working or not so i'm going to add
+56:49 
+
+56:49 here a print line
+56:51 
+
+56:51 and let's say print f
+56:56 
+
+56:56 and
+57:01 
+
+57:01 let's say trying
+57:03 
+
+57:03 which password and let's say it's
+57:05 
+
+57:05 generated text not pat
+57:09 
+
+57:09 sorry generated text
+57:12 
+
+57:12 like this
+57:14 
+
+57:14 and also here
+57:17 
+
+57:17 let's say print
+57:20 
+
+57:20 f
+57:22 
+
+57:22 font
+57:25 
+
+57:25 the
+57:27 
+
+57:27 generated texts
+57:30 
+
+57:30 all right then stops
+57:32 
+
+57:32 quits
+57:35 
+
+57:35 all right
+57:38 
+
+57:38 now we are okay let's use this class
+57:41 
+
+57:41 if done their name
+57:45 
+
+57:45 under
+57:46 
+
+57:46 main donder
+57:49 
+
+57:49 then create an instance to our class put
+57:53 
+
+57:53 force let's say brute force
+57:57 
+
+57:57 will be equal to brute force
+57:60 
+
+57:60 and we are going to give the
+58:02 
+
+58:02 password
+58:04 
+
+58:04 and also the length right so we are
+58:07 
+
+58:07 going to use the pwd here and also the
+58:09 
+
+58:09 length
+58:10 
+
+58:10 so let's give the length as 8
+58:14 
+
+58:14 and also i'm going to copy the password
+58:16 
+
+58:16 which is given in the question
+58:24 
+
+58:24 this is it
+58:26 
+
+58:26 all right
+58:29 
+
+58:29 so
+58:30 
+
+58:30 then let's
+58:33 
+
+58:33 generate threads
+58:37 
+
+58:37 let's initialize an empty list
+58:41 
+
+58:41 and then for
+58:43 
+
+58:43 let's say i
+58:44 
+
+58:44 in range
+58:47 
+
+58:47 os that cpu count
+58:50 
+
+58:50 this is the way we can find the number
+58:52 
+
+58:52 of cpus that we have in our pc
+58:56 
+
+58:56 so append this lists
+58:58 
+
+58:58 threads events
+59:03 
+
+59:03 with the threat clause
+59:06 
+
+59:06 of course the target
+59:08 
+
+59:08 is from our
+59:10 
+
+59:10 brute force
+59:12 
+
+59:12 but
+59:14 
+
+59:14 uh
+59:16 
+
+59:16 what was the name of the methods random
+59:18 
+
+59:18 combination random
+59:21 
+
+59:21 combination
+59:23 
+
+59:23 like this
+59:26 
+
+59:26 all right then we are going to
+59:29 
+
+59:29 start all the threads so let's say
+59:31 
+
+59:31 threads and threads
+59:35 
+
+59:35 threads dot start
+59:38 
+
+59:38 and then join
+59:40 
+
+59:40 like we did in question two
+59:45 
+
+59:45 that's threats dot join
+59:52 
+
+59:52 and i think we are okay
+59:56 
+
+59:56 do we have an error or warning
+60:06 
+
+60:06 where is the
+60:07 
+
+60:07 warning i cannot see
+60:10 
+
+60:10 oh no
+60:11 
+
+60:11 we don't have
+60:13 
+
+60:13 any alright let's run
+60:17 
+
+60:17 and see the outputs
+60:32 
+
+60:32 all right they're not
+60:36 
+
+60:36 sorry
+60:39 
+
+60:39 stop stop stop stop
+60:47 
+
+60:47 all right let's investigate the output
+60:50 
+
+60:50 i think there is a problem
+61:00 
+
+61:00 what is it why
+61:07 
+
+61:07 we have generated
+61:23 
+
+61:23 all right let's put here run
+61:26 
+
+61:26 and debug the code
+61:38 
+
+61:38 this generated text is this which is the
+61:43 
+
+61:43 eight characters
+61:45 
+
+61:45 all right
+61:50 
+
+61:50 then
+61:55 
+
+61:55 oh
+61:58 
+
+61:58 we have to
+62:02 
+
+62:02 all right all right we have to put this
+62:04 
+
+62:04 genetic text in this loop all right
+62:08 
+
+62:08 let's stop it
+62:12 
+
+62:12 and put it here
+62:15 
+
+62:15 generate two texts that'll be an empty
+62:18 
+
+62:18 text
+62:25 
+
+62:25 sorry
+62:26 
+
+62:26 let's debug again
+62:35 
+
+62:35 all right this is our first password
+62:40 
+
+62:40 and second password
+62:42 
+
+62:42 and a new password
+62:44 
+
+62:44 and a new password
+62:46 
+
+62:46 right it works
+62:52 
+
+62:52 now we can run directly
+62:55 
+
+62:55 without debug
+62:57 
+
+62:57 all right
+62:59 
+
+62:59 at some lines it's online at some lines
+63:02 
+
+63:02 you can see more than one password
+63:05 
+
+63:05 because it's
+63:07 
+
+63:07 running
+63:08 
+
+63:08 nearly
+63:10 
+
+63:10 simultaneously so it
+63:12 
+
+63:12 more than one thread can put one line
+63:15 
+
+63:15 they are their passwords
+63:18 
+
+63:18 so
+63:20 
+
+63:20 all right they are trying and trying for
+63:22 
+
+63:22 the
+63:24 
+
+63:24 eight characters
+63:25 
+
+63:25 and
+63:26 
+
+63:26 it's not
+63:28 
+
+63:28 an efficient solution
+63:32 
+
+63:32 but
+63:34 
+
+63:34 why isn't
+63:35 
+
+63:35 inefficient
+63:46 
+
+63:46 we cannot use just the randomization
+63:52 
+
+63:52 for the
+63:59 
+
+63:59 for this problem because
+64:01 
+
+64:01 uh
+64:02 
+
+64:02 we cannot find the
+64:05 
+
+64:05 correct password by using this
+64:07 
+
+64:07 approximation right so it generates one
+64:11 
+
+64:11 random password and it can regenerate
+64:14 
+
+64:14 the same password it can find the
+64:17 
+
+64:17 solution
+64:18 
+
+64:18 with the trying number
+64:20 
+
+64:20 one or two for example or it cannot find
+64:22 
+
+64:22 the correct solution
+64:24 
+
+64:24 uh
+64:25 
+
+64:25 for years and years so it's not the it's
+64:29 
+
+64:29 not a fixed solution right
+64:32 
+
+64:32 so
+64:33 
+
+64:33 you can try
+64:36 
+
+64:36 every combination but
+64:40 
+
+64:40 it's not
+64:41 
+
+64:41 guaranteed all right so we have to for
+64:44 
+
+64:44 example if you can just
+64:48 
+
+64:48 write a solution like this i can accept
+64:50 
+
+64:50 this and give your 30 points it's not
+64:53 
+
+64:53 problem but
+64:55 
+
+64:55 for the real solution of this question
+64:58 
+
+64:58 we have to
+64:60 
+
+65:00 improve
+65:01 
+
+65:01 our code
+65:04 
+
+65:04 so
+65:07 
+
+65:07 let's say it again for the exam it's
+65:10 
+
+65:10 going to be enough but for the
+65:13 
+
+65:13 real solution for the real world it's
+65:16 
+
+65:16 not enough
+65:17 
+
+65:17 so let's improve this code
+65:22 
+
+65:22 little
+65:32 
+
+65:32 all right let's remove this
+65:37 
+
+65:37 so
+65:38 
+
+65:38 the problem is generating the password
+65:42 
+
+65:42 randomly
+65:43 
+
+65:43 all right
+65:44 
+
+65:44 so generating the
+65:47 
+
+65:47 password randomly we have to generate
+65:52 
+
+65:52 we have to use
+65:54 
+
+65:54 all combinations
+65:56 
+
+65:56 all combinations for example let me draw
+65:59 
+
+65:59 it for you
+66:01 
+
+66:01 let's minimize this h top
+66:06 
+
+66:06 let's say we don't have all these
+66:08 
+
+66:08 characters
+66:10 
+
+66:10 in our self.charts but let's just
+66:14 
+
+66:14 sorry
+66:15 
+
+66:15 just
+66:17 
+
+66:17 have for example three letters
+66:23 
+
+66:23 the rest of the video will be about just
+66:25 
+
+66:25 the
+66:26 
+
+66:26 improvements
+66:27 
+
+66:27 and
+66:29 
+
+66:29 you can just stop the video and quit if
+66:32 
+
+66:32 you don't want to see it but
+66:34 
+
+66:34 it will take some time so in
+66:37 
+
+66:37 let's say in self.jars
+66:41 
+
+66:41 left.charts
+66:42 
+
+66:42 let's say we have just three characters
+66:45 
+
+66:45 for example a
+66:47 
+
+66:47 b
+66:47 
+
+66:47 and c
+66:49 
+
+66:49 so
+66:50 
+
+66:50 i'm curious about the all possible
+66:53 
+
+66:53 combinations if you
+66:55 
+
+66:55 if we use the randomization so it can
+66:59 
+
+66:59 generate just a a c for example and then
+67:02 
+
+67:02 a c again
+67:04 
+
+67:04 and maybe a b c and b a c
+67:07 
+
+67:07 and let's let's say the password will be
+67:10 
+
+67:10 bbb
+67:12 
+
+67:12 like this
+67:13 
+
+67:13 uh it can work for years and years and
+67:17 
+
+67:17 it cannot just find pbb all right it's
+67:20 
+
+67:20 not guaranteed but if we want to
+67:24 
+
+67:24 use the all possible combinations then
+67:27 
+
+67:27 we should start with the a
+67:30 
+
+67:30 a
+67:31 
+
+67:31 a
+67:32 
+
+67:32 and then change one of these characters
+67:35 
+
+67:35 let's say a a b for example and a a c
+67:40 
+
+67:40 then and then change another character
+67:43 
+
+67:43 like a b a
+67:46 
+
+67:46 and a b
+67:49 
+
+67:49 b
+67:50 
+
+67:50 and a b
+67:51 
+
+67:51 c like this right
+67:54 
+
+67:54 and then we can
+67:55 
+
+67:55 change this one now and let's say b
+67:59 
+
+67:59 a
+68:01 
+
+68:01 of course we should
+68:03 
+
+68:03 continue with the a c a
+68:06 
+
+68:06 a c b something
+68:08 
+
+68:08 all the way up to
+68:11 
+
+68:11 c
+68:12 
+
+68:12 c
+68:13 
+
+68:13 c right
+68:15 
+
+68:15 so
+68:16 
+
+68:16 these are the positions
+68:18 
+
+68:18 like self dot
+68:21 
+
+68:21 self dot for example self dot
+68:25 
+
+68:25 charge
+68:26 
+
+68:26 zero
+68:28 
+
+68:28 except that charge zero is a
+68:32 
+
+68:32 and
+68:33 
+
+68:33 self.jars
+68:36 
+
+68:36 one
+68:38 
+
+68:38 is b
+68:39 
+
+68:39 and also the self that charts
+68:44 
+
+68:44 2
+68:46 
+
+68:46 is c
+68:47 
+
+68:47 right
+68:49 
+
+68:49 so these are the combinations actually
+68:52 
+
+68:52 of this indices so the aaa will be zero
+68:57 
+
+68:57 zero zero right
+68:59 
+
+68:59 and this one is zero zero one this is
+69:03 
+
+69:03 zero zero two and this one is zero one
+69:06 
+
+69:06 zero
+69:07 
+
+69:07 zero one one and zero one two like this
+69:11 
+
+69:11 all the way up to
+69:13 
+
+69:13 two two
+69:14 
+
+69:14 two right
+69:16 
+
+69:16 so we should get the all of these
+69:20 
+
+69:20 combinations of course for eight we are
+69:22 
+
+69:22 going to have the eight positions so
+69:26 
+
+69:26 zero zero zero
+69:28 
+
+69:28 zero zero zero zero like this
+69:31 
+
+69:31 and also if we have what was it like 62
+69:36 
+
+69:36 62 characters in our self.jars
+69:40 
+
+69:40 then these positions are will be 61 61
+69:45 
+
+69:45 61
+69:46 
+
+69:46 like this all right
+69:48 
+
+69:48 eight times 61 61
+69:53 
+
+69:53 61
+69:54 
+
+69:54 61
+69:55 
+
+69:55 and another 61.
+69:58 
+
+69:58 these are the combinations so the
+69:60 
+
+69:60 combinations will be
+70:01 
+
+70:01 the 61 times 61 times 61 times 61 times
+70:07 
+
+70:07 61 so 61 to the power of eight
+70:12 
+
+70:12 these are the combinations
+70:14 
+
+70:14 right so to generate these
+70:18 
+
+70:18 combinations we have to
+70:21 
+
+70:21 use some indices right we have to get
+70:24 
+
+70:24 all of these combinations and at one
+70:26 
+
+70:26 point for example like this one
+70:29 
+
+70:29 we get this combination
+70:32 
+
+70:32 and we can change these indices with the
+70:34 
+
+70:34 characters like the a
+70:36 
+
+70:36 b
+70:37 
+
+70:37 c
+70:38 
+
+70:38 because the zero is a
+70:41 
+
+70:41 one is b and two is c
+70:43 
+
+70:43 so
+70:45 
+
+70:45 the real thing is generating all these
+70:48 
+
+70:48 indices and to do this
+70:52 
+
+70:52 which is a very primitive
+70:54 
+
+70:54 algorithm so we can for example let's
+70:57 
+
+70:57 say for a
+70:60 
+
+70:60 in range
+71:03 
+
+71:03 2 for example
+71:05 
+
+71:05 it generates for us a 0 1 and 2 right so
+71:09 
+
+71:09 for every value of a we should generate
+71:13 
+
+71:13 the value of b for b
+71:15 
+
+71:15 in
+71:16 
+
+71:16 range
+71:18 
+
+71:18 2 for example
+71:20 
+
+71:20 and also for every combination of a and
+71:23 
+
+71:23 b we should iterate towards c
+71:26 
+
+71:26 so
+71:26 
+
+71:26 we are going to use this another inner
+71:29 
+
+71:29 loop so we have we will have
+71:32 
+
+71:32 the three uh nesotubes range two like
+71:35 
+
+71:35 this so
+71:37 
+
+71:37 in the first loop we are going to have
+71:40 
+
+71:40 the zero zero zero and then zero zero
+71:42 
+
+71:42 one and then zero zero two and it goes
+71:44 
+
+71:44 like this right
+71:46 
+
+71:46 so we can
+71:47 
+
+71:47 have all these combinations by using
+71:50 
+
+71:50 these nested loops
+71:52 
+
+71:52 so let's implement these loops into our
+71:56 
+
+71:56 solution and uh remove the random parts
+72:00 
+
+72:00 and see the next problem that we are
+72:03 
+
+72:03 going to deal with
+72:06 
+
+72:06 so let's do this
+72:14 
+
+72:14 all right
+72:17 
+
+72:17 we have the self.jars and i'm going to
+72:23 
+
+72:23 this indices combinations and let's use
+72:25 
+
+72:25 self.jars
+72:27 
+
+72:27 underscore indices for example like this
+72:31 
+
+72:31 and of course we should
+72:34 
+
+72:34 use just
+72:35 
+
+72:35 fixed number now because we are going to
+72:38 
+
+72:38 use the nested loops
+72:41 
+
+72:41 and i'm going to
+72:43 
+
+72:43 write the loops
+72:45 
+
+72:45 for a limited
+72:47 
+
+72:47 number right so i'm going to
+72:49 
+
+72:49 fix the solution i'm going to lock the
+72:51 
+
+72:51 solution by using just eight characters
+72:54 
+
+72:54 now
+72:56 
+
+72:56 this is not the correct solution we are
+72:57 
+
+72:57 going to deal with another problem now
+72:60 
+
+72:60 so i'm going to use eight
+73:02 
+
+73:02 indices and let's use the
+73:04 
+
+73:04 letters for it and let's use the a
+73:08 
+
+73:08 b
+73:09 
+
+73:09 sorry with commas of course a b c d e
+73:13 
+
+73:13 f
+73:14 
+
+73:14 g and h these are eight right
+73:18 
+
+73:18 right
+73:19 
+
+73:19 all right
+73:21 
+
+73:21 and i'm going to
+73:22 
+
+73:22 iterate in the range
+73:25 
+
+73:25 of course uh with the limit how many
+73:28 
+
+73:28 characters do we have
+73:30 
+
+73:30 we have in the self.charge so i'm going
+73:32 
+
+73:32 to
+73:33 
+
+73:33 use for loops for this and let's say for
+73:36 
+
+73:36 a for example in range
+73:38 
+
+73:38 uh length of self.jars
+73:44 
+
+73:44 like
+73:45 
+
+73:45 this
+73:47 
+
+73:47 and also for b i'm going to do the same
+73:49 
+
+73:49 thing for b in range
+73:52 
+
+73:52 length of self.jars
+73:55 
+
+73:55 so i'm going to do the same thing for
+73:57 
+
+73:57 every variable actually so every index
+74:00 
+
+74:00 so for c d e f g and h
+74:04 
+
+74:04 like this
+74:08 
+
+74:08 c
+74:10 
+
+74:10 c
+74:12 
+
+74:12 d
+74:13 
+
+74:13 e
+74:15 
+
+74:15 f
+74:16 
+
+74:16 g
+74:17 
+
+74:17 and h
+74:20 
+
+74:20 all right
+74:21 
+
+74:21 so
+74:23 
+
+74:23 with this i'm going to generate
+74:26 
+
+74:26 the random combinations with the 61 to
+74:29 
+
+74:29 the power of eight
+74:32 
+
+74:32 right
+74:34 
+
+74:34 so this is going to be a real problem so
+74:36 
+
+74:36 i'm going to change something in the
+74:40 
+
+74:40 random combination
+74:43 
+
+74:43 methods
+74:44 
+
+74:44 also let's don't use random anymore
+74:47 
+
+74:47 because i'm going to remove the usage of
+74:49 
+
+74:49 random so let's just say combination
+74:53 
+
+74:53 and it includes again this
+74:55 
+
+74:55 solution
+74:56 
+
+74:56 and also
+75:01 
+
+75:01 how can i do this
+75:08 
+
+75:08 [Music]
+75:10 
+
+75:10 i'm going to use
+75:11 
+
+75:11 also the eight
+75:14 
+
+75:14 threads because i have eight cpus in my
+75:19 
+
+75:19 computer
+75:26 
+
+75:26 all right let's let's draw a tree to
+75:29 
+
+75:29 understand
+75:35 
+
+75:35 you get this part so i'm going to delete
+75:37 
+
+75:37 this part
+75:50 
+
+75:50 all right
+75:51 
+
+75:51 now i'm going to have this number of
+75:53 
+
+75:53 combinations
+75:55 
+
+75:55 right
+75:56 
+
+75:56 for example
+75:58 
+
+75:58 i have this combination with the index
+76:02 
+
+76:02 zero in the sev
+76:05 
+
+76:05 that charts underscore indices right so
+76:08 
+
+76:08 the next combination will be one the
+76:10 
+
+76:10 next combination will be two the next
+76:12 
+
+76:12 combination will be three four and it
+76:14 
+
+76:14 goes like this up to the point
+76:17 
+
+76:17 uh with the combination number the index
+76:20 
+
+76:20 of course the
+76:22 
+
+76:22 61 to the power of eight minus one
+76:24 
+
+76:24 because it starts from zero right so it
+76:27 
+
+76:27 can for example
+76:30 
+
+76:30 uh if we have eight
+76:32 
+
+76:32 threads
+76:33 
+
+76:33 and i want them all of them running at
+76:36 
+
+76:36 the same time so let's
+76:38 
+
+76:38 write this indices like
+76:41 
+
+76:41 can i write them like this 0 1
+76:45 
+
+76:45 2
+76:46 
+
+76:46 3
+76:47 
+
+76:47 four
+76:49 
+
+76:49 five
+76:50 
+
+76:50 six
+76:51 
+
+76:51 and seven
+76:52 
+
+76:52 and it makes eight of them and then i
+76:54 
+
+76:54 can continue from the next line like 8
+76:58 
+
+76:58 9
+76:59 
+
+76:59 10
+76:60 
+
+76:60 11 12
+77:02 
+
+77:02 13 14
+77:04 
+
+77:04 and 15
+77:06 
+
+77:06 and then of course it goes like this
+77:12 
+
+77:12 20 21 22
+77:16 
+
+77:16 23
+77:18 
+
+77:18 24
+77:21 
+
+77:21 25
+77:22 
+
+77:22 26 27
+77:25 
+
+77:25 28 29 30 and 31
+77:29 
+
+77:29 and let's just write one more line
+77:38 
+
+77:38 we have all this
+77:40 
+
+77:40 combination index all right
+77:43 
+
+77:43 starting from zero
+77:45 
+
+77:45 all the way up to
+77:49 
+
+77:49 i think this is a problem it's it's
+77:50 
+
+77:50 going to be 32 33 34 35
+77:54 
+
+77:54 36 37 i just corrected number 38. and
+77:59 
+
+77:59 continue it to 40.
+78:01 
+
+78:01 all right starting from zero all the way
+78:03 
+
+78:03 up to 61 to the power of eight minus one
+78:06 
+
+78:06 and i have eight
+78:08 
+
+78:08 threats
+78:11 
+
+78:11 you can have four threads five threads
+78:13 
+
+78:13 sixteen threads thirty two threads it
+78:15 
+
+78:15 doesn't matter
+78:17 
+
+78:17 it doesn't matter
+78:18 
+
+78:18 all right
+78:19 
+
+78:19 and i want them the combinations
+78:24 
+
+78:24 let's say this column
+78:28 
+
+78:28 this column for example
+78:31 
+
+78:31 i want
+78:32 
+
+78:32 this column to be handled by the thread
+78:36 
+
+78:36 zero
+78:37 
+
+78:37 thread zero
+78:40 
+
+78:40 and i want this column
+78:43 
+
+78:43 to be handled by of course it's
+78:46 
+
+78:46 it continues
+78:48 
+
+78:48 to be handled by thread 1
+78:51 
+
+78:51 and also this column
+78:53 
+
+78:53 like this
+78:54 
+
+78:54 to be handled by thread two
+78:58 
+
+78:58 and it goes like this thread three for
+79:01 
+
+79:01 this stretch four
+79:02 
+
+79:02 from this and threads five
+79:05 
+
+79:05 for this thread six
+79:08 
+
+79:08 thread seven
+79:09 
+
+79:09 total of eight frets
+79:11 
+
+79:11 right
+79:12 
+
+79:12 so to make this
+79:14 
+
+79:14 i'm going to
+79:15 
+
+79:15 create a loop
+79:17 
+
+79:17 and let's say
+79:19 
+
+79:19 these threads
+79:20 
+
+79:20 have the the thread number for example a
+79:24 
+
+79:24 lowercase t a variable it's going to be
+79:26 
+
+79:26 a zero for this thread it's going to be
+79:29 
+
+79:29 one it's going to be two for this thread
+79:32 
+
+79:32 and it's going to be seven for the last
+79:34 
+
+79:34 thread
+79:35 
+
+79:35 all right and also i'm going to create
+79:38 
+
+79:38 my loop let's say for i
+79:42 
+
+79:42 in range
+79:46 
+
+79:46 and for example let's start from not
+79:50 
+
+79:50 zero but zero plus
+79:53 
+
+79:53 t
+79:54 
+
+79:54 right so it makes for this thread start
+79:58 
+
+79:58 from zero but for this thread start from
+80:00 
+
+80:00 one
+80:01 
+
+80:01 therefore this thread starts from two
+80:03 
+
+80:03 for the stress as from 3 and for the
+80:05 
+
+80:05 last threat starts from 7
+80:08 
+
+80:08 all right
+80:09 
+
+80:09 and also
+80:11 
+
+80:11 of course
+80:12 
+
+80:12 starting from 0 plus
+80:15 
+
+80:15 t
+80:16 
+
+80:16 and then the upper limit is the same so
+80:19 
+
+80:19 it's going to be the length of
+80:22 
+
+80:22 self that
+80:24 
+
+80:24 char indices of course
+80:27 
+
+80:27 indices
+80:29 
+
+80:29 and
+80:30 
+
+80:30 for each step in this loop the
+80:34 
+
+80:34 increments should be
+80:36 
+
+80:36 eight right
+80:38 
+
+80:38 so for thread zero it's going to start
+80:41 
+
+80:41 from zero and the next step will be
+80:44 
+
+80:44 eight and the next step will be 16 the
+80:48 
+
+80:48 next step will be 24 and for thread
+80:52 
+
+80:52 7 for example it's going to start from
+80:54 
+
+80:54 the 0 plus t t is 7 for this track so
+80:58 
+
+80:58 it's going to start from 7 and in the
+81:00 
+
+81:00 next step it's going to be 15 and 23 and
+81:03 
+
+81:03 31 and 39
+81:05 
+
+81:05 all right so i'm going to use this loop
+81:08 
+
+81:08 to
+81:09 
+
+81:09 handle
+81:11 
+
+81:11 every
+81:12 
+
+81:12 combination
+81:15 
+
+81:15 for each
+81:17 
+
+81:17 threat
+81:18 
+
+81:18 let's make it
+81:24 
+
+81:24 let's make it
+81:25 
+
+81:25 i think after this
+81:29 
+
+81:29 inner function let's say for i
+81:34 
+
+81:34 in range zero plus
+81:37 
+
+81:37 t
+81:39 
+
+81:39 to the
+81:41 
+
+81:41 like i wrote here to the length
+81:44 
+
+81:44 of
+81:45 
+
+81:45 self.jar indices
+81:50 
+
+81:50 with the increment eight
+81:54 
+
+81:54 like this
+81:58 
+
+81:58 so i'm going to use if i
+82:01 
+
+82:01 going to use
+82:03 
+
+82:03 if i'm going to use this loop
+82:06 
+
+82:06 then i should
+82:09 
+
+82:09 break if
+82:10 
+
+82:10 one
+82:11 
+
+82:11 threat
+82:12 
+
+82:12 finds the
+82:15 
+
+82:15 password and i i cannot use the while
+82:17 
+
+82:17 anymore so let's add here and another
+82:20 
+
+82:20 check another if block with the
+82:22 
+
+82:22 self.font
+82:26 
+
+82:26 if it is true then break
+82:30 
+
+82:30 like this
+82:32 
+
+82:32 right then let's not use this while not
+82:36 
+
+82:36 self.fonting
+82:40 
+
+82:40 all right
+82:41 
+
+82:41 of course we are going to need the
+82:44 
+
+82:44 current number of threads
+82:46 
+
+82:46 so let's use it as an input argument
+82:49 
+
+82:49 itself
+82:51 
+
+82:51 and of course i'm going to change
+82:54 
+
+82:54 something
+82:57 
+
+82:57 generated text
+82:60 
+
+82:60 and let's
+83:01 
+
+83:01 say use the
+83:05 
+
+83:05 in
+83:07 
+
+83:07 self
+83:08 
+
+83:08 dot char underscore indices the zero
+83:12 
+
+83:12 will be a list including this indexes
+83:16 
+
+83:16 right for zero for example it includes
+83:18 
+
+83:18 zero zero zero zero zero eight times all
+83:22 
+
+83:22 right for
+83:24 
+
+83:24 two for example it includes the zero
+83:26 
+
+83:26 zero zero zero zero and at the end there
+83:28 
+
+83:28 will be n two
+83:30 
+
+83:30 all right so i'm going to loop over
+83:33 
+
+83:33 all these elements
+83:35 
+
+83:35 which we have
+83:37 
+
+83:37 in this list so let's say for index
+83:41 
+
+83:41 in
+83:43 
+
+83:43 self
+83:44 
+
+83:44 dot char indices
+83:47 
+
+83:47 and the actual number
+83:49 
+
+83:49 is the current number is i of course
+83:55 
+
+83:55 of course and i'm not going to use this
+83:58 
+
+83:58 random thing anymore so i'm going to
+83:60 
+
+83:60 delete this part
+84:02 
+
+84:02 and to
+84:03 
+
+84:03 add to the end of the generated text
+84:07 
+
+84:07 i'm going to use the self. charts but
+84:11 
+
+84:11 this time the index
+84:15 
+
+84:15 like this so it will at it is going to
+84:19 
+
+84:19 add at the end of the generated
+84:21 
+
+84:21 underscore text so for this one for
+84:24 
+
+84:24 example the zero
+84:26 
+
+84:26 zero with the character with the index
+84:28 
+
+84:28 zero actually the zero zero zero zero
+84:31 
+
+84:31 zero two or for example zero zero one
+84:34 
+
+84:34 zero zero something like this
+84:38 
+
+84:38 all right
+84:38 
+
+84:38 so i have it now
+84:43 
+
+84:43 there is a problem with the eye
+84:45 
+
+84:45 what is it
+84:48 
+
+84:48 after scope yeah
+84:54 
+
+84:54 we don't have any i in the other scope
+85:01 
+
+85:01 there won't be a problem
+85:06 
+
+85:06 all right
+85:08 
+
+85:08 all right
+85:10 
+
+85:10 then i constructed to generate a text
+85:16 
+
+85:16 so now
+85:17 
+
+85:17 we can add here the number of thread
+85:20 
+
+85:20 also let's say threads
+85:24 
+
+85:24 t
+85:27 
+
+85:27 is trying
+85:30 
+
+85:30 generated text
+85:36 
+
+85:36 all right
+85:39 
+
+85:39 okay
+85:42 
+
+85:42 and then
+85:48 
+
+85:48 it seems okay
+85:53 
+
+85:53 let's correct this
+85:55 
+
+85:55 so it's going to be the just the
+85:57 
+
+85:57 combination
+85:59 
+
+85:59 and also we should give the number of
+86:03 
+
+86:03 the threads now so i think this eye
+86:07 
+
+86:07 is a problem for this eye
+86:10 
+
+86:10 it shouldn't be but
+86:13 
+
+86:13 let's change it let's change it to trees
+86:24 
+
+86:24 i also give this
+86:27 
+
+86:27 as an argument
+86:29 
+
+86:29 likes ox
+86:31 
+
+86:31 will be
+86:32 
+
+86:32 t
+86:34 
+
+86:34 all right
+86:40 
+
+86:40 so the only problem is not using the
+86:43 
+
+86:43 random library
+86:55 
+
+86:55 it shouldn't be a problem but why it
+86:57 
+
+86:57 gives like the other scope all right
+86:59 
+
+86:59 let's change it to
+87:03 
+
+87:03 okay something
+87:06 
+
+87:06 it shouldn't be a problem
+87:13 
+
+87:13 all right just pycharm wants it
+87:16 
+
+87:16 all right now i think i'm okay
+87:22 
+
+87:22 i have all the combinations in charge
+87:24 
+
+87:24 underscore indices
+87:26 
+
+87:26 and also i have the
+87:29 
+
+87:29 methods
+87:36 
+
+87:36 foreign
+87:53 
+
+87:53 foreign
+88:19 
+
+88:19 sorry for the interruption so
+88:22 
+
+88:22 i'm going to run this code but
+88:24 
+
+88:24 of course there will be a problem why
+88:27 
+
+88:27 because we are going to have
+88:29 
+
+88:29 this number of values in the chart
+88:32 
+
+88:32 underscore indices
+88:34 
+
+88:34 all right
+88:35 
+
+88:35 this value
+88:37 
+
+88:37 it's going to be a very big number
+88:41 
+
+88:41 so
+88:43 
+
+88:43 let's just
+88:45 
+
+88:45 run the
+88:46 
+
+88:46 task manager
+88:50 
+
+88:50 i hope the recording
+88:52 
+
+88:52 won't stop let's hide these writings
+88:57 
+
+88:57 and my memory
+88:59 
+
+88:59 is already 77 percent
+89:05 
+
+89:05 i'm going to run
+89:09 
+
+89:09 and stop
+89:12 
+
+89:12 so let's just run this
+89:22 
+
+89:22 so
+89:22 
+
+89:22 now it's generating the combinations and
+89:26 
+
+89:26 it's using more and more memory as you
+89:29 
+
+89:29 can see
+89:33 
+
+89:33 actually
+89:34 
+
+89:34 6.7 now 6.8 i have 8 gigabytes
+89:40 
+
+89:40 of ram so
+89:56 
+
+89:56 i hope the recording won't stop
+90:05 
+
+90:05 it's increasing it's increasing
+90:10 
+
+90:10 so now
+90:12 
+
+90:12 we have
+90:16 
+
+90:16 all right 7.5
+90:24 
+
+90:24 so if
+90:25 
+
+90:25 it can
+90:28 
+
+90:28 generate
+90:29 
+
+90:29 all these indices and put it in the list
+90:31 
+
+90:31 self that charge underscore indices
+90:37 
+
+90:37 if it can make it
+90:38 
+
+90:38 it starts to write something to my
+90:40 
+
+90:40 screen but now my ram is completely full
+91:06 
+
+91:06 all right let's stop this and run this
+91:08 
+
+91:08 in the ubuntu terminal
+91:10 
+
+91:10 to understand better
+91:12 
+
+91:12 what happens
+91:19 
+
+91:19 windows don't
+91:21 
+
+91:21 doesn't do what i want
+91:24 
+
+91:24 so let's
+91:27 
+
+91:27 take it are edged up here and
+91:32 
+
+91:32 the terminal and let's say the python 3
+91:36 
+
+91:36 q3 dot pi i understand what happens so
+91:40 
+
+91:40 just keep an eye on this memory bar and
+91:43 
+
+91:43 also the swap bar i have
+91:46 
+
+91:46 24 gigabytes of swap which is very
+91:49 
+
+91:49 large
+91:54 
+
+91:54 now we have our thread here python 3 q3
+91:57 
+
+91:57 pi it's just single thread and the usage
+92:00 
+
+92:00 of memory is increasing
+92:29 
+
+92:29 now we have a memory bound problem all
+92:32 
+
+92:32 right
+92:33 
+
+92:33 so
+92:35 
+
+92:35 we cannot complete
+92:38 
+
+92:38 just the creating the indices
+92:42 
+
+92:42 by using this method to solve this
+92:45 
+
+92:45 problem
+92:48 
+
+92:48 because my memory is not going to be
+92:50 
+
+92:50 enough
+93:08 
+
+93:08 we are going to wait for a
+93:21 
+
+93:21 while and i think
+93:23 
+
+93:23 now we are going to get an error
+93:50 
+
+93:50 all right obviously
+93:52 
+
+93:52 it won't give an error but
+93:58 
+
+93:58 let
+93:60 
+
+93:60 let me decrease the number of characters
+94:02 
+
+94:02 that we have in the self.jars maybe
+94:06 
+
+94:06 then we can see a solution
+94:18 
+
+94:18 now we cannot
+94:20 
+
+94:20 pass this stage
+94:23 
+
+94:23 and come to the print
+94:41 
+
+94:41 all right let's stop this let's stop
+94:43 
+
+94:43 this and
+94:44 
+
+94:44 do what i say
+94:47 
+
+94:47 so i'm going to do this
+95:02 
+
+95:02 all right let's get it from here with
+95:03 
+
+95:03 the f9
+95:09 
+
+95:09 all right
+95:11 
+
+95:11 now let's change this line
+95:16 
+
+95:16 and let's say
+95:22 
+
+95:22 abc for example
+95:24 
+
+95:24 just
+95:25 
+
+95:25 abc123 and let's try with this
+95:28 
+
+95:28 six characters
+95:35 
+
+95:35 and run again
+95:42 
+
+95:42 all right now it starts now it starts
+95:47 
+
+95:47 now it's going to try all this
+95:50 
+
+95:50 combination and it's using all these
+95:52 
+
+95:52 eight threads
+95:54 
+
+95:54 as you can see and for
+95:57 
+
+95:57 with a computer like this with a
+95:59 
+
+95:59 personal computer it's not possible to
+96:01 
+
+96:01 do this with all these
+96:09 
+
+96:09 characters so
+96:12 
+
+96:12 you can try all these combinations and
+96:15 
+
+96:15 now it's a limited solution so it's
+96:18 
+
+96:18 guaranteed to find at one point all
+96:21 
+
+96:21 right so it can take
+96:24 
+
+96:24 very long time but
+96:25 
+
+96:25 it is guaranteed at one point you should
+96:29 
+
+96:29 find you can find
+96:31 
+
+96:31 the password by this approximation but
+96:34 
+
+96:34 as i said now we have a memory bond
+96:37 
+
+96:37 problem because
+96:39 
+
+96:39 before starting
+96:41 
+
+96:41 before starting
+96:44 
+
+96:44 we have all these indices in a list and
+96:47 
+
+96:47 then we are looping over we are
+96:50 
+
+96:50 iterating over all these combinations
+96:53 
+
+96:53 and it takes a lot of memory when we try
+96:57 
+
+96:57 to solve this with uh
+96:60 
+
+96:60 with the real
+97:01 
+
+97:01 uh charts lists with the real characters
+97:04 
+
+97:04 lists
+97:05 
+
+97:05 so we are going to improve this solution
+97:10 
+
+97:10 by not just using the static
+97:13 
+
+97:13 lists
+97:14 
+
+97:14 but instead of this
+97:16 
+
+97:16 we are going to
+97:18 
+
+97:18 use the yield keyword
+97:21 
+
+97:21 for our function so we are going to
+97:24 
+
+97:24 generate a combination and try this
+97:27 
+
+97:27 combination and then not store not save
+97:30 
+
+97:30 this combination in a
+97:32 
+
+97:32 list or in a variable and then throw it
+97:34 
+
+97:34 away and then try to next combination
+97:37 
+
+97:37 and we are going to solve this problem
+97:40 
+
+97:40 by doing
+97:41 
+
+97:41 this all right and also we have another
+97:45 
+
+97:45 we have another problem with this
+97:47 
+
+97:47 solution let me show you the writing
+97:49 
+
+97:49 again
+97:51 
+
+97:51 we cannot prevent we cannot
+97:55 
+
+97:55 make it
+97:57 
+
+97:57 to solve
+97:59 
+
+97:59 this solution not suffering from the
+98:02 
+
+98:02 global interpreter lock because
+98:04 
+
+98:04 if we
+98:05 
+
+98:05 are if we are going to try to use the
+98:08 
+
+98:08 number again so just in time compile
+98:11 
+
+98:11 from number again then we cannot use the
+98:15 
+
+98:15 for example the hash library in our
+98:17 
+
+98:17 atomic parts all right then we cannot
+98:20 
+
+98:20 use any library any third party library
+98:24 
+
+98:24 in our atomic parts we can just use some
+98:29 
+
+98:29 real basic libraries
+98:31 
+
+98:31 for example the random or something like
+98:33 
+
+98:33 this but we cannot use the hash lib so
+98:36 
+
+98:36 there is no way to solve this question
+98:40 
+
+98:40 which is not with the solution which is
+98:42 
+
+98:42 not suffering from the global
+98:44 
+
+98:44 interpreter lock
+98:46 
+
+98:46 so
+98:47 
+
+98:47 after this midterm and next week in the
+98:51 
+
+98:51 classroom we are going to improve this
+98:54 
+
+98:54 solution
+98:56 
+
+98:56 with the first step as i said
+98:59 
+
+98:59 the constructing the combination and try
+99:02 
+
+99:02 it and then throw it away
+99:04 
+
+99:04 and also instead of creating the
+99:07 
+
+99:07 multiple threads we are going to use the
+99:09 
+
+99:09 multiple processes
+99:11 
+
+99:11 so after the midterm to the final exam
+99:15 
+
+99:15 we are just going to use the
+99:18 
+
+99:18 processes instead of threats
+99:20 
+
+99:20 so this is it for this video
+99:24 
+
+99:24 again i strongly recommend you to come
+99:27 
+
+99:27 to class instead of watching all these
+99:30 
+
+99:30 videos these are just the supplementary
+99:32 
+
+99:32 videos so see you in the classroom

@@ -1,0 +1,4411 @@
+00:01 hi this is the sixth supplementary video
+00:04 
+
+00:04 for our course parallel programming
+00:07 
+
+00:07 and we are very close to our midterm
+00:10 
+
+00:10 exams so i think this is going to be the
+00:12 
+
+00:12 last video before our exam
+00:15 
+
+00:15 and today
+00:17 
+
+00:17 and in the last video in the last
+00:19 
+
+00:19 lecture we have solved our very famous
+00:22 
+
+00:22 problem
+00:23 
+
+00:23 dining philosophers
+00:27 
+
+00:27 dining philosophers
+00:31 
+
+00:31 and in this problem we had a rounding
+00:35 
+
+00:35 table
+00:36 
+
+00:36 like this
+00:37 
+
+00:37 and we have five philosophers
+00:40 
+
+00:40 around this table
+00:42 
+
+00:42 let me enumerate them like philosopher
+00:45 
+
+00:45 zero philosopher one
+00:47 
+
+00:47 those are four two philosopher three
+00:50 
+
+00:50 and philosopher four
+00:52 
+
+00:52 and we have
+00:55 
+
+00:55 plates
+00:56 
+
+00:56 for
+00:57 
+
+00:57 each philosopher
+01:02 
+
+01:02 like this
+01:03 
+
+01:03 sorry about the bad drawing
+01:06 
+
+01:06 and also we have
+01:08 
+
+01:08 five chopsticks
+01:13 
+
+01:13 on the table
+01:16 
+
+01:16 and we have some mills
+01:19 
+
+01:19 on these plates
+01:24 
+
+01:24 and the problem is a philosopher can be
+01:28 
+
+01:28 in two states and the first state is
+01:31 
+
+01:31 thinking
+01:34 
+
+01:34 thinking
+01:35 
+
+01:35 and
+01:36 
+
+01:36 the other state is eating
+01:40 
+
+01:40 so at the beginning we have all of our
+01:42 
+
+01:42 philosophers in thinking position and at
+01:45 
+
+01:45 a random time one philosopher decides to
+01:48 
+
+01:48 start to eat
+01:50 
+
+01:50 and of course he or she needs to use
+01:53 
+
+01:53 chopsticks and to be able to eat the
+01:57 
+
+01:57 meal
+01:58 
+
+01:58 he or she
+01:60 
+
+01:60 has to have
+02:02 
+
+02:02 two chopsticks all right so at one
+02:05 
+
+02:05 moment
+02:06 
+
+02:06 he or she can get only one chopstick and
+02:08 
+
+02:08 then he can try to he or she can try to
+02:11 
+
+02:11 get the other chopsticks so he or she
+02:14 
+
+02:14 needs to
+02:16 
+
+02:16 get these chopsticks one by one
+02:18 
+
+02:18 so
+02:20 
+
+02:20 in this scenario we have a problem
+02:23 
+
+02:23 uh
+02:24 
+
+02:24 at one moment for example philosopher
+02:26 
+
+02:26 zero can get this chopstick closer for
+02:28 
+
+02:28 one can this chopstick can get this
+02:30 
+
+02:30 chopstick and also philosopher two can
+02:33 
+
+02:33 get this chopstick pleasure for three
+02:34 
+
+02:34 can get this chopstick and then first of
+02:36 
+
+02:36 all four can get this chopstick and all
+02:39 
+
+02:39 of them can be in a position which they
+02:42 
+
+02:42 are waiting for the other chopstick and
+02:45 
+
+02:45 we call this
+02:46 
+
+02:46 situation
+02:48 
+
+02:48 as deadlock
+02:50 
+
+02:50 so
+02:51 
+
+02:51 then we have solved this problem by
+02:53 
+
+02:53 using lux and then using the summer
+02:55 
+
+02:55 force and
+02:57 
+
+02:57 using summer force has some advantage
+03:00 
+
+03:00 which we can
+03:02 
+
+03:02 adjust the resources so-called
+03:04 
+
+03:04 chopsticks to be able to use by
+03:07 
+
+03:07 more more than one user more than one
+03:10 
+
+03:10 philosopher
+03:12 
+
+03:12 right and in this week in this lecture
+03:15 
+
+03:15 we are going to generalize the solution
+03:18 
+
+03:18 of this problem which we can apply to
+03:20 
+
+03:20 any other parallel programming problem
+03:24 
+
+03:24 so
+03:25 
+
+03:25 this problem has some physical
+03:27 
+
+03:27 constraints
+03:29 
+
+03:29 which
+03:30 
+
+03:30 for example philosopher zero can only
+03:33 
+
+03:33 use this chopstick or this chopstick
+03:37 
+
+03:37 he or she cannot get directly this
+03:39 
+
+03:39 chopstick for example it has some
+03:41 
+
+03:41 physical restrictions but we are going
+03:44 
+
+03:44 to generalize this solution
+03:47 
+
+03:47 and we are going to apply this solution
+03:50 
+
+03:50 to any parallel programming problem and
+03:53 
+
+03:53 in
+03:54 
+
+03:54 any part of the programming problem we
+03:57 
+
+03:57 are going to have some
+03:59 
+
+03:59 users
+04:01 
+
+04:01 users
+04:02 
+
+04:02 and also we can call them
+04:04 
+
+04:04 processes
+04:07 
+
+04:07 processes
+04:08 
+
+04:08 and
+04:10 
+
+04:10 we have some we are going to have some
+04:12 
+
+04:12 resources
+04:17 
+
+04:17 and also we are going to have some jobs
+04:20 
+
+04:20 to be complete
+04:24 
+
+04:24 and to match these terms with our
+04:27 
+
+04:27 problem dining philosophers users here
+04:29 
+
+04:29 are of course the philosophers and
+04:31 
+
+04:31 resources here are the chopsticks and
+04:33 
+
+04:33 the jobs are the meals
+04:37 
+
+04:37 and
+04:38 
+
+04:38 in a general problem we are going to
+04:41 
+
+04:41 have some users for example let's say
+04:43 
+
+04:43 we have 10 users 10 processes
+04:46 
+
+04:46 and we are going to have some limited
+04:48 
+
+04:48 number of resources so called for
+04:50 
+
+04:50 example let's say we have three
+04:53 
+
+04:53 resources
+04:54 
+
+04:54 and we have some jobs for each of our
+04:58 
+
+04:58 users for example let's say we have 100
+05:01 
+
+05:01 jobs to complete
+05:03 
+
+05:03 and
+05:05 
+
+05:05 we
+05:06 
+
+05:06 we have to
+05:08 
+
+05:08 find the solution
+05:10 
+
+05:10 which we can use all of our users
+05:14 
+
+05:14 and we have to
+05:17 
+
+05:17 make them
+05:18 
+
+05:18 to be able to use
+05:21 
+
+05:21 some limited number of resources and we
+05:25 
+
+05:25 want them to complete these jobs in a
+05:28 
+
+05:28 balanced way of course all right so
+05:31 
+
+05:31 i'm going to start to write some codes
+05:34 
+
+05:34 and try to understand the solution how
+05:38 
+
+05:38 can we generalize
+05:39 
+
+05:39 the solution of the
+05:41 
+
+05:41 lining phase of this problem
+05:44 
+
+05:44 let's start
+05:46 
+
+05:46 our pycharm
+05:48 
+
+05:48 ide
+05:53 
+
+05:53 and i'm going to create a new project
+06:13 
+
+06:13 i'm waiting for purge pycharm
+06:17 
+
+06:17 to start
+06:38 
+
+06:38 or it's very slow
+06:41 
+
+06:41 all right
+06:45 
+
+06:45 now we have the window
+06:48 
+
+06:48 let's create a new project
+06:59 
+
+06:59 right
+07:01 
+
+07:01 let's say
+07:09 
+
+07:09 let's use a very short name for example
+07:11 
+
+07:11 like ws
+07:13 
+
+07:13 and i'm going to create a new virtual
+07:16 
+
+07:16 environment by using the python version
+07:22 
+
+07:22 3.8 is okay right
+07:52 
+
+07:52 my pc is struggling a little bit
+07:57 
+
+07:57 to create the project
+08:04 
+
+08:04 right now we have the window
+08:18 
+
+08:18 all right we have an example file of
+08:21 
+
+08:21 course i'm going to delete the
+08:22 
+
+08:22 ingredients of this file
+08:27 
+
+08:27 and it will be very similar to the
+08:29 
+
+08:29 solution of the dining philosopher so
+08:31 
+
+08:31 i'm going to import some libraries which
+08:33 
+
+08:33 we
+08:34 
+
+08:34 have used in the solution of the binding
+08:36 
+
+08:36 process problem so i'm going to need
+08:39 
+
+08:39 to use random library so i'm going to
+08:41 
+
+08:41 import it
+08:42 
+
+08:42 and also we are going to need to use the
+08:45 
+
+08:45 time library
+08:53 
+
+08:53 and of course we are going to
+08:56 
+
+08:56 import
+09:02 
+
+09:02 import
+09:03 
+
+09:03 the threats
+09:04 
+
+09:04 plus
+09:07 
+
+09:07 from the trading library and also
+09:10 
+
+09:10 like we have done in the last video i'm
+09:13 
+
+09:13 going to start
+09:15 
+
+09:15 by using semaphores
+09:18 
+
+09:18 to manage the resources
+09:21 
+
+09:21 let's create a class now
+09:24 
+
+09:24 i'm going to use the name jobs and users
+09:29 
+
+09:29 job saying users
+09:31 
+
+09:31 and of course i'm going to create a
+09:33 
+
+09:33 constructor for this class with the name
+09:35 
+
+09:35 dunder in it under
+09:37 
+
+09:37 and i'm going to use some input
+09:39 
+
+09:39 arguments
+09:40 
+
+09:40 to create our class
+09:43 
+
+09:43 so let's get the number of users
+09:49 
+
+09:49 from our users
+09:50 
+
+09:50 and also a number
+09:52 
+
+09:52 of resources
+09:57 
+
+09:57 and also let's get the job size from
+09:59 
+
+09:59 outside
+10:02 
+
+10:02 right
+10:03 
+
+10:03 let's
+10:04 
+
+10:04 save them
+10:05 
+
+10:05 into the properties of our class let's
+10:07 
+
+10:07 say self.n will be equal to number of
+10:09 
+
+10:09 users
+10:11 
+
+10:11 self.r will be equal to number of
+10:14 
+
+10:14 resources
+10:17 
+
+10:17 and also self.m
+10:19 
+
+10:19 will be equal to job size
+10:22 
+
+10:22 right
+10:24 
+
+10:24 let's create our resources now let's say
+10:27 
+
+10:27 self.resources
+10:30 
+
+10:30 resources will be equal to a sum of four
+10:36 
+
+10:36 so
+10:37 
+
+10:37 if you remember from the last video if
+10:39 
+
+10:39 we don't use any argument for
+10:42 
+
+10:42 when creating the sum of four class
+10:45 
+
+10:45 then creating an instance to the sample
+10:47 
+
+10:47 for class then the value the default
+10:50 
+
+10:50 value
+10:51 
+
+10:51 is going to be one
+10:53 
+
+10:53 so it means this resource can only be
+10:56 
+
+10:56 used by one user one process
+10:60 
+
+10:60 but you can also use any other value for
+11:03 
+
+11:03 here like five then
+11:05 
+
+11:05 you will make this resource to be able
+11:08 
+
+11:08 to use to enable
+11:10 
+
+11:10 this resource to five different users
+11:13 
+
+11:13 all right
+11:15 
+
+11:15 and now i'm not going to use any other
+11:17 
+
+11:17 value i just
+11:18 
+
+11:18 go with the default one with the value
+11:21 
+
+11:21 one for our semaphore and i'm going to
+11:23 
+
+11:23 create this semaphore for
+11:26 
+
+11:26 every
+11:27 
+
+11:27 resource of course we have the number of
+11:30 
+
+11:30 resources so
+11:31 
+
+11:31 i'm going to use
+11:33 
+
+11:33 this for loop
+11:35 
+
+11:35 i use underscore here because i don't
+11:37 
+
+11:37 need to use this index here
+11:40 
+
+11:40 and
+11:41 
+
+11:41 in this definition for example so i can
+11:44 
+
+11:44 use an underscore
+11:46 
+
+11:46 and just iterate over the starting from
+11:49 
+
+11:49 zero up to the number of resources
+11:54 
+
+11:54 and
+11:55 
+
+11:55 also with the same drill i'm going to
+11:58 
+
+11:58 create a jobs array
+12:01 
+
+12:01 list actually with the job size
+12:05 
+
+12:05 job size
+12:06 
+
+12:06 for underscore
+12:08 
+
+12:08 in
+12:09 
+
+12:09 range
+12:11 
+
+12:11 number of
+12:12 
+
+12:12 users
+12:14 
+
+12:14 so
+12:15 
+
+12:15 we have our self.jobs array let me draw
+12:18 
+
+12:18 it
+12:22 
+
+12:22 here for example we if we have 10 users
+12:25 
+
+12:25 then we have our self.jobs
+12:28 
+
+12:28 of
+12:31 
+
+12:31 jobs
+12:33 
+
+12:33 which is a list
+12:35 
+
+12:35 with our job size
+12:39 
+
+12:39 like 100 for the user 0 100 for the user
+12:43 
+
+12:43 1 and it goes like this up to
+12:47 
+
+12:47 100 for the user with the index
+12:51 
+
+12:51 9
+12:52 
+
+12:52 then it means we have 10
+12:54 
+
+12:54 numbers here in this list and each for
+12:58 
+
+12:58 our user
+13:00 
+
+13:00 so if we
+13:02 
+
+13:02 if our for example user 1
+13:05 
+
+13:05 has completed the one of its jobs then
+13:08 
+
+13:08 in the next step we will have 100 here
+13:10 
+
+13:10 with 99 here and goes like this up to
+13:14 
+
+13:14 the last user
+13:16 
+
+13:16 right
+13:18 
+
+13:18 i'm going to manage these jobs
+13:21 
+
+13:21 in this array
+13:24 
+
+13:24 and
+13:26 
+
+13:26 similar to the
+13:28 
+
+13:28 philosopher method which we have created
+13:30 
+
+13:30 last week this time i'm going to create
+13:32 
+
+13:32 a user method
+13:33 
+
+13:33 and of course
+13:34 
+
+13:34 [Music]
+13:35 
+
+13:35 i should get the current number of user
+13:38 
+
+13:38 with an input argument and i'm going to
+13:40 
+
+13:40 use the name
+13:42 
+
+13:42 variable name i
+13:44 
+
+13:44 let's start with an output message and
+13:46 
+
+13:46 let's say print
+13:49 
+
+13:49 i
+13:51 
+
+13:51 i am
+13:52 
+
+13:52 user
+13:54 
+
+13:54 number
+13:55 
+
+13:55 something
+13:56 
+
+13:56 and this number
+13:58 
+
+13:58 should be i
+14:01 
+
+14:01 all right so it's going to give an
+14:04 
+
+14:04 output message when we have
+14:07 
+
+14:07 called this method this user method
+14:11 
+
+14:11 all right
+14:12 
+
+14:12 and then
+14:13 
+
+14:13 it should
+14:16 
+
+14:16 it should be working
+14:18 
+
+14:18 while we have still jobs
+14:20 
+
+14:20 to complete for this user so i'm going
+14:23 
+
+14:23 to reach the
+14:25 
+
+14:25 elements with the position i from the
+14:28 
+
+14:28 self.jobs and if it is greater than zero
+14:31 
+
+14:31 then
+14:33 
+
+14:33 our user methods
+14:35 
+
+14:35 will
+14:37 
+
+14:37 continue
+14:38 
+
+14:38 all right
+14:39 
+
+14:39 so
+14:40 
+
+14:40 let's simulate
+14:42 
+
+14:42 the sleeping
+14:44 
+
+14:44 process
+14:45 
+
+14:45 and i'm just
+14:47 
+
+14:47 use the sleep method from the time
+14:49 
+
+14:49 library and i'm going to use it with a
+14:52 
+
+14:52 random amount of time so let's
+14:54 
+
+14:54 use the random method from the random
+14:56 
+
+14:56 library and this method will generate a
+14:59 
+
+14:59 random number random real number between
+15:01 
+
+15:01 zero and one so it will be zero point
+15:04 
+
+15:04 something but this time i'm going to use
+15:07 
+
+15:07 some longer times so let's
+15:10 
+
+15:10 take a sum
+15:12 
+
+15:12 this number with three so it will
+15:15 
+
+15:15 generate a random number between three
+15:17 
+
+15:17 and four seconds so it will be three
+15:19 
+
+15:19 point something seconds
+15:22 
+
+15:22 our user at the beginning will sleep
+15:25 
+
+15:25 with the three point something
+15:27 
+
+15:27 seconds and after the sleeping process
+15:31 
+
+15:31 our user will decide to start to
+15:34 
+
+15:34 complete some jobs
+15:36 
+
+15:36 so in the dining philosophers like start
+15:39 
+
+15:39 to eat
+15:40 
+
+15:40 so let's
+15:41 
+
+15:41 put an other
+15:43 
+
+15:43 output message and let's say user
+15:48 
+
+15:48 something wants
+15:51 
+
+15:51 to start now
+15:53 
+
+15:53 and this index will be i of course
+15:57 
+
+15:57 and now our user i
+15:60 
+
+15:60 wants to start now so
+16:02 
+
+16:02 how can it start
+16:04 
+
+16:04 of course it can er
+16:07 
+
+16:07 it starts to try to get some resource
+16:10 
+
+16:10 but which resource we will have some
+16:13 
+
+16:13 limited number of resource which is
+16:15 
+
+16:15 equal to number underscore of underscore
+16:17 
+
+16:17 resources for example we can use three
+16:20 
+
+16:20 we can use five we can use some other
+16:22 
+
+16:22 number and let's
+16:25 
+
+16:25 in this stage let's generate a random
+16:27 
+
+16:27 integer between
+16:30 
+
+16:30 0 and
+16:31 
+
+16:31 number of resources in the range of
+16:33 
+
+16:33 number of resources so let's try to just
+16:37 
+
+16:37 get
+16:38 
+
+16:38 an access to random resource all right
+16:41 
+
+16:41 so i'm going to create a i'm going to
+16:43 
+
+16:43 generate a random integer and store it
+16:45 
+
+16:45 in the variable name r so r will be
+16:48 
+
+16:48 equal to random dot rendent
+16:53 
+
+16:53 but be careful if you use random methods
+16:56 
+
+16:56 so the limits
+16:58 
+
+16:58 zero
+16:60 
+
+16:60 and of course we should use self.r but
+17:04 
+
+17:04 in the random methods
+17:06 
+
+17:06 both limits are included so if we use
+17:10 
+
+17:10 self.r directly here
+17:12 
+
+17:12 so if we have 3 as self.r so it will
+17:16 
+
+17:16 generate a random integer between 0 and
+17:19 
+
+17:19 3 but 3 will be included
+17:22 
+
+17:22 so the range is going to be actually 4
+17:25 
+
+17:25 right so i'm not going to use f that r
+17:28 
+
+17:28 directly but just use f that's r minus
+17:31 
+
+17:31 one
+17:33 
+
+17:33 so it will make us to generate a random
+17:35 
+
+17:35 integer between zero and two if we have
+17:38 
+
+17:38 three as self.r
+17:42 
+
+17:42 so let's continue
+17:44 
+
+17:44 now let's try to get this resource
+17:48 
+
+17:48 and
+17:50 
+
+17:50 if it is a semaphore so i can use here a
+17:53 
+
+17:53 directly if structure and let's say
+17:55 
+
+17:55 self.resources
+17:57 
+
+17:57 with the index r and i'm going to try to
+18:01 
+
+18:01 acquire this
+18:03 
+
+18:03 resource
+18:04 
+
+18:04 and if it is a semaphore i can use the
+18:07 
+
+18:07 timeout argument let's use timeout
+18:10 
+
+18:10 argument with for example let's say 10
+18:12 
+
+18:12 seconds
+18:14 
+
+18:14 i'm going to use a longer timeout
+18:17 
+
+18:17 sequence because i just
+18:19 
+
+18:19 i just want to simulate the weighting in
+18:23 
+
+18:23 the q positions all right because we
+18:26 
+
+18:26 have just limited number of resource and
+18:28 
+
+18:28 we have added of users
+18:31 
+
+18:31 so let's use this timeout argument and
+18:34 
+
+18:34 if
+18:35 
+
+18:35 our user can get this resource then
+18:39 
+
+18:39 let's
+18:40 
+
+18:40 write
+18:41 
+
+18:41 an output message and let's say user
+18:45 
+
+18:45 user i
+18:46 
+
+18:46 has the
+18:48 
+
+18:48 resource
+18:52 
+
+18:52 r
+18:53 
+
+18:53 all right
+18:54 
+
+18:54 let's give this arguments with i and r
+18:59 
+
+18:59 now we have a resource to complete this
+19:03 
+
+19:03 user's job by using these users so
+19:07 
+
+19:07 to simulate
+19:12 
+
+19:12 sorry you cannot see this part right
+19:25 
+
+19:25 all right to simulate
+19:27 
+
+19:27 the
+19:28 
+
+19:28 doing the job process to completing the
+19:30 
+
+19:30 job process i'm going to use sleep
+19:33 
+
+19:33 method again with a longer time so let's
+19:36 
+
+19:36 say time.slip
+19:40 
+
+19:40 time dot sleep again i'm going to use
+19:43 
+
+19:43 sorry again i'm going to use the random
+19:45 
+
+19:45 method from the random library
+19:49 
+
+19:49 that's rendered random
+19:52 
+
+19:52 random library but this time i'm going
+19:54 
+
+19:54 to
+19:55 
+
+19:55 wait i'm going to make this
+19:58 
+
+19:58 uh
+19:60 
+
+19:60 user wait with a longer time let's say 5
+20:03 
+
+20:03 plus random nutrients
+20:07 
+
+20:07 like this
+20:10 
+
+20:10 so
+20:10 
+
+20:10 this user has the resource and then
+20:17 
+
+20:17 this user has these users it has this
+20:20 
+
+20:20 resource and then wait for
+20:22 
+
+20:22 five point something seconds and then
+20:25 
+
+20:25 complete this job all right
+20:28 
+
+20:28 so after
+20:29 
+
+20:29 the waiting
+20:32 
+
+20:32 then we can complete the job and let's
+20:35 
+
+20:35 say self.jobs
+20:38 
+
+20:38 with the index of course i
+20:41 
+
+20:41 and i will decrease this amount of jobs
+20:43 
+
+20:43 by one
+20:46 
+
+20:46 so it means this user has completed the
+20:50 
+
+20:50 one slice of its job
+20:54 
+
+20:54 all right then we can release this
+20:57 
+
+20:57 resource because we have finished
+21:00 
+
+21:00 let's say serve dot resources
+21:03 
+
+21:03 with the index r
+21:05 
+
+21:05 and let's release this
+21:10 
+
+21:10 and we can put an output message to the
+21:13 
+
+21:13 screen
+21:15 
+
+21:15 let's say print
+21:17 
+
+21:17 user
+21:19 
+
+21:19 i
+21:20 
+
+21:20 has
+21:21 
+
+21:21 completed
+21:23 
+
+21:23 the
+21:24 
+
+21:24 job
+21:32 
+
+21:32 can we change the position
+21:36 
+
+21:36 no
+21:38 
+
+21:38 all right has completed the job and of
+21:40 
+
+21:40 course we are going to use the index i
+21:43 
+
+21:43 here
+21:45 
+
+21:45 like this
+21:47 
+
+21:47 and i think this
+21:48 
+
+21:48 is going to be a problem for witness
+21:53 
+
+21:53 blank lines
+22:03 
+
+22:03 all right
+22:04 
+
+22:04 now
+22:05 
+
+22:05 we have put this message to the screen
+22:08 
+
+22:08 and if we cannot get this resource then
+22:12 
+
+22:12 then we can
+22:14 
+
+22:14 write here
+22:16 
+
+22:16 go to here and else
+22:17 
+
+22:17 so if we cannot get this resource
+22:22 
+
+22:22 then we can write to screen
+22:27 
+
+22:27 and let's say user
+22:29 
+
+22:29 i
+22:30 
+
+22:30 could not
+22:33 
+
+22:33 get
+22:34 
+
+22:34 so i could not
+22:35 
+
+22:35 get the
+22:37 
+
+22:37 resource
+22:40 
+
+22:40 resource numbers
+22:43 
+
+22:43 will be
+22:44 
+
+22:44 r of course so let's give the indexes
+22:47 
+
+22:47 with i and r
+22:50 
+
+22:50 and i'm going to pause the recording for
+22:53 
+
+22:53 a moment and
+22:57 
+
+22:57 i'm going to restart restart the pycharm
+22:59 
+
+22:59 because i think there's a problem
+23:09 
+
+23:09 but
+23:12 
+
+23:12 i think i cannot pause the recording all
+23:14 
+
+23:14 right
+23:33 
+
+23:33 i hope
+23:35 
+
+23:35 there is no drop with the recording but
+23:38 
+
+23:38 i think there is
+23:41 
+
+23:41 all right
+23:43 
+
+23:43 now
+23:44 
+
+23:44 we have completed our class
+23:47 
+
+23:47 and
+23:48 
+
+23:48 now i'm going to
+23:51 
+
+23:51 write the main function which is going
+23:54 
+
+23:54 to use this class let's say def main
+23:59 
+
+23:59 and let's
+24:00 
+
+24:00 define the
+24:02 
+
+24:02 our arguments for our arguments for
+24:05 
+
+24:05 example like for the number of users
+24:07 
+
+24:07 let's use n
+24:09 
+
+24:09 equals to 10
+24:10 
+
+24:10 and for the number of resources let's
+24:12 
+
+24:12 use r equals to 3
+24:15 
+
+24:15 and for the
+24:17 
+
+24:17 number for the job size let's use m
+24:25 
+
+24:25 equals to 100
+24:31 
+
+24:31 all right let's then create an instance
+24:33 
+
+24:33 and let's say jobs underscore and
+24:36 
+
+24:36 underscore users
+24:38 
+
+24:38 it will be an instance to our class jobs
+24:40 
+
+24:40 and users
+24:42 
+
+24:42 and with the input arguments and
+24:46 
+
+24:46 r
+24:47 
+
+24:47 and m
+24:50 
+
+24:50 all right
+24:51 
+
+24:51 and then i'm going to create the threads
+24:56 
+
+24:56 let's say users will be equal to threads
+25:00 
+
+25:00 threads
+25:02 
+
+25:02 with the target
+25:04 
+
+25:04 of course from our
+25:06 
+
+25:06 instance
+25:08 
+
+25:08 with the user methods
+25:11 
+
+25:11 like this
+25:13 
+
+25:13 and
+25:14 
+
+25:14 arguments
+25:16 
+
+25:16 will be i
+25:18 
+
+25:18 because we have to define the current
+25:20 
+
+25:20 number of
+25:22 
+
+25:22 user which user
+25:25 
+
+25:25 now the current user
+25:27 
+
+25:27 and of course we have to iterate i
+25:31 
+
+25:31 in the range
+25:33 
+
+25:33 n
+25:36 
+
+25:36 all right
+25:37 
+
+25:37 now we have our users as threats
+25:41 
+
+25:41 so we can try we can start these threads
+25:44 
+
+25:44 with a loop let's say for user
+25:47 
+
+25:47 in
+25:48 
+
+25:48 users
+25:51 
+
+25:51 and user
+25:52 
+
+25:52 dot start so this
+25:55 
+
+25:55 line will start are all threads
+25:58 
+
+25:58 and then
+26:01 
+
+26:01 we are going to use another loop
+26:04 
+
+26:04 to
+26:05 
+
+26:05 make us
+26:07 
+
+26:07 to weight
+26:09 
+
+26:09 all of these threads to be complete so
+26:12 
+
+26:12 let's say user
+26:14 
+
+26:14 user.join
+26:20 
+
+26:20 all right
+26:24 
+
+26:24 now
+26:25 
+
+26:25 let's use this main function let's say
+26:28 
+
+26:28 if the under name
+26:32 
+
+26:32 if it is equal to dunder main thunder
+26:36 
+
+26:36 then let's call this function me
+26:46 
+
+26:46 and we are okay
+26:50 
+
+26:50 we are done
+26:54 
+
+26:54 here the pycharm is doing something
+27:06 
+
+27:06 all right let's run our project
+27:10 
+
+27:10 so i'm going to run this
+27:13 
+
+27:13 file
+27:15 
+
+27:15 no all right it's completed now let's
+27:19 
+
+27:19 is there any problem
+27:22 
+
+27:22 i think not all right we have done we
+27:25 
+
+27:25 have this green
+27:27 
+
+27:27 tick
+27:28 
+
+27:28 and we can run this file now no now i'm
+27:31 
+
+27:31 going to run this main.pi file
+27:35 
+
+27:35 let's investigate the output
+27:39 
+
+27:39 wait for a while
+27:42 
+
+27:42 to do something
+27:57 
+
+27:57 and we cannot see
+28:00 
+
+28:00 our users
+28:02 
+
+28:02 which resource
+28:06 
+
+28:06 we cannot see which user wants to get
+28:09 
+
+28:09 which resource so i'm going to add a
+28:11 
+
+28:11 line here let me stop
+28:14 
+
+28:14 this process
+28:17 
+
+28:17 and here after generating the r
+28:20 
+
+28:20 let's add here a message and let's say
+28:22 
+
+28:22 print so we can understand the waiting
+28:25 
+
+28:25 queue let's add here a line let's say
+28:28 
+
+28:28 user
+28:30 
+
+28:30 i
+28:32 
+
+28:32 is
+28:33 
+
+28:33 trying
+28:34 
+
+28:34 to get the resource
+28:38 
+
+28:38 r
+28:42 
+
+28:42 now we can see the waiting queues
+28:46 
+
+28:46 like this
+28:48 
+
+28:48 all right let's run again
+28:57 
+
+28:57 all right now we can see
+29:01 
+
+29:01 wait for a while to complete some jobs
+29:06 
+
+29:06 and then we are going to analyze the
+29:08 
+
+29:08 output messages
+29:14 
+
+29:14 some of our users are waiting some of
+29:18 
+
+29:18 our users are completing the jobs
+29:25 
+
+29:25 all right now let's stop
+29:28 
+
+29:28 let's stop and investigate the output
+29:37 
+
+29:37 all right
+29:39 
+
+29:39 let's run excel and use the table
+29:49 
+
+29:49 i want to see the waiting cues for
+29:56 
+
+29:56 all of our
+29:59 
+
+29:59 resources
+30:06 
+
+30:06 let's create a blank workbook
+30:20 
+
+30:20 all right we have three resources with
+30:22 
+
+30:22 the indexes zero
+30:25 
+
+30:25 one
+30:26 
+
+30:26 and two
+30:29 
+
+30:29 and let's use this two rows with the
+30:34 
+
+30:34 running
+30:35 
+
+30:35 users and waiting users for this
+30:39 
+
+30:39 resource
+30:41 
+
+30:41 let's use running and waiting
+30:44 
+
+30:44 and for the resource 2 running and
+30:46 
+
+30:46 waiting
+30:56 
+
+30:56 all right now let's see
+30:60 
+
+30:60 we have all of our users
+31:02 
+
+31:02 10 users
+31:04 
+
+31:04 with the indexes starting from zero all
+31:06 
+
+31:06 the way up to nine
+31:09 
+
+31:09 and first user eight once starts and
+31:13 
+
+31:13 it's trying to get the resource zero so
+31:16 
+
+31:16 it can directly get this resource and we
+31:20 
+
+31:20 are writing our user 8 in the running
+31:22 
+
+31:22 row for resource 0
+31:26 
+
+31:26 and then we have our user 9 wants to
+31:28 
+
+31:28 start and user 9 is trying to get the
+31:31 
+
+31:31 resource 2
+31:32 
+
+31:32 so it can get directly there's resource
+31:35 
+
+31:35 so i'm going to write 9 user 9 here with
+31:38 
+
+31:38 the running row for the resource 2. and
+31:41 
+
+31:41 then user 2 wants to start
+31:46 
+
+31:46 simultaneously user1
+31:49 
+
+31:49 and also user3 wants to start
+31:52 
+
+31:52 and user 2
+31:54 
+
+31:54 is trying to get the resource
+31:56 
+
+31:56 0. so user
+31:59 
+
+31:59 2 wants to get the resource 0 but it's
+32:02 
+
+32:02 not free
+32:03 
+
+32:03 it's used by
+32:05 
+
+32:05 user 8 so i'm going to write user 2 here
+32:09 
+
+32:09 in the waiting queue of resource 0
+32:12 
+
+32:12 and
+32:15 
+
+32:15 do we have some no
+32:19 
+
+32:19 and then user 3 wants to get the
+32:22 
+
+32:22 resource
+32:23 
+
+32:23 2 so i'm going to write user 3 here in
+32:26 
+
+32:26 the waiting queue of resource two
+32:29 
+
+32:29 and user one is trying to get the
+32:32 
+
+32:32 resource zero so i'm going to write user
+32:34 
+
+32:34 one here in the waiting queue of
+32:36 
+
+32:36 resource zero
+32:38 
+
+32:38 and then user four
+32:41 
+
+32:41 is going to be in the waiting queue of
+32:43 
+
+32:43 resource 2
+32:45 
+
+32:45 also here
+32:48 
+
+32:48 and then user 6 user 6
+32:51 
+
+32:51 is trying to get the resource 1 and it's
+32:53 
+
+32:53 free so it can directly get this
+32:56 
+
+32:56 resource
+32:56 
+
+32:56 like this
+32:58 
+
+32:58 and then user 7 will be in this queue
+33:03 
+
+33:03 and then user 5
+33:05 
+
+33:05 will be in this queue
+33:08 
+
+33:08 and then user 0 will be in this queue
+33:14 
+
+33:14 let's continue
+33:16 
+
+33:16 now user 6 has completed the job
+33:21 
+
+33:21 but
+33:22 
+
+33:22 no users
+33:24 
+
+33:24 are waiting in this queue
+33:27 
+
+33:27 so
+33:28 
+
+33:28 now we
+33:29 
+
+33:29 have no slipping
+33:32 
+
+33:32 user actually at this moment we have
+33:35 
+
+33:35 three users here in this queue we have
+33:38 
+
+33:38 four users
+33:39 
+
+33:39 in this queue and we have three users
+33:41 
+
+33:41 are working
+33:44 
+
+33:44 so
+33:45 
+
+33:45 let's invite investigate this situation
+33:50 
+
+33:50 we have all these users
+33:53 
+
+33:53 are using
+33:55 
+
+33:55 are used they are not free
+33:58 
+
+33:58 but we have four users in this queue
+34:02 
+
+34:02 we have three users in this queue
+34:05 
+
+34:05 but we have no users
+34:08 
+
+34:08 in this queue
+34:10 
+
+34:10 so after advancing some time so user 6
+34:14 
+
+34:14 has completed the job but no users are
+34:17 
+
+34:17 waiting for this resource so we are in a
+34:19 
+
+34:19 position
+34:20 
+
+34:20 which we have the most of our users are
+34:23 
+
+34:23 waiting for
+34:25 
+
+34:25 getting a resource waiting for to get a
+34:27 
+
+34:27 resource we have a free resource
+34:31 
+
+34:31 but they are not
+34:32 
+
+34:32 they don't want to use this resource
+34:35 
+
+34:35 which is free
+34:38 
+
+34:38 and we have to
+34:40 
+
+34:40 we are trying to manage this situation
+34:44 
+
+34:44 by using semaphores
+34:46 
+
+34:46 so semaphores has only some limited
+34:49 
+
+34:49 timeout argument
+34:51 
+
+34:51 so some users for example like 7 and 5
+34:55 
+
+34:55 after some time and we have defined this
+34:58 
+
+34:58 time 10 seconds at the timeout argument
+35:02 
+
+35:02 they
+35:03 
+
+35:03 are no longer
+35:05 
+
+35:05 be in this waiting queue
+35:08 
+
+35:08 and they will be in a position
+35:10 
+
+35:10 like not completing any job but waiting
+35:14 
+
+35:14 for a while for nothing
+35:16 
+
+35:16 right so
+35:18 
+
+35:18 first we have to solve this situation
+35:22 
+
+35:22 and we have to
+35:25 
+
+35:25 get rid of this fixed timeout times
+35:31 
+
+35:31 fixed timeout arguments first we have to
+35:34 
+
+35:34 make this waiting cruise
+35:37 
+
+35:37 which our users can be able to wait in
+35:41 
+
+35:41 this queue forever
+35:43 
+
+35:43 and then we have to balance this cues
+35:47 
+
+35:47 also
+35:48 
+
+35:48 so
+35:49 
+
+35:49 first to get rid of the
+35:52 
+
+35:52 timeout arguments
+35:54 
+
+35:54 i'm going to stop using the semi-force
+35:57 
+
+35:57 and i'm going to save it to use
+35:60 
+
+35:60 conditions
+36:01 
+
+36:01 and in conditions if we use conditions
+36:05 
+
+36:05 instead of sum of force then there will
+36:07 
+
+36:07 be a difference
+36:10 
+
+36:10 a condition can
+36:13 
+
+36:13 wait
+36:14 
+
+36:14 or
+36:15 
+
+36:15 send a signal
+36:17 
+
+36:17 after releasing or before just before
+36:20 
+
+36:20 releasing the resource
+36:23 
+
+36:23 so we are
+36:24 
+
+36:24 going to make this waiting cue
+36:29 
+
+36:29 and
+36:30 
+
+36:30 for example like user 4 7 and 5 can wait
+36:36 
+
+36:36 in this queue
+36:38 
+
+36:38 in
+36:40 
+
+36:40 like the forever time and after
+36:44 
+
+36:44 our user nine has completed the job it
+36:47 
+
+36:47 can send the signal to user three and
+36:51 
+
+36:51 it can say
+36:53 
+
+36:53 all right i'm done with this resource
+36:55 
+
+36:55 you can get it
+36:57 
+
+36:57 and it can be a dynamical time
+36:60 
+
+36:60 this is the key
+37:02 
+
+37:02 property all right it can be a dynamical
+37:05 
+
+37:05 time it can be one nanosecond or it can
+37:07 
+
+37:07 be one year for example one day two
+37:10 
+
+37:10 hours
+37:11 
+
+37:11 it can be a dynamical time so we don't
+37:14 
+
+37:14 have to define timeouts as like 10
+37:18 
+
+37:18 seconds 100 seconds or three minutes
+37:21 
+
+37:21 like this
+37:23 
+
+37:23 because the job
+37:25 
+
+37:25 can be a job which
+37:28 
+
+37:28 can take
+37:29 
+
+37:29 very little time or it can be a job
+37:32 
+
+37:32 which can take a very long time
+37:34 
+
+37:34 first we have to make dynamical
+37:38 
+
+37:38 times for the waiting cues so i'm going
+37:41 
+
+37:41 to switch the condition first and then
+37:44 
+
+37:44 i'm going to try to
+37:46 
+
+37:46 make balanced rating cues by using the
+37:50 
+
+37:50 conditions for example
+37:52 
+
+37:52 do we have any timeouts here here we
+37:55 
+
+37:55 have a lot of timeouts user 1
+37:59 
+
+37:59 user 4 user 7 and user 5 and also user 0
+38:04 
+
+38:04 could not get the resource and timeout
+38:07 
+
+38:07 happens here
+38:08 
+
+38:08 right we have all of these resources as
+38:11 
+
+38:11 time out we can increase the timeout
+38:14 
+
+38:14 instead of 10 seconds up to 20 seconds
+38:16 
+
+38:16 but how can we know how can we know to
+38:19 
+
+38:19 use the correct
+38:21 
+
+38:21 timeouts
+38:23 
+
+38:23 so we have to make
+38:25 
+
+38:25 the dynamical
+38:28 
+
+38:28 cues
+38:30 
+
+38:30 so let's use
+38:31 
+
+38:31 conditions
+38:33 
+
+38:33 as a first step
+38:35 
+
+38:35 so i'm going to import
+38:38 
+
+38:38 condition class
+38:40 
+
+38:40 from threading library instead of
+38:42 
+
+38:42 semaphore
+38:44 
+
+38:44 and then change this
+38:47 
+
+38:47 resource creation instead of some force
+38:50 
+
+38:50 condition
+38:52 
+
+38:52 and then of course
+38:54 
+
+38:54 i should i have to delete this
+38:57 
+
+38:57 timeout argument definition
+39:01 
+
+39:01 so now we don't have any timeouts
+39:05 
+
+39:05 but
+39:06 
+
+39:06 here just before releasing this resource
+39:10 
+
+39:10 i'm going to add a line and i'm going to
+39:12 
+
+39:12 say self.resources are
+39:16 
+
+39:16 notify
+39:18 
+
+39:18 and we have two options here notify and
+39:21 
+
+39:21 notify all
+39:23 
+
+39:23 and it can notify all the users which
+39:27 
+
+39:27 are in the waiting queue of this
+39:28 
+
+39:28 resource or we can just notify
+39:32 
+
+39:32 with the limited number of users which
+39:35 
+
+39:35 are waiting in this queue so we can say
+39:37 
+
+39:37 notify one for example or not by three
+39:40 
+
+39:40 and it can notify three users which are
+39:42 
+
+39:42 weighting of course the maximum of three
+39:45 
+
+39:45 users uh which are waiting in this
+39:48 
+
+39:48 two
+39:49 
+
+39:49 but
+39:50 
+
+39:50 in this problem
+39:53 
+
+39:53 which the solution which we have created
+39:55 
+
+39:55 now it doesn't matter it just notifies
+39:58 
+
+39:58 one users
+40:01 
+
+40:01 so i'm going to use the default option
+40:04 
+
+40:04 i'm going to notify the first user which
+40:06 
+
+40:06 are waiting in this which is waiting in
+40:08 
+
+40:08 this queue of this resource
+40:11 
+
+40:11 and then release the resource so i'm
+40:13 
+
+40:13 going to make this user to get this
+40:17 
+
+40:17 resource now we don't have
+40:20 
+
+40:20 any timeout argument so the cue can be
+40:23 
+
+40:23 dynamical a user can wait in this queue
+40:26 
+
+40:26 for none nanosecond one microseconds or
+40:30 
+
+40:30 one year
+40:32 
+
+40:32 and it's dynamically
+40:34 
+
+40:34 now let's run again our file
+40:40 
+
+40:40 we have all the users
+40:46 
+
+40:46 and of course
+40:48 
+
+40:48 again we have the
+40:50 
+
+40:50 lot problem.balancing problem
+40:55 
+
+40:55 but
+40:56 
+
+40:56 we made this q dynamical
+41:02 
+
+41:02 so some users has completed the job and
+41:05 
+
+41:05 releases the resource
+41:07 
+
+41:07 and the other users which are waiting in
+41:09 
+
+41:09 the queue
+41:10 
+
+41:10 gets this resource
+41:13 
+
+41:13 and start to complete its jobs
+41:17 
+
+41:17 so now
+41:19 
+
+41:19 we still have lot balance problem
+41:22 
+
+41:22 and how can we solve this problem
+41:26 
+
+41:26 before solving this problem first i'm
+41:29 
+
+41:29 going to visualize
+41:31 
+
+41:31 the problem
+41:33 
+
+41:33 which makes you to understand better the
+41:35 
+
+41:35 lord balance problem
+41:37 
+
+41:37 so let's stop the
+41:39 
+
+41:39 so no timeout happens as you can see
+41:47 
+
+41:47 let's stop this process
+41:50 
+
+41:50 and of course now here is meaningless
+41:55 
+
+41:55 because all of them can get the resource
+41:57 
+
+41:57 at one point
+41:60 
+
+41:60 because no timeout so we can delete this
+42:02 
+
+42:02 part i think
+42:06 
+
+42:06 we just have an if structure
+42:11 
+
+42:11 and we don't have an else part
+42:15 
+
+42:15 so now let's visualize this
+42:18 
+
+42:18 problem
+42:20 
+
+42:20 and let's say
+42:22 
+
+42:22 i'm going to import some libraries of
+42:24 
+
+42:24 course it's not in the scope of this
+42:27 
+
+42:27 course so i'm going to make it very fast
+42:30 
+
+42:30 and i'm going to use matplotlib
+42:33 
+
+42:33 so let's say import
+42:35 
+
+42:35 mathplotlib.pi
+42:37 
+
+42:37 plot
+42:38 
+
+42:38 as always
+42:40 
+
+42:40 as plt
+42:43 
+
+42:43 and we need to install this package
+42:48 
+
+42:48 into our virtual environments
+42:54 
+
+42:54 let's wait
+42:56 
+
+42:56 for pycharm to install this package
+43:18 
+
+43:18 it's still installing
+43:46 
+
+43:46 my pc is very slow today
+44:02 
+
+44:02 all right now we have the
+44:05 
+
+44:05 package met bloodlip
+44:07 
+
+44:07 in our virtual environment
+44:09 
+
+44:09 now let's
+44:11 
+
+44:11 import another class
+44:14 
+
+44:14 from matplotlib
+44:19 
+
+44:19 animation
+44:21 
+
+44:21 i'm going to import the function
+44:22 
+
+44:22 animation clause
+44:26 
+
+44:26 because i'm going to generate an instant
+44:30 
+
+44:30 visualization
+44:32 
+
+44:32 for our problem
+44:34 
+
+44:34 i'm going to watch the how the resources
+44:37 
+
+44:37 cues are changing
+44:39 
+
+44:39 all right
+44:43 
+
+44:43 and then let's import matplotlib
+44:45 
+
+44:45 directly also because i'm going to
+44:48 
+
+44:48 change something with the set settings
+44:50 
+
+44:50 or matplotlib
+44:53 
+
+44:53 so
+44:56 
+
+44:56 here
+44:60 
+
+44:60 let's
+45:01 
+
+45:01 change a setting and let's say
+45:03 
+
+45:03 matplotlib
+45:05 
+
+45:05 that's
+45:06 
+
+45:06 use
+45:08 
+
+45:08 tk egg and it makes us to see our plot
+45:13 
+
+45:13 in a separate window
+45:16 
+
+45:16 not in the pycharm window
+45:19 
+
+45:19 and let's create our axis let's say
+45:23 
+
+45:23 self.pick
+45:24 
+
+45:24 and also self.access
+45:30 
+
+45:30 equal to plt which is the instance to
+45:33 
+
+45:33 our pipeline class
+45:35 
+
+45:35 prt dot subplots
+45:38 
+
+45:38 with one row
+45:41 
+
+45:41 two columns i'm going to generate two
+45:43 
+
+45:43 different ports
+45:45 
+
+45:45 at the left and at the right side
+45:47 
+
+45:47 and i'm going to use also the tight line
+45:50 
+
+45:50 layout argument
+45:54 
+
+45:54 with the value true
+45:58 
+
+45:58 right
+46:01 
+
+46:01 now
+46:03 
+
+46:03 after the user methods
+46:06 
+
+46:06 let's create other methods which defines
+46:09 
+
+46:09 the
+46:10 
+
+46:10 properties of the axis
+46:13 
+
+46:13 which we are going to have in our plot
+46:16 
+
+46:16 let's use the name access properties
+46:22 
+
+46:22 let's say
+46:24 
+
+46:24 self.access
+46:25 
+
+46:25 0
+46:26 
+
+46:26 the first axis
+46:29 
+
+46:29 clear
+46:32 
+
+46:32 and also the second one
+46:36 
+
+46:36 i'm going to use
+46:38 
+
+46:38 these
+46:39 
+
+46:39 lines a lot so i'm going to put them in
+46:42 
+
+46:42 a separate method
+46:44 
+
+46:44 let's say self.access
+46:47 
+
+46:47 zero
+46:49 
+
+46:49 that's set
+46:50 
+
+46:50 y name
+46:51 
+
+46:51 which
+46:52 
+
+46:52 adjust the limit of y-axis
+46:58 
+
+46:58 with the values starting from zero up to
+47:01 
+
+47:01 self dot
+47:03 
+
+47:03 n
+47:06 
+
+47:06 and then
+47:07 
+
+47:07 do the same thing for the other axis set
+47:11 
+
+47:11 underscore while in
+47:14 
+
+47:14 with the value 0 and sef.m
+47:18 
+
+47:18 which is for the job size so i'm going
+47:21 
+
+47:21 to see the
+47:23 
+
+47:23 resources at the left and jobs at the
+47:26 
+
+47:26 right
+47:29 
+
+47:29 so let's use self.access
+47:32 
+
+47:32 zero
+47:35 
+
+47:35 say set title
+47:38 
+
+47:38 resources
+47:43 
+
+47:43 and jobs
+47:46 
+
+47:46 and the second axis so the index should
+47:48 
+
+47:48 be one
+47:52 
+
+47:52 i'm going to initialize this animation
+47:55 
+
+47:55 with from one function with the name in
+47:57 
+
+47:57 it
+47:59 
+
+47:59 and i'm going to call this access
+48:02 
+
+48:02 properties
+48:05 
+
+48:05 methods first
+48:08 
+
+48:08 and then i'm going to create my first
+48:10 
+
+48:10 bar graph
+48:12 
+
+48:12 bar plot let's say self.access zero
+48:16 
+
+48:16 it's going to be a bar plot
+48:19 
+
+48:19 with the values i for i in range
+48:24 
+
+48:24 self dot r so in the x axis
+48:28 
+
+48:28 it should be the number of resources
+48:31 
+
+48:31 resource 0 resource 1 resource 2 and
+48:34 
+
+48:34 resource 3 if you have more than 3
+48:36 
+
+48:36 resource
+48:38 
+
+48:38 and
+48:43 
+
+48:43 we have
+48:48 
+
+48:48 so now we don't have we don't know the
+48:50 
+
+48:50 number of users which are waiting in the
+48:54 
+
+48:54 queues of the resources so let's add
+48:57 
+
+48:57 here
+49:01 
+
+49:01 let's add here another array after the
+49:03 
+
+49:03 jobs let's say cf.2
+49:08 
+
+49:08 to
+49:09 
+
+49:09 store the number of users which are
+49:11 
+
+49:11 waiting in the particular
+49:14 
+
+49:14 queues of the resources and that's it at
+49:16 
+
+49:16 the start let's use zero
+49:19 
+
+49:19 for underscore in range
+49:21 
+
+49:21 number of resources
+49:24 
+
+49:24 and it makes us
+49:26 
+
+49:26 let me write to this part
+49:31 
+
+49:31 except that resources should be
+49:35 
+
+49:35 oh sorry not resources self.q
+49:39 
+
+49:39 self.q
+49:42 
+
+49:42 should be
+49:43 
+
+49:43 for all of the resources if we have
+49:45 
+
+49:45 three zero zero zero and if we add one
+49:50 
+
+49:50 user to the
+49:51 
+
+49:51 queue of the resource one for example it
+49:54 
+
+49:54 should be one zero one so after
+49:58 
+
+49:58 completing the job
+49:59 
+
+49:59 when this user releases the
+50:02 
+
+50:02 resource then we are going to decrease
+50:06 
+
+50:06 the
+50:06 
+
+50:06 value which we have here in the at the
+50:10 
+
+50:10 index
+50:11 
+
+50:11 one so at the beginning
+50:14 
+
+50:14 we have zeros for all the resources and
+50:17 
+
+50:17 here after
+50:20 
+
+50:20 defining r i'm going to increase the
+50:22 
+
+50:22 value
+50:24 
+
+50:24 with the index r
+50:27 
+
+50:27 let's increase by one
+50:30 
+
+50:30 so it will make this one
+50:33 
+
+50:33 so
+50:35 
+
+50:35 just before releasing the
+50:38 
+
+50:38 resource let's decrease the value again
+50:42 
+
+50:42 back to
+50:44 
+
+50:44 its value so let's increase decrease by
+50:47 
+
+50:47 one
+50:48 
+
+50:48 like this
+50:50 
+
+50:50 increase here
+50:51 
+
+50:51 decrease here
+50:53 
+
+50:53 the number of users which are waiting in
+50:56 
+
+50:56 the queue of this resource with the
+50:58 
+
+50:58 index are
+51:01 
+
+51:01 all right then
+51:04 
+
+51:04 this values i for i in range self.r
+51:08 
+
+51:08 so called 0 1 2 for the x axis
+51:13 
+
+51:13 and for the y axis now i can use my new
+51:16 
+
+51:16 array self.q
+51:18 
+
+51:18 so it will
+51:20 
+
+51:20 show the current values
+51:23 
+
+51:23 the number of users which are waiting in
+51:25 
+
+51:25 the queues of this resource
+51:28 
+
+51:28 and do a similar thing for the self.xs1
+51:33 
+
+51:33 it's going to be also a bar plot
+51:36 
+
+51:36 for
+51:37 
+
+51:37 sorry i for i in range this times f dot
+51:42 
+
+51:42 n number of users
+51:44 
+
+51:44 and this time i'm going to use self.jobs
+51:48 
+
+51:48 for the y-axis
+51:50 
+
+51:50 so
+51:50 
+
+51:50 it will show a bar plot which we have
+51:53 
+
+51:53 the user indexes in the x-axis
+51:57 
+
+51:57 and the number of jobs in the y-axis
+52:01 
+
+52:01 all right of course for each frame
+52:04 
+
+52:04 i'm going to call another methods and it
+52:07 
+
+52:07 will be a similar one but with a
+52:10 
+
+52:10 different name let's
+52:12 
+
+52:12 define
+52:13 
+
+52:13 an update methods
+52:16 
+
+52:16 with the
+52:17 
+
+52:17 frame number
+52:18 
+
+52:18 input argument but i'm not going to use
+52:20 
+
+52:20 frame number for this example so i just
+52:23 
+
+52:23 use underscore because i don't want to
+52:25 
+
+52:25 use it
+52:27 
+
+52:27 so i'm going to get this input argument
+52:29 
+
+52:29 but i'm not going to use it so i'm going
+52:31 
+
+52:31 to use underscore here
+52:34 
+
+52:34 and of course i'm going to call the axis
+52:37 
+
+52:37 properties again
+52:39 
+
+52:39 and then i'm going to
+52:40 
+
+52:40 do
+52:41 
+
+52:41 this part
+52:45 
+
+52:45 again with the current values
+52:48 
+
+52:48 and if we are done so it means we have
+52:52 
+
+52:52 no jobs to complete anymore
+52:54 
+
+52:54 so let's say sum
+52:57 
+
+52:57 of self.jobs if it is equal to zero
+53:01 
+
+53:01 then quit so it will make a make makes
+53:04 
+
+53:04 us the it will make us to close the plot
+53:08 
+
+53:08 window all right so the quit method will
+53:11 
+
+53:11 close our
+53:14 
+
+53:14 plot window
+53:15 
+
+53:15 so let's now
+53:17 
+
+53:17 draw our plots
+53:19 
+
+53:19 i'm going to use a method with the named
+53:21 
+
+53:21 roll
+53:23 
+
+53:23 and again i'm not going to use this
+53:25 
+
+53:25 instance so i'm going to use underscore
+53:27 
+
+53:27 will be good to
+53:29 
+
+53:29 just create this
+53:32 
+
+53:32 array
+53:33 
+
+53:33 with an instance
+53:36 
+
+53:36 function animation
+53:38 
+
+53:38 with the figureself.pick
+53:41 
+
+53:41 which we have created in the constructor
+53:46 
+
+53:46 here
+53:49 
+
+53:49 this is the figure
+53:52 
+
+53:52 and
+53:54 
+
+53:54 for each frame that's called self.update
+53:60 
+
+53:60 and as an init function
+54:02 
+
+54:02 let's just call self.init
+54:08 
+
+54:08 and if we save this animation just count
+54:12 
+
+54:12 10 frames
+54:15 
+
+54:15 all right
+54:18 
+
+54:18 then
+54:19 
+
+54:19 we can show our plots
+54:25 
+
+54:25 i think we are done
+54:27 
+
+54:27 now we can
+54:30 
+
+54:30 see a visual representation of our
+54:34 
+
+54:34 solution
+54:35 
+
+54:35 of course now we have used just
+54:37 
+
+54:37 conditions
+54:38 
+
+54:38 we
+54:39 
+
+54:39 get rid of the timeout arguments but
+54:43 
+
+54:43 still we don't have an allot balancer so
+54:46 
+
+54:46 we should see long waiting cues and long
+54:50 
+
+54:50 unbalanced waiting queues for the
+54:52 
+
+54:52 resources let's just
+54:55 
+
+54:55 run our file
+55:04 
+
+55:04 of course we
+55:05 
+
+55:05 don't call the method
+55:08 
+
+55:08 draw
+55:09 
+
+55:09 so we cannot see the
+55:11 
+
+55:11 output let's just
+55:14 
+
+55:14 add here
+55:16 
+
+55:16 after starting all the threads
+55:18 
+
+55:18 let's call jobs and users
+55:22 
+
+55:22 users
+55:23 
+
+55:23 oh no
+55:25 
+
+55:25 i just
+55:28 
+
+55:28 use their own name let's change jobs and
+55:31 
+
+55:31 users
+55:33 
+
+55:33 draw
+55:34 
+
+55:34 all right
+55:35 
+
+55:35 it will initialize our plots
+55:39 
+
+55:39 let's run
+55:45 
+
+55:45 it appears in my seconds monitor so
+55:48 
+
+55:48 let's
+55:50 
+
+55:50 get here
+55:52 
+
+55:52 right this is our plot
+56:00 
+
+56:00 so at the right
+56:03 
+
+56:03 we have the jobs for each
+56:06 
+
+56:06 users
+56:07 
+
+56:07 of course it starts with the initial
+56:09 
+
+56:09 values 100 and
+56:12 
+
+56:12 left we
+56:13 
+
+56:13 see the
+56:15 
+
+56:15 number of users which are in the waiting
+56:17 
+
+56:17 queues for resource 0 1 and 2 and right
+56:20 
+
+56:20 now we don't have any user waiting in
+56:22 
+
+56:22 the
+56:23 
+
+56:23 waiting for the resource one of course
+56:25 
+
+56:25 we have again we have unbalanced queue
+56:29 
+
+56:29 we have six users here or seven users
+56:31 
+
+56:31 now eight users now waiting for resource
+56:34 
+
+56:34 two and our user our resource one is
+56:38 
+
+56:38 still free now it's not free now it's
+56:41 
+
+56:41 some users
+56:42 
+
+56:42 are using and now
+56:45 
+
+56:45 uh oh and
+56:48 
+
+56:48 as a result
+56:49 
+
+56:49 at one point we have nine users waiting
+56:52 
+
+56:52 for the resource two
+56:57 
+
+56:57 it's
+56:59 
+
+56:59 dramatically bad
+57:00 
+
+57:00 dramatically unbalanced
+57:03 
+
+57:03 so now
+57:04 
+
+57:04 as a second step as a final step we have
+57:07 
+
+57:07 to solve
+57:08 
+
+57:08 this situation we have to
+57:12 
+
+57:12 introduce a lot balance
+57:15 
+
+57:15 and
+57:16 
+
+57:16 we have a problem
+57:20 
+
+57:20 we can wait for to complete all users to
+57:23 
+
+57:23 complete the jobs but i'm going to stop
+57:25 
+
+57:25 now
+57:27 
+
+57:27 we
+57:28 
+
+57:28 have a problem
+57:31 
+
+57:31 with the line
+57:33 
+
+57:33 here
+57:35 
+
+57:35 which
+57:36 
+
+57:36 generates
+57:38 
+
+57:38 the
+57:39 
+
+57:39 r index as a random integer
+57:42 
+
+57:42 so
+57:44 
+
+57:44 i have to change this part and i have to
+57:47 
+
+57:47 introduce a lot balancer i just want to
+57:52 
+
+57:52 curve i just want to find the
+57:55 
+
+57:55 minimum
+57:56 
+
+57:56 number of users which are waiting in the
+57:59 
+
+57:59 queue
+57:60 
+
+58:00 so
+58:01 
+
+58:01 because
+58:02 
+
+58:02 i make my next user
+58:04 
+
+58:04 will be in this queue which we have the
+58:07 
+
+58:07 minimum number of users are waiting
+58:10 
+
+58:10 so first
+58:12 
+
+58:12 in the self.q
+58:15 
+
+58:15 we have the number of users
+58:17 
+
+58:17 which are waiting in the queues
+58:20 
+
+58:20 so here instead of using just a random
+58:22 
+
+58:22 integer i can find the minimum
+58:26 
+
+58:26 elements with the minimum value
+58:29 
+
+58:29 by using the min
+58:30 
+
+58:30 methods
+58:31 
+
+58:31 and of course with the argumentshaft.q
+58:34 
+
+58:34 so it will
+58:37 
+
+58:37 give us
+58:38 
+
+58:38 the
+58:39 
+
+58:39 minimum elements from this
+58:42 
+
+58:42 array from this list
+58:44 
+
+58:44 and then we can find the index of this
+58:48 
+
+58:48 element
+58:50 
+
+58:50 by using the index method from the
+58:53 
+
+58:53 self.q
+58:54 
+
+58:54 so i'm using the self.q here
+58:58 
+
+58:58 self.q
+59:00 
+
+59:00 and the method should be the
+59:03 
+
+59:03 index
+59:04 
+
+59:04 like this
+59:07 
+
+59:07 like this
+59:08 
+
+59:08 so
+59:09 
+
+59:09 this part will return with the minimum
+59:12 
+
+59:12 value
+59:13 
+
+59:13 for example 1 0
+59:16 
+
+59:16 6
+59:17 
+
+59:17 as last time
+59:19 
+
+59:19 so it will return with the value 0
+59:22 
+
+59:22 and this
+59:23 
+
+59:23 methods will return the index
+59:26 
+
+59:26 of the element which has the value 0 or
+59:30 
+
+59:30 which has the value minimum
+59:33 
+
+59:33 so
+59:34 
+
+59:34 we
+59:35 
+
+59:35 have
+59:36 
+
+59:36 found the
+59:38 
+
+59:38 most suitable
+59:40 
+
+59:40 resource
+59:42 
+
+59:42 to wait
+59:44 
+
+59:44 in its queue so i'm going to delete this
+59:47 
+
+59:47 part
+59:49 
+
+59:49 i no longer use
+59:51 
+
+59:51 a random integer
+59:53 
+
+59:53 so now we have
+59:55 
+
+59:55 a very primitive
+59:57 
+
+59:57 lot balancer
+59:59 
+
+59:59 let's
+60:00 
+
+60:00 run now
+60:04 
+
+60:04 and again i'm going to move the
+60:07 
+
+60:07 window from my other
+60:10 
+
+60:10 desktop
+60:23 
+
+60:23 all right
+60:24 
+
+60:24 now
+60:26 
+
+60:26 as you can see
+60:28 
+
+60:28 we have a very balanced
+60:31 
+
+60:31 queue for all of our resource and as
+60:35 
+
+60:35 maximum we can have four users waiting
+60:38 
+
+60:38 in the queue
+60:39 
+
+60:39 and four at one resource three at one
+60:42 
+
+60:42 resource three at one resource so it
+60:45 
+
+60:45 makes 10
+60:47 
+
+60:47 at one moment so we have a lot balancer
+60:52 
+
+60:52 so we can
+60:54 
+
+60:54 understand better if we decrease the
+60:57 
+
+60:57 waiting times
+60:59 
+
+60:59 so the sleeping times i'm going to stop
+61:02 
+
+61:02 again and change
+61:04 
+
+61:04 the sleeping times
+61:07 
+
+61:07 let's don't use three
+61:10 
+
+61:10 something just use
+61:15 
+
+61:15 shorter sleeping times or just use
+61:20 
+
+61:20 even shortage let's use
+61:23 
+
+61:23 random
+61:24 
+
+61:24 but random
+61:27 
+
+61:27 or two so
+61:28 
+
+61:28 this
+61:30 
+
+61:30 method will generate us a real random
+61:33 
+
+61:33 number between 0 and 0.5
+61:37 
+
+61:37 and also we can now arrange the y limits
+61:41 
+
+61:41 not so not self.n because it is very
+61:45 
+
+61:45 long we have balanced the number of
+61:47 
+
+61:47 users i'm going to use here
+61:51 
+
+61:51 over self.n
+61:52 
+
+61:52 dot r because the maximum number
+61:54 
+
+61:54 which we can have in a waiting q now is
+61:58 
+
+61:58 n over r
+62:01 
+
+62:01 so let's
+62:03 
+
+62:03 run now
+62:04 
+
+62:04 and move the window again
+62:21 
+
+62:21 all right now it's very fast
+62:33 
+
+62:33 all right
+62:38 
+
+62:38 it's working
+62:51 
+
+62:51 i think we can
+62:54 
+
+62:54 suppress the output message now
+62:59 
+
+62:59 to make this operation consume
+63:03 
+
+63:03 less cpu power
+63:05 
+
+63:05 because i'm recording this video and
+63:08 
+
+63:08 my pc is struggling a little bit
+63:12 
+
+63:12 but you understand the idea right
+63:15 
+
+63:15 when we finished
+63:17 
+
+63:17 when we have finished all of the jobs
+63:23 
+
+63:23 our
+63:25 
+
+63:25 window will close
+63:27 
+
+63:27 will be closed automatically
+63:30 
+
+63:30 so let's just wait for it
+63:38 
+
+63:38 and this limit should be i think
+63:41 
+
+63:41 n over r plus one
+63:44 
+
+63:44 all right
+63:45 
+
+63:45 let's
+63:49 
+
+63:49 correct this value and over r
+63:53 
+
+63:53 plus
+63:54 
+
+63:54 1
+63:56 
+
+63:56 so we have to round the number because
+63:59 
+
+63:59 of it
+63:60 
+
+64:00 and also i'm going to suppress the
+64:02 
+
+64:02 output message let's use
+64:05 
+
+64:05 triple single quotes to make all of
+64:09 
+
+64:09 these lines
+64:12 
+
+64:12 command lines
+64:21 
+
+64:21 or let's just delete it
+64:24 
+
+64:24 i'm not going to use them anymore
+64:31 
+
+64:31 you can download all
+64:33 
+
+64:33 of these codes from my github repository
+64:37 
+
+64:37 repository with the name weight and
+64:40 
+
+64:40 signal
+64:42 
+
+64:42 and
+64:43 
+
+64:43 don't
+64:45 
+
+64:45 use any output message all right
+64:49 
+
+64:49 let's
+64:50 
+
+64:50 run now
+64:58 
+
+64:58 without an output message
+65:01 
+
+65:01 and now we have the
+65:04 
+
+65:04 correct y limit
+65:08 
+
+65:08 all right
+65:12 
+
+65:12 now it's
+65:14 
+
+65:14 much
+65:15 
+
+65:15 faster
+65:16 
+
+65:16 the output message
+65:18 
+
+65:18 just consumes a lot of cpu power you can
+65:20 
+
+65:20 suppress them after completing the
+65:22 
+
+65:22 algorithm
+65:26 
+
+65:26 and
+65:27 
+
+65:27 as you can see now we have balanced
+65:32 
+
+65:32 resources queues and also we have
+65:35 
+
+65:35 consumed our jobs
+65:37 
+
+65:37 in a very balanced way for the users
+65:41 
+
+65:41 we don't have a long bar for resource
+65:44 
+
+65:44 for user
+65:45 
+
+65:45 tree for example and all
+65:47 
+
+65:47 the other ones are short but we are
+65:50 
+
+65:50 consuming all these jobs in a balanced
+65:53 
+
+65:53 way so we don't have any user storing
+65:57 
+
+65:57 all right
+65:60 
+
+65:60 this is the solution which we have
+66:02 
+
+66:02 generalized by using the solution of the
+66:04 
+
+66:04 dining philosopher's problem
+66:07 
+
+66:07 so we are done now
+66:11 
+
+66:11 we are not going to have any other
+66:14 
+
+66:14 subjects
+66:15 
+
+66:15 for the midterm exam
+66:17 
+
+66:17 you just you're just responsible with
+66:20 
+
+66:20 the subjects
+66:28 
+
+66:28 all right we have finished you are just
+66:30 
+
+66:30 responsible with the subjects let me
+66:33 
+
+66:33 write them in a notebook page
+66:35 
+
+66:35 or let me
+66:37 
+
+66:37 page let me minimize this window
+66:40 
+
+66:40 i also close this one
+66:54 
+
+66:54 the subjects are
+66:60 
+
+66:60 the subjects are the problems
+67:05 
+
+67:05 problems are important
+67:07 
+
+67:07 in this
+67:08 
+
+67:08 course so the problems are the problem
+67:16 
+
+67:16 so
+67:17 
+
+67:17 we should parallelize our solutions by
+67:20 
+
+67:20 using threads
+67:21 
+
+67:21 so we just
+67:22 
+
+67:22 introduce introduce the threads
+67:25 
+
+67:25 let's use the solutions
+67:29 
+
+67:29 here
+67:31 
+
+67:31 all right
+67:32 
+
+67:32 so
+67:33 
+
+67:33 the first problem is gill
+67:37 
+
+67:37 global interpreter luck
+67:39 
+
+67:39 and the solution was as you remember
+67:42 
+
+67:42 just in time compiler
+67:50 
+
+67:50 compiler
+67:51 
+
+67:51 so-called jit
+67:54 
+
+67:54 from number
+67:58 
+
+67:58 number jits
+67:60 
+
+68:00 all right and the other problem is race
+68:03 
+
+68:03 condition
+68:08 
+
+68:08 race condition and the solution was
+68:11 
+
+68:11 using the locks
+68:14 
+
+68:14 of course as a first step we have used
+68:17 
+
+68:17 the
+68:20 
+
+68:20 object-oriented programming but
+68:22 
+
+68:22 the primitives from prevalent world
+68:25 
+
+68:25 just locks
+68:28 
+
+68:28 and semaphores
+68:32 
+
+68:32 and today we have learnt the condition
+68:39 
+
+68:39 and of course we can say the problem
+68:41 
+
+68:41 synchronization also
+68:48 
+
+68:48 and here we use the join
+68:51 
+
+68:51 methods we can say it
+68:53 
+
+68:53 and then we have a problem with that
+68:56 
+
+68:56 luck
+68:59 
+
+68:59 and
+68:60 
+
+68:60 we
+69:01 
+
+69:01 are used we have used some algorithms by
+69:04 
+
+69:04 using again these primitives
+69:07 
+
+69:07 and today we have
+69:10 
+
+69:10 dealt with the problem
+69:12 
+
+69:12 lot balance
+69:18 
+
+69:18 and the solution again by using the
+69:19 
+
+69:19 weighting cues
+69:22 
+
+69:22 so
+69:22 
+
+69:22 let's we can say the weight and signal
+69:32 
+
+69:32 these are the subjects for our midterms
+69:35 
+
+69:35 and all of them
+69:37 
+
+69:37 are about the threats
+69:40 
+
+69:40 for this exam perhaps and after the
+69:42 
+
+69:42 midterm exam we will be doing
+69:45 
+
+69:45 uh
+69:47 
+
+69:47 by using the processes
+69:49 
+
+69:49 so
+69:50 
+
+69:50 here for midterm we just deal with the
+69:53 
+
+69:53 multi-threading
+69:55 
+
+69:55 problems
+69:56 
+
+69:56 and after the midterm we will be dealing
+69:59 
+
+69:59 with the
+70:01 
+
+70:01 multi-processing problems
+70:03 
+
+70:03 so this is it
+70:05 
+
+70:05 for this video
+70:08 
+
+70:08 tomorrow
+70:10 
+
+70:10 monday
+70:12 
+
+70:12 there won't be
+70:14 
+
+70:14 a morning lecture
+70:17 
+
+70:17 we have completed the
+70:19 
+
+70:19 oh no
+70:20 
+
+70:20 we have completed the morning lectures
+70:24 
+
+70:24 uh at the last friday in the last friday
+70:27 
+
+70:27 but tomorrow and the monday we will be
+70:31 
+
+70:31 having an evening lecture just evening
+70:34 
+
+70:34 lecture i am going to
+70:36 
+
+70:36 cover some exercises for the midterm
+70:39 
+
+70:39 all right
+70:41 
+
+70:41 see you later
+70:45 
+
+70:45 you

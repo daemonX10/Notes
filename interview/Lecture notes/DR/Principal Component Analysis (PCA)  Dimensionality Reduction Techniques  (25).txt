@@ -1,0 +1,634 @@
+00:00 welcome back to the second part of this
+00:02 dimensionality reduction series the
+00:04 method we discuss today is PCA the
+00:07 well-known principle component analysis
+00:10 which was first introduced in 1901 by KL
+00:13 Pearson this video is structured as
+00:15 follows we start with some intuition
+00:17 about the technique then we'll look into
+00:19 the algorithmic details and finally we
+00:22 apply PCA on a data set and do some
+00:25 visualizations let's go there are many
+00:28 great resources that vent into the cre
+00:30 of this video such as Peter blam's
+00:33 amazing blog post on PCA but also the
+00:35 PCA for data science book for example as
+00:38 always you find everything in the video
+00:41 description let's start with building a
+00:43 conceptual understanding of how PCA
+00:46 works for this let's assume we have a
+00:48 bunch of observations and here for
+00:51 Simplicity we only have two Dimensions
+00:53 X1 and X2 the corresponding data in
+00:56 tular format could look like this the
+00:59 central idea of PCA is to reduce the
+01:02 number of Dimensions by finding
+01:04 so-called principal
+01:06 components these principal components
+01:08 are uncorrelated and we only keep the
+01:11 most informative ones to reduce the
+01:13 dimensionality we will learn more about
+01:15 them soon here we don't have many
+01:17 choices so we will reduce the 2D data
+01:19 into one dimension if you've read other
+01:22 PCA tutorials you most likely heard that
+01:25 this technique tries to retain as much
+01:27 variance as possible in the data I
+01:30 always found this a bit abstract and
+01:32 therefore constructed a little example
+01:33 to better understand it this data set
+01:36 represents the relative size of a city
+01:38 in X1 versus the cost of living in
+01:42 X2 we immediately observe that this data
+01:45 is kind of redundant because in most
+01:47 cases the size of a city correlates with
+01:50 the cost of living so basically one
+01:52 value can be computed from the other one
+01:55 we will highlight two data points namely
+01:57 Rome which is much cheaper than other
+01:60 big cities and on top we have New York
+02:02 City which is pretty expensive but also
+02:04 pretty big these are just madeup
+02:07 examples how would you squeeze this data
+02:09 set into one single Dimension while
+02:12 preserving as much information as
+02:14 possible and information is mainly the
+02:17 relationship between data points here
+02:19 you could only use the axis X1 which
+02:22 reflects the size of a city but you
+02:24 could also use X2 which reflects the
+02:26 cost of living in fact there are many
+02:29 options we could ALS use this line as a
+02:31 new Axis or we could use this line so
+02:35 which one is better obviously the green
+02:37 line somehow captures more of the data
+02:40 this spread can also be calculated
+02:42 namely by measuring the variance the
+02:45 formula of variance for a single feature
+02:48 is defined as follows we substract the
+02:51 mean from all values and square them to
+02:54 make the distances positive the result
+02:57 is then summed up and divided by the
+02:59 number of samples
+03:00 overall variance is a measure for the
+03:03 spread of data when data points are far
+03:06 away from the center of the distribution
+03:08 highlighted in red here we have a larger
+03:11 variance if they're closer to the center
+03:13 we have a smaller variance now going
+03:15 back to our data set let's have a look
+03:17 at the variance of our two new axes the
+03:20 longer axis has a pretty large variance
+03:24 and the smaller one has also a smaller
+03:26 variance because there's less spread
+03:28 along this axis
+03:32 now when we take a look at how the data
+03:34 looks like along these axes we can see
+03:36 the variance even more clearly certainly
+03:39 this distribution plots are not
+03:41 perfectly precise it's just a sketch at
+03:44 the beginning we said that we want to
+03:45 reduce the 2D data into a single
+03:47 Dimension so let's do that now this can
+03:50 be done by projecting the data onto the
+03:52 new axis we will later see how such a
+03:55 projection is performed in
+03:59 practice
+04:00 now all of our data points lie along one
+04:03 single Dimension each of our originally
+04:06 2D data points is assigned to a single
+04:09 value along these axes in tabular form
+04:12 this would look like this and when we
+04:14 remind ourselves of the Cities from the
+04:17 beginning which were Rome and New York
+04:20 City we see that the left axis captures
+04:23 much more of the relationship between
+04:25 the data points and the right Axis is
+04:28 kind of cramped in fact the extreme case
+04:31 which is a variance of zero would mean
+04:33 that all points lie at the same value on
+04:36 one axis certainly when all data points
+04:39 look the same it's harder to distinguish
+04:41 between them and therefore variance can
+04:44 serve as a measure of information in
+04:47 data what we can see here are the two
+04:50 principal components of our data set
+04:52 both of them capture information about
+04:54 the size of a city as well as the cost
+04:56 of living therefore you can see these
+04:59 axes as a a combination of our original
+05:02 features but the interesting piece is
+05:05 that these combinations capture even
+05:07 more information than the individual
+05:09 features would that's why they are
+05:11 called principle they are the main axis
+05:14 in our data set it's no coincidence that
+05:16 I chose exactly those two axes as they
+05:19 together capture all of the information
+05:21 in the data this can be displayed in a
+05:24 so-called scre plots which shows the
+05:26 explained variance of each principal
+05:28 components and now dimensionality
+05:31 reduction comes into play typically we
+05:34 only keep the principal components that
+05:36 retain most of the variance in the data
+05:38 so here we would just keep the first
+05:40 principle component and still have 90%
+05:43 of the information of the 2D case in
+05:46 other words we drop less informative
+05:49 principle components in practice this
+05:51 means all of the points are projected
+05:54 onto this new axis which looks like
+05:58 this then we we can get rid of the two
+06:01 features and only use the new
+06:04 axis and our selected principle
+06:06 components summarizes our data set in a
+06:09 lower dimensional space of course we can
+06:12 extend this principle to many dimensions
+06:14 such as high-dimensional images here's
+06:16 an example for the principal components
+06:19 of a face image data set think of them
+06:22 like aess through the pixel space that
+06:25 capture most of the variation between
+06:27 faces usually these are face
+06:30 characteristics like the shape of the
+06:31 nose and so on remember in the
+06:34 introductory video when I said that
+06:36 faces can be reduced to their lower
+06:38 intrinsic dimensionality that's exactly
+06:41 what PCA is doing here the principal
+06:43 components for face images are called
+06:46 igen faces because they correspond to
+06:48 the igen vectors of the face image space
+06:51 we will learn more about that in a
+06:53 second the cool thing is that you can
+06:55 reconstruct any phase based on these
+06:57 spaces vectors here's an example of
+07:00 exactly that the image is reconstructed
+07:03 as linear combination of the IG faces of
+07:07 course reconstructing data based on the
+07:10 principal components has an inherent
+07:12 loss of information if the number of
+07:14 principal components is smaller than the
+07:16 original number of
+07:18 features I also like this visualization
+07:20 by Peter blur it shows how the face
+07:23 characteristics change when walking
+07:25 along a principal component or igen face
+07:29 this is just like walking along our
+07:31 newly created AIS in the previous
+07:33 example principal components are
+07:36 orthogonal to each other because
+07:38 otherwise they would capture correlated
+07:40 information more specifically they form
+07:42 an orthogonal basis which we will learn
+07:45 more about later in this video
+07:46 technically speaking PCA is projecting
+07:49 data into a new coordinate system where
+07:51 the A's are the principal components and
+07:54 this is called a basis transformation
+07:56 because it translates rotates or scales
+08:00 observations this also means that for a
+08:03 n dimensional data set we will end up
+08:05 with n principal components of which we
+08:08 just keep the most valuable ones
+08:10 typically one last remark the classical
+08:13 PCA is a linear method because we are
+08:15 only allowed to draw straight lines for
+08:18 this data set we will capture more
+08:20 variants using such a curved axis but
+08:23 this is not possible but there is an
+08:25 extension called kernel PCA which also
+08:28 allows to perform nonlinear
+08:30 dimensionality reduction but we won't
+08:32 cover it in this
+08:34 video now that we've gained a
+08:36 comprehensive understanding of PCA let's
+08:39 delve into the details of identifying
+08:41 these principal
+08:43 axes geometrically we are looking for
+08:46 the line with the minimal distance to
+08:48 all of the points this is nicely shown
+08:50 in this animation when we project the
+08:53 data onto this best fitting line like
+08:55 we've done before we preserve most of
+08:58 the information in higher Dimensions
+09:00 these lines become planes or
+09:03 hyperplanes the first idea that might
+09:05 come to your mind is that we need to
+09:07 perform some sort of optimization such
+09:10 as minimizing the sum of square
+09:12 distances like it's done in linear
+09:14 regression we could do this in principle
+09:17 for example fitting a line with gradient
+09:20 descent it turns out however that there
+09:22 exists a more efficient closed form
+09:25 solution to finding principal components
+09:28 when explaining PCA that there are many
+09:30 different ways to approach this
+09:31 technique some explanations are
+09:34 geometric interpretations we try to find
+09:36 the line with the minimal distances
+09:39 others involve lots of linear algebra
+09:41 and some also talk about finding the
+09:43 direction of Maximum variance at the
+09:46 beginning it might be difficult to
+09:48 accept that all of these views lead to
+09:50 the same way of finding principal
+09:52 components in fact minimizing the
+09:54 squared distances is equivalent to
+09:57 maximizing the variance in the video
+09:59 description I've put a nice blog post
+10:01 that mathematically deres this result in
+10:03 detail it's based on L multipliers but I
+10:07 won't further discuss it in this video
+10:09 instead of deriving it mathematically we
+10:12 will take a look at this intuitive
+10:13 visualization by Alex Williams the
+10:16 spreads or variance along the principal
+10:19 axis is displayed in blue here the
+10:21 distance between a data point and the
+10:23 axis is displayed in
+10:26 red using the Pythagoras Theorem we
+10:29 realiz I that the maximum variance and
+10:32 minimum distance are reached at the same
+10:34 time and therefore it doesn't really
+10:36 matter which perspective we choose in
+10:38 fact all optimization problems arrive at
+10:41 the same solution in the end okay so
+10:44 what is this solution the efficient
+10:47 closed form solution to finding the
+10:48 principal components starts with The
+10:50 co-variance Matrix this just naturally
+10:53 arises in the mathematical solution The
+10:56 covariance Matrix shows the variances of
+10:58 variables on the diagonal and
+11:01 co-variances between variables on of
+11:04 diagonal positions the variables could
+11:07 for example be the cost of living and
+11:09 the size of a city like in the example
+11:11 from the beginning the co-variance
+11:13 between two variables is the sum of the
+11:16 product of their deviations from their
+11:18 respective mean divided by the number of
+11:21 observations like shown in this formula
+11:24 it tells us about the relationship
+11:26 between features and generally expresses
+11:28 the coari iation of two variables
+11:31 meaning if they move together in the
+11:32 same direction just for completeness the
+11:35 difference to correlation is that
+11:37 correlation measures the intensity and
+11:40 direction of a relationship whereas
+11:42 covariance only measures the direction
+11:45 correlation is also called normalized
+11:47 covariance but it's not so important at
+11:49 this point as we are interested in the
+11:52 direction of the largest variance it
+11:54 absolutely makes sense to look at the
+11:56 variability in our data set expressed by
+11:58 this Matrix
+11:60 let's have a look at a few examples to
+12:01 get a feeling for the covariance Matrix
+12:04 for this data set we have a slightly
+12:05 higher variance of 1.3 for the feature
+12:09 X2 and the two variables move in the
+12:11 same direction therefore the co-variance
+12:14 between the variables is also high and
+12:16 as you can see the covariance Matrix is
+12:19 symmetric along the diagonal this
+12:21 example shows a slightly lower variance
+12:23 for each of the variables and no clear
+12:26 Trends how they would move together
+12:28 therefore the covariance is quite low
+12:30 this means knowing the value of one
+12:32 feature doesn't tell us much about the
+12:33 other feature finally here we have the
+12:36 same variances like in the first example
+12:38 but the co-variance is negative as we
+12:41 have a joint negative Trend so the
+12:44 takeaway of this is that the co-variance
+12:46 Matrix tells us about the variance and
+12:48 Joint directions of the variables before
+12:51 we move on and discuss why the
+12:53 co-variance Matrix is relevant for
+12:55 finding the principal components let's
+12:57 discuss some linear algebra Basics which
+12:60 will be needed to understand the
+13:01 following points in a coordinate system
+13:04 are typically described with a value for
+13:06 each
+13:07 axis if we write 1 comma 2 it means
+13:10 nothing else but 1 * the first basis
+13:13 Vector plus 2 * the second basis
+13:16 Vector this makes data points nothing
+13:19 else but vectors themselves now every
+13:22 Matrix can be associated with a linear
+13:25 transformation that for example
+13:27 translates or rotates the vectors which
+13:30 are data
+13:32 points if we for example have this
+13:35 Matrix and multiply it with our data
+13:38 point vectors we can use the general
+13:41 matrix multiplication rule to calculate
+13:43 the transformation what this means is
+13:46 that each row is Multiplied with the
+13:49 coordinates of the data points and this
+13:51 moves the data point to a new position
+13:54 so let's do that for the points on the
+13:56 left when we plug them into the
+13:59 expression on top we end up at these new
+14:02 positions the original data space was
+14:04 spanned by unit vectors and looks like
+14:07 this when we visualize the target space
+14:10 we see what kind of transformation The
+14:12 Matrix on top is performing it's
+14:15 stretching and scaling all of our data
+14:17 points from the unit sphere into the
+14:19 ellipse space on the right now linear
+14:23 transformation have some unique
+14:25 characteristics and one crucial
+14:27 characteristic can be described by
+14:29 so-called igen
+14:33 vectors these are the vectors that don't
+14:36 change the direction under a
+14:39 transformation let's say we have this
+14:41 red and blue vector and apply a matrix
+14:44 transformation and thereby move the
+14:46 vectors to these
+14:48 positions here the red Vector still
+14:51 points into the exactly same direction
+14:53 like before the transformation while the
+14:55 blue Vector points somewhere else the
+14:58 red Vector is what we call an igen
+15:00 Vector because it's not changing
+15:02 direction under
+15:04 transformation furthermore the length of
+15:07 the vector corresponds to the so-called
+15:09 igen value it's a measure for the
+15:11 intensity of the stretch in the vector's
+15:14 direction a very intuitive example of an
+15:16 igen Vector is when you point your arm
+15:19 into the air and spin in circles then
+15:22 your arm is the IG Vector of the
+15:24 rotation transformation as it doesn't
+15:26 change the
+15:28 direction
+15:29 more formally the igen vector equation
+15:32 looks like this all it says is that
+15:34 multiplying an igen vector v with the
+15:37 Matrix a leads to the same result as
+15:41 multiplying the igen vector with the
+15:43 corresponding igen
+15:45 value therefore the vector's direction
+15:48 is unaffected the only thing that
+15:50 happens is that it is multiplied by some
+15:52 scaler just like we've seen in a
+15:54 previous example usually this is called
+15:57 diagonalizing a matrix because instead
+15:59 of our Matrix on top we can just
+16:02 multiply with a diagonal matrix of igen
+16:05 values later we will also quickly talk
+16:07 about how to calculate igen vectors and
+16:10 igen values equipped with this knowledge
+16:12 we can now discuss how the principal
+16:14 components are found based on the
+16:16 covariance Matrix according to a theorem
+16:19 called the spectral theorem any
+16:22 symmetric Matrix like the covariance
+16:24 Matrix always has real igen vectors and
+16:27 igen values the set of all igen values
+16:29 of a matrix is also called The Matrix
+16:32 Spectrum that's where the theorems name
+16:34 comes from this means that every
+16:36 covariance Matrix can be
+16:39 diagonalized and the amazing thing for
+16:41 PCA is that igen vectors of the
+16:44 covariance Matrix correspond to the
+16:47 principal components so the Direction
+16:49 with the highest variance and the igen
+16:51 values correspond to the explained
+16:53 variance of each principal component now
+16:56 where is this surprising fact coming
+16:58 from
+16:59 The co-variance Matrix formulation
+17:01 naturally arises from the mathematical
+17:04 optimization problem that we want to
+17:06 solve I won't go further into the
+17:08 details here but if you're interested in
+17:10 finding out how the mathematical
+17:12 formulation looks like have a look at
+17:14 the links I've added to the video
+17:16 description now we should have
+17:18 everything in place to quickly go over
+17:20 each step of the PCA algorithm the first
+17:24 step is to Center the data centering the
+17:27 data means that the data is exactly at
+17:30 the origin of the coordinate system this
+17:32 can be achieved by substracting the mean
+17:35 of each
+17:37 feature some implementations
+17:39 additionally scale the data such that it
+17:41 has unit variance the reason for doing
+17:44 all of this is to have the same
+17:46 contribution of each variable as you can
+17:49 imagine all of the projections only work
+17:51 if we have the same ranges for each of
+17:53 the axes step two is to calculate the
+17:56 covariance Matrix as we now know the
+17:60 co-variance Matrix helps us to find a
+18:02 closed form solution to identifying the
+18:05 Direction with the highest variance it
+18:08 tells us about the variances of
+18:09 variables and between variables meaning
+18:12 to which degree the variables vary
+18:14 together the formula of variance is
+18:17 shown on top co-variance on the bottom
+18:20 in both Expressions xar represents the
+18:22 mean Vector of the corresponding
+18:24 variable the third step is the igen
+18:27 value decomposition
+18:29 as we've learned due to the co-variance
+18:31 being a symmetric Matrix and applying
+18:34 the spectral theorem The co-variance
+18:36 Matrix can be
+18:38 diagonalized the igen vectors correspond
+18:40 to the principal components and the igon
+18:42 values to the variance along the vectors
+18:46 this is an example of how it could look
+18:48 like the two vectors are the two
+18:50 principal components as well as the igen
+18:53 vectors of the covariance Matrix the
+18:55 blue values are the igen values and as
+18:58 you can see see the spread of principal
+18:60 component one is about three times as
+19:02 big as principal component
+19:04 2 but how do we actually calculate igen
+19:07 vectors this igen decomposition is
+19:10 performed with some more linear algebra
+19:13 starting with solving the characteristic
+19:15 polinomial for the Matrix finally I have
+19:18 to be honest with you when you calculate
+19:20 PCA using your favorite programming
+19:22 Library most likely no icon
+19:24 decomposition is performed in practice
+19:27 singular value decomposition I is
+19:29 computed the probably most crucial
+19:31 reason for this is the runtime
+19:33 complexity of the two methods IG
+19:36 decomposition has a cubic complexity
+19:38 while a singular value decomposition has
+19:40 a much smaller one depending on the
+19:42 shape of the data Matrix SVD is a more
+19:46 General Matrix decomposition technique
+19:49 that can also handle rectangular
+19:50 matrices remember igen decomposition
+19:53 only works on squared matrices it also
+19:56 has many other applications Beyond PCA
+19:59 it calculates singular values and
+20:01 singular vectors just like igen values
+20:03 and igen vectors when using SVD on a
+20:06 data set we don't have to calculate the
+20:08 covariance Matrix as we can apply it
+20:11 directly to the data set that's another
+20:13 reason why SVD is typically faster the
+20:16 results of SVD and igen decomposition
+20:19 are of course the same okay so does this
+20:22 mean we don't need igen composition at
+20:24 all not quite remember when I talked
+20:26 about kernel PCA at the beginning to
+20:28 learn nonlinear principal components for
+20:31 this technique the data is mapped using
+20:33 a kernel function in this scenario the
+20:36 single of value decomposition doesn't
+20:38 naturally extend to the nonlinear
+20:40 mappings and we need to make use of the
+20:42 igen decomposition on The covariance
+20:44 Matrix okay the last step is to use the
+20:47 igen vectors to project the data onto
+20:49 the new
+20:50 axis for our example from the beginning
+20:53 this projection is performed as follows
+20:56 we take our two-dimensional data Matrix
+20:59 multiply it with the calculated igen
+21:01 vectors or principal components and get
+21:03 the transformed data on the principal
+21:06 component axis so that's exactly what we
+21:09 see here and that's the corresponding
+21:12 data symmetric matrices always have
+21:15 orthogonal igen vectors that's why the
+21:17 principal components are orthogonal to
+21:19 each other so they're at right angles
+21:22 because they are orthogonal it also
+21:24 means that they have no correlation
+21:26 that's why PCA is set to project the
+21:28 data into a decorrelated basis it's also
+21:32 quite easy to prove this mathematically
+21:34 again for this you find another Link in
+21:36 the video description obviously we want
+21:39 to reduce the dimensionality therefore
+21:41 we only project onto the principal
+21:43 components with the highest variance
+21:46 this can be determined using igen
+21:48 values so again we take the data Matrix
+21:52 select only the igen vector with the
+21:54 highest IG value and obtain the
+21:56 projections onto the first PR iple
+21:59 components and we finally end up with
+22:01 these projections and that's the
+22:03 corresponding data so that's the full
+22:06 picture and now let's go ahead and apply
+22:09 this on a real data set okay so this is
+22:13 the notebook and you can find the link
+22:15 in the description I selected a wine
+22:18 data set from Psychic learn and this
+22:21 wine data set has a bunch of features
+22:24 that describe different characteristics
+22:26 of a wine and we have three classes of
+22:29 wines I don't know exactly what they
+22:31 stand for but overall we have around 200
+22:35 data points with 13 features now here I
+22:39 Define two functions one is building a
+22:42 simple Seaborn Scatter Plots the other
+22:45 one is using IPI volume a very nice
+22:48 library to create 3D
+22:52 visualizations so let's run that and it
+22:55 will also automatically install IPI
+22:57 volume if it's not yet
+22:60 installed now let's start with the first
+23:03 technique and I just wanted to point out
+23:05 here that you can use numai to also
+23:07 calculate igen values and igen vectors
+23:10 using this linear algebra package and
+23:13 you can use NY COV to calculate the
+23:17 covariance Matrix and here are examples
+23:20 for the first uh three igen vectors and
+23:23 igen values of the covariance
+23:26 Matrix okay now the 2D projection is
+23:29 pretty simple of course we use the
+23:31 easiest package you can use which is
+23:33 psychic learn and here we import PCA and
+23:37 as you can see it gets imported from
+23:38 decomposition because it performs a
+23:41 decomposition in detail it performs
+23:43 singular value decomposition as you can
+23:45 read in the
+23:47 documentation we will also time the
+23:49 execution so that we can compare later
+23:52 the different dimensionality reduction
+23:53 techniques and now we just call fit
+23:56 transform and this will perform the the
+23:59 singular value decomposition and then we
+24:02 visualize this and it will show this
+24:05 picture so we have the three classes in
+24:08 a two-dimensional space and what you can
+24:12 do with um this PCA object is you can
+24:15 also extract the igen values and igen
+24:19 vectors using explained variance ratio
+24:22 and components so that's quite nice and
+24:26 then secondly just because we have three
+24:29 dimensions let's also use them so we can
+24:33 also make a 3D plot I like this Library
+24:35 it's very nice for
+24:37 visualization and this might in some
+24:40 cases help to even better um represent
+24:45 data and that's pretty much it so we
+24:47 will continue this notebook in the next
+24:49 video looking at the other
+24:52 techniques to finish this video I
+24:54 quickly want to go over this table which
+24:56 we will extend with the other
+24:58 dimensionality reduction
+24:60 techniques and for PCA we can say it's a
+25:03 global technique because we incorporate
+25:05 all of the data at the same time it's
+25:07 linear because we project onto linear
+25:10 principal components of course there are
+25:12 also extensions to
+25:14 nonlinearity it's a production based
+25:16 method because of this decomposition
+25:18 approach the main purpose is to use the
+25:21 principal components for data analysis
+25:23 and
+25:24 visualization it's deterministic when we
+25:27 rerun it is will lead to the same result
+25:29 which is not true for all of the
+25:31 techniques the computational complexity
+25:34 depends on the decomposition approach
+25:36 and ranges from cubic for igen Value
+25:39 decomposition to squared in the case of
+25:41 singular value decomposition the only
+25:44 real hyperparameter is the number of
+25:46 principal components which can be
+25:47 identified with a scre plot then the key
+25:51 idea is to decompose The covariance
+25:53 Matrix into igen vectors and igen values
+25:56 and finally some other applications are
+25:58 Den noising compression or correlation
+26:01 analysis awesome that's it for the first
+26:03 technique in this video in the next
+26:06 video we will have a look at
+26:07 multi-dimensional scaling thanks for
+26:10 watching and see you soon in the next
+26:12 [Music]
+26:15 one

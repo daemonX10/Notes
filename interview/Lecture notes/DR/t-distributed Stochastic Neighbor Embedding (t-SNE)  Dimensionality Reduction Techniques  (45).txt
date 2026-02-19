@@ -1,0 +1,299 @@
+00:01 welcome back to part four of our dimensionality reduction Series in this video we will dive into the details of
+00:08 tne which is one of the most commonly used dimensionality reduction techniques
+00:13 it also seems that my viewers mostly use tney as their method of choice for you
+00:18 guys I think it also makes sense to familiarize with umap which will be discussed in the next video as you might
+00:24 know tne is considered a manifold learning technique so let's recap what this exactly means Disney is a nonlinear
+00:33 technique and often produces a better low dimensional embedding compared to linear methods like PCA here you can see
+00:40 an example of the embedding space for the amness data set which contains images of handwritten digits we can see
+00:47 that the 2D representation is much more organized in the case of tney but what
+00:53 is the reason for this in a nutshell it's because PCA tries to map the global
+00:58 ukian distances between all points into the embedding space and apparently ukian
+01:04 distance is not a great choice in higher Dimensions this problem was already mentioned in the first video of the
+01:11 series which relates to the curse of dimensionality trying to preserve pairwise distances in the low
+01:17 dimensional space is impossible because the less Dimensions the less space we have left to position the points
+01:24 consequently the distances will converge towards zero which means we need to place all the points close to each other
+01:31 that effectively leads to one big cluster like we've seen in this image the same applies for MDS which we've
+01:38 discussed in the last video a good way to visually understand why ukian distance is not ideal is to look at the
+01:45 manifold of the Swiss roll data set as PCA makes use of ukian distances the
+01:50 points on the top will be close to each other in the embedding space as they have a small ukian distance even though
+01:58 we would not consider them as direct neighbor the right distance for properly unrolling the Swiss roll data set is
+02:05 called geodesic distance and is shown on the image below it is defined as the
+02:10 shortest curve on a surface that connects two points and the surface is the manifold of the Swiss roll in our
+02:17 case it turns out that we can approximate the geodesic Distance by
+02:22 building a path from neighbor to neighbor and that's also a fundamental idea of tne as also mentioned in the
+02:29 name it's a neighbor embedding technique having that said in the following I will
+02:34 guide you through the basic ideas some improvements of the algorithm and finally how to make it scale to millions
+02:41 of data points we will mainly look at three important contributions to build
+02:46 the basis for how tne is implemented in most libraries today the first paper was
+02:52 proposed in 2002 by Jeffrey Hinton and Sam RIS and is called stochastic
+02:58 neighbor embedding or short sne knee in a follow-up paper by Lawrence fander
+03:03 Martin and Jeffrey Hinton a couple of improvements were proposed that led to
+03:08 tney and finally Barnes hsne presented by Lawrence fer Martin provides the
+03:14 toolbox to scale tne to millions of data points and this historical outline will
+03:20 also serve as agenda for this video so let's start with the first paper stochastic neighbor
+03:26 embedding the foundational paper called sne presents the basic idea how to map
+03:31 high-dimensional data into a lower dimensional space in the following we will quickly discuss each of the steps
+03:38 of the algorithm and summarize the full thing at the end of this chapter following the notation of previous
+03:44 videos the high dimensional data is called X and lower dimensional data such as a single Dimension here is denoted
+03:51 with Y as always our goal is to preserve the structure of the original data let's
+03:57 take this simple 2D data set as an example the first step of sne is to calculate pawise distances typically
+04:04 using the ukian distance function and this leads to this distance Matrix but wait we said we can't
+04:12 successfully preserve Global distances in the lower dimensions and that is
+04:17 right and because of that sne will introduce a way to only look at the local neighborhood of each point before
+04:24 that however it is still required to know all of the distances between the points in order to decide which ones are
+04:31 actually neighbors so we won't get around this step what's happening next is that sne converts the distances to
+04:37 probability distributions for each point on the right you can see a gausian
+04:42 distribution that corresponds to the red points in the paper such a distribution
+04:48 is called a conditional probability because we condition on the distance to a specific point like the red Point here
+04:56 the Y values of this probability distribution are now expressed expressing the similarity between points
+05:03 okay wait so this came out of nowhere we converted the distances to a point to a
+05:09 probability distribution such that closer points have a higher value and further away points have a lower value a
+05:16 good way to justify this is to think of these distributions as a waiting of all data points as a result far away points
+05:24 become very irrelevant and therefore we sort of relax our Dimension scaling problem as we don't have to pay too much
+05:31 attention to them in this example the green orange and yellow points have very small similarities and the blue point
+05:39 has a rather High similarity now to be fair introducing probabilities is not too well motivated
+05:46 in the paper and I'm also not sure if probability is the right term as there're not really stochastic events
+05:52 here but we will just accept this notion in The Following also there is no need to draw both sides of the gaussian
+05:59 distribution here here because distances are typically positive for visualization reasons I will however always use the
+06:06 full gaan Bell this conditional probability can also be expressed in an equation like shown here the red point
+06:13 is highlighted as XY remember we are still operating in the high dimensional
+06:19 Space X in the equation we find the ukan distance between the red points and a
+06:25 neighbor Point J this distance is then plugged into the formul of the gaussian
+06:31 normal distribution where we also find the variance Sigma you might remember that gion
+06:38 distributions have two parameters the mean and the variance the mean is simply
+06:43 zero here because the distance of the red point to itself is zero finally the
+06:48 whole term is normalized over all points to get a probability value between Zer and one which makes sure that the data
+06:56 is represented equally so regardless of the density so that's basically how we can calculate
+07:02 the similarity value from the distance okay so it looks pretty well
+07:08 for our initial example where we have a gaan centered around the red point and
+07:14 the blue point is mapped to 0.3 which is relatively High the other three points
+07:19 are mapped to very low similarities like the Green Point to 0.01 overall we are happy let's have a
+07:27 look at another Point's perspective such as the Green Point here here we realize that the
+07:33 distribution is somehow not perfectly suited the blue point is still mapped to a relatively high probability value even
+07:41 though we don't really want it to be included in our cluster because the blue point was not really a neighbor so we're
+07:48 not happy with that it turns out that it's unlikely that the same variance
+07:54 value is optimal for all points in dense regions a smaller value is appr
+07:59 appropriate ideally we would like to see something more in the direction of this distribution as you know variance
+08:06 controls the width of a gaan and by making it smaller we assign a smaller
+08:11 value to the points at the tals of the distribution this adjustment is also
+08:16 happening systematically in sne which brings us to the term perplexity
+08:22 perplexity is a hyperparameter and can be seen as a measure for how many neighbors we want to include for each
+08:29 point if we set it very high it will lead to very compact clusters as all points are
+08:35 in the neighborhood of each other if it's a lower value the low dimensional space will be more distributed as only a
+08:43 few neighbors are included under the hood perplexity simply controls what we
+08:48 just adjusted manually namely the variance of the Gan distribution of each point as you can see a high perplexity
+08:56 value is expressed by a flat Gan distribution and a low value corresponds
+09:01 to a peak distribution perplexity is mathematically defined as follows for a
+09:08 conditional probability distribution which is the neighborhood probability of a point I it equals to two to the power
+09:16 of the Shannon entropy of this distribution the Shannon entropy is a
+09:21 popular tool in information Theory and measures the average amount of
+09:27 information generally speaking the entropy increases if the variance increases because the flatter the
+09:33 distribution the more uncertainty we have I've put a nice blog post in the video description if you want to go
+09:40 deeper into entropy by putting this entropy into the exponents the
+09:45 perplexity tells us approximately how many neighbors our gausian kernel covers
+09:50 and therefore perplexity balances between preserving Global and local structure so at this point we know two
+09:57 things first we should adjust the width of the distribution for each point
+10:02 because it is not optimal to use the same variance every time and secondly we
+10:08 can use perplexity to measure how many neighbors a distribution currently captures so ideally we would like to
+10:15 capture the same number of neighbors for each point so what's left is we need to
+10:20 find the optimal variance for each point such that we have the same complexity value for all of the points in order to
+10:27 find the optimal variance for each Point most of the libraries perform a binary search that finds a perplexity as close
+10:35 as possible to what we specify as hyperparameter such as 30 in this
+10:41 example in a nutshell binary search goes through a list of audited values and
+10:46 evaluates one variance at a time by calculating the perplexity then the maximum or minimum
+10:53 bound is moved until a suitable approximation is found this algorithm is faster than
+10:59 trying all of the values in the list for example here we could find a close to 30
+11:04 value already for the second Sigma and can terminate the search and this search
+11:10 can be easily parallelized for each data point which you can also see in the psychic learn
+11:15 documentation the last step is to apply the same principles to the low dimensional
+11:21 mapping this means for each point we have two probability distributions one for high dimensional data denoted with
+11:28 pji and one for the low dimensional embedding space denoted with
+11:34 qji the last step of sne is to compare these two distributions to evaluate how
+11:40 similar the neighborhood is this means we evaluate the Y values for p and Q and
+11:46 need to compare them how close their similarities are a popular measure for comparing distributions is cack liab
+11:53 Divergence or short K Divergence it simply sums over all of the points and
+11:58 all of the neighbors of of each point and compares the function values according to this formula if you want to
+12:05 get a feeling for this loss function I highly recommend to pause the video and plug in the values of the green and blue
+12:11 point here trust me this will be very useful for understanding this video you
+12:17 will realize that this loss function weighs values close to the center more
+12:22 than values at the tals of the distribution and that's exactly what we want to put more emphasis on close
+12:29 neighbors so if a close neighbor in the original P distribution is embedded far
+12:34 away in the Q distribution then we receive a large penalty for that as the
+12:40 name implies this loss function measures the Divergence between the distributions and therefore we want to minimize it
+12:47 also note that we can only move the points in the Q distribution and P is
+12:52 fixed just a side note a good way to verify the quality of the tne fit is to
+12:58 use the shepher diagrams that we've learned about in the last video it's simply a scatter plot between the
+13:04 high-dimensional distances and the low-dimensional ones I've not seen many people doing this but it's an excellent
+13:11 way to build more trust into the tne results finally for minimizing the cost
+13:16 function gradient descent is used the gradient of our cost function
+13:22 which is kld Divergence with respect to why has this simple form in the tne
+13:28 papers the author provide an intuitive explanation how to interpret this gradients it's simply the resulting
+13:34 Force created by a set of Springs between a specific point such as the red points and all other points of the low
+13:42 dimensional mapping these Springs repel or attract points depending on whether
+13:47 the distance is too small or too large compared to the high-dimensional similarities in the gradients the first
+13:55 term measures this mismatch so if the distance is too large or too small and the second term expresses the
+14:03 force of the spring so how strongly should we repel or attract you can even reformulate this
+14:10 gradient to separate the attractive and repulsive forces interestingly this
+14:16 corresponds to a so-called nbody simulation which is relevant in physics
+14:21 so our sne or tne mapping can be seen as a set of particles that pull and push
+14:27 each other and we update the positions until a steady state is reached so let's
+14:32 quickly summarize the steps of the traditional sne algorithm we start with
+14:38 initializing the low dimensional points randomly or running PCA for a starting
+14:43 configuration then we compute the pairwise ukan distances between all points after that we introduce locality
+14:51 by applying gaussian distributions to the distances then we find the sigma values of each Point's distribution
+14:58 using a binary search such that each point has roughly the same number of neighbors and finally we optimize their
+15:05 positions by improving the KL Divergence between the low and high dimensional probability distributions for each
+15:12 individual data point so that's it for sne now let's have a look at tne in a
+15:18 nutshell it's just sne with a couple of improvements but the overall algorithm
+15:23 stays the same in order to understand why we even need Improvement let's quickly discuss the crowding problem
+15:30 which motivates the most important change namely the T in tne imagine we have a data set that is
+15:37 arranged in a two-dimensional space like this in order to map this to the one-dimensional space we can simply
+15:44 arrange the points in the line now how well does this mapping preserve the distances of the original data for this
+15:52 we can have a look at the neighbor probability distribution of a specific point such as green again the distances
+15:60 correspond to similarity values and the blue point is furthest away if we
+16:05 compare this with the distribution of the high dimensional green points we realize that the blue point has been
+16:12 placed too far away in the low-dimensional embedding the orange and red points seem to have more or less the
+16:18 right values but the blue point has definitely a too small similarity the
+16:23 issue here is that no matter how we arrange the points in embedding space we will always have the situation that some
+16:29 of the points are not as close as they should be the reason for this is simply
+16:35 that the intrinsic dimensionality of the data is too large for the number of Dimensions we have chosen this situation
+16:41 is exactly what the crowding problem describes when we can't preserve the right distance to all neighbors because
+16:48 there is simply not enough space for it because the blue point is not perfectly placed yet there will be a small
+16:55 attractive force between blue and green as indicated by this this spring this
+17:00 Force stems from the last term of the K Divergence loss which punishes
+17:06 deviations between the distributions let's see what the results of these forces between points looks
+17:13 like as you can see sne on the left which suffers from the crowding problem
+17:19 has a hard time to form clusters because during optimization the small forces will make all points Clump together
+17:26 thisne on the right alleviates this problem and is able to form clear clusters so how is tne doing that the
+17:34 basic idea is to use a probability distribution that simply assigns a higher value to these problematic points
+17:42 and this simply reduces The Unwanted forces as the deviations between the similarity values is much smaller in a
+17:50 sense you can think about this as having a broader neighborhoods in the low dimensional space which allows for a bit
+17:56 of error the distribution that is used for this is called students te distribution and that's where the T and
+18:04 tne is coming from as you can see in this comparison the T distribution has
+18:09 heavier tails and this will assign higher similarity values this allows the
+18:15 points to be further away and still have a relatively high probability so here
+18:20 you can see the situation even more clearly the blue point from before gets a much higher value assigned which
+18:27 reduces the deviation to the original distance and hence reduces the forces between points so the takeaway of this
+18:33 is there is not much we can do about the missing space in low Dimensions but we can allow for some Arrow which we will
+18:40 do by using the T distribution using this distribution also brings some additional advantages Beyond alleviating
+18:47 the croing problem first of all we don't have to perform binary search to find
+18:52 the variances like for the gaussian distribution and instead can always use the same distribution for All Points
+18:59 more specifically this is the T distribution with one degree of Freedom
+19:04 secondly the calculation of the probabilities is computationally more efficient because we don't have to
+19:11 calculate exponentials like in the Gan distribution so this was definitely the most significant change in tne but let's
+19:18 now also quickly discuss other things that were adjusted to make the optimization more efficient symmetric
+19:25 probabilities have been introduced here you can see an example of the similarity of blue given the Green Point which is
+19:33 0.15 now what if we turn things around what is the similarity of green given
+19:41 blue somehow we would expect that the similarities between them are equal we
+19:46 realize however that this is not the case besides being a bit unsatisfying
+19:51 this also has a negative effect on outliers in our data the blue outlier
+19:57 here will always have a small probability in the neighborhood of each other points this not only makes the
+20:03 blue point very sad but most importantly doesn't include it into the cost
+20:08 function in other words it doesn't matter where we place the blue points in the low dimensional space because it
+20:15 will never be really considered in the loss function therefore the authors proposed to average the conditional
+20:21 probabilities to get joint probabilities this allows the outliers to contribute
+20:26 to the cost function another nice side effect of this is that the gradient calculation is simplified which leads to
+20:33 computational benefits finally the third most important Improvement is early
+20:39 exaggeration let's first discuss what the underlying problem is that the authors try to solve here assume we have
+20:46 two-dimensional data that is forming two clearly defined clusters when
+20:52 initializing the low dimensional space randomly we might have a starting configuration like this so each of these
+20:58 2D points is mapped to one point of the one-dimensional line after optimization
+21:05 we would expect two separated clusters on this axis when we start the
+21:10 optimization now the KL Divergence loss Will activates attractive forces between
+21:16 similar points and repulsive forces between points that should be distant from each other so differently colored
+21:24 points will repel each other and points with the same color will will move together the result without early
+21:31 exaggeration would look like this but wait that's not quite what we expected
+21:37 what about the blue guy on the left well because of all of the
+21:42 repulsive forces by the orange cluster in the middle the blue point has no
+21:47 chance to move to the other side the simple way to solve this is to increase
+21:52 attractive forces for the first couple of iterations as indicated by these
+21:58 thick green arrows this allows the separated blue point to overcome the
+22:03 repulsive forces in order to move to the other side after some iterations the
+22:09 attractive forces return to normal such that clear clusters can be formed all of
+22:15 these things can be controlled in the gradient if you're interested in more details I can recommend to take a look
+22:22 at this paper which performs a comprehensive analysis of the attractive and repulsive forces expressed by the
+22:29 gradient of the loss function for completeness early exaggeration simply multiplies the attractive forces of the
+22:36 gradient with a factor greater than one applied to a real data set like the
+22:42 genomic Mouse data set on this image the differences look like this on the right tne forms more densely packed clusters
+22:50 so as a wrap up early exaggeration symmetric probabilities and the introduction of the T distribution for
+22:57 low dimensional space space were the main improvements presented in the tney paper there were some additional minor
+23:04 things that I didn't address here such as adaptive learning rates to avoid local Minima now let's give ourselves a
+23:11 short interactive Break by clicking through one of the CES of the sponsor of this video series which is brilliant.org
+23:19 brilliant offers plenty of interactive courses for data science programming and
+23:24 Tech in general to give you some more insights I thought makes sense to click through a few lessons from a very recent
+23:32 topic namely large language models I know that my viewers have
+23:37 advanced knowledge so I already jumped a bit ahead and completed the first few sessions here you can see the lessons on
+23:45 tokenization so how language models convert text to a dictionary used for
+23:50 model training you can go through these lessons on your phone whenever you have time and therefore have the chance to
+23:57 stay up toate every every day you can get started for free for a full 30 days
+24:02 using the link brilliant.org deepinder and the first 200 to sign up
+24:07 using this link will get 20% off the annual premium
+24:12 subscription now it's time to go through some code and after that we will shortly discuss the Barnes Hut sne so originally
+24:21 I wanted to go a bit deeper into the programming stuff but this video is probably already two packed for this so
+24:28 we will just have a short look at the tne implementation in psychic learn so
+24:34 as you can see here it says tne minimizes the KL Divergence of the
+24:39 gaussian and the student T distribution que so that's exactly what we just talked about and you can see that there
+24:46 is the Barnes Hut method which we will discuss after this coding section and if
+24:52 you don't use Barnes hat it will use the exact computation and here you can also
+24:57 see that we perform or the method performs gradient descent and this gives you the KL diversions and here we also
+25:04 have the options to Define early exaggeration which we just discussed and
+25:10 when we move up a little bit then we can find the fit function right here and
+25:17 here are a couple of things so the learning rate and that kind of stuff for The gradients
+25:23 Descent and in addition to that we can it will use barns Hut or for the exact
+25:29 computation and you can also pass it another pre-computed metrix so typically
+25:35 it's calculating ukian distance so this is exactly the pawise parse distance
+25:41 part which we discussed at the beginning of this video and based on these distances it's then converting them into
+25:47 joint probabilities so we've also discussed that these are these symmetric
+25:53 probabilities and for that it will perform the binary search
+25:59 all right based on the implementation let's now run these first couple of cells to get the data set and now let's
+26:06 have a look at tne um using psychic learn again I won't do anything fancy here this is just to
+26:13 quickly go over the parameters so nend components is how many dimensions we want let's choose three because we have
+26:21 this 3D plot again perplexity defines how many neighbors we want to have in
+26:27 the neighborhood of each point then early exageration defines how strongly
+26:33 we want to scale the attractive forces when running early exaggeration for the
+26:39 first couple of EPO and then we have here some properties for the gradient
+26:45 descent then in it we can specify PCA to start with a PCA
+26:51 configuration let's run that and the final thing is end jobs um and and end
+26:58 jobs is because for performing the binary search we can parallelize that as
+27:04 mentioned before and so we will just choose four workers here to do that and
+27:10 this is what the embedding looks like and just like before we can also do the
+27:16 same thing in 2D if you need a great guides to better understand the
+27:21 parameters and the effects of each of the parameters of tne I recommend to
+27:27 check out this till. pop which has a great blog post regarding this this also
+27:33 helps to understand or to realize that tne is actually not useful for
+27:38 clustering because it doesn't guarantee that any of the information within or
+27:44 between clusters makes sense the last thing we will discuss here only on a
+27:50 high level is Barnes hard tne which actually is very important because it
+27:55 allows to scale TIY to m millions of data points so we've just had a look at
+28:01 the documentation and we saw that there are two ways to compute the embeddings either you use the exact way which has a
+28:08 squared computational complexity or you use Barnes Huts which has a lock linear
+28:14 complexity so it's much more efficient remember when I previously talked about how sne is connected to nbody
+28:22 simulations from physics well it turns out that the runtime also used to be a
+28:27 big issue in that domain especially when you deal with millions of particles
+28:33 Joshua Barnes and Pete Hut came up with an approximation algorithm for solving
+28:39 and body simulations more efficiently the basis for this approximation is to
+28:44 divide the space into cubic cells which summarize the particles in the cell using the cell's Center the exciting
+28:52 idea of Lawrence funder Martin was to also transfer this to our good old T
+28:58 algorithm imagine we have millions of points and need to compute pawise distances probabilities and all of that
+29:05 for every single point using Barn hatut approximation we can alleviate the
+29:10 problem by summarizing the points belonging to the Clusters so instead of
+29:16 using all points of each cluster we can just take the center the second step of barn Hut is to build a so-called quad
+29:23 tree which summarizes all of the points belonging to a specific cell in a tree
+29:29 structure by traversing this tree we can efficiently calculate the repulsive
+29:34 forces between the Clusters this allows to approximate the repulsive part of the
+29:40 gradients by using only the centers of each cell So eventually there's much
+29:45 more we could talk about when it comes to accelerations of TIY but this was
+29:50 just a quick Peak to give you some intuition about what is happening under the hood finally let's go over our our
+29:58 dimensionality reduction comparison table first of all tne is a local technique as the embeddings are based on
+30:05 each Point's neighborhood secondly this method is nonlinear as we can approximate
+30:12 arbitrary shapes and that's why it also belongs to the manifold learning
+30:18 techniques the main purpose is visualization to gain intuition about the data as the name implies tne is
+30:26 stochastic and that's because the objective function is non-convex and different initializations
+30:32 lead to different Minima we learned that Barnes Hut is an efficient lock linear approximation of tne because tne itself
+30:40 has quadratic complexity the most important parameters are perplexity early exageration and everything related
+30:47 to gradient descent the key idea is to use each Point's neighborhood to create embeddings finally it's important to
+30:54 note that tne is an iterative algorithm and we can't apply it to new data like
+30:60 in the case of PCA that's why there are also not many other applications other
+31:05 than visualization all right this was a lot and that's it for today thanks again
+31:10 for watching and see you soon in the final part when we look at
+31:19 umap

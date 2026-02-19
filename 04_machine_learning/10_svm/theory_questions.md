@@ -762,19 +762,112 @@ Traditional SVM is like a puzzle where each piece's position affects all others�
 
 ## Question 19
 
-**What are “Support Vector Regression” and its applications?**
+**Explain the linear kernel in SVM and when to use it.**
+
+### Answer
+
+**Definition:**
+The linear kernel is the simplest kernel function in SVM, defined as $K(x_i, x_j) = x_i^T x_j$ — a direct dot product between two feature vectors without any transformation. It creates a linear (hyperplane) decision boundary in the original feature space.
+
+**Mathematical Form:**
+$$K(x_i, x_j) = x_i^T x_j = \sum_{k=1}^{d} x_{ik} \cdot x_{jk}$$
+
+No mapping to higher-dimensional space — $\phi(x) = x$ (identity mapping).
+
+**When to Use Linear Kernel:**
+
+| Scenario | Why Linear Works |
+|----------|-----------------|
+| **High-dimensional data (d >> n)** | Text classification, genomics — already in high-dimensional space where linear separation often exists |
+| **Large datasets (n > 10,000)** | Much faster than RBF; O(nd) vs O(n²d) |
+| **Linearly separable data** | No need for non-linear transformation |
+| **Interpretability required** | Weight vector w directly shows feature importance |
+| **Sparse data (TF-IDF, bag-of-words)** | Linear kernels work well with sparse features |
+
+**When NOT to Use Linear Kernel:**
+
+| Scenario | Why Linear Fails |
+|----------|-----------------|
+| Non-linearly separable data | Cannot capture circular/spiral boundaries |
+| Low-dimensional data with complex patterns | Need RBF or polynomial kernel |
+| Image pixel features (raw) | Non-linear relationships between pixels |
+
+**Linear Kernel vs LinearSVC:**
+```python
+from sklearn.svm import SVC, LinearSVC
+
+# SVC with linear kernel (uses libsvm — slower)
+svc_linear = SVC(kernel='linear')  # O(n²) memory for kernel matrix
+
+# LinearSVC (uses liblinear — much faster)
+linear_svc = LinearSVC()  # O(nd) memory, coordinate descent
+# Preferred for large datasets
+```
+
+**Key Advantage:** The weight vector $w = \sum \alpha_i y_i x_i$ is explicitly computable, enabling direct feature importance interpretation.
+
+**Interview Tip:** When features > samples (text, genomics), always try linear kernel first — it's faster, less prone to overfitting, and often performs just as well as RBF.
 
 ---
 
 ## Question 20
 
-**Explain thelinear kernelin SVM and when to use it.**
+**What is a Radial Basis Function (RBF) kernel, and how does it transform the feature space?**
 
----
+### Answer
 
-## Question 21
+**Definition:**
+The RBF (Gaussian) kernel is the most popular non-linear kernel in SVM. It measures similarity between two points based on their Euclidean distance, implicitly mapping data to an **infinite-dimensional** feature space.
 
-**What is aRadial Basis Function (RBF) kernel, and how does it transform thefeature space?**
+**Mathematical Formula:**
+$$K(x_i, x_j) = \exp\left(-\gamma \|x_i - x_j\|^2\right)$$
+
+Where:
+- $\gamma = \frac{1}{2\sigma^2}$ controls the "reach" of each support vector
+- $\|x_i - x_j\|^2$ is the squared Euclidean distance
+- Output range: $(0, 1]$ — identical points give 1, distant points approach 0
+
+**How RBF Transforms Feature Space:**
+
+1. **Implicit Infinite-Dimensional Mapping:**
+   Using Taylor expansion of the Gaussian function, $\exp(-\gamma\|x-y\|^2)$ corresponds to a dot product in an infinite-dimensional space. Each data point is mapped to infinite coordinates.
+
+2. **Intuition — Bump Functions:**
+   Each support vector creates a "bump" (Gaussian peak) centered on itself. The decision boundary is formed by combining these bumps. Points near a support vector get high similarity; distant points get near-zero similarity.
+
+3. **Local vs Global:**
+   - Small γ → wide bumps → smooth, global decision boundary
+   - Large γ → narrow bumps → complex, local decision boundary (overfitting risk)
+
+**Effect of γ Parameter:**
+
+| γ Value | Behavior | Risk |
+|---------|----------|------|
+| Very small (0.001) | Very smooth boundary, almost linear | Underfitting |
+| Default (1/n_features) | Balanced complexity | Good starting point |
+| Very large (1000) | Each point is its own island | Severe overfitting |
+
+**When to Use RBF Kernel:**
+- Non-linearly separable data
+- No prior knowledge about data structure (good default)
+- Moderate-sized datasets (kernel matrix is n×n)
+- Low to medium dimensional data
+
+**Practical Example:**
+```python
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+
+# IMPORTANT: Always scale features before RBF kernel
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# default gamma = 1/n_features ('scale')
+svm_rbf = SVC(kernel='rbf', C=1.0, gamma='scale')
+svm_rbf.fit(X_scaled, y)
+```
+
+**Critical Tip:** RBF kernel is distance-based — **always standardize features** before using it, otherwise features with larger scales dominate the distance computation.
 
 ---
 
@@ -1410,70 +1503,6 @@ svc = SVC(kernel='rbf')  # Uses SMO internally
 from sklearn.svm import LinearSVC
 linear_svc = LinearSVC()  # Uses coordinate descent
 ```
-
----## Question 27
-
-**Explain how SVM can be utilized forhandwriting recognition.**
-
----
-
-## Question 28
-
-**Explain the use of SVM inreinforcement learningcontexts.**
-
----
-
-## Question 29
-
-**What are the potential uses of SVMs inrecommendation systems?**
-
----
-
-## Question 30
-
-**Explain the concept ofbaggingandboosting SVM classifiers.**
-
----
-
-## Question 31
-
-**Describe a scenario where an SVM is used as aweak learnerin anensemble method.**
-
----
-
-## Question 32
-
-**What are the mathematical foundations and optimization theory behind SVM?**
-
----
-
-## Question 33
-
-**How do you solve the quadratic programming problem in SVM optimization?**
-
-### Answer
-
-**The QP Problem:**
-$$\max_\alpha \sum\alpha_i - \frac{1}{2}\alpha^T Q \alpha$$
-s.t. $0 \leq \alpha_i \leq C$, $\sum\alpha_i y_i = 0$
-
-Where $Q_{ij} = y_i y_j K(x_i, x_j)$
-
-**Solution Methods:**
-
-| Method | Description | Use Case |
-|--------|-------------|----------|
-| **SMO** | Optimize 2 αs at a time | Kernel SVM (libsvm) |
-| **Coordinate Descent** | One variable at a time | Linear SVM (liblinear) |
-| **Interior Point** | General QP solver | Small problems |
-| **SGD** | Stochastic gradient on primal | Large-scale linear |
-
-**SMO Algorithm (Most Common):**
-1. Select two αᵢ, αⱼ violating KKT conditions
-2. Solve 2-variable subproblem analytically
-3. Update and repeat until convergence
-
-**Practical**: sklearn's SVC uses libsvm (SMO), LinearSVC uses liblinear (coordinate descent).
 
 ---
 

@@ -1,0 +1,3514 @@
+00:01 hi welcome again this is the second
+00:03 
+
+00:03 supplementary video of our course
+00:05 
+
+00:05 brother programming and you know this is
+00:08 
+
+00:08 a face-to-face course so i strongly
+00:10 
+
+00:10 recommend you to come to class for this
+00:12 
+
+00:12 class but uh for this course but if you
+00:15 
+
+00:15 are not able to come to class then
+00:17 
+
+00:17 you can follow the subjects by using
+00:19 
+
+00:19 these supplementary videos and you know
+00:22 
+
+00:22 the
+00:23 
+
+00:23 last video is for the first week of this
+00:25 
+
+00:25 course and
+00:26 
+
+00:26 we have started with a problem
+00:30 
+
+00:30 which we try to find to find the value
+00:34 
+
+00:34 of pi by using a monte carlo simulation
+00:36 
+
+00:36 and today i'm going to start by using
+00:38 
+
+00:38 the jupiter notebook
+00:41 
+
+00:41 [Music]
+00:43 
+
+00:43 and then remind you the problem that we
+00:46 
+
+00:46 are dealing with
+00:47 
+
+00:47 so i'm gonna i'm going to start my
+00:49 
+
+00:49 jupiter notebook by clicking this link
+00:53 
+
+00:53 you can use the anaconda navigator and
+00:55 
+
+00:55 then you can launch the jupyter notebook
+00:57 
+
+00:57 from here
+01:01 
+
+01:01 and now i have my notebook i'm going to
+01:04 
+
+01:04 create a new python 3
+01:06 
+
+01:06 notebook by clicking this new button and
+01:08 
+
+01:08 then select this
+01:10 
+
+01:10 link
+01:15 
+
+01:15 all right then i have my notebook now
+01:18 
+
+01:18 and
+01:19 
+
+01:19 as you remember
+01:21 
+
+01:21 we have used the
+01:23 
+
+01:23 library random
+01:26 
+
+01:26 so i'm going to import this library
+01:28 
+
+01:28 first
+01:29 
+
+01:29 import random
+01:30 
+
+01:30 and then i'm going to create a visual uh
+01:33 
+
+01:33 description of our problem finding the
+01:36 
+
+01:36 value of pi by using monte carlo
+01:38 
+
+01:38 simulation so i'm going to create some
+01:41 
+
+01:41 points
+01:42 
+
+01:42 uh let me draw it first let me draw it
+01:45 
+
+01:45 first for you
+01:46 
+
+01:46 and then
+01:47 
+
+01:47 i'm going to use fortran i'm going to
+01:49 
+
+01:49 use python sorry
+01:52 
+
+01:52 so let me select
+01:54 
+
+01:54 this color
+01:57 
+
+01:57 and
+01:58 
+
+01:58 we have a circle like this
+02:01 
+
+02:01 which
+02:03 
+
+02:03 its origin
+02:06 
+
+02:06 is
+02:07 
+
+02:07 on the
+02:08 
+
+02:08 point with the coordinates zero and zero
+02:13 
+
+02:13 with the
+02:14 
+
+02:14 coordinate system like this so we have x
+02:17 
+
+02:17 we have y here and we have
+02:21 
+
+02:21 a square around this circle
+02:23 
+
+02:23 and then we
+02:26 
+
+02:26 have generated some
+02:29 
+
+02:29 random real numbers between minus 1 and
+02:32 
+
+02:32 plus 1 for x position and also
+02:37 
+
+02:37 minus one and plus one plus one for the
+02:40 
+
+02:40 y coordinate and we have generated some
+02:43 
+
+02:43 points
+02:44 
+
+02:44 in this square
+02:46 
+
+02:46 and then we counted the numbers
+02:49 
+
+02:49 these points
+02:51 
+
+02:51 how many
+02:53 
+
+02:53 points we have in the circle and how
+02:55 
+
+02:55 many points
+02:58 
+
+02:58 which we have in total
+03:00 
+
+03:00 all right then i'm going to do the same
+03:03 
+
+03:03 thing now by using the python notebook
+03:06 
+
+03:06 so i'm going to start with the importing
+03:09 
+
+03:09 the random library and then
+03:11 
+
+03:11 for x and y variable i'm going to create
+03:13 
+
+03:13 an array first so let me create an empty
+03:16 
+
+03:16 array
+03:18 
+
+03:18 for x and also an empty array for y
+03:21 
+
+03:21 then
+03:23 
+
+03:23 for each point i'm going to append this
+03:26 
+
+03:26 arrays
+03:29 
+
+03:29 so
+03:31 
+
+03:31 obviously i need uh
+03:33 
+
+03:33 i need a
+03:35 
+
+03:35 loop for this purpose so i'm going to
+03:38 
+
+03:38 use for loop
+03:40 
+
+03:40 and
+03:41 
+
+03:41 let me say
+03:43 
+
+03:43 for example
+03:45 
+
+03:45 let's use 1000 numbers
+03:48 
+
+03:48 then let's create the positions let's
+03:51 
+
+03:51 generate the positions and append this
+03:54 
+
+03:54 arrays so i'm going to append x first
+03:58 
+
+03:58 with a random number
+03:60 
+
+03:60 then i'm going to use the uniform
+04:02 
+
+04:02 methods of random library
+04:06 
+
+04:06 and of course i'm going to give the
+04:08 
+
+04:08 limits as minus 1 and plus 1. so i'm
+04:10 
+
+04:10 going to do the same thing for y values
+04:13 
+
+04:13 so i'm going to append the y array
+04:16 
+
+04:16 by using the uniform method from random
+04:18 
+
+04:18 library
+04:19 
+
+04:19 with the same limits minus one and plus
+04:21 
+
+04:21 one
+04:23 
+
+04:23 all right
+04:24 
+
+04:24 let me check the values for x and y for
+04:27 
+
+04:27 a moment so in jupyter notebook you uh
+04:30 
+
+04:30 you don't have to use the print function
+04:32 
+
+04:32 you you can just give the name of the
+04:34 
+
+04:34 array or variable and then hit the shift
+04:37 
+
+04:37 enter button to run this cell and then
+04:39 
+
+04:39 it shows you the
+04:41 
+
+04:41 ingredient of this the values of these
+04:43 
+
+04:43 variables are a so i'm going to do this
+04:46 
+
+04:46 do this thing to
+04:48 
+
+04:48 see the values
+04:50 
+
+04:50 so we have these values in x variables
+04:53 
+
+04:53 so
+04:54 
+
+04:54 we have it
+04:57 
+
+04:57 it works correctly so i can delete this
+04:60 
+
+04:60 cell now and then i'm going to show you
+05:03 
+
+05:03 the visual uh description of this
+05:05 
+
+05:05 problem so uh i think
+05:07 
+
+05:07 first i'm going to import the import sum
+05:10 
+
+05:10 library and also i can search it from
+05:13 
+
+05:13 google
+05:14 
+
+05:14 let's say
+05:17 
+
+05:17 python notebook
+05:20 
+
+05:20 item notebook
+05:21 
+
+05:21 and i want to create a scatter diagram
+05:27 
+
+05:27 schedule plot let's
+05:30 
+
+05:30 select one of these examples
+05:34 
+
+05:34 i think matplo met plot leap is okay so
+05:36 
+
+05:36 i can click this one
+05:40 
+
+05:40 and all right we need this
+05:43 
+
+05:43 uh we need this library and it imports
+05:47 
+
+05:47 it as plt
+05:49 
+
+05:49 and then i can use the plt plt.scatter
+05:52 
+
+05:52 methods and also
+05:54 
+
+05:54 i should give the
+05:56 
+
+05:56 values in an array just we have like we
+05:59 
+
+05:59 have in x and y arrays so i can
+06:03 
+
+06:03 draw i can generate this schedule plot
+06:06 
+
+06:06 so i'm going to do the same thing and
+06:08 
+
+06:08 i'm going to import
+06:10 
+
+06:10 the
+06:11 
+
+06:11 matplotlib that's pi plots
+06:15 
+
+06:15 as plt
+06:17 
+
+06:17 so
+06:18 
+
+06:18 as you know python is an imperative
+06:20 
+
+06:20 interpreted language so you can import
+06:23 
+
+06:23 these libraries after uh doing something
+06:26 
+
+06:26 so uh
+06:27 
+
+06:27 in
+06:28 
+
+06:28 in compile language you have to include
+06:31 
+
+06:31 your headers first
+06:33 
+
+06:33 or import your libraries first and then
+06:36 
+
+06:36 you should do something but in python
+06:39 
+
+06:39 because of it's an interpreted language
+06:41 
+
+06:41 you can do something you can do a lot of
+06:43 
+
+06:43 things and then you can import and
+06:45 
+
+06:45 library and then you can do something
+06:47 
+
+06:47 else
+06:48 
+
+06:48 so i'm going to import this
+06:51 
+
+06:51 metplotlip.pipelot library in this cell
+06:54 
+
+06:54 and then i can use it so i'm going to
+06:56 
+
+06:56 use the scatter methods
+06:59 
+
+06:59 of this library by using the x and y
+07:02 
+
+07:02 values which i generated in the previous
+07:05 
+
+07:05 cell so shift enter
+07:09 
+
+07:09 and then i can see a lot of numbers
+07:13 
+
+07:13 between the x values minus one and plus
+07:15 
+
+07:15 one and also between the y values minus
+07:18 
+
+07:18 one and plus one so i i'm going to try
+07:22 
+
+07:22 to
+07:23 
+
+07:23 get a picture like this like the eye
+07:26 
+
+07:26 draw on the screen so i'm going to
+07:29 
+
+07:29 change something
+07:31 
+
+07:31 in this plot
+07:33 
+
+07:33 i think first uh i should
+07:37 
+
+07:37 i should find how to show the
+07:40 
+
+07:40 axis
+07:41 
+
+07:41 in
+07:43 
+
+07:43 this plot so let me
+07:46 
+
+07:46 search it like this match bloat lip
+07:49 
+
+07:49 show
+07:50 
+
+07:50 axis
+07:52 
+
+07:52 lines all right
+07:56 
+
+07:56 let me check this one
+08:03 
+
+08:03 right there's an example and this is the
+08:05 
+
+08:05 question and this is the answer
+08:07 
+
+08:07 so this one
+08:09 
+
+08:09 works
+08:10 
+
+08:10 i think for me and also you can
+08:13 
+
+08:13 you can turn on a grid by using this
+08:16 
+
+08:16 methods
+08:18 
+
+08:18 as i can see i'm going to copy these two
+08:21 
+
+08:21 lines
+08:23 
+
+08:23 to my code to my notebook
+08:25 
+
+08:25 to show the axis
+08:28 
+
+08:28 x and y axis of course
+08:31 
+
+08:31 i can
+08:32 
+
+08:32 hit the enter button and after the
+08:35 
+
+08:35 using the scatter method i can pass
+08:38 
+
+08:38 these two lines
+08:43 
+
+08:43 all right then i can get rid of this
+08:48 
+
+08:48 warning by using the plt.show methods
+08:52 
+
+08:52 i think
+08:56 
+
+08:56 all right of course we are going to use
+08:58 
+
+08:58 them
+08:59 
+
+08:59 from the pl
+09:01 
+
+09:01 t namespace
+09:04 
+
+09:04 all right then we have
+09:06 
+
+09:06 this
+09:08 
+
+09:08 plot now
+09:11 
+
+09:11 now i think uh i'm going to
+09:14 
+
+09:14 try to
+09:15 
+
+09:15 draw a rectangle
+09:18 
+
+09:18 so called square and also i'm going to
+09:20 
+
+09:20 try to draw a circle
+09:24 
+
+09:24 let me search it matplotlib
+09:28 
+
+09:28 draw
+09:29 
+
+09:29 rectangle
+09:36 
+
+09:36 stack overflow is
+09:39 
+
+09:39 i think what i'm looking for
+09:44 
+
+09:44 and
+09:45 
+
+09:45 i think these
+09:47 
+
+09:47 two lines will work for me but first it
+09:51 
+
+09:51 says
+09:52 
+
+09:52 you need to
+09:54 
+
+09:54 create an instance to figure and also
+09:56 
+
+09:56 for access so i think first i'm going to
+09:59 
+
+09:59 need this one
+10:04 
+
+10:04 all right
+10:06 
+
+10:06 let me
+10:10 
+
+10:10 let me do it first
+10:12 
+
+10:12 all right now i have an instance to
+10:15 
+
+10:15 figure and also access and then i'm
+10:17 
+
+10:17 going to use
+10:20 
+
+10:20 this methods
+10:23 
+
+10:23 ax dot
+10:24 
+
+10:24 add patch
+10:26 
+
+10:26 all right
+10:32 
+
+10:32 use it here and i'm going to change
+10:35 
+
+10:35 this variable with this instance
+10:39 
+
+10:39 so
+10:41 
+
+10:41 from patch
+10:44 
+
+10:44 dot
+10:45 
+
+10:45 rectangle then i think i can just take
+10:49 
+
+10:49 rectangle parts
+10:51 
+
+10:51 and also i can modify this
+10:54 
+
+10:54 import line to get an instance to the
+10:57 
+
+10:57 rectangle method so
+10:59 
+
+10:59 let me change it like
+11:02 
+
+11:02 adding a line here
+11:04 
+
+11:04 so i'm going to add from matt's plot
+11:08 
+
+11:08 lip
+11:09 
+
+11:09 dot patch
+11:11 
+
+11:11 and i'm going to
+11:14 
+
+11:14 the rectangle
+11:16 
+
+11:16 all right then i can use rectangle
+11:18 
+
+11:18 directly
+11:20 
+
+11:20 so
+11:22 
+
+11:22 let's use rectangle
+11:27 
+
+11:27 and how it's how does it work
+11:30 
+
+11:30 it works like a start point
+11:33 
+
+11:33 and then
+11:34 
+
+11:34 width and then height right then
+11:37 
+
+11:37 we can
+11:39 
+
+11:39 specify some properties of this
+11:40 
+
+11:40 rectangle so i'm going to use this
+11:44 
+
+11:44 structure
+11:46 
+
+11:46 and
+11:47 
+
+11:47 let me change them
+11:49 
+
+11:49 i i i i try to create a rectangle
+11:53 
+
+11:53 starting from
+11:54 
+
+11:54 this point so this point has the
+11:57 
+
+11:57 coordinates minus one and minus one so
+11:59 
+
+11:59 i'm going to change this starting point
+12:01 
+
+12:01 to
+12:02 
+
+12:02 the coordinates
+12:04 
+
+12:04 minus one and minus one and also it has
+12:07 
+
+12:07 the width if it is a square it has the
+12:09 
+
+12:09 width two and it has the height two so
+12:11 
+
+12:11 i'm going to change these two numbers
+12:14 
+
+12:14 with two and two
+12:16 
+
+12:16 all right let me try it
+12:19 
+
+12:19 name a rectangle is not defined because
+12:22 
+
+12:22 uh i didn't run this cell
+12:25 
+
+12:25 so first i'm going to run this cell and
+12:27 
+
+12:27 then i'm going to run this cell
+12:30 
+
+12:30 all right now i have a rectangle
+12:35 
+
+12:35 all right do we have any other
+12:39 
+
+12:39 properties
+12:42 
+
+12:42 let me check it
+12:45 
+
+12:45 does it work
+12:47 
+
+12:47 like this rectangle in the question mark
+12:50 
+
+12:50 then
+12:50 
+
+12:50 shift enter all right then i can reach
+12:53 
+
+12:53 the top string of this
+12:56 
+
+12:56 function
+12:57 
+
+12:57 so
+12:58 
+
+12:58 uh
+12:59 
+
+12:59 it is an app documentation in jupyter
+13:02 
+
+13:02 notebook so
+13:04 
+
+13:04 i'm going to look for
+13:08 
+
+13:08 look for a property
+13:11 
+
+13:11 all right this one alpha
+13:13 
+
+13:13 by using the alpha
+13:15 
+
+13:15 i can i think i can
+13:19 
+
+13:19 increase the transparency of this
+13:21 
+
+13:21 rectangle so i can make it uh
+13:24 
+
+13:24 i can
+13:26 
+
+13:26 make these points as visible so
+13:35 
+
+13:35 i'm going to try
+13:37 
+
+13:37 let's
+13:39 
+
+13:39 give a value for the
+13:41 
+
+13:41 alpha
+13:43 
+
+13:43 let's say 0.2
+13:45 
+
+13:45 all right it works so
+13:47 
+
+13:47 now i can
+13:48 
+
+13:48 see the
+13:49 
+
+13:49 rectangle
+13:51 
+
+13:51 i can see the square and also i can see
+13:53 
+
+13:53 the points
+13:55 
+
+13:55 right it's working so
+13:58 
+
+13:58 for next step i'm going to create the
+13:60 
+
+14:00 circle so i'm going to do the same thing
+14:03 
+
+14:03 i think
+14:04 
+
+14:04 we can have
+14:07 
+
+14:07 another patch
+14:08 
+
+14:08 with the name
+14:10 
+
+14:10 circle
+14:11 
+
+14:11 let me try it first
+14:13 
+
+14:13 let's say i'm going to import from
+14:16 
+
+14:16 matplotlib.patch
+14:18 
+
+14:18 rectangle and
+14:19 
+
+14:19 circle
+14:20 
+
+14:20 let me try it
+14:22 
+
+14:22 all right it doesn't give any errors so
+14:24 
+
+14:24 i'm going to check
+14:25 
+
+14:25 the
+14:27 
+
+14:27 existence of this function by typing its
+14:31 
+
+14:31 name in this cell and also at the
+14:33 
+
+14:33 question mark
+14:34 
+
+14:34 shift enter
+14:36 
+
+14:36 and all right
+14:37 
+
+14:37 we can use it with the same syntax
+14:41 
+
+14:41 with the
+14:43 
+
+14:43 rectangle so i'm going to add this page
+14:46 
+
+14:46 and it also has an alpha property so i
+14:48 
+
+14:48 can use it and this time i'm going to
+14:51 
+
+14:51 give the origin i think
+14:54 
+
+14:54 yes at center with positions x and y and
+14:58 
+
+14:58 then i'm going to give the radius
+15:00 
+
+15:00 all right i can close this now
+15:03 
+
+15:03 and i'm going to add a line with ax
+15:07 
+
+15:07 let's add patch
+15:12 
+
+15:12 circle
+15:14 
+
+15:14 uh
+15:15 
+
+15:15 with the origin of course zero and zero
+15:19 
+
+15:19 and with the radius one
+15:22 
+
+15:22 all right then i'm going to give the
+15:25 
+
+15:25 iphone property
+15:27 
+
+15:27 0.2
+15:31 
+
+15:31 all right i think now i have a circle
+15:34 
+
+15:34 and also i have a square but i cannot
+15:37 
+
+15:37 see them
+15:38 
+
+15:38 so let me define a color here
+15:41 
+
+15:41 let's say that
+15:44 
+
+15:44 this one
+15:47 
+
+15:47 make it yellow for example
+15:49 
+
+15:49 and then make the circle
+15:53 
+
+15:53 red
+15:55 
+
+15:55 twitch right
+15:57 
+
+15:57 all right now we have a circle and we
+16:01 
+
+16:01 have
+16:03 
+
+16:03 we have
+16:04 
+
+16:04 a
+16:05 
+
+16:05 square
+16:07 
+
+16:07 so i think i can change the
+16:09 
+
+16:09 color
+16:12 
+
+16:12 of the these points let me
+16:16 
+
+16:16 make them black
+16:20 
+
+16:20 right it's working and also
+16:22 
+
+16:22 i want to change the
+16:24 
+
+16:24 size of these points and i'm going to
+16:27 
+
+16:27 get some help from due to notebook again
+16:30 
+
+16:30 then let me say plt dot sketcher
+16:33 
+
+16:33 question mark
+16:36 
+
+16:36 all right
+16:38 
+
+16:38 i have x and y arguments and then i have
+16:41 
+
+16:41 an s
+16:44 
+
+16:44 here s i think all right scalars or ra
+16:47 
+
+16:47 li er i like
+16:49 
+
+16:49 and this argument is for the marker size
+16:54 
+
+16:54 point square
+16:55 
+
+16:55 all right
+16:57 
+
+16:57 then i can give a value for this
+16:59 
+
+16:59 argument let me add it
+17:02 
+
+17:02 as
+17:02 
+
+17:02 with one for example
+17:05 
+
+17:05 all right now i can have a lot of points
+17:08 
+
+17:08 let me change this
+17:11 
+
+17:11 number
+17:12 
+
+17:12 up to 5000 for example
+17:14 
+
+17:14 then run all this cell again then i have
+17:16 
+
+17:16 a lot of numbers
+17:19 
+
+17:19 all right i think i can do another thing
+17:22 
+
+17:22 with this
+17:24 
+
+17:24 uh with this
+17:26 
+
+17:26 port
+17:27 
+
+17:27 so i can also
+17:29 
+
+17:29 get rid of this
+17:31 
+
+17:31 access and i think
+17:34 
+
+17:34 now i have an instance to access with
+17:37 
+
+17:37 the a x variable
+17:40 
+
+17:40 then
+17:41 
+
+17:41 i can try it here like a x dot
+17:45 
+
+17:45 top
+17:47 
+
+17:47 all right we got all these methods
+17:53 
+
+17:53 we got a lot of methods and i want to
+17:57 
+
+17:57 get rid of the axis so i'm going to try
+17:60 
+
+17:60 this one
+18:03 
+
+18:03 axis
+18:05 
+
+18:05 and let's put a question mark at the end
+18:07 
+
+18:07 of this line and shift enter to get some
+18:09 
+
+18:09 help
+18:11 
+
+18:11 all right what does it say
+18:19 
+
+18:19 [Music]
+18:22 
+
+18:22 all right it says if you use off
+18:25 
+
+18:25 then you can turn off axis lines and
+18:28 
+
+18:28 labels so i'm going to use it to get rid
+18:31 
+
+18:31 of this uh
+18:33 
+
+18:33 outer frame
+18:35 
+
+18:35 all right so i'm
+18:38 
+
+18:38 going to
+18:40 
+
+18:40 do this before showing the plots
+18:42 
+
+18:42 so let's say ax that access
+18:47 
+
+18:47 all fighting
+18:49 
+
+18:49 all right now i have this plot
+18:52 
+
+18:52 and then at last
+18:55 
+
+18:55 i'm going to
+18:58 
+
+18:58 i want to see a script plot like i draw
+19:01 
+
+19:01 here on the screen
+19:03 
+
+19:03 so i'm going to search it from google
+19:06 
+
+19:06 and i say match plot clip
+19:10 
+
+19:10 square
+19:11 
+
+19:11 plot
+19:15 
+
+19:15 make a square plot with equal axis in
+19:17 
+
+19:17 multiple clip all right let's try it
+19:21 
+
+19:21 and it says
+19:22 
+
+19:22 you can use set
+19:25 
+
+19:25 aspect methods
+19:26 
+
+19:26 right then turn back to jupyter notebook
+19:29 
+
+19:29 and
+19:30 
+
+19:30 try it
+19:33 
+
+19:33 set
+19:34 
+
+19:34 aspect
+19:35 
+
+19:35 and the question mark to get some help
+19:38 
+
+19:38 right
+19:47 
+
+19:47 it has some options
+19:48 
+
+19:48 and you should use ax that set aspect
+19:52 
+
+19:52 with these values auto
+19:54 
+
+19:54 and equal and also you can give a
+19:57 
+
+19:57 number
+19:58 
+
+19:58 so i think now the default option is
+20:00 
+
+20:00 auto
+20:02 
+
+20:02 and i'm going to change it to equal to
+20:04 
+
+20:04 say to get same scaling from data to
+20:07 
+
+20:07 plot uh use for x and y so i'm going to
+20:11 
+
+20:11 use it
+20:12 
+
+20:12 and after turning off the access
+20:16 
+
+20:16 i'm going to use access
+20:18 
+
+20:18 set
+20:19 
+
+20:19 aspect
+20:20 
+
+20:20 uh with a bit value equal
+20:24 
+
+20:24 all right then i get a square so after
+20:29 
+
+20:29 completing your monte carlo simulations
+20:31 
+
+20:31 you can also
+20:32 
+
+20:32 get the visualization of your simulation
+20:35 
+
+20:35 and also after uh make your code
+20:39 
+
+20:39 parallel to work on these processors
+20:43 
+
+20:43 and all these cores and then you can
+20:47 
+
+20:47 get the visualization of all these cores
+20:51 
+
+20:51 separately all these threads separately
+20:54 
+
+20:54 i can
+20:55 
+
+20:55 want you to create
+20:57 
+
+20:57 such plots so
+20:59 
+
+20:59 i want to
+21:01 
+
+21:01 give how to create these plots in this
+21:05 
+
+21:05 video
+21:06 
+
+21:06 all right then i can
+21:08 
+
+21:08 continue
+21:09 
+
+21:09 all right we
+21:11 
+
+21:11 now
+21:12 
+
+21:12 remember our problem
+21:19 
+
+21:19 and where were we i'm going to check
+21:26 
+
+21:26 i'm going to delete this drawing first
+21:30 
+
+21:30 i'm going to check it
+21:32 
+
+21:32 from our team
+21:34 
+
+21:34 for example this one
+21:37 
+
+21:37 rather programming morning class
+21:41 
+
+21:41 all right i have uploaded this video
+21:43 
+
+21:43 last week then
+21:48 
+
+21:48 then we have completed the first and
+21:51 
+
+21:51 also the second lecture in the class
+21:54 
+
+21:54 also we have
+21:56 
+
+21:56 written these codes in class but
+21:59 
+
+21:59 in the video version of this course uh
+22:03 
+
+22:03 we are going to check
+22:05 
+
+22:05 the last point from the video so
+22:08 
+
+22:08 i'm going to run this video
+22:17 
+
+22:17 and go to the ends
+22:20 
+
+22:20 all right we have a code like this we
+22:23 
+
+22:23 have a
+22:24 
+
+22:24 python code like this and also we have
+22:27 
+
+22:27 written the fortran version of this code
+22:29 
+
+22:29 and i think we have compared the
+22:32 
+
+22:32 running time of these codes so we have
+22:35 
+
+22:35 24.78
+22:38 
+
+22:38 seconds for writing
+22:41 
+
+22:41 10 millions points and
+22:44 
+
+22:44 we have generated the same number of
+22:46 
+
+22:46 points 10 million points in fortune but
+22:49 
+
+22:49 it has completed the running
+22:51 
+
+22:51 it has completed the simulation within
+22:53 
+
+22:53 the just
+22:55 
+
+22:55 0.32 seconds it's a big difference
+22:59 
+
+22:59 but
+23:00 
+
+23:00 before we are going to talk about this
+23:03 
+
+23:03 difference first i'm going to improve
+23:05 
+
+23:05 these codes
+23:07 
+
+23:07 by uh turning it to an object-oriented
+23:10 
+
+23:10 course
+23:11 
+
+23:11 so first i'm going to create a class to
+23:15 
+
+23:15 get the running time of
+23:18 
+
+23:18 all the codes which we are going to
+23:20 
+
+23:20 write in this course so it is going to
+23:23 
+
+23:23 be a running time counter
+23:25 
+
+23:25 class and then also i'm going to write a
+23:28 
+
+23:28 class to calculate the value of pi by
+23:32 
+
+23:32 using the monte carlo smooch
+23:34 
+
+23:34 so let me turn it off
+23:38 
+
+23:38 and
+23:39 
+
+23:39 let me create a folder
+23:41 
+
+23:41 in my desktop now for today's video
+23:47 
+
+23:47 let's say
+23:48 
+
+23:48 uh
+23:51 
+
+23:51 brother programming
+23:53 
+
+23:53 video
+23:54 
+
+23:54 02
+23:57 
+
+23:57 i'm going to
+23:60 
+
+23:60 create a pycharm project in this folder
+24:07 
+
+24:07 you can use whatever you want if you
+24:09 
+
+24:09 want to use then
+24:11 
+
+24:11 you can go with the
+24:13 
+
+24:13 notebook structure and if you want you
+24:15 
+
+24:15 can use some
+24:17 
+
+24:17 id like me like pie charm
+24:20 
+
+24:20 to write your python quotes it doesn't
+24:22 
+
+24:22 matter for me
+24:25 
+
+24:25 the notebooks are useful when you want
+24:27 
+
+24:27 to
+24:28 
+
+24:28 try something very fast and then see the
+24:31 
+
+24:31 result results like this scatter plot
+24:34 
+
+24:34 and also the ides are very useful when
+24:38 
+
+24:38 you
+24:39 
+
+24:39 make it make your quotes like a complete
+24:42 
+
+24:42 project
+24:51 
+
+24:51 all rights
+24:54 
+
+24:54 we are about ready
+24:56 
+
+24:56 this is an example
+24:59 
+
+24:59 but i'm not going to use it
+25:02 
+
+25:02 so
+25:05 
+
+25:05 you know
+25:07 
+
+25:07 uh i accept you as you know the object
+25:10 
+
+25:10 oriented programming but you don't know
+25:12 
+
+25:12 python very well so i'm not going to
+25:15 
+
+25:15 teach you the concepts of the object
+25:17 
+
+25:17 oriented programming but i'm going to
+25:19 
+
+25:19 teach the
+25:21 
+
+25:21 how
+25:22 
+
+25:22 you can do the you can employ these
+25:25 
+
+25:25 aspects in python
+25:31 
+
+25:31 so
+25:33 
+
+25:33 in python it's a script language so it's
+25:36 
+
+25:36 an interpreted language but
+25:38 
+
+25:38 you you should
+25:40 
+
+25:40 you can run your codes by just
+25:45 
+
+25:45 running the file directly or you can
+25:47 
+
+25:47 just import the python code in another
+25:51 
+
+25:51 python script
+25:52 
+
+25:52 so first i'm going to check this
+25:55 
+
+25:55 so if this python
+25:58 
+
+25:58 if this python file runs directly from a
+26:01 
+
+26:01 terminal or just by double clicking it
+26:04 
+
+26:04 in some file explorer then
+26:07 
+
+26:07 a main function will run right so i'm
+26:11 
+
+26:11 going to check it first so
+26:14 
+
+26:14 let's say that if the
+26:16 
+
+26:16 name
+26:17 
+
+26:17 is
+26:20 
+
+26:20 main
+26:21 
+
+26:21 then it means
+26:25 
+
+26:25 brands
+26:30 
+
+26:30 running
+26:31 
+
+26:31 directly for them
+26:39 
+
+26:39 all right
+26:40 
+
+26:40 and let me run it
+26:45 
+
+26:45 all right
+26:47 
+
+26:47 then
+26:48 
+
+26:48 i'm going to create
+26:50 
+
+26:50 another python file
+26:53 
+
+26:53 to include in this main.pi file
+26:57 
+
+26:57 which will include our classes
+27:05 
+
+27:05 so let's give a name
+27:07 
+
+27:07 my name for example
+27:09 
+
+27:09 bc.pi
+27:11 
+
+27:11 and it will do the same thing like we
+27:13 
+
+27:13 did in the last video
+27:16 
+
+27:16 it will
+27:17 
+
+27:17 count the time it will come to the
+27:18 
+
+27:18 running time and also it will generate
+27:21 
+
+27:21 it will try to find the value of pi by
+27:24 
+
+27:24 using the monte carlo simulation so i'm
+27:25 
+
+27:25 going to do it first
+27:28 
+
+27:28 i'm going to import a random library and
+27:30 
+
+27:30 i'm going to import the time library and
+27:33 
+
+27:33 first i'm going to create that tic tac
+27:40 
+
+27:40 i'm going to create a class
+27:42 
+
+27:42 with the name tic tac
+27:45 
+
+27:45 so
+27:46 
+
+27:46 it will count the running time first i'm
+27:50 
+
+27:50 going to define a constructor for this
+27:52 
+
+27:52 class so in python we can do it by using
+27:56 
+
+27:56 the name double uh double underscore
+27:60 
+
+27:60 init
+28:03 
+
+28:03 self is the same keyword which you
+28:06 
+
+28:06 which we which you were using in java
+28:11 
+
+28:11 or some
+28:12 
+
+28:12 other programming language
+28:16 
+
+28:16 like c plus plus
+28:18 
+
+28:18 it's the same thing with this all right
+28:21 
+
+28:21 so
+28:21 
+
+28:21 uh it works to
+28:24 
+
+28:24 we are using it to get access to the
+28:28 
+
+28:28 uh class itself so i'm going to
+28:32 
+
+28:32 define some variables first
+28:35 
+
+28:35 let's define t1
+28:37 
+
+28:37 and then t2
+28:40 
+
+28:40 with the initial value 0
+28:42 
+
+28:42 and then i'm going to
+28:44 
+
+28:44 create i'm going to define the first
+28:47 
+
+28:47 function
+28:48 
+
+28:48 which
+28:49 
+
+28:49 starts the time counter with the name
+28:52 
+
+28:52 tick
+28:53 
+
+28:53 and it will just
+28:56 
+
+28:56 get the
+28:57 
+
+28:57 current time
+28:59 
+
+28:59 to our variable t1
+29:02 
+
+29:02 all right then
+29:04 
+
+29:04 i'm going to
+29:06 
+
+29:06 create another
+29:08 
+
+29:08 method which has the name talk
+29:11 
+
+29:11 and it will stop the time counter so
+29:15 
+
+29:15 this time
+29:16 
+
+29:16 i'm going to change the value of
+29:18 
+
+29:18 t2
+29:20 
+
+29:20 and
+29:21 
+
+29:21 of course it will have it will have the
+29:24 
+
+29:24 current time again all right and also
+29:27 
+
+29:27 the method talk will return a value
+29:31 
+
+29:31 which is the difference between these
+29:34 
+
+29:34 two times
+29:36 
+
+29:36 so
+29:37 
+
+29:37 i'm going to find the returning value
+29:39 
+
+29:39 by making the process making the
+29:41 
+
+29:41 operation self dot t2 minus half dot t1
+29:46 
+
+29:46 right it's a very
+29:49 
+
+29:49 simple
+29:50 
+
+29:50 class
+29:53 
+
+29:53 right
+29:55 
+
+29:55 then i'm going to
+29:57 
+
+29:57 check this
+29:58 
+
+29:58 in this file pbc.pi
+30:01 
+
+30:01 i'm going to add
+30:02 
+
+30:02 a similar part which i
+30:05 
+
+30:05 write
+30:06 
+
+30:06 in main.pi so i'm going to check if name
+30:12 
+
+30:12 equals
+30:13 
+
+30:13 domain
+30:17 
+
+30:17 then i'm going to try to
+30:19 
+
+30:19 get an instance to the method to the
+30:22 
+
+30:22 class tick tock
+30:23 
+
+30:23 so let's say tt
+30:26 
+
+30:26 is equal to tick tock
+30:30 
+
+30:30 right
+30:31 
+
+30:31 and let's start the counter by calling
+30:34 
+
+30:34 the tick
+30:35 
+
+30:35 methods and then let's sleep a little
+30:40 
+
+30:40 for example five seconds
+30:42 
+
+30:42 and then
+30:44 
+
+30:44 let's write the value return
+30:49 
+
+30:49 sorry print
+30:51 
+
+30:51 not return parent
+30:53 
+
+30:53 tt.talk
+30:58 
+
+30:58 all right let me save it
+31:04 
+
+31:04 and then
+31:06 
+
+31:06 there's a warning because we don't use
+31:08 
+
+31:08 the random library yet
+31:10 
+
+31:10 so
+31:12 
+
+31:12 let me save it and then run it
+31:16 
+
+31:16 run bc
+31:18 
+
+31:18 all right
+31:22 
+
+31:22 so i think it's sleeping now
+31:25 
+
+31:25 and after completing the five seconds uh
+31:28 
+
+31:28 it will give us the result of the
+31:30 
+
+31:30 counter it approximately it's
+31:32 
+
+31:32 approximately five seconds right now i'm
+31:35 
+
+31:35 going to try it
+31:38 
+
+31:38 from this file
+31:40 
+
+31:40 so i'm going to import this class first
+31:45 
+
+31:45 so i'm going to use the keyword from
+31:47 
+
+31:47 so from bc import
+31:50 
+
+31:50 tick tock
+31:54 
+
+31:54 all right and then if name
+31:58 
+
+31:58 equals domain then i'm going to do the
+32:00 
+
+32:00 same thing tt
+32:03 
+
+32:03 that's
+32:05 
+
+32:05 tick tock
+32:07 
+
+32:07 and
+32:11 
+
+32:11 start the counter
+32:12 
+
+32:12 with the method kick
+32:15 
+
+32:15 and then
+32:17 
+
+32:17 print
+32:19 
+
+32:19 tt
+32:21 
+
+32:21 attack but how can i understand
+32:24 
+
+32:24 which one is working so i'm going to use
+32:26 
+
+32:26 a
+32:27 
+
+32:27 another keyword here another
+32:29 
+
+32:29 output here
+32:31 
+
+32:31 let's say time
+32:33 
+
+32:33 equals to
+32:35 
+
+32:35 let's say 0.5
+32:38 
+
+32:38 f
+32:39 
+
+32:39 and then a percentage and then tt.talk
+32:43 
+
+32:43 let me save it
+32:45 
+
+32:45 and then run
+32:48 
+
+32:48 i'm going to run
+32:50 
+
+32:50 main.pi file
+32:53 
+
+32:53 right now it says running directly this
+32:56 
+
+32:56 output and also it will give me the
+32:59 
+
+32:59 output time equals to
+33:01 
+
+33:01 zero point zero zero zero code because
+33:04 
+
+33:04 we don't add the
+33:06 
+
+33:06 sleep function i'm going to add the time
+33:09 
+
+33:09 dot slip with some seconds but we don't
+33:13 
+
+33:13 have
+33:16 
+
+33:16 the access
+33:17 
+
+33:17 to time library in this file so i'm
+33:19 
+
+33:19 going to import time library here
+33:22 
+
+33:22 and then run
+33:23 
+
+33:23 main.pi file again
+33:27 
+
+33:27 like this
+33:28 
+
+33:28 now i'm making i'm waiting
+33:31 
+
+33:31 three seconds and then i see the output
+33:34 
+
+33:34 and if you noticed now if i import some
+33:37 
+
+33:37 class from bc file then we don't see
+33:41 
+
+33:41 this output here all right so this
+33:45 
+
+33:45 part only works if you run this file
+33:49 
+
+33:49 directly
+33:51 
+
+33:51 let me check my camera if it is very
+33:54 
+
+33:54 dark here no you can see me all right so
+33:57 
+
+33:57 this part
+33:58 
+
+33:58 is only working if you
+34:01 
+
+34:01 run this file directly
+34:04 
+
+34:04 so this is the difference between the
+34:05 
+
+34:05 and importing a pi file or
+34:08 
+
+34:08 running it
+34:09 
+
+34:09 right now we get an access
+34:14 
+
+34:14 to this file i think we no longer need
+34:17 
+
+34:17 the time library
+34:22 
+
+34:22 so let me put a comment here i'm going
+34:24 
+
+34:24 to continue
+34:26 
+
+34:26 writing something from here and now i'm
+34:30 
+
+34:30 going to
+34:31 
+
+34:31 add
+34:32 
+
+34:32 the other class here
+34:36 
+
+34:36 which finds the value of pi by using the
+34:40 
+
+34:40 monte carlo simulation so i'm going to
+34:42 
+
+34:42 use the name finds pi now
+34:46 
+
+34:46 and let me create an instructor again
+34:49 
+
+34:49 constructor again sorry
+34:51 
+
+34:51 with the name in it
+34:54 
+
+34:54 and now i'm going to define a variable
+34:56 
+
+34:56 with name n
+34:58 
+
+34:58 and also
+34:60 
+
+34:60 i
+35:00 
+
+35:00 which
+35:01 
+
+35:01 corresponds to the total number of
+35:03 
+
+35:03 points and also the inner number of
+35:06 
+
+35:06 the number of inner points
+35:08 
+
+35:08 which we have inside the circle and i'm
+35:11 
+
+35:11 going to define our function to our
+35:14 
+
+35:14 points
+35:15 
+
+35:15 which we wrote in the
+35:18 
+
+35:18 last video draw points
+35:20 
+
+35:20 all right
+35:22 
+
+35:22 with the self
+35:23 
+
+35:23 and also i'm going to give another total
+35:25 
+
+35:25 number of points with the name double
+35:29 
+
+35:29 n and then i'm going to
+35:32 
+
+35:32 write a loop for i in range
+35:35 
+
+35:35 double n
+35:38 
+
+35:38 and let's
+35:39 
+
+35:39 generate a random number a random
+35:42 
+
+35:42 position for x with the method uniform
+35:47 
+
+35:47 at the limits minus one plus one
+35:50 
+
+35:50 and then
+35:51 
+
+35:51 for y
+35:53 
+
+35:53 also uniform minus one plus one
+35:57 
+
+35:57 why do we have
+35:59 
+
+35:59 another parentheses here
+36:01 
+
+36:01 all right now let me calculate the
+36:05 
+
+36:05 value of r
+36:09 
+
+36:09 by
+36:10 
+
+36:10 taking a sum of the squares of these two
+36:15 
+
+36:15 coordinates and also i'm going to
+36:17 
+
+36:17 increase the number of n
+36:19 
+
+36:19 with one
+36:22 
+
+36:22 for one loop
+36:24 
+
+36:24 so i'm going to check the value of r if
+36:26 
+
+36:26 it is less than or equal to 1
+36:29 
+
+36:29 then i'm going to increase the number of
+36:31 
+
+36:31 increased value of i by one
+36:36 
+
+36:36 all right
+36:37 
+
+36:37 if we need it
+36:39 
+
+36:39 to see the value of pi i'm going to
+36:42 
+
+36:42 create another method here
+36:45 
+
+36:45 which returns the value of
+36:48 
+
+36:48 y
+36:50 
+
+36:50 so 4 times
+36:52 
+
+36:52 i
+36:53 
+
+36:53 divided by
+36:55 
+
+36:55 n
+36:56 
+
+36:56 so i'm not going to teach you anything
+36:58 
+
+36:58 about the scope
+36:59 
+
+36:59 so you can uh
+37:01 
+
+37:01 so you can understand this i is a
+37:04 
+
+37:04 different thing
+37:06 
+
+37:06 from this eye all right
+37:09 
+
+37:09 so it's the object oriented programming
+37:11 
+
+37:11 i accept you
+37:13 
+
+37:13 [Music]
+37:15 
+
+37:15 know
+37:16 
+
+37:16 you all know these concepts but you
+37:18 
+
+37:18 don't know right
+37:20 
+
+37:20 if i'm wrong then please notice me
+37:23 
+
+37:23 please warn me
+37:25 
+
+37:25 all right now we have these methods let
+37:28 
+
+37:28 me turn back to
+37:32 
+
+37:32 main.pi file
+37:33 
+
+37:33 and here
+37:35 
+
+37:35 after starting the
+37:37 
+
+37:37 time counter i'm going to delete this
+37:39 
+
+37:39 line
+37:40 
+
+37:40 i no longer need to print anything
+37:44 
+
+37:44 so let me delete this one and i'm going
+37:47 
+
+37:47 to create an instance
+37:49 
+
+37:49 to to our class
+37:52 
+
+37:52 find pi
+37:53 
+
+37:53 so let me give a name finding underscore
+37:56 
+
+37:56 pi
+37:59 
+
+37:59 once pi
+38:00 
+
+38:00 and of course i
+38:02 
+
+38:02 should i have to import this class from
+38:06 
+
+38:06 file
+38:07 
+
+38:07 pc
+38:09 
+
+38:09 and it's okay
+38:11 
+
+38:11 and let me throw the points
+38:14 
+
+38:14 finding pi
+38:16 
+
+38:16 let's draw points
+38:21 
+
+38:21 maybe
+38:22 
+
+38:22 i should correct
+38:24 
+
+38:24 i should
+38:25 
+
+38:25 change this name it's not point
+38:28 
+
+38:28 points
+38:32 
+
+38:32 all right
+38:34 
+
+38:34 change this to points
+38:36 
+
+38:36 then
+38:37 
+
+38:37 let's give
+38:40 
+
+38:40 10 millions again
+38:42 
+
+38:42 all right
+38:43 
+
+38:43 now let me get the results for the value
+38:48 
+
+38:48 of pi
+38:49 
+
+38:49 by calling the method value of pi from
+38:51 
+
+38:51 the finding pi instance
+38:54 
+
+38:54 so
+38:56 
+
+38:56 now i'm going to
+38:59 
+
+38:59 print all these values
+39:01 
+
+39:01 with the formatted output so pi will be
+39:04 
+
+39:04 equal to
+39:06 
+
+39:06 something with
+39:09 
+
+39:09 eight digits after the point of course
+39:12 
+
+39:12 it's a real number
+39:14 
+
+39:14 and also we have some points
+39:16 
+
+39:16 and let me
+39:18 
+
+39:18 see
+39:19 
+
+39:19 all of them together
+39:21 
+
+39:21 i or n
+39:24 
+
+39:24 like this
+39:25 
+
+39:25 and also we can
+39:29 
+
+39:29 combine the
+39:31 
+
+39:31 time with this line
+39:35 
+
+39:35 let me increase the size a little bit
+39:38 
+
+39:38 all right so i'm going to use
+39:40 
+
+39:40 something like
+39:42 
+
+39:42 5 f for the time
+39:44 
+
+39:44 all right let me continue from the
+39:47 
+
+39:47 near line
+39:48 
+
+39:48 so a percentage symbol
+39:50 
+
+39:50 and then give the value of pi
+39:52 
+
+39:52 then
+39:54 
+
+39:54 give the value of i
+39:56 
+
+39:56 and then give the value of
+39:58 
+
+39:58 n
+39:59 
+
+39:59 and then
+40:01 
+
+40:01 i get the
+40:03 
+
+40:03 result of our time counter so i should
+40:06 
+
+40:06 delete this line now
+40:09 
+
+40:09 and it's okay let me run it
+40:14 
+
+40:14 so we are going to run
+40:16 
+
+40:16 main dots pi file
+40:21 
+
+40:21 so
+40:23 
+
+40:23 we should wait a little bit
+40:35 
+
+40:35 i don't talk about the homeworks in
+40:37 
+
+40:37 these videos
+40:39 
+
+40:39 but
+40:41 
+
+40:41 they are not homeworks which you get a
+40:43 
+
+40:43 great for them
+40:46 
+
+40:46 yet
+40:48 
+
+40:48 but they are important
+40:50 
+
+40:50 also i want to add here
+40:53 
+
+40:53 word seconds
+40:55 
+
+40:55 all right we have completed so uh i'm
+40:58 
+
+40:58 going to talk about the homeworks in
+41:00 
+
+41:00 class
+41:02 
+
+41:02 they are very important so you can see
+41:05 
+
+41:05 the homework of last week for example
+41:07 
+
+41:07 from this announcement uh
+41:10 
+
+41:10 they're about jit which is
+41:13 
+
+41:13 a just-in-time compiler from the number
+41:15 
+
+41:15 library and also i'm going to i gave an
+41:19 
+
+41:19 homework with this notation which is in
+41:22 
+
+41:22 the parenthesis and and the comma
+41:25 
+
+41:25 they are important but i don't talk
+41:27 
+
+41:27 about them in the videos
+41:29 
+
+41:29 please come into class
+41:32 
+
+41:32 for talking about to talk about the
+41:34 
+
+41:34 homeworks
+41:37 
+
+41:37 but
+41:38 
+
+41:38 the homeworks which i gave you the
+41:40 
+
+41:40 grades and i'm going to give them from
+41:43 
+
+41:43 the assignment part of the teams
+41:47 
+
+41:47 so you are safe if you don't come to
+41:49 
+
+41:49 class but i strongly recommend you
+41:52 
+
+41:52 all right now
+41:54 
+
+41:54 it's completed
+41:56 
+
+41:56 we have this pi value with these numbers
+41:59 
+
+41:59 in this
+42:00 
+
+42:00 time sequence so
+42:02 
+
+42:02 now our code is object-oriented we have
+42:06 
+
+42:06 two methods uh the first one is
+42:08 
+
+42:08 tick-tock and the second one is find pi
+42:12 
+
+42:12 now i'm going to try to
+42:14 
+
+42:14 make it multi-threads so now it's just
+42:18 
+
+42:18 single threads we can check it
+42:22 
+
+42:22 from task manager i think
+42:27 
+
+42:27 let me run it again
+42:31 
+
+42:31 we have pycharm here
+42:34 
+
+42:34 it's just a single thread and also take
+42:36 
+
+42:36 a look at the performance of this
+42:38 
+
+42:38 computer
+42:39 
+
+42:39 so we have
+42:44 
+
+42:44 the usage something like
+42:46 
+
+42:46 38 percent
+42:55 
+
+42:55 some cores are working
+42:57 
+
+42:57 in a schedule lighting
+43:00 
+
+43:00 and it's completed
+43:05 
+
+43:05 but it's completed now
+43:08 
+
+43:08 and also
+43:09 
+
+43:09 there's a lot on my computer now because
+43:11 
+
+43:11 i'm recording the
+43:13 
+
+43:13 screen
+43:16 
+
+43:16 so the idle loads i think it's about 25
+43:20 
+
+43:20 and if i run the code then it makes 37
+43:23 
+
+43:23 38
+43:25 
+
+43:25 so i think it's working like
+43:28 
+
+43:28 on the 15 percent of
+43:32 
+
+43:32 our
+43:33 
+
+43:33 cpus
+43:35 
+
+43:35 so let me create the threads
+43:38 
+
+43:38 and
+43:40 
+
+43:40 let me check the time first
+43:43 
+
+43:43 oh
+43:44 
+
+43:44 now the video is on
+43:47 
+
+43:47 something like
+43:48 
+
+43:48 40 minutes
+43:50 
+
+43:50 so i just going to give you an overview
+43:53 
+
+43:53 so let's
+43:55 
+
+43:55 import
+43:57 
+
+43:57 threads
+43:58 
+
+43:58 from the trading
+43:60 
+
+43:60 library
+44:01 
+
+44:01 from trading import threads and just
+44:05 
+
+44:05 create a thread now
+44:07 
+
+44:07 so
+44:09 
+
+44:09 instead of calling these methods
+44:11 
+
+44:11 directly calling this method directly to
+44:13 
+
+44:13 our points
+44:15 
+
+44:15 i'm going to
+44:16 
+
+44:16 create a thread here
+44:18 
+
+44:18 let's say threads
+44:21 
+
+44:21 targets
+44:24 
+
+44:24 same thing finding underscore by
+44:27 
+
+44:27 draw points
+44:32 
+
+44:32 and
+44:33 
+
+44:33 arguments
+44:35 
+
+44:35 n which is the homework of last week
+44:38 
+
+44:38 this notation in the parenthesis
+44:42 
+
+44:42 just n
+44:43 
+
+44:43 and a comma
+44:45 
+
+44:45 why
+44:46 
+
+44:46 do i use it
+44:48 
+
+44:48 all right then we have our thread and
+44:51 
+
+44:51 then let's start
+44:53 
+
+44:53 let's do it
+44:57 
+
+44:57 let me increase the size a little bit
+44:59 
+
+44:59 all right now
+45:01 
+
+45:01 instead of running directly now we have
+45:04 
+
+45:04 a threat
+45:06 
+
+45:06 all right and
+45:12 
+
+45:12 how is it going to be
+45:16 
+
+45:16 is there an error here
+45:19 
+
+45:19 on research reference n all right
+45:22 
+
+45:22 because we don't
+45:25 
+
+45:25 we don't create it let's create it first
+45:29 
+
+45:29 like this
+45:30 
+
+45:30 instead of writing all these numbers in
+45:32 
+
+45:32 this
+45:33 
+
+45:33 notation i just going to use i'm just
+45:35 
+
+45:35 going to use n
+45:37 
+
+45:37 and now we're okay let me check it i'm
+45:40 
+
+45:40 going to save it
+45:42 
+
+45:42 and i'm going to turn back to
+45:45 
+
+45:45 our
+45:48 
+
+45:48 task manager
+45:51 
+
+45:51 and run it
+45:56 
+
+45:56 oh
+45:58 
+
+45:58 we just see the output with the
+46:01 
+
+46:01 0.01 seconds
+46:04 
+
+46:04 but it's not that fast because it's
+46:06 
+
+46:06 still working
+46:07 
+
+46:07 it's still working now we have the load
+46:10 
+
+46:10 about 40
+46:12 
+
+46:12 and i think the process is also active
+46:16 
+
+46:16 by charm
+46:18 
+
+46:18 all right it's still active here it
+46:20 
+
+46:20 makes something about 15 percent
+46:24 
+
+46:24 and now it's okay i think
+46:27 
+
+46:27 now let me do something i'm going to
+46:31 
+
+46:31 take this part in a loop
+46:34 
+
+46:34 in the range
+46:36 
+
+46:36 let's say
+46:39 
+
+46:39 25
+46:42 
+
+46:42 and
+46:44 
+
+46:44 the invention is very important in
+46:45 
+
+46:45 python so
+46:46 
+
+46:46 i'm going to do this
+46:50 
+
+46:50 and
+46:53 
+
+46:53 i think it will work
+46:54 
+
+46:54 save and run so it will show us a lot of
+46:59 
+
+46:59 outputs a lot of lines
+47:01 
+
+47:01 let me check
+47:05 
+
+47:05 but i forgot
+47:07 
+
+47:07 i forgot something let me wait
+47:12 
+
+47:12 let me wait first
+47:15 
+
+47:15 to complete this process
+47:18 
+
+47:18 and then i'm going to add a line with
+47:22 
+
+47:22 sleep function
+47:29 
+
+47:29 let me wait
+47:34 
+
+47:34 i think now we're okay
+47:37 
+
+47:37 okay
+47:39 
+
+47:39 all right now we are okay
+47:41 
+
+47:41 and now let's import time
+47:45 
+
+47:45 library again import time
+47:49 
+
+47:49 and come here
+47:51 
+
+47:51 and after
+47:53 
+
+47:53 printing all these values
+47:56 
+
+47:56 slip one seconds
+48:01 
+
+48:01 all right so
+48:03 
+
+48:03 it will show us every second the output
+48:06 
+
+48:06 and we can understand the improvement
+48:10 
+
+48:10 so now run main
+48:14 
+
+48:14 all right the numbers are increasing
+48:16 
+
+48:16 every second
+48:33 
+
+48:33 what is the problem here
+48:37 
+
+48:37 what is the problem here
+48:41 
+
+48:41 please pause the video and think about
+48:42 
+
+48:42 the problem
+48:45 
+
+48:45 problem is
+48:47 
+
+48:47 use this function here
+48:50 
+
+48:50 outside the loop so i'm going to cut
+48:52 
+
+48:52 this
+48:53 
+
+48:53 commands
+48:54 
+
+48:54 and
+48:56 
+
+48:56 add this line here
+48:58 
+
+48:58 to calculate in every second
+49:01 
+
+49:01 for pi
+49:03 
+
+49:03 so save again
+49:04 
+
+49:04 and then let's make it 30
+49:09 
+
+49:09 and run again
+49:14 
+
+49:14 right now it's approaching the real
+49:16 
+
+49:16 value of pi
+49:18 
+
+49:18 which is
+49:20 
+
+49:20 3.14159 something
+49:22 
+
+49:22 and the number of i the value of i and
+49:26 
+
+49:26 also the value of n
+49:28 
+
+49:28 are increasing
+49:30 
+
+49:30 and also time is advancing
+49:45 
+
+49:45 so
+49:46 
+
+49:46 after
+49:47 
+
+49:47 i think
+49:48 
+
+49:48 here after about 25 seconds
+49:51 
+
+49:51 seconds it has completed the thread is
+49:54 
+
+49:54 completed but there's a point here the
+49:57 
+
+49:57 main process
+49:59 
+
+49:59 does not wait to complete the threat
+50:02 
+
+50:02 does not wait the threat to complete all
+50:04 
+
+50:04 right so you should
+50:06 
+
+50:06 make it
+50:07 
+
+50:07 uh by hand
+50:09 
+
+50:09 what if
+50:10 
+
+50:10 i create more than one thread
+50:14 
+
+50:14 then
+50:15 
+
+50:15 i should arrange all these threads and
+50:19 
+
+50:19 synchronize all these threads and be
+50:21 
+
+50:21 careful about the values so
+50:24 
+
+50:24 i can face a problem like we have faced
+50:27 
+
+50:27 before adding this line in the loop so i
+50:31 
+
+50:31 i have to be very careful about the
+50:34 
+
+50:34 multiprocessing
+50:35 
+
+50:35 multi threading
+50:38 
+
+50:38 codes all right so i have created a
+50:41 
+
+50:41 class in this video
+50:43 
+
+50:43 to
+50:44 
+
+50:44 make it suitable to run in multithreads
+50:48 
+
+50:48 mode so
+50:49 
+
+50:49 in the next video
+50:51 
+
+50:51 or tomorrow in the class i'm going to
+50:54 
+
+50:54 continue to improve my code to run on
+50:59 
+
+50:59 multithreads and then run on
+51:01 
+
+51:01 multiprocessors
+51:03 
+
+51:03 see you in the next video
+51:08 
+
+51:08 if i can stop the video

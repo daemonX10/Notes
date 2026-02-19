@@ -1,0 +1,704 @@
+00:01 hello everyone and welcome back to the
+00:03 final video of this dimensionality
+00:05 reduction Series so far we've had a look
+00:08 at PCA MDS and tne and now it's finally
+00:12 time to talk about one of the most
+00:14 recent methods which is umap according
+00:17 to some memes on Reddit umap appears to
+00:20 be superior over tney but is this
+00:24 actually true to answer this question we
+00:26 should begin with discussing if there is
+00:29 at all anything that we would like to
+00:31 improve in tney the techniques we
+00:33 discussed so far are somewhat located at
+00:36 the extremes when it comes to what kind
+00:38 of information is preserved MDS for
+00:41 example is trying to preserve all Global
+00:43 distances and we learned that this is
+00:46 not ideal because it's simply not
+00:48 possible in a low-dimensional space
+00:50 Disney on the other hand restricts
+00:52 itself to only look at the local
+00:54 neighborhoods and therefore might miss
+00:56 the overall structure in the data that's
+00:59 also the reason why this distances
+01:01 between clusters of tney points are
+01:03 meaningless the main argument for this
+01:05 behavior is typically that the K
+01:07 Divergence loss used in tney doesn't
+01:09 care about the global structure now umap
+01:12 claims to preserve both local and most
+01:15 of the global structure in the data so
+01:17 it sits somewhere in between this comes
+01:20 from how the algorithm is designed by
+01:22 paying more attention to the overall
+01:23 geometry of the data well but there is
+01:26 some discussion around it a paper by
+01:29 kobak and lindaman has for example shown
+01:31 that these differences mainly arise from
+01:34 how the algorithms are initialized so
+01:36 there is no evidence per se that umap
+01:39 has any advantage over TIY in terms of
+01:41 preserving Global structure one clear
+01:44 Advantage however is the computational
+01:46 complexity which is close to linear and
+01:49 therefore faster than the quadratic
+01:51 complexity of the traditional tne as
+01:53 this plot from the documentation shows
+01:55 umap is clearly faster when the data set
+01:58 sizes become larger and the comparison
+02:00 also includes approximations of tney
+02:03 like Barnes Huts which is indicated by
+02:05 the green line having cleared up these
+02:07 rumors let's now talk about umap umap
+02:09 stands for uniform manifold
+02:11 approximation and projection the
+02:13 technique was published in 2018 by
+02:16 Leland mckin John Healey and James mwell
+02:20 which are researchers from the Canadian
+02:21 Tut Institute for mathematics and
+02:24 Computing a historical side note William
+02:26 T was a British Canadian mathematician
+02:30 reading this paper was very refreshing
+02:32 as it is one of the most comprehensive
+02:34 papers that I've read in the last years
+02:36 in order to understand umap we will have
+02:38 to make a short journey into the world
+02:40 of topological data analysis in the
+02:43 paper there's a complete section on the
+02:45 theoretical motivations drawn from this
+02:47 field and therefore we will first build
+02:49 the foundations to understand the rest
+02:51 of the technique as you know data
+02:53 usually corresponds to a set of points
+02:55 which are arranged in a high-dimensional
+02:57 space also called the ambient space each
+03:00 feature corresponds to a new dimension
+03:03 now topological data analysis or short
+03:05 TDA is interested in the shape of the
+03:08 data in the space or in other words the
+03:10 manifold in the TDA toolbox there are
+03:13 different methods that help us to
+03:15 extract topological and geometric
+03:17 features of the data this mathematical
+03:20 field is also called
+03:22 homology such features can for example
+03:24 be connections Loops or holes in the
+03:27 data set and they can reveal interesting
+03:29 details about our data so the set of
+03:32 points on the right doesn't give us any
+03:34 topological information per se so how do
+03:37 these methods calculate topological
+03:39 features all of this is based on
+03:42 triangles as you might know surfaces are
+03:45 often approximated using triangles and
+03:48 this is for example used in computer
+03:50 graphics and video games triangles are
+03:52 the simplest polygons and a nice
+03:54 property of triangles is that we can
+03:56 construct all other polygons with them
+03:59 which is called triangle lay
+04:00 what's even nicer we can generalize
+04:03 triangles into higher
+04:05 Dimensions the triangle we just saw is a
+04:07 2d example for 3D we call it a
+04:11 tetrahedron these generalizations are
+04:13 also called
+04:15 simplies one of the most basic ideas in
+04:18 topological data analysis is to Simply
+04:20 clue simplies together along faces to
+04:23 approximate the geometry in the data the
+04:26 result of that is a so-called simplicial
+04:29 complex which we can can see on the
+04:30 right don't take this sketch too
+04:32 seriously however because it's just
+04:34 based on zero and one simplies the
+04:37 takeaway is that we can resemble the
+04:40 topological structure in our data by
+04:42 cluing together simplies later we will
+04:44 see that a similar approaches used in
+04:47 umap to learn the local structure of the
+04:49 manifolds for TDA we can now calculate
+04:52 all of our geometric features on this
+04:54 graph directly which is quite convenient
+04:58 so far so good the last question is how
+05:00 do we actually build such a simpli
+05:02 complex so how do we glue these things
+05:05 together the general approach used in
+05:07 TDA is called
+05:09 filtration we simply put balls of a
+05:12 fixed radius Epsilon around each point
+05:15 and whenever these balls overlap in
+05:17 certain ways we connect the points this
+05:20 automatically generates a graph for each
+05:22 radius Epsilon in simplical homology all
+05:26 of this is defined much more concretely
+05:28 and in fact there are different way ways
+05:30 to build these structures for umap we
+05:32 mainly care about the vorus rips complex
+05:36 which is determined by the zero and one
+05:38 Simplex a great python Library called
+05:40 Giotto TDA has a nice visualization of
+05:44 the filtration procedure as you can see
+05:47 with each new radius Epsilon the shape
+05:49 is evolving and we get a pretty good
+05:51 feeling for how the shape of the data
+05:53 looks like which is of course also true
+05:56 for higher
+05:57 dimensions for umap this little
+05:59 introduction is is probably sufficient
+06:01 at this point but I will talk about one
+06:03 more detail because I simply find it
+06:06 important given this evolving structure
+06:08 we now have different levels of
+06:10 topological features there's a large
+06:12 hole in the data set at some point which
+06:15 gets destroyed again once the radi
+06:17 become too large so what level of
+06:20 granularity is the right one to make
+06:23 this even more concrete if we perform
+06:25 filtration on such a shape we will get
+06:27 information about many small holes but
+06:30 but also a big hole so how do we know
+06:32 which hole is the feature we are
+06:34 interested in this is where persistent
+06:37 homology comes into play it simply
+06:39 tracks the beginning and end of these
+06:41 features throughout the filtration
+06:44 procedure that's also where the name
+06:46 comes from it checks which topological
+06:48 features are persistent over the radii
+06:52 thinking about umap again topological
+06:54 Theory provides guarantees about how the
+06:57 manifold of the data can be captured in
+06:59 a min meaningful way and that's why we
+07:01 started this video with this quick
+07:04 primer we can now discuss the umap
+07:06 algorithm in two steps first we
+07:09 construct a topological representation
+07:12 using the vorus rips complex which
+07:14 effectively gives us a k nearest
+07:16 neighbor graph secondly we find a low
+07:20 dimensional representation that has a
+07:22 similar topological structure and this
+07:25 in the end is a graph layout
+07:26 optimization in the ukian 2D or 3D space
+07:30 case the ACT implementation is quite
+07:33 simple but the authors emphasized that
+07:35 the mathematical framework serves as a
+07:37 foundation to justify the
+07:40 approach let's discuss the first step in
+07:43 more detail in the TDA introduction we
+07:46 learned about the vorus rips complex and
+07:49 how it can be built using filtration by
+07:52 putting a radius around each points we
+07:55 will do something similar in umap an
+07:57 immediate question now is which r Rus
+07:60 should we pick to construct a simpal
+08:02 complex that approximates the manifold
+08:05 on which the data lies there is no one
+08:08 size fits all radius for all data sets
+08:11 and therefore umap has a hyperparameter
+08:13 which is the number of Neighbors in
+08:16 order to understand why it's not a
+08:17 radius anymore we will have to dig a
+08:20 Little Deeper all of this has to do with
+08:22 the U in um map which stands for uniform
+08:25 let's assume our data lies on this
+08:28 manifold if the dat is uniformly
+08:31 distributed on a manifold the
+08:32 consequence is that we always roughly
+08:35 capture the same number of neighbors if
+08:37 we position a ball with a radius
+08:39 somewhere in this example we have six
+08:42 neighbors for a given radius this would
+08:44 make it quite easy for us as we could
+08:46 always choose the same radius Epsilon
+08:48 and capture the topology at the right
+08:50 resolution for the entire manifold
+08:53 there's even a theorem the Nerf theorem
+08:56 which proves this observation from a
+08:58 mathematical point of view if the data
+09:00 is uniformly distributed on the
+09:02 manifolds a simplish complex of the
+09:04 cover of the data will approximate the
+09:07 manifold correctly all of what we've
+09:09 just seen is also formulated
+09:11 mathematically in the paper in LMA 1
+09:14 given a ranan manifolds in an ambient
+09:17 space and given a bunch of locally
+09:19 constant points P we can approximate the
+09:23 geodesic distance using balls centered
+09:26 at each points this means if the data is
+09:30 uniformly distributed like in this
+09:31 example the geodesic distance on the
+09:34 manifold is simply 1 divided by the
+09:37 radius of these balls which is simply
+09:39 the average distance between
+09:42 points the only problem is that real
+09:45 world data doesn't behave that nicely
+09:48 the data might be scattered around like
+09:50 this if we place a ball with the same
+09:52 radius on this collection of points we
+09:55 might get a different number of
+09:57 neighbors for each of the points and one
+09:59 first issue we observe is that the two
+10:01 points on the bottom are isolated from
+10:04 the rest of the points in the end we
+10:06 however want to have one Global
+10:08 simplicial complex that covers all of
+10:11 the
+10:12 data the problem here is that the
+10:14 previously mentioned Nerf theorem
+10:16 doesn't apply anymore because the data
+10:18 doesn't cover the manifold sufficiently
+10:21 another problem is that at some places
+10:23 the balls cover too much which results
+10:26 in very high dimensional simplies that's
+10:29 also not ideal because it simply doesn't
+10:31 reflect the global manifold structure in
+10:33 that
+10:34 area all of this would be much nicer if
+10:37 the data was uniformly distributed but
+10:39 what can we do about it umap is called
+10:42 uniform manifold approximation for a
+10:45 reason so there must be a way to
+10:47 introduce uniformity and that's exactly
+10:49 what the authors
+10:51 do looking at LMA one once again the
+10:54 author simply decide to give each point
+10:57 an individual distance function such
+10:59 that that the data is approximately
+11:01 uniformly distributed with regard to
+11:03 that metric this way the Assumption of
+11:06 uniform distribution still holds and we
+11:09 are able to approximate the geodesic
+11:11 distance according to this Lama I found
+11:14 this sketch by Tom hosgood which nicely
+11:16 visualizes the effect of these
+11:18 individual distance functions to force
+11:21 the data to be uniform the geometry
+11:24 changes sparely clustered regions will
+11:26 shrink and densely clustered ones will
+11:29 be in en larged practically this means
+11:32 that the balls around each point stretch
+11:35 to the K nearest neighbor of the point
+11:38 choosing k equals 2 it could look like
+11:40 this in dense and sparse regions instead
+11:43 of choosing the radius we now simply
+11:45 choose a value for the number of
+11:47 neighbors this is more convenient
+11:49 because choosing actual distances is
+11:51 very data set dependent whereas the
+11:54 default value for example 10 neighbors
+11:57 Works quite well for most of the data
+11:59 sets
+11:60 if we would build a simplicial complex
+12:02 out of this information it would result
+12:04 in a simple graph that looks like this
+12:07 with our local metric we can now also
+12:10 measure distance between the points and
+12:13 therefore we can also include
+12:14 information about how close to neighbors
+12:17 are this means our radius can be
+12:20 interpreted as the probability that a
+12:22 connection exists in practice an
+12:25 exponential decay is used around each
+12:28 point to give more weight to points that
+12:30 are closer in the neighborhood this
+12:32 information can also be used in our
+12:34 graph namely by putting weights on the
+12:37 edges here the first neighbor receives a
+12:40 higher weight because it's closer to our
+12:42 Center points unfortunately using this
+12:45 approach it can still happen that points
+12:47 become isolated because they are too far
+12:50 away simply because the exponential
+12:52 decay assigns a very small value to them
+12:55 the authors decide to add a local
+12:58 connectivity constraint such that the
+12:60 Decay starts beyond the first neighbor
+13:03 this eventually looks more or less like
+13:06 this as you can see we have no
+13:09 exponential decay until the first
+13:12 neighbor and then the exponential decay
+13:14 starts beyond the first neighbor in our
+13:18 graph this leads to a connection weight
+13:21 of one for the first neighbor and then
+13:24 to smaller weights for all other nearest
+13:27 neighbors except for having no isolated
+13:30 points this also has further beneficial
+13:34 implications as distances in the
+13:36 high-dimensional space tend to be larger
+13:38 to the first neighbor the distance
+13:40 distributions are typically cramped
+13:42 together we've also seen this in the
+13:44 previous videos of the
+13:46 series as you can see when introducing
+13:49 the local connectivity constraint the
+13:52 distributions become a bit wider because
+13:54 it stretches out to the first
+13:56 neighbor this result can also be
+13:59 demonstrated ated mathematically and
+14:01 shows that umap is not simply building a
+14:03 k nearest neighbor graph but many
+14:06 considerations went into the design of
+14:08 the method in the documentation for the
+14:11 umap python Library there's also a nice
+14:13 visualization of the whole graph
+14:15 construction as you can see the circles
+14:18 around each point stretch to the first
+14:20 neighbor and then start to Decay
+14:22 exponentially all we've just seen is
+14:25 mathematically expressed in the paper
+14:27 using the following distance function
+14:29 this formula eventually defines how
+14:32 large the radi around each individual
+14:35 Point are and as we know by now this is
+14:38 controlled by the number of nearest
+14:40 neighbors K let's begin with the term on
+14:43 the left here we find the exponential
+14:46 decay around the center point that
+14:48 weighs the neighbors according to their
+14:51 distance in the exponent we find this
+14:54 complex looking term which is nothing
+14:56 else but the local connectivity
+14:58 constraint we just discussed just
+14:60 visually by substracting row I which is
+15:03 defined as the minimum distance among
+15:05 the nearest neighbors we make sure that
+15:08 the exponential decay starts only beyond
+15:11 the first neighbor that's because
+15:13 substracting the first neighbor's
+15:15 distance leads to negative values which
+15:17 are replaced by zero because of the
+15:20 maximum
+15:21 operator and anything to the power of
+15:23 zero is one so we will always have a
+15:26 connection probability of one it's also
+15:28 possible to visualize this distance
+15:30 function which you can see here finally
+15:34 Sigma I is a normalization factor that
+15:37 allows to control the intensity of the
+15:40 Decay if we now sum over the Decay
+15:43 distances to all nearest neighbors we
+15:46 roughly want the ball to capture the
+15:48 probability mass of log 2 of K there's
+15:51 not much information in the paper why
+15:53 log 2 is used but I read on GitHub that
+15:56 empirically this leads to better results
+15:59 case simply acts as a global constant
+16:02 that defines how locally we want to
+16:04 estimate the metric if we set it to a
+16:06 higher value we will have larger balls
+16:08 around each point and capture more of
+16:10 the global structure at this point one
+16:13 or the other might spot some
+16:15 similarities with tne I will talk more
+16:17 about this later in this video so given
+16:20 this new distance function we now have a
+16:22 local view for each individual point in
+16:25 the data set for a specific number of
+16:28 nearest neighbors such as two here we
+16:30 get a radius around each point that
+16:32 connects the point to all neighbors
+16:35 within the radius this gives us a graph
+16:37 for each data point more specifically a
+16:40 weighted graph as we can also put the
+16:42 connection probability on the edges to
+16:45 indicate which points are closer than
+16:47 others note that the edge weights
+16:49 between nodes are not a symmetric
+16:52 relationship one node might be a nearest
+16:55 neighbor of another nodes but not vice
+16:57 versa
+16:59 the real challenge now is to combine all
+17:02 of these individual weighted graphs into
+17:04 one large simplicial complex that
+17:07 represents the entire manifolds how
+17:09 would you come up with for example this
+17:11 subgraph given the individual weighted
+17:14 nearest neighbor graphs do we take the
+17:17 max of the edge weights or the average
+17:19 or what do we
+17:21 do mathematically speaking we have
+17:24 different local metric spaces for each
+17:26 data points and want to merge them into
+17:28 a joint simpal complex the math section
+17:32 of the paper tells us exactly how this
+17:34 can be done namely by converting the
+17:37 graphs to fuzzy simplicial sets in fuzzy
+17:41 simplicial sets the membership is not
+17:43 binary but instead a probability between
+17:45 zero and one and that's exactly the
+17:48 situation we have with our Edge weights
+17:51 and in fuzzy topology there exists
+17:54 already a clearly defined operation for
+17:56 merging representations which can be
+17:59 found in definition n in the paper the
+18:02 basic idea behind it is that the
+18:04 combined Edge weight is the probability
+18:06 that an edge exists minus the
+18:09 probability that no Edge exists this
+18:11 combined weights then represents the
+18:13 probability that at least one of the
+18:15 edges exist in this formula a
+18:18 corresponds to The adjacency Matrix of
+18:20 the graph we won't get too deep into the
+18:23 math here but if you want to read more
+18:24 about it I've added a more mathematical
+18:27 slide deck to the video description
+18:30 following this merging approach we have
+18:32 a mathematical guarantee that we obtain
+18:34 an appropriate topological
+18:36 representation of the whole data set now
+18:39 the full picture we started with drawing
+18:41 balls around each point to build the
+18:43 simpal complex then we made these balls
+18:46 stretch to the case nearest neighbor to
+18:48 ensure local uniformity over the
+18:50 manifolds then we added exponential
+18:53 decay beyond the first neighbor to have
+18:55 Edge weights that correspond to the
+18:57 distance finally we found a
+18:59 mathematically grounded way to merge all
+19:01 of the local views of the topology and
+19:04 eventually we have a weighted K nearest
+19:06 neighbor graph that represents the
+19:08 structure in our data set so now let's
+19:11 talk about the Second Step which is how
+19:13 do we produce a low dimensional
+19:15 embedding that preserves exactly this
+19:17 structure we start with our
+19:19 high-dimensional weighted nearest
+19:21 neighbor graph let's call it h for the
+19:24 low dimensional 2D or 3D space we
+19:26 initialize the points somehow later we
+19:29 will also discuss different ways to do
+19:31 this but let's focus on more important
+19:33 things first for this set of points we
+19:36 apply the same procedure as in the high
+19:38 dimensional space which gives us another
+19:40 K nearest neighbor graph with weighted
+19:43 edges which we call
+19:45 L now we want to change this
+19:47 low-dimensional graph such that it
+19:50 approximates the high dimensional one as
+19:52 good as possible for this we need to
+19:55 compare the two graphs somehow I don't
+19:57 know if you ever tried to compare graphs
+19:59 but it's a challenging problem here we
+20:02 luckily have a one toone correspondence
+20:04 for the nodes because we can simply say
+20:07 this high-dimensional point belongs to
+20:09 this low dimensional Point as a result
+20:12 the only thing we actually need to
+20:13 compare are the edges or more
+20:15 specifically The Edge
+20:20 weights when taking a look at the umap
+20:23 python implementation we can see that
+20:25 the comparison between these graphs is
+20:27 nothing else but the comparison of their
+20:29 adjacency matrices these are the
+20:32 adjacency matrices of our two graphs and
+20:34 the entries can be simply interpreted as
+20:37 Edge
+20:38 probabilities I highlighted the edges in
+20:40 different colors to show that the graphs
+20:43 can have a different number of edges and
+20:45 therefore it doesn't suffice to only
+20:47 compare the existing ones but also the
+20:49 non-existing edges in other words The
+20:51 adjacency Matrix will consider
+20:53 everything at the same time and
+20:55 therefore it's the only reasonable
+20:56 Choice here by moving the lowest lower
+20:59 dimensional adjacency Matrix closer to
+21:01 the high dimensional one we end up with
+21:03 a graph that approximates the original
+21:06 graph
+21:07 H okay so how do we actually compare the
+21:10 two adjacency matrices do we substract
+21:13 them from each other or what is the
+21:14 right way the edges are simply beri
+21:17 variables and therefore it makes sense
+21:19 to use the cross entropy over all
+21:21 existing edges let's inspect this
+21:23 formula
+21:26 closer cross entropy simply compares The
+21:29 Edge probabilities for the high and low
+21:32 dimensional graph for both cases when
+21:35 edges exist and when edges don't exist
+21:38 on the left are all of the existing
+21:40 edges and on the right The adjacency
+21:43 Matrix shows one minus the edges which
+21:45 gives values for the non-existing edges
+21:49 the first term then simply makes sure
+21:51 that the low dimensional points are
+21:53 close to each other when they have a
+21:54 high Edge probability and the second
+21:57 term makes sure that the points withow
+21:59 low probabilities will be far away in
+22:01 the embedding space using this loss
+22:03 function we can simultaneously optimize
+22:05 the position of all points you probably
+22:08 already guessed it we can adjust the
+22:10 coordinates of the low dimensional
+22:12 points using stochastic radient descent
+22:15 using this loss function the authors
+22:17 mentioned that using this loss function
+22:19 corresponds to a force directed graph
+22:21 layout algorithm this simply means that
+22:24 the points push and pull each other
+22:26 until a steady state is reached we've
+22:28 also seen this in the tne video in case
+22:31 you're interested it is even possible to
+22:33 derive the exact attractive and
+22:35 repulsive forces given this optimization
+22:38 function Yi and YJ correspond to the
+22:41 coordinates of two low dimensional
+22:43 points for edges between these points
+22:46 with higher weights the attractive
+22:48 forces are stronger whereas lower
+22:50 weighted edges have stronger repulsive
+22:52 forces you can find more details about
+22:55 this in the umap paper so those were the
+22:58 most important aspect effects of umap
+22:60 and before we do a little bit of
+23:01 Hands-On coding let me quickly talk
+23:04 about four more minor things that are
+23:06 used in the actual implementation we
+23:08 haven't talked about how the K nearest
+23:10 neighbors are actually
+23:12 found as this needs to be done many
+23:14 times and therefore should be fast the
+23:17 efficient kous neighbor descent
+23:18 algorithm is used it has an empirical
+23:21 complexity that is close to linear it's
+23:24 an approximation by only looking at
+23:26 neighbors of neighbors instead of the
+23:28 full data set next the actual loss
+23:31 function is slightly simplified as some
+23:33 of the terms can be removed additionally
+23:36 negative sampling is used to not deal
+23:39 with all negative edges in The adjacency
+23:41 Matrix this speeds up the optimization
+23:45 finally the initialization of the low
+23:47 dimensional points is not random but the
+23:50 authors use a technique called spectral
+23:52 embedding I won't go into the details
+23:55 here but you can simply think of it as a
+23:57 technique designed for graphs or most
+23:59 specifically their adjacency Matrix and
+24:01 this leads to a better starting position
+24:03 for the low dimensional points now let's
+24:06 do a little bit of Hands-On coding and
+24:08 before that I can recommend to take a
+24:10 look at this website which is built by
+24:12 different researchers from Google it's
+24:15 an excellent playground to experiment
+24:17 with umap
+24:18 hyperparameters the certainly most
+24:20 important hyperparameter of umap is the
+24:23 number of
+24:26 neighbors this interactive visualization
+24:28 helps to get a feeling for
+24:34 it the second most important parameter
+24:37 is minist which controls how tightly the
+24:40 points Clump
+24:43 together okay so just like before we run
+24:47 the data set cell in order to have
+24:50 access to our data set so as you can see
+24:52 we import umap from umap so not from
+24:56 Psychic learn and the reason for that is
+24:59 that umap has not been added to Cy learn
+25:01 so far and there have been some tickets
+25:05 where people ask if umap will be added
+25:07 in the future which would be of course
+25:09 quite convenient but the justification
+25:12 also makes sense uh which is simply that
+25:14 the umap package itself is already
+25:16 nicely maintained and there are not many
+25:19 reasons to include it in cycle learn
+25:22 okay so we can use umap using the umap
+25:25 class and then we Define the number of
+25:27 components in this example we have three
+25:30 because we have three dimensions down
+25:32 here and then number of neighbors is how
+25:36 many nearest neighbors we want to use in
+25:38 that algorithm and then mindis defines
+25:41 how closely the points can be placed
+25:44 next to each other in the low
+25:46 dimensional embedding and then we can
+25:49 also use metric which uh defines the
+25:53 metric we want to use to calculate the
+25:56 distance between the points and if you
+25:59 want or if you need more help with the
+26:01 parameters the umap documentation is
+26:05 excellent and there is also a lot of
+26:08 examples and those four are basically
+26:11 the main parameters of um map so it's
+26:14 quite simple and when we run this we can
+26:18 also call fit transform like before and
+26:21 this leads to Arrangement like this and
+26:24 we can also do it for the
+26:26 two-dimensional space
+26:28 to finalize this video Let's quickly
+26:31 revisit the connection between tne and
+26:34 umap umap and tne are quite similar in
+26:38 many aspects as they both create low
+26:40 dimensional embeddings based on the
+26:42 nearest
+26:43 Neighbors when we look at the distance
+26:46 functions we spot a few similarities
+26:49 both use exponential decay and have a
+26:52 sigma to control the intensity umap in
+26:55 addition has the local connectivity
+26:57 constraint which which has beneficial
+26:59 effects for maintaining the global
+27:01 structure in tne we used perplexity to
+27:05 adjust the resolution scale between more
+27:07 local and more Global views in umap we
+27:10 can use the number of nearest Neighbors
+27:13 which is not just more intuitive but
+27:15 also easier to pick there's literature
+27:17 that discusses more connections between
+27:19 those two and it is argued that umap is
+27:22 simply a special case of tney let's
+27:24 complete this series by filling out the
+27:26 comparison table that we used throughout
+27:29 the videos umap is a local and nonlinear
+27:32 manifold learning technique that's
+27:34 because we try to approximate the
+27:36 manifold using the nearest neighbors of
+27:38 each point the main purpose is
+27:41 visualization and data analysis it is
+27:44 not deterministic because there are
+27:46 stochastic components that come from the
+27:48 approximations used to speed up
+27:50 performance the computational complexity
+27:53 of umap is n to the power of
+27:56 1.14 and this bound comes from the
+27:59 nearest neighbor descent algorithm and
+28:01 was estimated empirically we also
+28:03 discussed the two most important
+28:05 hyperparameters the number of neighbors
+28:07 and mindist the key idea is motivated
+28:10 mathematically and aims to build a fuzzy
+28:13 simpal complex and this in the end leads
+28:15 to a canorous neighbor graph umap has
+28:18 become very popular in bioinformatics
+28:21 but beyond that I haven't looked into
+28:22 any other
+28:24 applications congratulations with this
+28:26 you have successfully completed the
+28:28 dimensionality reduction Series in total
+28:31 this summed up to around 2 hours of
+28:33 videos and I hope it served as a solid
+28:36 foundation to get you started with these
+28:39 four techniques we have however just
+28:41 scratched the surface and there are
+28:42 plenty of other methods out there maybe
+28:45 I will add more videos to this playlist
+28:47 in the future so thank you for watching
+28:50 and see you soon
