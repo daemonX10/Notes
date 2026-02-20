@@ -20449,43 +20449,584 @@ class SMEValidatedMT:
 
 ## Question 29
 **How do you implement robust error handling and fallback mechanisms in MT systems?**
-**Answer:** _To be filled_
+**Answer:**
+
+Robust MT systems handle failures gracefully through input validation, fallback models, error detection, and recovery strategies that maintain service availability.
+
+**Core Concepts:**
+
+| Error Type | Detection | Fallback |
+|---|---|---|
+| Unsupported Language | Language detection check | Return error with supported list |
+| Too-Long Input | Length validation | Chunk and translate segments |
+| Model Failure | Exception handling | Switch to backup model |
+| Low-Quality Output | QE score check | Flag for human translation |
+| Degenerate Output | Repetition/empty detection | Retry with different params |
+
+**Python Code Example:**
+
+```python
+# Pipeline: robust MT with error handling and fallbacks
+import logging
+
+class RobustMTService:
+    def __init__(self, primary_model, fallback_model, qe_model):
+        self.primary = primary_model
+        self.fallback = fallback_model
+        self.qe = qe_model
+        self.logger = logging.getLogger('mt_service')
+        self.supported_langs = {'en', 'de', 'fr', 'es', 'zh', 'ja'}
+        self.max_length = 5000
+
+    def validate_input(self, text, src_lang, tgt_lang):
+        if not text or not text.strip():
+            return False, "Empty input"
+        if len(text) > self.max_length:
+            return False, f"Input exceeds {self.max_length} chars"
+        if src_lang not in self.supported_langs:
+            return False, f"Source language '{src_lang}' not supported"
+        if tgt_lang not in self.supported_langs:
+            return False, f"Target language '{tgt_lang}' not supported"
+        return True, "OK"
+
+    def is_degenerate(self, text):
+        if not text or len(text.strip()) < 2:
+            return True
+        words = text.split()
+        if len(words) > 3:
+            unique_ratio = len(set(words)) / len(words)
+            if unique_ratio < 0.2:
+                return True
+        return False
+
+    def translate(self, text, src_lang, tgt_lang):
+        # Validate
+        valid, msg = self.validate_input(text, src_lang, tgt_lang)
+        if not valid:
+            return {'status': 'error', 'message': msg}
+
+        # Try primary model
+        try:
+            result = self.primary.translate(text, src_lang, tgt_lang)
+            if not self.is_degenerate(result):
+                qe_score = self.qe.estimate(text, result)
+                if qe_score > 0.5:
+                    return {'status': 'ok', 'translation': result,
+                            'model': 'primary', 'confidence': qe_score}
+        except Exception as e:
+            self.logger.error(f"Primary model failed: {e}")
+
+        # Fallback model
+        try:
+            result = self.fallback.translate(text, src_lang, tgt_lang)
+            return {'status': 'ok', 'translation': result,
+                    'model': 'fallback', 'confidence': 0.5}
+        except Exception as e:
+            self.logger.error(f"Fallback model failed: {e}")
+            return {'status': 'error', 'message': 'All models failed'}
+
+# service = RobustMTService(primary, fallback, qe)
+# result = service.translate("Hello", 'en', 'de')
+```
+
+**Interview Tips:**
+- Discuss multi-model fallback as essential for production MT availability
+- Mention degenerate output detection (repetition, empty, too-short)
+- Highlight input validation as the first line of defense
+- Note that chunking long inputs is better than rejecting them outright
 
 ---
 
 ## Question 30
 **What approaches work best for combining machine translation with other language technologies?**
-**Answer:** _To be filled_
+**Answer:**
+
+Combining MT with other language technologies creates end-to-end multilingual pipelines for tasks like cross-lingual search, multilingual summarization, and speech-to-speech translation.
+
+**Core Concepts:**
+
+| Combination | Components | Application |
+|---|---|---|
+| Speech-to-Speech | ASR → MT → TTS | Real-time interpretation |
+| Cross-Lingual Search | Query MT → IR → Result MT | Multilingual search engines |
+| Multilingual Summarization | MT → Summarizer or MT + Summarizer | Cross-language summarization |
+| Multilingual Chatbot | NLU → MT → Response → MT | Customer support |
+| OCR + MT | Image → OCR → MT | Document translation |
+
+**Python Code Example:**
+
+```python
+# Pipeline: combining MT with other NLP technologies
+class MultilingualPipeline:
+    def __init__(self, translator, summarizer, ner_model):
+        self.translator = translator
+        self.summarizer = summarizer
+        self.ner = ner_model
+
+    def cross_lingual_summarize(self, text, src_lang, tgt_lang,
+                                 strategy='translate_then_summarize'):
+        """Summarize text across languages."""
+        if strategy == 'translate_then_summarize':
+            translated = self.translator(text, src_lang, tgt_lang)
+            summary = self.summarizer(translated)
+        elif strategy == 'summarize_then_translate':
+            summary_src = self.summarizer(text)
+            summary = self.translator(summary_src, src_lang, tgt_lang)
+        return summary
+
+    def cross_lingual_ner(self, text, src_lang, entity_lang='en'):
+        """Extract entities via translation to English."""
+        if src_lang != entity_lang:
+            english_text = self.translator(text, src_lang, entity_lang)
+        else:
+            english_text = text
+        entities = self.ner(english_text)
+        return entities
+
+    def multilingual_qa(self, question, context, q_lang, c_lang, a_lang):
+        """Answer question across languages."""
+        # Translate both to common language
+        if q_lang != 'en':
+            question = self.translator(question, q_lang, 'en')
+        if c_lang != 'en':
+            context = self.translator(context, c_lang, 'en')
+        # QA in English (placeholder)
+        answer = f"Answer from context"  # QA model here
+        if a_lang != 'en':
+            answer = self.translator(answer, 'en', a_lang)
+        return answer
+
+# pipeline = MultilingualPipeline(translator, summarizer, ner)
+# summary = pipeline.cross_lingual_summarize(de_text, 'de', 'en')
+```
+
+**Interview Tips:**
+- Discuss translate-then-process vs. process-then-translate trade-offs
+- Mention that end-to-end multilingual models often outperform pipeline approaches
+- Highlight speech translation as a key application combining ASR, MT, and TTS
+- Note that error propagation is the main challenge in pipeline architectures
 
 ---
 
 ## Question 31
 **How do you handle machine translation for texts with mixed languages or code-switching?**
-**Answer:** _To be filled_
+**Answer:**
+
+Code-switching MT handles text containing multiple languages intermixed (common in bilingual communities), requiring language identification at the word/phrase level and appropriate translation strategies.
+
+**Core Concepts:**
+
+| Challenge | Example | Solution |
+|---|---|---|
+| Intra-Sentential Switching | "I went to the tienda to buy leche" | Word-level language ID |
+| Inter-Sentential | Sentences alternate languages | Sentence-level detection + routing |
+| Script Mixing | Hindi-English (Hinglish) in Latin script | Romanization-aware models |
+| Borrowings vs. Switches | Adopted words vs. actual switching | Context disambiguation |
+| Transliterated Text | Non-Latin languages in Latin script | Transliteration-aware models |
+
+**Python Code Example:**
+
+```python
+# Pipeline: code-switching aware MT
+class CodeSwitchingMT:
+    def __init__(self, translator, lang_detector):
+        self.translator = translator
+        self.lang_detector = lang_detector
+
+    def detect_word_languages(self, text):
+        """Detect language of each word."""
+        words = text.split()
+        labeled = []
+        for word in words:
+            if len(word) > 2:
+                lang = self.lang_detector(word)
+            else:
+                lang = 'unknown'
+            labeled.append((word, lang))
+        return labeled
+
+    def segment_by_language(self, text):
+        """Group consecutive same-language words."""
+        labeled = self.detect_word_languages(text)
+        segments = []
+        current_lang = None
+        current_words = []
+
+        for word, lang in labeled:
+            if lang == current_lang or lang == 'unknown':
+                current_words.append(word)
+            else:
+                if current_words:
+                    segments.append((' '.join(current_words), current_lang))
+                current_words = [word]
+                current_lang = lang
+
+        if current_words:
+            segments.append((' '.join(current_words), current_lang))
+        return segments
+
+    def translate_mixed(self, text, target_lang):
+        """Translate code-switched text."""
+        segments = self.segment_by_language(text)
+        translated_segments = []
+
+        for segment_text, src_lang in segments:
+            if src_lang == target_lang:
+                translated_segments.append(segment_text)  # Already target lang
+            elif src_lang and src_lang != 'unknown':
+                translated = self.translator(segment_text, src_lang, target_lang)
+                translated_segments.append(translated)
+            else:
+                translated_segments.append(segment_text)  # Unknown, keep as-is
+
+        return ' '.join(translated_segments)
+
+# cs_mt = CodeSwitchingMT(translate_fn, detect_lang_fn)
+# result = cs_mt.translate_mixed("Vamos to the party tonight", 'en')
+```
+
+**Interview Tips:**
+- Discuss that code-switching is extremely common in multilingual communities
+- Mention that multilingual models (M2M-100) handle some code-switching naturally
+- Highlight that word-level language identification is the key preprocessing step
+- Note the difference between code-switching (intentional) and borrowings (adopted)
 
 ---
 
 ## Question 32
 **What techniques help with MT consistency in federated or distributed processing scenarios?**
-**Answer:** _To be filled_
+**Answer:**
+
+Distributed MT processing requires coordinated terminology, synchronized model versions, and consistent quality across multiple processing nodes to ensure uniform translation quality.
+
+**Core Concepts:**
+
+| Technique | Consistency Guarantee | Overhead |
+|---|---|---|
+| Model Version Pinning | All nodes use same checkpoint | Deployment coordination |
+| Shared Translation Memory | Centralized TM across nodes | Network latency |
+| Deterministic Inference | Same input → same output | Greedy decoding required |
+| Distributed Terminology DB | Synchronized term databases | Sync overhead |
+| Canary Deployments | Gradual rollout of model updates | Monitoring overhead |
+
+**Python Code Example:**
+
+```python
+# Pipeline: consistent distributed MT processing
+import hashlib
+import json
+
+class DistributedMTCoordinator:
+    def __init__(self, model_version, shared_tm=None):
+        self.model_version = model_version
+        self.shared_tm = shared_tm or {}  # Shared translation memory
+        self.node_id = None
+
+    def register_node(self, node_id):
+        self.node_id = node_id
+
+    def get_consistency_key(self, source, src_lang, tgt_lang):
+        """Generate deterministic key for caching."""
+        payload = f"{source}|{src_lang}|{tgt_lang}|{self.model_version}"
+        return hashlib.sha256(payload.encode()).hexdigest()
+
+    def translate_consistent(self, source, src_lang, tgt_lang, translator):
+        """Translate with distributed consistency."""
+        key = self.get_consistency_key(source, src_lang, tgt_lang)
+
+        # Check shared cache first
+        if key in self.shared_tm:
+            return self.shared_tm[key], 'cached'
+
+        # Translate with deterministic settings
+        translation = translator(
+            source, src_lang, tgt_lang,
+            num_beams=4, do_sample=False  # Deterministic
+        )
+
+        # Store in shared cache
+        self.shared_tm[key] = translation
+        return translation, 'translated'
+
+    def verify_node_consistency(self, test_inputs, nodes):
+        """Verify all nodes produce same output."""
+        inconsistencies = []
+        for test_input in test_inputs:
+            outputs = set()
+            for node in nodes:
+                output = node.translate(test_input)
+                outputs.add(output)
+            if len(outputs) > 1:
+                inconsistencies.append({
+                    'input': test_input, 'variants': list(outputs)
+                })
+        return inconsistencies
+
+# coord = DistributedMTCoordinator('v2.1')
+# result, source = coord.translate_consistent(text, 'en', 'de', translator)
+```
+
+**Interview Tips:**
+- Discuss model version pinning as the most critical consistency requirement
+- Mention that greedy/beam search is deterministic, while sampling is not
+- Highlight shared translation memory for segment-level consistency
+- Note that A/B testing during model updates requires careful transition management
 
 ---
 
 ## Question 33
 **How do you implement efficient batch processing for large-scale translation applications?**
-**Answer:** _To be filled_
+**Answer:**
+
+Large-scale MT batch processing optimizes throughput through input sorting, dynamic batching, GPU utilization, and parallel processing pipelines.
+
+**Core Concepts:**
+
+| Optimization | Throughput Gain | Implementation |
+|---|---|---|
+| Length Sorting | 2-3x | Sort inputs by length, reduce padding |
+| Dynamic Batching | 2-5x | Maximize tokens per batch |
+| Multi-GPU Parallelism | Linear with GPUs | Data parallel inference |
+| Async I/O | 1.5-2x | Overlap data loading with inference |
+| CTranslate2 | 3-5x over PyTorch | Optimized inference engine |
+
+**Python Code Example:**
+
+```python
+# Pipeline: optimized batch translation
+import time
+from concurrent.futures import ProcessPoolExecutor
+import numpy as np
+
+class BatchMTProcessor:
+    def __init__(self, model, tokenizer, max_batch_tokens=4096):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.max_batch_tokens = max_batch_tokens
+
+    def create_dynamic_batches(self, texts):
+        """Create batches maximizing token utilization."""
+        # Sort by estimated token count
+        indexed = [(i, t, len(t.split())) for i, t in enumerate(texts)]
+        indexed.sort(key=lambda x: x[2])
+
+        batches = []
+        current_batch = []
+        current_tokens = 0
+
+        for idx, text, est_tokens in indexed:
+            if current_tokens + est_tokens > self.max_batch_tokens and current_batch:
+                batches.append(current_batch)
+                current_batch = []
+                current_tokens = 0
+            current_batch.append((idx, text))
+            current_tokens += est_tokens
+
+        if current_batch:
+            batches.append(current_batch)
+        return batches
+
+    def translate_batch(self, batch):
+        """Translate a single batch."""
+        indices, texts = zip(*batch)
+        inputs = self.tokenizer(list(texts), return_tensors="pt",
+                               padding=True, truncation=True)
+        outputs = self.model.generate(**inputs, max_length=256)
+        decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        return list(zip(indices, decoded))
+
+    def translate_all(self, texts):
+        """Translate all texts with optimized batching."""
+        start = time.time()
+        batches = self.create_dynamic_batches(texts)
+        all_results = []
+
+        for batch in batches:
+            results = self.translate_batch(batch)
+            all_results.extend(results)
+
+        # Restore original order
+        all_results.sort(key=lambda x: x[0])
+        elapsed = time.time() - start
+        return {
+            'translations': [r[1] for r in all_results],
+            'total_time': elapsed,
+            'throughput': len(texts) / elapsed
+        }
+
+# processor = BatchMTProcessor(model, tokenizer)
+# results = processor.translate_all(thousands_of_texts)
+```
+
+**Interview Tips:**
+- Discuss dynamic batching by max tokens (not max sentences) for GPU efficiency
+- Mention CTranslate2 and Marian as optimized MT inference engines
+- Highlight that length sorting reduces wasted computation on padding
+- Note that production systems typically achieve 100-1000 segments/second per GPU
 
 ---
 
 ## Question 34
 **What strategies work best for machine translation with regulatory compliance requirements?**
-**Answer:** _To be filled_
+**Answer:**
+
+Regulatory-compliant MT ensures translations meet legal standards through audit trails, quality assurance workflows, data protection, and certification processes required in regulated industries.
+
+**Core Concepts:**
+
+| Requirement | Regulation | MT Implementation |
+|---|---|---|
+| Data Protection | GDPR, HIPAA | PII masking, on-premises deployment |
+| Audit Trail | SOX, financial regulations | Log all translations with metadata |
+| Quality Certification | ISO 17100 | Human post-editing + certification |
+| Liability Documentation | Legal requirements | Document MT involvement in translation |
+| Data Retention | Industry-specific | Configurable retention policies |
+
+**Python Code Example:**
+
+```python
+# Pipeline: regulatory-compliant MT system
+import logging
+from datetime import datetime
+import json
+
+class RegulatoryCompliantMT:
+    def __init__(self, translator, config):
+        self.translator = translator
+        self.config = config
+        self.audit_logger = logging.getLogger('audit')
+        self.translations_log = []
+
+    def translate_compliant(self, text, src_lang, tgt_lang,
+                           user_id, project_id, purpose):
+        """Translate with full regulatory compliance."""
+        # Create audit record
+        record = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'user_id': user_id,
+            'project_id': project_id,
+            'purpose': purpose,
+            'src_lang': src_lang,
+            'tgt_lang': tgt_lang,
+            'input_hash': hash(text),  # Don't log actual content for privacy
+            'input_length': len(text),
+            'model_version': self.config.get('model_version', 'unknown')
+        }
+
+        # Translate
+        translation = self.translator(text, src_lang, tgt_lang)
+        record['output_length'] = len(translation)
+        record['status'] = 'completed'
+
+        # Log audit record
+        self.audit_logger.info(json.dumps(record))
+        self.translations_log.append(record)
+
+        return {
+            'translation': translation,
+            'audit_id': record['timestamp'],
+            'requires_certification': self.config.get('require_certification', False),
+            'disclaimer': 'Machine-translated. Human review recommended for official use.'
+        }
+
+    def export_audit_report(self, start_date=None, end_date=None):
+        """Export audit trail for compliance review."""
+        filtered = self.translations_log
+        if start_date:
+            filtered = [r for r in filtered if r['timestamp'] >= start_date]
+        if end_date:
+            filtered = [r for r in filtered if r['timestamp'] <= end_date]
+        return {
+            'total_translations': len(filtered),
+            'date_range': f"{start_date} to {end_date}",
+            'records': filtered
+        }
+
+# config = {'model_version': 'v3.1', 'require_certification': True}
+# cmt = RegulatoryCompliantMT(translator, config)
+```
+
+**Interview Tips:**
+- Discuss ISO 17100 as the standard for translation services (requires human post-editing)
+- Mention that GDPR requires data processing agreements for cloud MT services
+- Highlight that MT output should always include a disclaimer in regulated contexts
+- Note that financial and medical translations have stricter compliance requirements
 
 ---
 
 ## Question 35
 **How do you handle machine translation for texts requiring high accuracy and reliability?**
-**Answer:** _To be filled_
+**Answer:**
+
+High-accuracy MT combines multiple quality assurance layers: multi-model ensembling, quality estimation filtering, human-in-the-loop review, and domain-specific fine-tuning.
+
+**Core Concepts:**
+
+| Strategy | Accuracy Gain | Cost |
+|---|---|---|
+| Model Ensembling | 1-3 BLEU points | 2-5x inference cost |
+| QE-Based Filtering | Removes low-quality outputs | Moderate compute |
+| Human Post-Editing | Highest possible quality | High human cost |
+| Domain Fine-Tuning | 3-10 BLEU points for domain | Training cost |
+| Multi-Pass Translation | Iterative refinement | 2-3x inference cost |
+
+**Python Code Example:**
+
+```python
+# Pipeline: high-accuracy MT with multi-layer quality assurance
+class HighAccuracyMT:
+    def __init__(self, models, tokenizers, qe_model):
+        self.models = models  # List of MT models for ensemble
+        self.tokenizers = tokenizers
+        self.qe_model = qe_model
+
+    def ensemble_translate(self, text, src_lang, tgt_lang):
+        """Translate with multiple models and select best."""
+        candidates = []
+        for model, tokenizer in zip(self.models, self.tokenizers):
+            inputs = tokenizer(text, return_tensors="pt", truncation=True)
+            outputs = model.generate(**inputs, num_beams=5, max_length=256)
+            translation = tokenizer.decode(outputs[0], skip_special_tokens=True)
+            qe_score = self.qe_model.estimate(text, translation)
+            candidates.append((translation, qe_score))
+
+        # Select highest quality
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        return candidates[0][0], candidates[0][1]
+
+    def multi_pass_refine(self, text, src_lang, tgt_lang, passes=2):
+        """Iterative refinement through multiple translation passes."""
+        current = text
+        for i in range(passes):
+            translation, score = self.ensemble_translate(
+                current, src_lang, tgt_lang)
+            # Paraphrase and re-translate for refinement
+            if i < passes - 1:
+                current = f"Improve: {translation}"
+        return translation, score
+
+    def translate_high_accuracy(self, text, src_lang, tgt_lang,
+                                min_confidence=0.85):
+        """Full high-accuracy pipeline."""
+        translation, score = self.ensemble_translate(text, src_lang, tgt_lang)
+        result = {
+            'translation': translation,
+            'confidence': score,
+            'quality_tier': 'high' if score > min_confidence else 'needs_review'
+        }
+        if score < min_confidence:
+            result['recommendation'] = 'Human review recommended'
+        return result
+
+# ha_mt = HighAccuracyMT([model1, model2], [tok1, tok2], qe_model)
+# result = ha_mt.translate_high_accuracy(text, 'en', 'de')
+```
+
+**Interview Tips:**
+- Discuss model ensembling as the most reliable way to improve MT accuracy
+- Mention minimum Bayes risk (MBR) decoding as a reranking alternative
+- Highlight that human post-editing is still essential for highest-stakes translations
+- Note that domain fine-tuning often provides bigger gains than ensembling alone
 
 ---
 
