@@ -1095,3 +1095,50 @@ X_hashed = vectorizer.transform(text_data)
 *Answer to be added.*
 
 ---
+## Question 32
+
+**How does Scikit-Learn implement logistic regression differently from linear regression?**
+
+**Answer:**
+
+| Aspect | Linear Regression | Logistic Regression |
+|--------|-------------------|--------------------|
+| Task | Regression (continuous) | Classification (discrete) |
+| Output | $\hat{y} = Xw + b$ | $P(y=1) = \sigma(Xw + b)$ |
+| Loss function | MSE: $\frac{1}{n}\sum(y - \hat{y})^2$ | Log loss: $-\frac{1}{n}\sum[y\log(p) + (1-y)\log(1-p)]$ |
+| Activation | None (identity) | Sigmoid: $\sigma(z) = \frac{1}{1+e^{-z}}$ |
+| Solver | Closed-form (OLS) or SGD | Iterative (LBFGS, Newton, SAG) |
+| Regularization | Optional (Ridge, Lasso) | Always applied (`C` parameter) |
+
+```python
+from sklearn.linear_model import LinearRegression, LogisticRegression
+
+# Linear Regression
+lin_reg = LinearRegression()  # No regularization by default
+lin_reg.fit(X_train, y_continuous)
+y_pred = lin_reg.predict(X_test)  # Continuous values
+print(lin_reg.coef_)              # Feature weights
+print(lin_reg.intercept_)         # Bias term
+
+# Logistic Regression
+log_reg = LogisticRegression(
+    C=1.0,              # Inverse regularization (higher = less regularization)
+    penalty='l2',       # Regularization type
+    solver='lbfgs',     # Optimization algorithm
+    max_iter=100,
+    multi_class='auto'  # 'ovr' or 'multinomial'
+)
+log_reg.fit(X_train, y_class)
+y_pred = log_reg.predict(X_test)          # Class labels
+y_prob = log_reg.predict_proba(X_test)    # Probabilities
+print(log_reg.classes_)                    # [0, 1]
+
+# Key difference: LogisticRegression ALWAYS regularizes
+# C=1e10 ≈ no regularization
+# C=0.01 = strong regularization
+```
+
+> **Interview Tip:** Despite the name, logistic regression is a **classifier**. The key API difference is `predict_proba()` — linear regression doesn't have it. Logistic regression always uses regularization (`C` parameter).
+
+---
+

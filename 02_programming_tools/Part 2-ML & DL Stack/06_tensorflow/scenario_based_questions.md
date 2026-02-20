@@ -946,32 +946,276 @@ y = tf.constant([0, 1, 0])
 
 ## Question 11
 
-**How would you go about debugging a TensorFlow model that isn’t learning?**
-
-*Answer to be added.*
-
----
-
-## Question 12
-
-**Discuss common errors encountered in TensorFlow and how to resolve them**
-
-*Answer to be added.*
-
----
-
-## Question 13
-
-**How can the TensorBoard tool be used to debug TensorFlow programs ?**
-
-*Answer to be added.*
-
----
-
-## Question 14
-
 **How would you apply TensorFlow to predict stock market trends ?**
 
 *Answer to be added.*
 
 ---
+## Question 12
+
+**Explain what steps you would take to develop a chatbot using TensorFlow.**
+
+### Answer
+
+**Definition**: Building a chatbot with TensorFlow involves creating a **sequence-to-sequence (Seq2Seq)** or **Transformer-based** model that takes user input text and generates appropriate responses.
+
+### Development Steps
+
+| Step | Task | TensorFlow Tool |
+|------|------|----------------|
+| 1 | Collect conversation data | `tf.data.TextLineDataset` |
+| 2 | Preprocess text | `TextVectorization`, tokenizers |
+| 3 | Build model | Transformer / Seq2Seq with attention |
+| 4 | Train on dialogue pairs | `model.fit()` |
+| 5 | Implement inference | Greedy / beam search decoding |
+| 6 | Deploy | TF Serving, TFLite |
+
+### Python Code Example
+```python
+import tensorflow as tf
+import numpy as np
+
+# --- Step 1: Prepare dialogue data ---
+questions = [
+    "hi how are you", "what is your name",
+    "what can you do", "tell me a joke",
+    "goodbye", "thanks for the help"
+]
+answers = [
+    "i am doing well thank you", "i am a chatbot",
+    "i can answer your questions", "why did the chicken cross the road",
+    "goodbye have a nice day", "you are welcome"
+]
+
+# Add start/end tokens for decoder
+answers_in = ["<start> " + a for a in answers]
+answers_out = [a + " <end>" for a in answers]
+
+# --- Step 2: Tokenization ---
+VOCAB_SIZE = 1000
+MAX_LEN = 20
+
+encoder_vectorizer = tf.keras.layers.TextVectorization(
+    max_tokens=VOCAB_SIZE, output_sequence_length=MAX_LEN
+)
+decoder_vectorizer = tf.keras.layers.TextVectorization(
+    max_tokens=VOCAB_SIZE, output_sequence_length=MAX_LEN
+)
+
+encoder_vectorizer.adapt(questions)
+decoder_vectorizer.adapt(answers_in + answers_out)
+
+# --- Step 3: Build Transformer Chatbot ---
+def positional_encoding(length, depth):
+    positions = np.arange(length)[:, np.newaxis]
+    dims = np.arange(depth)[np.newaxis, :]
+    angles = positions / np.power(10000, (2 * (dims // 2)) / depth)
+    angles[:, 0::2] = np.sin(angles[:, 0::2])
+    angles[:, 1::2] = np.cos(angles[:, 1::2])
+    return tf.cast(angles[np.newaxis, :, :], dtype=tf.float32)
+
+EMBED_DIM = 128
+NUM_HEADS = 4
+FF_DIM = 256
+
+# Encoder
+encoder_input = tf.keras.Input(shape=(MAX_LEN,), name='encoder_input')
+enc_emb = tf.keras.layers.Embedding(VOCAB_SIZE, EMBED_DIM)(encoder_input)
+enc_emb = enc_emb + positional_encoding(MAX_LEN, EMBED_DIM)
+enc_attn = tf.keras.layers.MultiHeadAttention(
+    num_heads=NUM_HEADS, key_dim=EMBED_DIM // NUM_HEADS
+)(enc_emb, enc_emb)
+enc_norm = tf.keras.layers.LayerNormalization()(enc_emb + enc_attn)
+enc_ff = tf.keras.layers.Dense(FF_DIM, activation='relu')(enc_norm)
+enc_ff = tf.keras.layers.Dense(EMBED_DIM)(enc_ff)
+encoder_output = tf.keras.layers.LayerNormalization()(enc_norm + enc_ff)
+
+# Decoder
+decoder_input = tf.keras.Input(shape=(MAX_LEN,), name='decoder_input')
+dec_emb = tf.keras.layers.Embedding(VOCAB_SIZE, EMBED_DIM)(decoder_input)
+dec_emb = dec_emb + positional_encoding(MAX_LEN, EMBED_DIM)
+dec_self_attn = tf.keras.layers.MultiHeadAttention(
+    num_heads=NUM_HEADS, key_dim=EMBED_DIM // NUM_HEADS
+)(dec_emb, dec_emb)
+dec_norm1 = tf.keras.layers.LayerNormalization()(dec_emb + dec_self_attn)
+dec_cross_attn = tf.keras.layers.MultiHeadAttention(
+    num_heads=NUM_HEADS, key_dim=EMBED_DIM // NUM_HEADS
+)(dec_norm1, encoder_output)
+dec_norm2 = tf.keras.layers.LayerNormalization()(dec_norm1 + dec_cross_attn)
+dec_ff = tf.keras.layers.Dense(FF_DIM, activation='relu')(dec_norm2)
+dec_ff = tf.keras.layers.Dense(EMBED_DIM)(dec_ff)
+dec_output = tf.keras.layers.LayerNormalization()(dec_norm2 + dec_ff)
+output = tf.keras.layers.Dense(VOCAB_SIZE, activation='softmax')(dec_output)
+
+chatbot_model = tf.keras.Model(
+    inputs=[encoder_input, decoder_input], outputs=output
+)
+chatbot_model.compile(optimizer='adam',
+                      loss='sparse_categorical_crossentropy',
+                      metrics=['accuracy'])
+chatbot_model.summary()
+
+# --- Step 4: Inference (Greedy Decoding) ---
+def generate_response(input_text, max_len=MAX_LEN):
+    enc_input = encoder_vectorizer([input_text])
+    dec_input = decoder_vectorizer(["<start>"])
+    
+    for i in range(max_len):
+        predictions = chatbot_model.predict([enc_input, dec_input], verbose=0)
+        next_token = tf.argmax(predictions[0, i, :]).numpy()
+        vocab = decoder_vectorizer.get_vocabulary()
+        if vocab[next_token] == "<end>":
+            break
+        # Update decoder input with predicted token
+    return "Generated response"
+```
+
+### Interview Tips
+- Modern chatbots use **pre-trained Transformers** (BERT, GPT) fine-tuned on dialogue data
+- For production, consider **TF Hub** models or **HuggingFace Transformers** with TF backend
+- Key challenges: context tracking, handling out-of-vocabulary words, response diversity
+- Retrieval-based chatbots (similarity search) are simpler and often more reliable than generative ones
+
+---
+
+## Question 13
+
+**Describe how you would use TensorFlow in an autonomous vehicle perception system.**
+
+### Answer
+
+**Definition**: An autonomous vehicle perception system uses deep learning to **interpret sensor data** (cameras, LiDAR, radar) to detect objects, track motion, and understand the driving environment.
+
+### Perception Pipeline Components
+
+| Component | Task | TensorFlow Model |
+|-----------|------|-----------------|
+| **Object Detection** | Detect cars, pedestrians, signs | EfficientDet, SSD, Faster R-CNN |
+| **Semantic Segmentation** | Pixel-level scene understanding | DeepLab, U-Net |
+| **Depth Estimation** | Estimate distance from camera | Monocular depth networks |
+| **Lane Detection** | Identify lane boundaries | Custom CNN/Transformer |
+| **3D Object Detection** | Detect objects in LiDAR point clouds | PointPillars, VoxelNet |
+| **Sensor Fusion** | Combine camera + LiDAR + radar | Multi-input Functional API |
+| **Tracking** | Track objects across frames | SORT, DeepSORT |
+
+### Python Code Example
+```python
+import tensorflow as tf
+
+# --- 1. Object Detection with TF Hub ---
+# import tensorflow_hub as hub
+# detector = hub.load(
+#     "https://tfhub.dev/tensorflow/efficientdet/d4/1")
+# detections = detector(image_tensor)
+# boxes, scores, classes = (detections['detection_boxes'],
+#                           detections['detection_scores'],
+#                           detections['detection_classes'])
+
+# --- 2. Custom Multi-Task Perception Model ---
+# Shared backbone (feature extractor)
+backbone = tf.keras.applications.EfficientNetB3(
+    include_top=False, weights='imagenet',
+    input_shape=(512, 512, 3)
+)
+backbone.trainable = False  # Freeze for transfer learning
+
+input_image = tf.keras.Input(shape=(512, 512, 3))
+features = backbone(input_image)
+
+# Task 1: Object Detection Head
+det_x = tf.keras.layers.Conv2D(256, 3, padding='same', activation='relu')(features)
+det_x = tf.keras.layers.Conv2D(256, 3, padding='same', activation='relu')(det_x)
+detection_output = tf.keras.layers.Conv2D(
+    5 * 9, 1, name='detection'  # 5 = (x, y, w, h, conf) * 9 anchors
+)(det_x)
+
+# Task 2: Semantic Segmentation Head
+seg_x = tf.keras.layers.Conv2DTranspose(128, 3, strides=2, padding='same',
+                                         activation='relu')(features)
+seg_x = tf.keras.layers.Conv2DTranspose(64, 3, strides=2, padding='same',
+                                         activation='relu')(seg_x)
+segmentation_output = tf.keras.layers.Conv2D(
+    20, 1, activation='softmax', name='segmentation'  # 20 classes
+)(seg_x)
+
+# Task 3: Depth Estimation Head
+depth_x = tf.keras.layers.Conv2DTranspose(128, 3, strides=2, padding='same',
+                                           activation='relu')(features)
+depth_output = tf.keras.layers.Conv2D(
+    1, 1, activation='sigmoid', name='depth'
+)(depth_x)
+
+# Multi-task model
+perception_model = tf.keras.Model(
+    inputs=input_image,
+    outputs={
+        'detection': detection_output,
+        'segmentation': segmentation_output,
+        'depth': depth_output
+    }
+)
+
+# Compile with task-specific losses
+perception_model.compile(
+    optimizer=tf.keras.optimizers.Adam(1e-4),
+    loss={
+        'detection': tf.keras.losses.Huber(),
+        'segmentation': 'sparse_categorical_crossentropy',
+        'depth': 'mse'
+    },
+    loss_weights={'detection': 1.0, 'segmentation': 0.5, 'depth': 0.3}
+)
+
+# --- 3. Sensor Fusion (Camera + LiDAR) ---
+camera_input = tf.keras.Input(shape=(512, 512, 3), name='camera')
+lidar_input = tf.keras.Input(shape=(100000, 4), name='lidar')  # x, y, z, intensity
+
+# Camera branch
+cam_features = tf.keras.applications.MobileNetV2(
+    include_top=False, input_shape=(512, 512, 3)
+)(camera_input)
+cam_flat = tf.keras.layers.GlobalAveragePooling2D()(cam_features)
+
+# LiDAR branch (PointNet-style)
+lidar_features = tf.keras.layers.Conv1D(64, 1, activation='relu')(lidar_input)
+lidar_features = tf.keras.layers.Conv1D(128, 1, activation='relu')(lidar_features)
+lidar_flat = tf.keras.layers.GlobalMaxPooling1D()(lidar_features)
+
+# Fusion
+fused = tf.keras.layers.concatenate([cam_flat, lidar_flat])
+fused = tf.keras.layers.Dense(256, activation='relu')(fused)
+fusion_output = tf.keras.layers.Dense(100 * 7)(fused)  # 100 objects x 7 params
+
+fusion_model = tf.keras.Model(
+    inputs=[camera_input, lidar_input],
+    outputs=fusion_output
+)
+
+# --- 4. TFLite for Edge Deployment ---
+# Convert for in-car inference (e.g., NVIDIA Jetson)
+converter = tf.lite.TFLiteConverter.from_keras_model(perception_model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+# tflite_model = converter.convert()
+```
+
+### Key Considerations
+
+| Aspect | Requirement |
+|--------|-------------|
+| **Latency** | < 100ms inference for real-time (10+ FPS) |
+| **Reliability** | Redundant models, fail-safe mechanisms |
+| **Edge Deployment** | TFLite on NVIDIA Jetson, Google Coral |
+| **Data** | Millions of annotated driving scenes |
+| **Safety** | Extensive testing, adversarial robustness |
+
+### Interview Tips
+- **Multi-task learning** (shared backbone) is key for efficiency — one forward pass for detection + segmentation + depth
+- **Sensor fusion** combining camera + LiDAR is standard in L4/L5 autonomy
+- Models must be **quantized and optimized** for real-time edge inference
+- Safety-critical systems require **formal verification**, extensive testing, and redundancy
+- TensorFlow's ecosystem (TF Lite, TF Serving, TF Hub) covers the full AV pipeline from training to deployment
+
+---
+
+---
+

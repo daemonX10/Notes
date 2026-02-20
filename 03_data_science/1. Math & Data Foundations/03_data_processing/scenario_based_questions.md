@@ -428,6 +428,75 @@ centers_original_scale = scaler.inverse_transform(kmeans.cluster_centers_)
 
 ## Question 9
 
+**Describe the steps you would take to preprocess a dataset for a recommender system.**
+
+**Answer:**
+
+Preprocessing for recommender systems involves handling sparse user-item interaction data, encoding user/item features, normalizing ratings, and creating appropriate train/test splits that respect temporal ordering.
+
+**Step-by-Step Approach:**
+
+**1. Data Collection & Understanding**
+- User-item interaction matrix (ratings, clicks, purchases)
+- User features (demographics, preferences)
+- Item features (categories, descriptions, metadata)
+- Check sparsity: typically 95-99% of user-item pairs are missing
+
+**2. Handle Interaction Data**
+
+| Task | Method |
+|------|--------|
+| **Explicit feedback** (ratings) | Normalize ratings per user (mean-center) |
+| **Implicit feedback** (clicks/purchases) | Convert to binary or confidence scores |
+| **Missing values** | NOT random — absence ≠ dislike |
+| **Duplicates** | Aggregate (average rating, total clicks) |
+
+**3. Feature Engineering**
+
+```python
+# User features
+user_features = {
+    'avg_rating': user_ratings.mean(),
+    'num_ratings': user_ratings.count(),
+    'rating_std': user_ratings.std(),
+    'active_days': (last_activity - first_activity).days
+}
+
+# Item features
+item_features = {
+    'avg_rating': item_ratings.mean(),
+    'num_ratings': item_ratings.count(),
+    'popularity': item_interactions.count(),
+    'category_encoded': one_hot(item_category)
+}
+```
+
+**4. Train/Test Split**
+- **Temporal split**: Train on past, test on future (most realistic)
+- **Leave-one-out**: Hold out last interaction per user
+- **Never random split**: Would cause data leakage
+
+**5. Normalize Ratings**
+```python
+# Mean-center per user (removes user bias)
+user_means = ratings.groupby('user_id')['rating'].transform('mean')
+ratings['normalized'] = ratings['rating'] - user_means
+```
+
+**6. Handle Cold Start**
+- New users: Use demographic-based recommendations initially
+- New items: Use content-based features until interactions accumulate
+
+**Key Considerations:**
+- Respect temporal ordering in all preprocessing
+- Handle popularity bias (popular items dominate)
+- Scale features for distance-based methods
+- Consider implicit vs explicit feedback differently
+
+---
+
+## Question 10
+
 **How would you sanitize and validate user input data in a production environment?**
 
 **Answer:**
@@ -512,7 +581,7 @@ def process_input(raw_data):
 
 ---
 
-## Question 10
+## Question 11
 
 **Discuss the process of cleaning and preprocessing real-time streaming data.**
 
@@ -587,7 +656,7 @@ class StreamingFeatures:
 
 ---
 
-## Question 11
+## Question 12
 
 **Discuss the concept of embeddings in collaborative filtering.**
 
@@ -641,7 +710,7 @@ class CollaborativeFiltering(nn.Module):
 
 ---
 
-## Question 12
+## Question 13
 
 **Discuss research trends aimed at handling very large and high-dimensional datasets.**
 
@@ -680,7 +749,7 @@ class CollaborativeFiltering(nn.Module):
 
 ---
 
-## Question 13
+## Question 14
 
 **Discuss the importance of transparency in data preprocessing.**
 

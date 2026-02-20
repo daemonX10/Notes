@@ -1942,29 +1942,13 @@ Spark is typically used for **data preparation and batch inference**, not traini
 
 ## Question 47
 
-**How can you minimize data shuffling in Spark?**
-
-*Answer to be added.*
-
----
-
-## Question 48
-
-**Discuss the importance and methods of caching/persistence in Spark**
-
-*Answer to be added.*
-
----
-
-## Question 49
-
 **Discuss the advancements in Spark 3.x and their impact on big data processing**
 
 *Answer to be added.*
 
 ---
 
-## Question 50
+## Question 48
 
 **How do you implement custom aggregations in Spark?**
 

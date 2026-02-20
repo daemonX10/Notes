@@ -244,3 +244,20 @@ for item in spark.sparkContext.getConf().getAll():
 - Executor cores: 4-5 per executor
 - Shuffle partitions: 100-200 per core
 
+---
+
+## Question 7
+
+**How can you minimize data shuffling in Spark?**
+
+*Answer to be added.*
+
+---
+
+## Question 8
+
+**Discuss the importance and methods of caching/persistence in Spark**
+
+*Answer to be added.*
+
+---

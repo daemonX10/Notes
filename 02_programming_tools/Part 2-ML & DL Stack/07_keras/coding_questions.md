@@ -673,314 +673,6 @@ def train_gan(epochs, batch_size=128):
 
 ## Question 11
 
-**What is a custom layer in Keras and how would you implement one?**
-
-**Answer:**
-
-A custom layer extends `tf.keras.layers.Layer` when built-in layers don't meet your needs.
-
-```python
-import tensorflow as tf
-from tensorflow.keras import layers
-
-# === Basic Custom Layer ===
-class LinearLayer(layers.Layer):
-    def __init__(self, units, **kwargs):
-        super().__init__(**kwargs)
-        self.units = units
-    
-    def build(self, input_shape):
-        # Create weights (called once on first input)
-        self.w = self.add_weight(
-            shape=(input_shape[-1], self.units),
-            initializer='glorot_uniform',
-            trainable=True,
-            name='kernel'
-        )
-        self.b = self.add_weight(
-            shape=(self.units,),
-            initializer='zeros',
-            trainable=True,
-            name='bias'
-        )
-    
-    def call(self, inputs):
-        return tf.matmul(inputs, self.w) + self.b
-    
-    def get_config(self):
-        config = super().get_config()
-        config.update({'units': self.units})
-        return config
-
-# === Advanced: Layer with Training Behavior ===
-class NoisyDense(layers.Layer):
-    def __init__(self, units, noise_std=0.1, **kwargs):
-        super().__init__(**kwargs)
-        self.units = units
-        self.noise_std = noise_std
-        self.dense = layers.Dense(units)
-    
-    def call(self, inputs, training=False):
-        output = self.dense(inputs)
-        if training:
-            noise = tf.random.normal(tf.shape(output), stddev=self.noise_std)
-            output += noise
-        return output
-
-# === Usage ===
-model = tf.keras.Sequential([
-    LinearLayer(64, name='custom_linear'),
-    layers.ReLU(),
-    NoisyDense(32),
-    layers.Dense(10, activation='softmax')
-])
-```
-
-| Method | Purpose | Required? |
-|--------|---------|----------|
-| `__init__` | Store configuration | Yes |
-| `build(input_shape)` | Create weights | Yes (for learnable params) |
-| `call(inputs)` | Forward pass logic | Yes |
-| `get_config()` | Serialization | For model saving |
-
-> **Interview Tip:** Use `build()` instead of `__init__` for weights so the layer infers input shape lazily. Always implement `get_config()` if you need to save/load the model.
-
----
-
-## Question 12
-
-**What is early stopping in Keras and how do you implement it?**
-
-**Answer:**
-
-Early stopping monitors a metric and stops training when it stops improving, preventing overfitting.
-
-```python
-import tensorflow as tf
-from tensorflow.keras import callbacks
-
-# === Basic Early Stopping ===
-early_stop = callbacks.EarlyStopping(
-    monitor='val_loss',           # Metric to watch
-    patience=10,                  # Epochs to wait after no improvement
-    restore_best_weights=True,    # Revert to best weights
-    min_delta=0.001,              # Minimum change to qualify as improvement
-    mode='min',                   # 'min' for loss, 'max' for accuracy
-    verbose=1
-)
-
-# === Combined with ModelCheckpoint ===
-checkpoint = callbacks.ModelCheckpoint(
-    'best_model.h5',
-    monitor='val_loss',
-    save_best_only=True
-)
-
-reduce_lr = callbacks.ReduceLROnPlateau(
-    monitor='val_loss',
-    factor=0.5,
-    patience=5
-)
-
-history = model.fit(
-    X_train, y_train,
-    epochs=500,                   # Set high; early stopping handles it
-    validation_split=0.2,
-    callbacks=[early_stop, checkpoint, reduce_lr]
-)
-
-print(f"Stopped at epoch: {len(history.history['loss'])}")
-print(f"Best val_loss: {min(history.history['val_loss']):.4f}")
-
-# === Custom Early Stopping ===
-class CustomEarlyStopping(callbacks.Callback):
-    def __init__(self, patience=5, min_accuracy=0.95):
-        super().__init__()
-        self.patience = patience
-        self.min_accuracy = min_accuracy
-        self.wait = 0
-        self.best_loss = float('inf')
-    
-    def on_epoch_end(self, epoch, logs=None):
-        val_loss = logs.get('val_loss')
-        val_acc = logs.get('val_accuracy')
-        
-        if val_acc and val_acc >= self.min_accuracy:
-            print(f"\nTarget accuracy reached: {val_acc:.4f}")
-            self.model.stop_training = True
-        elif val_loss < self.best_loss:
-            self.best_loss = val_loss
-            self.wait = 0
-        else:
-            self.wait += 1
-            if self.wait >= self.patience:
-                self.model.stop_training = True
-```
-
-| Parameter | Default | Recommendation |
-|-----------|---------|----------------|
-| `patience` | 0 | 5-20 (higher for noisy metrics) |
-| `min_delta` | 0 | 0.001 (ignore tiny improvements) |
-| `restore_best_weights` | False | **Always True** |
-| `monitor` | `val_loss` | Use validation metric |
-
-> **Interview Tip:** Always set `restore_best_weights=True`. Without it, the model keeps the weights from the *last* epoch (which may be worse than the best). Set `epochs` high (e.g., 500) and let EarlyStopping decide when to stop.
-
----
-
-## Question 13
-
-**How do you implement a multi-output model in Keras?**
-
-**Answer:**
-
-Multi-output models predict multiple targets simultaneously using the Functional API.
-
-```python
-import tensorflow as tf
-from tensorflow.keras import layers, models
-
-# === Example: Predict Age (regression) + Gender (classification) from face ===
-inputs = layers.Input(shape=(128, 128, 3), name='image_input')
-
-# Shared backbone
-x = layers.Conv2D(32, 3, activation='relu')(inputs)
-x = layers.MaxPooling2D()(x)
-x = layers.Conv2D(64, 3, activation='relu')(x)
-x = layers.MaxPooling2D()(x)
-x = layers.Flatten()(x)
-x = layers.Dense(128, activation='relu')(x)
-
-# Branch 1: Age prediction (regression)
-age_output = layers.Dense(64, activation='relu')(x)
-age_output = layers.Dense(1, activation='linear', name='age_output')(age_output)
-
-# Branch 2: Gender prediction (binary classification)
-gender_output = layers.Dense(64, activation='relu')(x)
-gender_output = layers.Dense(1, activation='sigmoid', name='gender_output')(gender_output)
-
-# Branch 3: Ethnicity (multi-class)
-ethnicity_output = layers.Dense(64, activation='relu')(x)
-ethnicity_output = layers.Dense(5, activation='softmax', name='ethnicity_output')(ethnicity_output)
-
-# Build model
-model = models.Model(
-    inputs=inputs,
-    outputs=[age_output, gender_output, ethnicity_output]
-)
-
-# Compile with per-output loss and weights
-model.compile(
-    optimizer='adam',
-    loss={
-        'age_output': 'mse',
-        'gender_output': 'binary_crossentropy',
-        'ethnicity_output': 'categorical_crossentropy'
-    },
-    loss_weights={
-        'age_output': 0.5,
-        'gender_output': 1.0,
-        'ethnicity_output': 1.0
-    },
-    metrics={
-        'age_output': 'mae',
-        'gender_output': 'accuracy',
-        'ethnicity_output': 'accuracy'
-    }
-)
-
-# Train
-model.fit(
-    X_train,
-    {'age_output': y_age, 'gender_output': y_gender, 'ethnicity_output': y_ethnicity},
-    epochs=50, batch_size=32
-)
-
-model.summary()
-```
-
-| Component | Purpose |
-|-----------|--------|
-| Shared backbone | Common feature extraction |
-| Output branches | Task-specific heads |
-| `loss_weights` | Balance losses between tasks |
-| Named outputs | Map losses/metrics to outputs |
-
-> **Interview Tip:** Multi-task learning often improves generalization because the shared backbone learns features useful for all tasks. Name your output layers for cleaner loss/metric configuration.
-
----
-
-## Question 14
-
-**Discuss the implementation of stateful LSTM networks in Keras.**
-
-**Answer:**
-
-Stateful LSTMs maintain hidden state across batches, unlike default (stateless) LSTMs that reset state after each batch.
-
-```python
-import tensorflow as tf
-import numpy as np
-from tensorflow.keras import layers, models
-
-# === Stateful LSTM ===
-batch_size = 32
-timesteps = 10
-features = 5
-
-model = models.Sequential([
-    layers.LSTM(64, stateful=True, return_sequences=True,
-                batch_input_shape=(batch_size, timesteps, features)),  # Must specify batch_size
-    layers.LSTM(32, stateful=True),
-    layers.Dense(1)
-])
-model.compile(optimizer='adam', loss='mse')
-
-# === Training: Manually Reset States ===
-for epoch in range(50):
-    model.reset_states()  # Reset at start of each sequence/epoch
-    for batch_x, batch_y in data_generator:  # Must yield exact batch_size
-        model.train_on_batch(batch_x, batch_y)
-
-# === Prediction ===
-model.reset_states()
-for chunk in test_chunks:
-    pred = model.predict(chunk, batch_size=batch_size)
-
-# === Stateful vs Stateless Comparison ===
-# Stateless (default): states reset after every batch
-stateless = layers.LSTM(64, stateful=False)  # Default
-
-# Stateful: states carry over between batches
-stateful = layers.LSTM(64, stateful=True,
-                       batch_input_shape=(batch_size, timesteps, features))
-
-# === When to Use Stateful ===
-# 1. Very long sequences split across batches
-# 2. Real-time streaming predictions
-# 3. When temporal continuity matters across batches
-
-# === Key Requirements ===
-# - batch_input_shape instead of input_shape
-# - Manual model.reset_states()
-# - Data must be ordered (no shuffling between batches!)
-# - Each batch must have exactly batch_size samples
-```
-
-| Aspect | Stateless (Default) | Stateful |
-|--------|-------------------|----------|
-| State reset | After each batch | Manual `reset_states()` |
-| Input shape | `input_shape=(T, F)` | `batch_input_shape=(B, T, F)` |
-| Shuffling | Allowed | **Not allowed** between batches |
-| Batch size | Flexible | **Fixed** |
-| Use case | Standard sequence tasks | Very long sequences, streaming |
-
-> **Interview Tip:** Stateful LSTMs are rarely needed. Use them only for sequences too long to fit in one batch or real-time streaming. Most tasks work fine with stateless LSTMs and longer sequence lengths.
-
----
-
-## Question 15
-
 **Create a simple Keras model using the Sequential API for binary classification.**
 
 **Answer:**
@@ -1051,7 +743,7 @@ plt.show()
 
 ---
 
-## Question 16
+## Question 12
 
 **Write a script to load and preprocess image data for a CNN in Keras.**
 
@@ -1133,7 +825,7 @@ for images, labels in train_ds.take(1):
 
 ---
 
-## Question 17
+## Question 13
 
 **Code a Multi-Layer Perceptron (MLP) in Keras for a regression task.**
 
@@ -1210,7 +902,7 @@ for pred, actual in zip(predictions.flatten(), y_test[:5]):
 
 ---
 
-## Question 18
+## Question 14
 
 **Develop a custom callback in Keras that logs the predictions of a model at the end of each epoch.**
 
@@ -1294,7 +986,7 @@ class DistributionLogger(callbacks.Callback):
 
 ---
 
-## Question 19
+## Question 15
 
 **Implement a Keras data generator to handle large datasets that cannot fit into memory.**
 
@@ -1387,7 +1079,7 @@ ds = tf.data.TFRecordDataset('data.tfrecord').map(parse_tfrecord).batch(32)
 
 ---
 
-## Question 20
+## Question 16
 
 **Write a Python function using Keras to calculate and display a confusion matrix for a classification model.**
 
@@ -1461,7 +1153,7 @@ cm = plot_confusion_matrix(model, X_test, y_test, class_names)
 
 ---
 
-## Question 21
+## Question 17
 
 **Create a script that fine-tunes a pre-trained convolutional neural network on a new dataset in Keras.**
 
@@ -1547,190 +1239,7 @@ train_ds = train_ds.map(lambda x, y: (preprocess(x), y))
 
 ---
 
-## Question 22
-
-**Explain how you can use Keras to implement a neural style transfer model.**
-
-**Answer:**
-
-```python
-import tensorflow as tf
-import numpy as np
-
-# === Neural Style Transfer ===
-# Combines content of one image with style of another
-
-# 1. Load pre-trained VGG19
-vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
-vgg.trainable = False
-
-# 2. Define content and style layers
-content_layers = ['block5_conv2']
-style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
-                'block4_conv1', 'block5_conv1']
-
-def get_model(content_layers, style_layers):
-    outputs = [vgg.get_layer(name).output for name in content_layers + style_layers]
-    return tf.keras.Model(inputs=vgg.input, outputs=outputs)
-
-extractor = get_model(content_layers, style_layers)
-
-# 3. Gram matrix for style representation
-def gram_matrix(tensor):
-    result = tf.linalg.einsum('bijc,bijd->bcd', tensor, tensor)
-    shape = tf.shape(tensor)
-    num_locations = tf.cast(shape[1] * shape[2], tf.float32)
-    return result / num_locations
-
-# 4. Compute losses
-def compute_loss(generated, content_target, style_targets,
-                 content_weight=1e4, style_weight=1e-2):
-    outputs = extractor(generated)
-    n_style = len(style_layers)
-    
-    content_output = outputs[:len(content_layers)]
-    style_outputs = outputs[len(content_layers):]
-    
-    # Content loss
-    content_loss = tf.reduce_mean(
-        [(tf.reduce_mean((c - t) ** 2))
-         for c, t in zip(content_output, content_target)]
-    )
-    
-    # Style loss
-    style_loss = tf.reduce_mean(
-        [(tf.reduce_mean((gram_matrix(s) - gram_matrix(t)) ** 2))
-         for s, t in zip(style_outputs, style_targets)]
-    )
-    
-    return content_weight * content_loss + style_weight * style_loss
-
-# 5. Optimization loop
-def style_transfer(content_image, style_image, epochs=1000, lr=0.02):
-    # Initialize generated image from content
-    generated = tf.Variable(content_image, dtype=tf.float32)
-    
-    content_target = extractor(content_image)[:len(content_layers)]
-    style_targets = extractor(style_image)[len(content_layers):]
-    
-    optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-    
-    for epoch in range(epochs):
-        with tf.GradientTape() as tape:
-            loss = compute_loss(generated, content_target, style_targets)
-        
-        grads = tape.gradient(loss, generated)
-        optimizer.apply_gradients([(grads, generated)])
-        generated.assign(tf.clip_by_value(generated, 0.0, 1.0))
-        
-        if epoch % 100 == 0:
-            print(f"Epoch {epoch}, Loss: {loss:.2f}")
-    
-    return generated
-```
-
-| Component | Purpose |
-|-----------|--------|
-| Content layers | Capture high-level structural features |
-| Style layers | Capture textures, patterns, colors |
-| Gram matrix | Statistical representation of style |
-| Content loss | Preserve structure of content image |
-| Style loss | Match texture statistics of style image |
-
-> **Interview Tip:** Neural style transfer optimizes the **pixel values** of the generated image (not model weights). The Gram matrix captures correlations between feature maps, representing artistic style independent of spatial arrangement.
-
----
-
-## Question 23
-
-**Discuss a strategy for implementing a real-time object detection system using Keras.**
-
-**Answer:**
-
-```python
-import tensorflow as tf
-import numpy as np
-import cv2
-
-# === Strategy 1: Using Pre-trained YOLOv5/YOLOv8 ===
-# pip install ultralytics
-from ultralytics import YOLO
-
-model = YOLO('yolov8n.pt')  # Nano model for speed
-
-# Real-time webcam detection
-cap = cv2.VideoCapture(0)
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
-    
-    results = model(frame)
-    annotated = results[0].plot()  # Draw bounding boxes
-    cv2.imshow('Detection', annotated)
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cap.release()
-
-# === Strategy 2: TFLite for Edge/Mobile ===
-# Convert model
-converter = tf.lite.TFLiteConverter.from_saved_model('ssd_mobilenet/')
-converter.optimizations = [tf.lite.Optimize.DEFAULT]
-tflite_model = converter.convert()
-
-# Run inference
-interpreter = tf.lite.Interpreter(model_content=tflite_model)
-interpreter.allocate_tensors()
-
-def detect_tflite(interpreter, image):
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-    
-    input_data = cv2.resize(image, (300, 300))
-    input_data = np.expand_dims(input_data, axis=0).astype(np.float32) / 255.0
-    
-    interpreter.set_tensor(input_details[0]['index'], input_data)
-    interpreter.invoke()
-    
-    boxes = interpreter.get_tensor(output_details[0]['index'])
-    classes = interpreter.get_tensor(output_details[1]['index'])
-    scores = interpreter.get_tensor(output_details[2]['index'])
-    
-    return boxes, classes, scores
-
-# === Strategy 3: SSD MobileNet in Keras ===
-# Fine-tune for custom objects
-base = tf.keras.applications.MobileNetV2(
-    input_shape=(224, 224, 3), include_top=False, weights='imagenet'
-)
-base.trainable = False
-
-model = tf.keras.Sequential([
-    base,
-    tf.keras.layers.GlobalAveragePooling2D(),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(4 + num_classes)  # bbox (4) + class scores
-])
-```
-
-| Model | FPS | Accuracy (mAP) | Best For |
-|-------|-----|----------------|----------|
-| YOLOv8n | ~60+ | 37.3 | Real-time, general |
-| SSD MobileNet | ~30 | 22.0 | Mobile/edge |
-| EfficientDet | ~15 | 51.0 | High accuracy |
-| Faster R-CNN | ~5 | 42.0 | Accuracy over speed |
-
-| Optimization | Effect |
-|-------------|--------|
-| Quantization (INT8) | 2-4x faster, 4x smaller |
-| TensorRT | 2-5x faster on NVIDIA GPUs |
-| Model pruning | Remove unused weights |
-| Input resolution | Lower = faster (trade accuracy) |
-
-> **Interview Tip:** For real-time detection, YOLO family models dominate. For edge deployment, convert to TFLite with quantization. The key trade-off is always speed vs. accuracy—choose based on latency requirements.
-
-## Question 24
+## Question 18
 
 **Implement custom training logic in Keras by overriding the training step function**
 
@@ -1738,7 +1247,7 @@ model = tf.keras.Sequential([
 
 ---
 
-## Question 25
+## Question 19
 
 **Use the Keras functional API to create a model with shared layers and multiple inputs/outputs**
 
@@ -1746,7 +1255,7 @@ model = tf.keras.Sequential([
 
 ---
 
-## Question 26
+## Question 20
 
 **Code an LSTM network in Keras to perform sentiment analysis on text data**
 

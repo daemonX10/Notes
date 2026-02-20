@@ -1713,140 +1713,13 @@ class DQNAgent:
 
 ## Question 24
 
-**Describe how you would use Keras to develop a recommendation system.**
-
-### Answer
-
-**Definition**: Recommendation systems predict user preferences for items. Keras can implement various recommendation approaches including collaborative filtering (learning user-item interactions), content-based filtering, and hybrid models using neural networks.
-
-### Recommendation Approaches
-
-| Approach | Method | When to Use |
-|----------|--------|-------------|
-| **Collaborative Filtering** | User-item interaction patterns | Sufficient user history |
-| **Content-Based** | Item/user feature similarity | Cold-start items |
-| **Neural Collaborative Filtering** | Deep learning embeddings | Large-scale, complex patterns |
-| **Hybrid** | Combine multiple approaches | Production systems |
-
-### Python Code Example — Neural Collaborative Filtering
-```python
-from tensorflow import keras
-from tensorflow.keras import layers
-import numpy as np
-
-# Assume: user_ids, item_ids, ratings as training data
-num_users = 10000
-num_items = 5000
-embedding_dim = 64
-
-# METHOD 1: Matrix Factorization with Embeddings
-user_input = keras.Input(shape=(1,), name='user_id')
-item_input = keras.Input(shape=(1,), name='item_id')
-
-# User embedding
-user_embedding = layers.Embedding(num_users, embedding_dim,
-                                   name='user_embedding')(user_input)
-user_vec = layers.Flatten()(user_embedding)
-
-# Item embedding
-item_embedding = layers.Embedding(num_items, embedding_dim,
-                                   name='item_embedding')(item_input)
-item_vec = layers.Flatten()(item_embedding)
-
-# Dot product → predicted rating
-dot_product = layers.Dot(axes=1)([user_vec, item_vec])
-output = layers.Dense(1, activation='sigmoid')(dot_product)  # Scale to [0, 1]
-
-mf_model = keras.Model([user_input, item_input], output)
-mf_model.compile(optimizer='adam', loss='mse', metrics=['mae'])
-mf_model.fit([user_ids, item_ids], ratings, epochs=20, batch_size=256,
-             validation_split=0.2)
-
-# METHOD 2: Deep Neural Collaborative Filtering (NCF)
-user_input = keras.Input(shape=(1,), name='user_id')
-item_input = keras.Input(shape=(1,), name='item_id')
-
-# GMF path (Generalized Matrix Factorization)
-user_emb_gmf = layers.Embedding(num_users, 32)(user_input)
-item_emb_gmf = layers.Embedding(num_items, 32)(item_input)
-gmf = layers.Multiply()([layers.Flatten()(user_emb_gmf),
-                          layers.Flatten()(item_emb_gmf)])
-
-# MLP path (Multi-Layer Perceptron)
-user_emb_mlp = layers.Embedding(num_users, 32)(user_input)
-item_emb_mlp = layers.Embedding(num_items, 32)(item_input)
-mlp = layers.Concatenate()([layers.Flatten()(user_emb_mlp),
-                             layers.Flatten()(item_emb_mlp)])
-mlp = layers.Dense(128, activation='relu')(mlp)
-mlp = layers.Dropout(0.3)(mlp)
-mlp = layers.Dense(64, activation='relu')(mlp)
-mlp = layers.Dropout(0.3)(mlp)
-
-# Combine GMF + MLP
-combined = layers.Concatenate()([gmf, mlp])
-output = layers.Dense(32, activation='relu')(combined)
-output = layers.Dense(1, activation='sigmoid')(output)
-
-ncf_model = keras.Model([user_input, item_input], output)
-ncf_model.compile(optimizer='adam', loss='binary_crossentropy',
-                  metrics=['accuracy'])
-
-# METHOD 3: Content-Based with Side Features
-user_input = keras.Input(shape=(1,), name='user_id')
-item_input = keras.Input(shape=(1,), name='item_id')
-user_features = keras.Input(shape=(20,), name='user_features')  # Age, etc.
-item_features = keras.Input(shape=(50,), name='item_features')  # Genre, etc.
-
-user_emb = layers.Flatten()(layers.Embedding(num_users, 32)(user_input))
-item_emb = layers.Flatten()(layers.Embedding(num_items, 32)(item_input))
-
-# Combine embeddings with side features
-combined = layers.Concatenate()([user_emb, item_emb,
-                                  user_features, item_features])
-x = layers.Dense(256, activation='relu')(combined)
-x = layers.Dropout(0.3)(x)
-x = layers.Dense(128, activation='relu')(x)
-x = layers.Dense(64, activation='relu')(x)
-output = layers.Dense(1, activation='sigmoid')(x)
-
-hybrid_model = keras.Model(
-    [user_input, item_input, user_features, item_features], output
-)
-hybrid_model.compile(optimizer='adam', loss='mse', metrics=['mae'])
-```
-
-### Making Recommendations
-```python
-# Predict ratings for all items for a user
-user_id = 42
-all_items = np.arange(num_items)
-user_array = np.full_like(all_items, user_id)
-
-predicted_ratings = mf_model.predict([user_array, all_items])
-
-# Get top-10 recommendations
-top_10_items = np.argsort(predicted_ratings.flatten())[-10:][::-1]
-print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
-```
-
-### Interview Tips
-- Embedding layers are the foundation of neural recommendation — they learn latent representations of users and items
-- Neural Collaborative Filtering (NCF) combines matrix factorization with deep learning for superior performance
-- Cold-start problem (new users/items): use content-based features alongside embeddings
-- For production, consider approximate nearest neighbor (ANN) search for fast retrieval from millions of items
-- Mention evaluation metrics: NDCG, Hit Rate, MAP, and not just MSE/MAE
-
----
-
-## Question 25
-
 **Describe how you would install and set up Keras in a Python environment**
 
 *Answer to be added.*
 
 ---
 
-## Question 26
+## Question 25
 
 **What are some advantages of using Keras over other deep learning frameworks ?**
 
@@ -1854,7 +1727,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 27
+## Question 26
 
 **How do you save and load models in Keras ?**
 
@@ -1862,7 +1735,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 28
+## Question 27
 
 **What is the purpose of the Dense layer in Keras ?**
 
@@ -1870,7 +1743,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 29
+## Question 28
 
 **How would you implement a Convolutional Neural Network in Keras ?**
 
@@ -1878,7 +1751,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 30
+## Question 29
 
 **Can you describe how Recurrent Neural Networks are different and how to implement one in Keras ?**
 
@@ -1886,7 +1759,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 31
+## Question 30
 
 **Explain the purpose of dropout layers and how to use them in Keras**
 
@@ -1894,7 +1767,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 32
+## Question 31
 
 **How do you use Batch Normalization in a Keras model ?**
 
@@ -1902,7 +1775,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 33
+## Question 32
 
 **Discuss how you would construct a residual network (ResNet) in Keras**
 
@@ -1910,7 +1783,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 34
+## Question 33
 
 **Explain the role of optimizers in Keras**
 
@@ -1918,7 +1791,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 35
+## Question 34
 
 **What is the purpose of a loss function in Keras and how do you select one?**
 
@@ -1926,7 +1799,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 36
+## Question 35
 
 **Discuss the process of compiling a model in Keras**
 
@@ -1934,7 +1807,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 37
+## Question 36
 
 **Discuss different strategies for finding the optimal batch size and number of epochs in Keras**
 
@@ -1942,7 +1815,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 38
+## Question 37
 
 **Discuss the process of feature scaling and why it’s important for neural networks in Keras**
 
@@ -1950,7 +1823,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 39
+## Question 38
 
 **How to incorporate transfer learning into Keras ?**
 
@@ -1958,7 +1831,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 40
+## Question 39
 
 **How would you convert a Keras model to TensorFlow’s SavedModel format for deployment?**
 
@@ -1966,7 +1839,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 41
+## Question 40
 
 **Discuss the use of Keras in mobile and edge devices**
 
@@ -1974,7 +1847,7 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 42
+## Question 41
 
 **What are Generative Adversarial Networks (GANs) and how would you implement them using Keras ?**
 
@@ -1982,10 +1855,420 @@ print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
 
 ---
 
-## Question 43
+## Question 42
 
 **Discuss recent advancements in Keras , such as custom training loops**
 
 *Answer to be added.*
 
 ---
+## Question 43
+
+**What is a custom layer in Keras and how would you implement one?**
+
+**Answer:**
+
+A custom layer extends `tf.keras.layers.Layer` when built-in layers don't meet your needs.
+
+```python
+import tensorflow as tf
+from tensorflow.keras import layers
+
+# === Basic Custom Layer ===
+class LinearLayer(layers.Layer):
+    def __init__(self, units, **kwargs):
+        super().__init__(**kwargs)
+        self.units = units
+    
+    def build(self, input_shape):
+        # Create weights (called once on first input)
+        self.w = self.add_weight(
+            shape=(input_shape[-1], self.units),
+            initializer='glorot_uniform',
+            trainable=True,
+            name='kernel'
+        )
+        self.b = self.add_weight(
+            shape=(self.units,),
+            initializer='zeros',
+            trainable=True,
+            name='bias'
+        )
+    
+    def call(self, inputs):
+        return tf.matmul(inputs, self.w) + self.b
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({'units': self.units})
+        return config
+
+# === Advanced: Layer with Training Behavior ===
+class NoisyDense(layers.Layer):
+    def __init__(self, units, noise_std=0.1, **kwargs):
+        super().__init__(**kwargs)
+        self.units = units
+        self.noise_std = noise_std
+        self.dense = layers.Dense(units)
+    
+    def call(self, inputs, training=False):
+        output = self.dense(inputs)
+        if training:
+            noise = tf.random.normal(tf.shape(output), stddev=self.noise_std)
+            output += noise
+        return output
+
+# === Usage ===
+model = tf.keras.Sequential([
+    LinearLayer(64, name='custom_linear'),
+    layers.ReLU(),
+    NoisyDense(32),
+    layers.Dense(10, activation='softmax')
+])
+```
+
+| Method | Purpose | Required? |
+|--------|---------|----------|
+| `__init__` | Store configuration | Yes |
+| `build(input_shape)` | Create weights | Yes (for learnable params) |
+| `call(inputs)` | Forward pass logic | Yes |
+| `get_config()` | Serialization | For model saving |
+
+> **Interview Tip:** Use `build()` instead of `__init__` for weights so the layer infers input shape lazily. Always implement `get_config()` if you need to save/load the model.
+
+---
+
+## Question 44
+
+**What is early stopping in Keras and how do you implement it?**
+
+**Answer:**
+
+Early stopping monitors a metric and stops training when it stops improving, preventing overfitting.
+
+```python
+import tensorflow as tf
+from tensorflow.keras import callbacks
+
+# === Basic Early Stopping ===
+early_stop = callbacks.EarlyStopping(
+    monitor='val_loss',           # Metric to watch
+    patience=10,                  # Epochs to wait after no improvement
+    restore_best_weights=True,    # Revert to best weights
+    min_delta=0.001,              # Minimum change to qualify as improvement
+    mode='min',                   # 'min' for loss, 'max' for accuracy
+    verbose=1
+)
+
+# === Combined with ModelCheckpoint ===
+checkpoint = callbacks.ModelCheckpoint(
+    'best_model.h5',
+    monitor='val_loss',
+    save_best_only=True
+)
+
+reduce_lr = callbacks.ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.5,
+    patience=5
+)
+
+history = model.fit(
+    X_train, y_train,
+    epochs=500,                   # Set high; early stopping handles it
+    validation_split=0.2,
+    callbacks=[early_stop, checkpoint, reduce_lr]
+)
+
+print(f"Stopped at epoch: {len(history.history['loss'])}")
+print(f"Best val_loss: {min(history.history['val_loss']):.4f}")
+
+# === Custom Early Stopping ===
+class CustomEarlyStopping(callbacks.Callback):
+    def __init__(self, patience=5, min_accuracy=0.95):
+        super().__init__()
+        self.patience = patience
+        self.min_accuracy = min_accuracy
+        self.wait = 0
+        self.best_loss = float('inf')
+    
+    def on_epoch_end(self, epoch, logs=None):
+        val_loss = logs.get('val_loss')
+        val_acc = logs.get('val_accuracy')
+        
+        if val_acc and val_acc >= self.min_accuracy:
+            print(f"\nTarget accuracy reached: {val_acc:.4f}")
+            self.model.stop_training = True
+        elif val_loss < self.best_loss:
+            self.best_loss = val_loss
+            self.wait = 0
+        else:
+            self.wait += 1
+            if self.wait >= self.patience:
+                self.model.stop_training = True
+```
+
+| Parameter | Default | Recommendation |
+|-----------|---------|----------------|
+| `patience` | 0 | 5-20 (higher for noisy metrics) |
+| `min_delta` | 0 | 0.001 (ignore tiny improvements) |
+| `restore_best_weights` | False | **Always True** |
+| `monitor` | `val_loss` | Use validation metric |
+
+> **Interview Tip:** Always set `restore_best_weights=True`. Without it, the model keeps the weights from the *last* epoch (which may be worse than the best). Set `epochs` high (e.g., 500) and let EarlyStopping decide when to stop.
+
+---
+
+## Question 45
+
+**How do you implement a multi-output model in Keras?**
+
+**Answer:**
+
+Multi-output models predict multiple targets simultaneously using the Functional API.
+
+```python
+import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# === Example: Predict Age (regression) + Gender (classification) from face ===
+inputs = layers.Input(shape=(128, 128, 3), name='image_input')
+
+# Shared backbone
+x = layers.Conv2D(32, 3, activation='relu')(inputs)
+x = layers.MaxPooling2D()(x)
+x = layers.Conv2D(64, 3, activation='relu')(x)
+x = layers.MaxPooling2D()(x)
+x = layers.Flatten()(x)
+x = layers.Dense(128, activation='relu')(x)
+
+# Branch 1: Age prediction (regression)
+age_output = layers.Dense(64, activation='relu')(x)
+age_output = layers.Dense(1, activation='linear', name='age_output')(age_output)
+
+# Branch 2: Gender prediction (binary classification)
+gender_output = layers.Dense(64, activation='relu')(x)
+gender_output = layers.Dense(1, activation='sigmoid', name='gender_output')(gender_output)
+
+# Branch 3: Ethnicity (multi-class)
+ethnicity_output = layers.Dense(64, activation='relu')(x)
+ethnicity_output = layers.Dense(5, activation='softmax', name='ethnicity_output')(ethnicity_output)
+
+# Build model
+model = models.Model(
+    inputs=inputs,
+    outputs=[age_output, gender_output, ethnicity_output]
+)
+
+# Compile with per-output loss and weights
+model.compile(
+    optimizer='adam',
+    loss={
+        'age_output': 'mse',
+        'gender_output': 'binary_crossentropy',
+        'ethnicity_output': 'categorical_crossentropy'
+    },
+    loss_weights={
+        'age_output': 0.5,
+        'gender_output': 1.0,
+        'ethnicity_output': 1.0
+    },
+    metrics={
+        'age_output': 'mae',
+        'gender_output': 'accuracy',
+        'ethnicity_output': 'accuracy'
+    }
+)
+
+# Train
+model.fit(
+    X_train,
+    {'age_output': y_age, 'gender_output': y_gender, 'ethnicity_output': y_ethnicity},
+    epochs=50, batch_size=32
+)
+
+model.summary()
+```
+
+| Component | Purpose |
+|-----------|--------|
+| Shared backbone | Common feature extraction |
+| Output branches | Task-specific heads |
+| `loss_weights` | Balance losses between tasks |
+| Named outputs | Map losses/metrics to outputs |
+
+> **Interview Tip:** Multi-task learning often improves generalization because the shared backbone learns features useful for all tasks. Name your output layers for cleaner loss/metric configuration.
+
+---
+
+## Question 46
+
+**Discuss the implementation of stateful LSTM networks in Keras.**
+
+**Answer:**
+
+Stateful LSTMs maintain hidden state across batches, unlike default (stateless) LSTMs that reset state after each batch.
+
+```python
+import tensorflow as tf
+import numpy as np
+from tensorflow.keras import layers, models
+
+# === Stateful LSTM ===
+batch_size = 32
+timesteps = 10
+features = 5
+
+model = models.Sequential([
+    layers.LSTM(64, stateful=True, return_sequences=True,
+                batch_input_shape=(batch_size, timesteps, features)),  # Must specify batch_size
+    layers.LSTM(32, stateful=True),
+    layers.Dense(1)
+])
+model.compile(optimizer='adam', loss='mse')
+
+# === Training: Manually Reset States ===
+for epoch in range(50):
+    model.reset_states()  # Reset at start of each sequence/epoch
+    for batch_x, batch_y in data_generator:  # Must yield exact batch_size
+        model.train_on_batch(batch_x, batch_y)
+
+# === Prediction ===
+model.reset_states()
+for chunk in test_chunks:
+    pred = model.predict(chunk, batch_size=batch_size)
+
+# === Stateful vs Stateless Comparison ===
+# Stateless (default): states reset after every batch
+stateless = layers.LSTM(64, stateful=False)  # Default
+
+# Stateful: states carry over between batches
+stateful = layers.LSTM(64, stateful=True,
+                       batch_input_shape=(batch_size, timesteps, features))
+
+# === When to Use Stateful ===
+# 1. Very long sequences split across batches
+# 2. Real-time streaming predictions
+# 3. When temporal continuity matters across batches
+
+# === Key Requirements ===
+# - batch_input_shape instead of input_shape
+# - Manual model.reset_states()
+# - Data must be ordered (no shuffling between batches!)
+# - Each batch must have exactly batch_size samples
+```
+
+| Aspect | Stateless (Default) | Stateful |
+|--------|-------------------|----------|
+| State reset | After each batch | Manual `reset_states()` |
+| Input shape | `input_shape=(T, F)` | `batch_input_shape=(B, T, F)` |
+| Shuffling | Allowed | **Not allowed** between batches |
+| Batch size | Flexible | **Fixed** |
+| Use case | Standard sequence tasks | Very long sequences, streaming |
+
+> **Interview Tip:** Stateful LSTMs are rarely needed. Use them only for sequences too long to fit in one batch or real-time streaming. Most tasks work fine with stateless LSTMs and longer sequence lengths.
+
+---
+
+## Question 47
+
+**Explain how you can use Keras to implement a neural style transfer model.**
+
+**Answer:**
+
+```python
+import tensorflow as tf
+import numpy as np
+
+# === Neural Style Transfer ===
+# Combines content of one image with style of another
+
+# 1. Load pre-trained VGG19
+vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
+vgg.trainable = False
+
+# 2. Define content and style layers
+content_layers = ['block5_conv2']
+style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
+                'block4_conv1', 'block5_conv1']
+
+def get_model(content_layers, style_layers):
+    outputs = [vgg.get_layer(name).output for name in content_layers + style_layers]
+    return tf.keras.Model(inputs=vgg.input, outputs=outputs)
+
+extractor = get_model(content_layers, style_layers)
+
+# 3. Gram matrix for style representation
+def gram_matrix(tensor):
+    result = tf.linalg.einsum('bijc,bijd->bcd', tensor, tensor)
+    shape = tf.shape(tensor)
+    num_locations = tf.cast(shape[1] * shape[2], tf.float32)
+    return result / num_locations
+
+# 4. Compute losses
+def compute_loss(generated, content_target, style_targets,
+                 content_weight=1e4, style_weight=1e-2):
+    outputs = extractor(generated)
+    n_style = len(style_layers)
+    
+    content_output = outputs[:len(content_layers)]
+    style_outputs = outputs[len(content_layers):]
+    
+    # Content loss
+    content_loss = tf.reduce_mean(
+        [(tf.reduce_mean((c - t) ** 2))
+         for c, t in zip(content_output, content_target)]
+    )
+    
+    # Style loss
+    style_loss = tf.reduce_mean(
+        [(tf.reduce_mean((gram_matrix(s) - gram_matrix(t)) ** 2))
+         for s, t in zip(style_outputs, style_targets)]
+    )
+    
+    return content_weight * content_loss + style_weight * style_loss
+
+# 5. Optimization loop
+def style_transfer(content_image, style_image, epochs=1000, lr=0.02):
+    # Initialize generated image from content
+    generated = tf.Variable(content_image, dtype=tf.float32)
+    
+    content_target = extractor(content_image)[:len(content_layers)]
+    style_targets = extractor(style_image)[len(content_layers):]
+    
+    optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+    
+    for epoch in range(epochs):
+        with tf.GradientTape() as tape:
+            loss = compute_loss(generated, content_target, style_targets)
+        
+        grads = tape.gradient(loss, generated)
+        optimizer.apply_gradients([(grads, generated)])
+        generated.assign(tf.clip_by_value(generated, 0.0, 1.0))
+        
+        if epoch % 100 == 0:
+            print(f"Epoch {epoch}, Loss: {loss:.2f}")
+    
+    return generated
+```
+
+| Component | Purpose |
+|-----------|--------|
+| Content layers | Capture high-level structural features |
+| Style layers | Capture textures, patterns, colors |
+| Gram matrix | Statistical representation of style |
+| Content loss | Preserve structure of content image |
+| Style loss | Match texture statistics of style image |
+
+> **Interview Tip:** Neural style transfer optimizes the **pixel values** of the generated image (not model weights). The Gram matrix captures correlations between feature maps, representing artistic style independent of spatial arrangement.
+
+---
+
+## Question 48
+
+**Discuss strategies to identify the cause of a performance bottleneck in a Keras model**
+
+*Answer to be added.*
+
+---
+

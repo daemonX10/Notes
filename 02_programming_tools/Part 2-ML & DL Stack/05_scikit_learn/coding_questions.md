@@ -513,53 +513,6 @@ plot_learning_curve(model, X, y)
 
 ## Question 11
 
-**How does Scikit-Learn implement logistic regression differently from linear regression?**
-
-**Answer:**
-
-| Aspect | Linear Regression | Logistic Regression |
-|--------|-------------------|--------------------|
-| Task | Regression (continuous) | Classification (discrete) |
-| Output | $\hat{y} = Xw + b$ | $P(y=1) = \sigma(Xw + b)$ |
-| Loss function | MSE: $\frac{1}{n}\sum(y - \hat{y})^2$ | Log loss: $-\frac{1}{n}\sum[y\log(p) + (1-y)\log(1-p)]$ |
-| Activation | None (identity) | Sigmoid: $\sigma(z) = \frac{1}{1+e^{-z}}$ |
-| Solver | Closed-form (OLS) or SGD | Iterative (LBFGS, Newton, SAG) |
-| Regularization | Optional (Ridge, Lasso) | Always applied (`C` parameter) |
-
-```python
-from sklearn.linear_model import LinearRegression, LogisticRegression
-
-# Linear Regression
-lin_reg = LinearRegression()  # No regularization by default
-lin_reg.fit(X_train, y_continuous)
-y_pred = lin_reg.predict(X_test)  # Continuous values
-print(lin_reg.coef_)              # Feature weights
-print(lin_reg.intercept_)         # Bias term
-
-# Logistic Regression
-log_reg = LogisticRegression(
-    C=1.0,              # Inverse regularization (higher = less regularization)
-    penalty='l2',       # Regularization type
-    solver='lbfgs',     # Optimization algorithm
-    max_iter=100,
-    multi_class='auto'  # 'ovr' or 'multinomial'
-)
-log_reg.fit(X_train, y_class)
-y_pred = log_reg.predict(X_test)          # Class labels
-y_prob = log_reg.predict_proba(X_test)    # Probabilities
-print(log_reg.classes_)                    # [0, 1]
-
-# Key difference: LogisticRegression ALWAYS regularizes
-# C=1e10 ≈ no regularization
-# C=0.01 = strong regularization
-```
-
-> **Interview Tip:** Despite the name, logistic regression is a **classifier**. The key API difference is `predict_proba()` — linear regression doesn't have it. Logistic regression always uses regularization (`C` parameter).
-
----
-
-## Question 12
-
 **Write a Python script using Scikit-Learn to train and evaluate a logistic regression model.**
 
 **Answer:**
@@ -621,7 +574,7 @@ print(f"\nTop 5 Features:\n{coef_df.head()}")
 
 ---
 
-## Question 13
+## Question 12
 
 **Implement feature extraction from text using Scikit-Learn’s CountVectorizer or TfidfVectorizer**
 
@@ -698,7 +651,7 @@ vec = TfidfVectorizer(tokenizer=custom_tokenizer)
 
 ---
 
-## Question 14
+## Question 13
 
 **Normalize a given dataset using Scikit-Learn’s preprocessing module, then train and test a Naive Bayes classifier**
 
@@ -760,7 +713,7 @@ print(f"Confidence for first sample: {y_prob[0].round(3)}")
 
 ---
 
-## Question 15
+## Question 14
 
 **Use Scikit-Learn to visualize the decision boundary of a SVM with a non-linear kernel.**
 
@@ -831,7 +784,7 @@ plt.show()
 
 ---
 
-## Question 16
+## Question 15
 
 **Implement dimensionality reduction using PCA with Scikit-Learn and visualize the result.**
 
@@ -893,7 +846,7 @@ print(f"Components needed for 95% variance: {pca_95.n_components_}")
 
 ---
 
-## Question 17
+## Question 16
 
 **Create a clustering analysis on a dataset using Scikit-Learn’s DBSCAN method**
 
@@ -973,7 +926,7 @@ plt.show()
 
 ---
 
-## Question 18
+## Question 17
 
 **How do you save a trained Scikit-Learn model to disk and load it back for later use?**
 
@@ -1042,7 +995,7 @@ joblib.dump({'model': model, 'metadata': metadata}, 'model_with_meta.joblib')
 
 > **Interview Tip:** Always save the **Scikit-Learn version** with the model — models may be incompatible across versions. Use `joblib` for Scikit-Learn (optimized for large NumPy arrays). For production, convert to **ONNX** for language-agnostic deployment.
 
-## Question 19
+## Question 18
 
 **Create a Python function that uses Scikit-Learn to perform a k-fold cross-validation on a dataset**
 
@@ -1050,7 +1003,7 @@ joblib.dump({'model': model, 'metadata': metadata}, 'model_with_meta.joblib')
 
 ---
 
-## Question 20
+## Question 19
 
 **Demonstrate how to use Scikit-Learn’s Pipeline to combine preprocessing and model training steps**
 
@@ -1058,7 +1011,7 @@ joblib.dump({'model': model, 'metadata': metadata}, 'model_with_meta.joblib')
 
 ---
 
-## Question 21
+## Question 20
 
 **Write a Python function that uses Scikit-Learn’s RandomForestClassifier and performs a grid search to find the best hyperparameters**
 

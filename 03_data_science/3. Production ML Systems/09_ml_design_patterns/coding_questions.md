@@ -2,426 +2,6 @@
 
 ## Question 1
 
-**What is the â€˜Feature Projectionâ€™ design pattern and how is it implemented?**
-
-**Answer:**
-
-### 1. Definition
-Feature Projection transforms high-dimensional features into a lower-dimensional representation while preserving relevant information for downstream tasks. It reduces computational cost and mitigates the curse of dimensionality.
-
-### 2. Common Techniques
-
-| Technique | Type | Use Case |
-|-----------|------|----------|
-| **PCA** | Linear | General dimensionality reduction |
-| **t-SNE** | Non-linear | Visualization |
-| **UMAP** | Non-linear | Clustering, visualization |
-| **Autoencoders** | Neural | Complex non-linear patterns |
-| **Random Projection** | Linear | Very high dimensions |
-
-### 3. Python Implementation
-
-```python
-import numpy as np
-from sklearn.decomposition import PCA
-from sklearn.random_projection import GaussianRandomProjection
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import StandardScaler
-from sklearn.datasets import load_digits
-import matplotlib.pyplot as plt
-
-class FeatureProjector:
-    """Feature Projection pattern implementation"""
-    
-    def __init__(self, method='pca', n_components=None, random_state=42):
-        self.method = method
-        self.n_components = n_components
-        self.random_state = random_state
-        self.projector = None
-        self.scaler = StandardScaler()
-        self.is_fitted = False
-    
-    def _create_projector(self, n_features):
-        """Create projector based on method"""
-        n_comp = self.n_components or min(50, n_features // 2)
-        
-        if self.method == 'pca':
-            return PCA(n_components=n_comp, random_state=self.random_state)
-        elif self.method == 'random':
-            return GaussianRandomProjection(n_components=n_comp, 
-                                           random_state=self.random_state)
-        elif self.method == 'tsne':
-            return TSNE(n_components=min(n_comp, 3), 
-                       random_state=self.random_state)
-        else:
-            raise ValueError(f"Unknown method: {self.method}")
-    
-    def fit(self, X):
-        """Fit the projector"""
-        X_scaled = self.scaler.fit_transform(X)
-        self.projector = self._create_projector(X.shape[1])
-        self.projector.fit(X_scaled)
-        self.is_fitted = True
-        return self
-    
-    def transform(self, X):
-        """Project features to lower dimension"""
-        if not self.is_fitted:
-            raise ValueError("Projector not fitted. Call fit() first.")
-        X_scaled = self.scaler.transform(X)
-        return self.projector.transform(X_scaled)
-    
-    def fit_transform(self, X):
-        """Fit and transform in one step"""
-        X_scaled = self.scaler.fit_transform(X)
-        self.projector = self._create_projector(X.shape[1])
-        self.is_fitted = True
-        return self.projector.fit_transform(X_scaled)
-    
-    def get_explained_variance(self):
-        """Get explained variance for PCA"""
-        if self.method == 'pca' and self.is_fitted:
-            return self.projector.explained_variance_ratio_
-        return None
-
-class AutoencoderProjector:
-    """Neural network based feature projection"""
-    
-    def __init__(self, encoding_dim=32, epochs=50):
-        self.encoding_dim = encoding_dim
-        self.epochs = epochs
-        self.encoder = None
-        self.autoencoder = None
-    
-    def build(self, input_dim):
-        """Build autoencoder architecture"""
-        try:
-            from tensorflow import keras
-            from tensorflow.keras import layers
-        except ImportError:
-            print("TensorFlow not available")
-            return None
-        
-        # Encoder
-        input_layer = keras.Input(shape=(input_dim,))
-        encoded = layers.Dense(128, activation='relu')(input_layer)
-        encoded = layers.Dense(64, activation='relu')(encoded)
-        encoded = layers.Dense(self.encoding_dim, activation='relu')(encoded)
-        
-        # Decoder
-        decoded = layers.Dense(64, activation='relu')(encoded)
-        decoded = layers.Dense(128, activation='relu')(decoded)
-        decoded = layers.Dense(input_dim, activation='sigmoid')(decoded)
-        
-        self.autoencoder = keras.Model(input_layer, decoded)
-        self.encoder = keras.Model(input_layer, encoded)
-        
-        self.autoencoder.compile(optimizer='adam', loss='mse')
-        return self
-    
-    def fit(self, X, validation_split=0.1):
-        """Train autoencoder"""
-        self.build(X.shape[1])
-        self.autoencoder.fit(X, X, 
-                            epochs=self.epochs,
-                            batch_size=32,
-                            validation_split=validation_split,
-                            verbose=0)
-        return self
-    
-    def transform(self, X):
-        """Get encoded representation"""
-        return self.encoder.predict(X, verbose=0)
-
-# Usage Example
-print("=== Feature Projection Pattern ===\n")
-
-# Load high-dimensional data
-digits = load_digits()
-X, y = digits.data, digits.target
-print(f"Original shape: {X.shape}")
-
-# PCA Projection
-pca_proj = FeatureProjector(method='pca', n_components=10)
-X_pca = pca_proj.fit_transform(X)
-print(f"PCA projected shape: {X_pca.shape}")
-print(f"Explained variance (first 5): {pca_proj.get_explained_variance()[:5]}")
-
-# Random Projection
-random_proj = FeatureProjector(method='random', n_components=10)
-X_random = random_proj.fit_transform(X)
-print(f"Random projected shape: {X_random.shape}")
-
-# Visualize 2D projection
-pca_2d = FeatureProjector(method='pca', n_components=2)
-X_2d = pca_2d.fit_transform(X)
-
-plt.figure(figsize=(10, 6))
-scatter = plt.scatter(X_2d[:, 0], X_2d[:, 1], c=y, cmap='tab10', alpha=0.6)
-plt.colorbar(scatter)
-plt.title('Feature Projection: PCA 2D')
-plt.xlabel('PC1')
-plt.ylabel('PC2')
-plt.tight_layout()
-plt.savefig('feature_projection.png', dpi=100)
-print("\nVisualization saved to feature_projection.png")
-```
-
-### 4. Interview Tips
-- PCA for linear reduction, autoencoders for non-linear
-- Random projection is fast for very high dimensions
-- Always scale features before projection
-- Consider explained variance ratio for choosing dimensions
-
----
-
-## Question 2
-
-**Explain how the â€˜Periodic Trainingâ€™ design pattern is implemented in an actual system.**
-
-**Answer:**
-
-### 1. Definition
-Periodic Training automatically retrains models on a schedule (daily, weekly, monthly) to incorporate new data and adapt to changing patterns. It ensures models stay fresh without manual intervention.
-
-### 2. Key Components
-
-| Component | Purpose |
-|-----------|---------|
-| **Scheduler** | Trigger training at intervals |
-| **Data Pipeline** | Fetch fresh training data |
-| **Training Job** | Execute model training |
-| **Validation** | Verify new model quality |
-| **Deployment** | Promote if validation passes |
-| **Monitoring** | Track training success/failure |
-
-### 3. Python Implementation
-
-```python
-import time
-import threading
-import numpy as np
-from datetime import datetime, timedelta
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-import pickle
-import os
-from typing import Dict, Callable, Optional
-
-class PeriodicTrainingScheduler:
-    """Scheduler for periodic model training"""
-    
-    def __init__(self, training_interval_hours: int = 24):
-        self.interval = training_interval_hours * 3600
-        self.running = False
-        self.last_training = None
-        self.next_training = None
-        self.training_history = []
-    
-    def start(self, training_func: Callable):
-        """Start periodic training"""
-        self.running = True
-        self.next_training = datetime.now()
-        
-        def training_loop():
-            while self.running:
-                now = datetime.now()
-                if now >= self.next_training:
-                    print(f"\n[{now}] Starting scheduled training...")
-                    result = training_func()
-                    self.last_training = now
-                    self.next_training = now + timedelta(seconds=self.interval)
-                    self.training_history.append({
-                        'timestamp': now.isoformat(),
-                        'result': result
-                    })
-                    print(f"Next training scheduled for: {self.next_training}")
-                time.sleep(1)
-        
-        thread = threading.Thread(target=training_loop, daemon=True)
-        thread.start()
-        print(f"Periodic training started (interval: {self.interval/3600}h)")
-    
-    def stop(self):
-        """Stop periodic training"""
-        self.running = False
-        print("Periodic training stopped")
-
-class DataPipeline:
-    """Simulates data pipeline for fresh training data"""
-    
-    def __init__(self, data_source: str = "database"):
-        self.data_source = data_source
-        self.data_version = 0
-    
-    def fetch_training_data(self, n_samples: int = 1000):
-        """Fetch latest training data"""
-        self.data_version += 1
-        
-        # Simulate fetching fresh data with slight distribution shift
-        np.random.seed(int(time.time()) % 1000)
-        X = np.random.randn(n_samples, 10)
-        
-        # Simulate concept drift by changing decision boundary
-        shift = (self.data_version - 1) * 0.1
-        y = ((X[:, 0] + X[:, 1] + shift) > 0).astype(int)
-        
-        print(f"Fetched data version {self.data_version}: {n_samples} samples")
-        return X, y, self.data_version
-
-class ModelTrainer:
-    """Handles model training with validation"""
-    
-    def __init__(self, model_dir: str = "models"):
-        self.model_dir = model_dir
-        self.current_model = None
-        self.current_version = 0
-        self.min_accuracy = 0.8  # Minimum accuracy to deploy
-        os.makedirs(model_dir, exist_ok=True)
-    
-    def train(self, X, y, data_version: int) -> Dict:
-        """Train and validate model"""
-        # Split data
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
-        
-        # Train model
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
-        start_time = time.time()
-        model.fit(X_train, y_train)
-        training_time = time.time() - start_time
-        
-        # Validate
-        val_predictions = model.predict(X_val)
-        accuracy = accuracy_score(y_val, val_predictions)
-        
-        result = {
-            'data_version': data_version,
-            'accuracy': accuracy,
-            'training_time': training_time,
-            'deployed': False
-        }
-        
-        # Deploy if accuracy meets threshold
-        if accuracy >= self.min_accuracy:
-            self._deploy_model(model, data_version)
-            result['deployed'] = True
-            print(f"Model deployed: accuracy={accuracy:.4f}")
-        else:
-            print(f"Model NOT deployed: accuracy={accuracy:.4f} < {self.min_accuracy}")
-        
-        return result
-    
-    def _deploy_model(self, model, version: int):
-        """Save and activate new model"""
-        model_path = os.path.join(self.model_dir, f"model_v{version}.pkl")
-        with open(model_path, 'wb') as f:
-            pickle.dump(model, f)
-        
-        self.current_model = model
-        self.current_version = version
-    
-    def predict(self, X):
-        """Make predictions with current model"""
-        if self.current_model is None:
-            raise ValueError("No model deployed")
-        return self.current_model.predict(X)
-
-class PeriodicTrainingSystem:
-    """Complete periodic training system"""
-    
-    def __init__(self, interval_hours: int = 24):
-        self.scheduler = PeriodicTrainingScheduler(interval_hours)
-        self.data_pipeline = DataPipeline()
-        self.trainer = ModelTrainer()
-        self.training_results = []
-    
-    def training_job(self) -> Dict:
-        """Execute complete training job"""
-        # Fetch data
-        X, y, version = self.data_pipeline.fetch_training_data()
-        
-        # Train and validate
-        result = self.trainer.train(X, y, version)
-        self.training_results.append(result)
-        
-        return result
-    
-    def start(self):
-        """Start periodic training system"""
-        # Initial training
-        print("=== Initial Training ===")
-        self.training_job()
-        
-        # Start scheduler
-        self.scheduler.start(self.training_job)
-    
-    def stop(self):
-        """Stop periodic training"""
-        self.scheduler.stop()
-    
-    def get_status(self) -> Dict:
-        """Get system status"""
-        return {
-            'current_model_version': self.trainer.current_version,
-            'last_training': self.scheduler.last_training,
-            'next_training': self.scheduler.next_training,
-            'training_count': len(self.training_results),
-            'results': self.training_results
-        }
-
-# Demo with accelerated schedule
-print("=== Periodic Training Pattern Demo ===\n")
-
-# Create system with 1-hour interval (accelerated for demo)
-system = PeriodicTrainingSystem(interval_hours=1)
-
-# Run initial training
-print("Running initial training...")
-result = system.training_job()
-print(f"Result: {result}")
-
-# Simulate multiple training cycles
-print("\n=== Simulating Multiple Training Cycles ===")
-for i in range(3):
-    print(f"\n--- Training Cycle {i+2} ---")
-    result = system.training_job()
-    print(f"Result: {result}")
-
-# Check status
-print("\n=== Final Status ===")
-status = system.get_status()
-print(f"Model version: {status['current_model_version']}")
-print(f"Total trainings: {status['training_count']}")
-
-# Test prediction
-X_test = np.random.randn(5, 10)
-predictions = system.trainer.predict(X_test)
-print(f"\nTest predictions: {predictions}")
-```
-
-### 4. Production Considerations
-
-| Aspect | Implementation |
-|--------|----------------|
-| **Scheduling** | Airflow, Kubernetes CronJobs |
-| **Data** | Delta Lake, Feature Store |
-| **Training** | Kubeflow, SageMaker |
-| **Validation** | A/B testing, shadow mode |
-| **Rollback** | Keep N previous versions |
-
-### 5. Interview Tips
-- Discuss how to handle training failures
-- Mention validation gates before deployment
-- Consider data freshness vs training cost trade-off
-- Always keep rollback capability
-
----
-
-## Question 3
-
 **Implement a basic â€˜Replayâ€™ pattern mechanism using Python to simulate model retraining with different datasets.**
 
 **Answer:**
@@ -719,7 +299,7 @@ for run in comparison:
 
 ---
 
-## Question 4
+## Question 2
 
 **Develop a simple ensemble model using Python, following the â€˜Model Ensembleâ€™ design pattern.**
 
@@ -992,7 +572,7 @@ for name, model_class in [('RandomForest', RandomForestClassifier),
 
 ---
 
-## Question 5
+## Question 3
 
 **Write a script to perform batch serving of a machine learning model using dummy data.**
 
@@ -1254,7 +834,7 @@ print(results['prediction'].value_counts())
 
 ---
 
-## Question 6
+## Question 4
 
 **Code a 'Model Checkpointing' system during training using TensorFlow/Keras.**
 
@@ -1334,7 +914,7 @@ keras_checkpointing()
 
 ---
 
-## Question 7
+## Question 5
 
 **Create a feature store simulation in Python to demonstrate sharing and reuse of feature transformation code.**
 
@@ -1491,7 +1071,7 @@ print(f"\nTraining data:\n{training_data}")
 
 ---
 
-## Question 8
+## Question 6
 
 **Implement a 'Warm Start' to accelerate training for a new model using an established pretrained model.**
 
@@ -1630,7 +1210,7 @@ keras_warm_start()
 
 ---
 
-## Question 9
+## Question 7
 
 **Simulate a horizontal scaling of a machine learning pipeline handling increasing workloads.**
 
@@ -1785,194 +1365,7 @@ print(scaler.get_metrics())
 
 ---
 
-## Question 10
-
-**Discuss the implications of implementing the 'Stateless Model' design pattern in distributed systems.**
-
-**Answer:**
-
-### 1. Definition
-Stateless Model design ensures prediction services don't maintain client state between requests. Each request contains all necessary information, enabling easy scaling, load balancing, and fault tolerance.
-
-### 2. Implications
-
-| Aspect | Implication |
-|--------|-------------|
-| **Scalability** | Easy horizontal scaling - any replica handles any request |
-| **Load Balancing** | Simple round-robin works well |
-| **Fault Tolerance** | Failed node replaced without state migration |
-| **Caching** | Must be external (Redis) not in-memory |
-| **Session Data** | Passed with each request or stored externally |
-
-### 3. Python Implementation
-
-```python
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-import pickle
-import hashlib
-from typing import Dict, Any
-import time
-
-class StatelessPredictionService:
-    """Stateless model serving - no client state between requests"""
-    
-    def __init__(self, model_path: str):
-        # Model loaded once at startup, not modified per-request
-        with open(model_path, 'rb') as f:
-            self.model = pickle.load(f)
-        self.instance_id = hashlib.md5(str(time.time()).encode()).hexdigest()[:8]
-    
-    def predict(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Stateless prediction - all context in request
-        
-        Request contains:
-        - features: input data
-        - request_id: for tracking
-        - metadata: any additional context
-        """
-        features = np.array(request['features']).reshape(1, -1)
-        
-        prediction = self.model.predict(features)[0]
-        probability = None
-        if hasattr(self.model, 'predict_proba'):
-            probability = self.model.predict_proba(features)[0].tolist()
-        
-        # Response is self-contained - no state dependency
-        return {
-            'request_id': request.get('request_id'),
-            'prediction': int(prediction),
-            'probability': probability,
-            'served_by': self.instance_id,  # Shows which replica handled it
-            'timestamp': time.time()
-        }
-
-class StatefulAntiPattern:
-    """Anti-pattern: Stateful service (for comparison)"""
-    
-    def __init__(self, model):
-        self.model = model
-        self.session_data = {}  # BAD: State stored between requests
-        self.request_count = {}  # BAD: Per-client counters
-    
-    def predict(self, client_id: str, features):
-        # BAD: Depends on previous requests
-        if client_id not in self.session_data:
-            self.session_data[client_id] = {'history': []}
-        
-        self.session_data[client_id]['history'].append(features)
-        self.request_count[client_id] = self.request_count.get(client_id, 0) + 1
-        
-        # This service CAN'T be easily scaled - state is in memory
-        return self.model.predict(features.reshape(1, -1))
-
-class ExternalStateManager:
-    """Proper pattern: External state storage for stateless services"""
-    
-    def __init__(self):
-        # Simulates Redis/external cache
-        self.cache = {}
-    
-    def get_session(self, session_id: str) -> Dict:
-        return self.cache.get(session_id, {})
-    
-    def set_session(self, session_id: str, data: Dict):
-        self.cache[session_id] = data
-    
-    def update_session(self, session_id: str, key: str, value: Any):
-        if session_id not in self.cache:
-            self.cache[session_id] = {}
-        self.cache[session_id][key] = value
-
-class StatelessWithExternalState:
-    """Stateless service with external state management"""
-    
-    def __init__(self, model, state_manager: ExternalStateManager):
-        self.model = model
-        self.state_manager = state_manager
-    
-    def predict(self, request: Dict) -> Dict:
-        session_id = request.get('session_id')
-        features = np.array(request['features']).reshape(1, -1)
-        
-        # Get session from external store (not local memory)
-        session = self.state_manager.get_session(session_id) if session_id else {}
-        
-        prediction = self.model.predict(features)[0]
-        
-        # Update external state (service remains stateless)
-        if session_id:
-            history = session.get('predictions', [])
-            history.append(int(prediction))
-            self.state_manager.update_session(session_id, 'predictions', history)
-        
-        return {
-            'prediction': int(prediction),
-            'session_history': session.get('predictions', [])
-        }
-
-# Demo
-print("=== Stateless Model Pattern Demo ===\n")
-
-# Train and save model
-np.random.seed(42)
-X, y = np.random.randn(500, 10), (np.random.randn(500) > 0).astype(int)
-model = RandomForestClassifier(n_estimators=50, random_state=42)
-model.fit(X, y)
-
-with open('model.pkl', 'wb') as f:
-    pickle.dump(model, f)
-
-# Create stateless service
-service = StatelessPredictionService('model.pkl')
-
-# Multiple requests - each self-contained
-print("Stateless Predictions:")
-for i in range(3):
-    request = {
-        'request_id': f'req_{i}',
-        'features': np.random.randn(10).tolist()
-    }
-    response = service.predict(request)
-    print(f"  Request {i}: prediction={response['prediction']}, server={response['served_by']}")
-
-# With external state
-print("\nStateless with External State:")
-state_mgr = ExternalStateManager()
-service_with_state = StatelessWithExternalState(model, state_mgr)
-
-for i in range(3):
-    request = {
-        'session_id': 'user_123',
-        'features': np.random.randn(10).tolist()
-    }
-    response = service_with_state.predict(request)
-    print(f"  Request {i}: prediction={response['prediction']}, history={response['session_history']}")
-
-# Cleanup
-import os
-os.remove('model.pkl')
-```
-
-### 4. Key Implications Summary
-
-| Stateless Benefits | Stateful Drawbacks |
-|-------------------|-------------------|
-| Any replica serves any request | Sticky sessions required |
-| Easy failover | State lost on crash |
-| Simple load balancing | Complex state sync |
-| Cloud-native ready | Hard to scale |
-
-### 5. Interview Tips
-- Stateless enables Kubernetes-style scaling
-- External stores (Redis) for shared state
-- Each request must be self-contained
-- Mention container orchestration benefits
-
----
-
-## Question 11
+## Question 8
 
 **Write a Python function that demonstrates the 'Handling Missing Data' pattern.**
 
@@ -2174,7 +1567,7 @@ print("\nValidation passed: No missing values")
 
 ---
 
-## Question 12
+## Question 9
 
 **Code a simplified 'Hyperparameter Database' to track experiments in machine learning.**
 
@@ -2429,7 +1822,7 @@ os.remove("demo_experiments.db")
 
 ---
 
-## Question 13
+## Question 10
 
 **Develop a basic implementation of 'Model Factories' using Python for creating and deploying models.**
 
@@ -2685,7 +2078,7 @@ shutil.rmtree("deployed_models")
 
 ---
 
-## Question 14
+## Question 11
 
 **Simulate a 'Data Validator' using Python to check for data skew or anomalies as new data arrives.**
 
@@ -3003,7 +2396,7 @@ validator.print_report(result)
 
 ---
 
-## Question 15
+## Question 12
 
 **Create a 'Feature Monitoring' tool using Python and a visualization library to track changes over time.**
 
@@ -3293,7 +2686,7 @@ for alert in alerts[-3:]:  # Show last 3
 
 ---
 
-## Question 16
+## Question 13
 
 **Implement a 'Retry' pattern in a Python script for a machine learning service that handles intermittent failures.**
 

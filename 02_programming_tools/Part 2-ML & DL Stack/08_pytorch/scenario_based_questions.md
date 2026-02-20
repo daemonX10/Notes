@@ -1084,7 +1084,7 @@ class InferenceService:
 
 ## Question 11
 
-**How do you check if your PyTorch model is utilizing the GPU ?**
+**How would you handle imbalanced classes when training a classification model in PyTorch?**
 
 *Answer to be added.*
 
@@ -1092,7 +1092,7 @@ class InferenceService:
 
 ## Question 12
 
-**What strategies can you use to monitor and decrease overfitting in a PyTorch model?**
+**How can PyTorch be utilized for real-time inference , and what concerns would you have in such a setting?**
 
 *Answer to be added.*
 
@@ -1100,7 +1100,7 @@ class InferenceService:
 
 ## Question 13
 
-**How would you handle imbalanced classes when training a classification model in PyTorch?**
+**Discuss a scenario where you would need to convert a PyTorch model to ONNX format**
 
 *Answer to be added.*
 
@@ -1108,7 +1108,7 @@ class InferenceService:
 
 ## Question 14
 
-**How can PyTorch be utilized for real-time inference , and what concerns would you have in such a setting?**
+**Propose a method for deploying a PyTorch model as a REST API service**
 
 *Answer to be added.*
 
@@ -1116,7 +1116,7 @@ class InferenceService:
 
 ## Question 15
 
-**Discuss a scenario where you would need to convert a PyTorch model to ONNX format**
+**Describe your approach to fine-tuning a pre-trained model in PyTorch for a new task**
 
 *Answer to be added.*
 
@@ -1124,48 +1124,9 @@ class InferenceService:
 
 ## Question 16
 
-**Propose a method for deploying a PyTorch model as a REST API service**
-
-*Answer to be added.*
-
----
-
-## Question 17
-
-**Describe your approach to fine-tuning a pre-trained model in PyTorch for a new task**
-
-*Answer to be added.*
-
----
-
-## Question 18
-
-**How would you create a PyTorch extension module with custom C++/CUDA operations ?**
-
-*Answer to be added.*
-
----
-
-## Question 19
-
 **Discuss a project where PyTorch played a key role in developing a machine learning solution**
 
 *Answer to be added.*
 
 ---
 
-## Question 20
-
-**How do you ensure reproducibility of experiments when using PyTorch?**
-
-*Answer to be added.*
-
----
-
-## Question 21
-
-**Portray how PyTorch Lightning can simplify the standard PyTorch workflow**
-
-*Answer to be added.*
-
----

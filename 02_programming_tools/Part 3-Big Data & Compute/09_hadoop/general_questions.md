@@ -327,3 +327,21 @@ if __name__ == '__main__':
 - Right-size containers
 - Monitor GC overhead
 - Check data locality metrics
+
+---
+
+## Question 6
+
+**How can you diagnose and troubleshoot Hadoop performance issues ?**
+
+*Answer to be added.*
+
+---
+
+## Question 7
+
+**How can job scheduling be optimized in Hadoop ?**
+
+*Answer to be added.*
+
+---

@@ -2018,22 +2018,6 @@ The small files problem is one of the **most common HDFS issues** in production.
 
 ## Question 43
 
-**How can you diagnose and troubleshoot Hadoop performance issues ?**
-
-*Answer to be added.*
-
----
-
-## Question 44
-
-**How can job scheduling be optimized in Hadoop ?**
-
-*Answer to be added.*
-
----
-
-## Question 45
-
 **Discuss the concept and benefits of a journal node in HDFS HA configuration**
 
 *Answer to be added.*

@@ -202,6 +202,16 @@
 
 ---
 
+## Question 26
+
+**What are some of the benefits of implementingMLOps practicesin a machine learning project?**
+
+**Answer:** _[To be filled]_
+
+---
+
+---
+
 # --- Model Versioning Questions (from source .txt) ---
 
 ## Question 1

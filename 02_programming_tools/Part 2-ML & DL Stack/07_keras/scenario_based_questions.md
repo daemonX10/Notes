@@ -1009,7 +1009,7 @@ learner.learn_task(X_task2, y_task2)
 
 ## Question 11
 
-**Discuss strategies to identify the cause of a performance bottleneck in a Keras model**
+**How would you architect a Keras model to handle a large-scale image recognition problem ?**
 
 *Answer to be added.*
 
@@ -1017,16 +1017,316 @@ learner.learn_task(X_task2, y_task2)
 
 ## Question 12
 
-**How would you architect a Keras model to handle a large-scale image recognition problem ?**
-
-*Answer to be added.*
-
----
-
-## Question 13
-
 **How would you use Keras to build models for sequence-to-sequence tasks , such as machine translation ?**
 
 *Answer to be added.*
 
 ---
+## Question 13
+
+**Discuss a strategy for implementing a real-time object detection system using Keras.**
+
+**Answer:**
+
+```python
+import tensorflow as tf
+import numpy as np
+import cv2
+
+# === Strategy 1: Using Pre-trained YOLOv5/YOLOv8 ===
+# pip install ultralytics
+from ultralytics import YOLO
+
+model = YOLO('yolov8n.pt')  # Nano model for speed
+
+# Real-time webcam detection
+cap = cv2.VideoCapture(0)
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+    
+    results = model(frame)
+    annotated = results[0].plot()  # Draw bounding boxes
+    cv2.imshow('Detection', annotated)
+    
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+cap.release()
+
+# === Strategy 2: TFLite for Edge/Mobile ===
+# Convert model
+converter = tf.lite.TFLiteConverter.from_saved_model('ssd_mobilenet/')
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+tflite_model = converter.convert()
+
+# Run inference
+interpreter = tf.lite.Interpreter(model_content=tflite_model)
+interpreter.allocate_tensors()
+
+def detect_tflite(interpreter, image):
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    
+    input_data = cv2.resize(image, (300, 300))
+    input_data = np.expand_dims(input_data, axis=0).astype(np.float32) / 255.0
+    
+    interpreter.set_tensor(input_details[0]['index'], input_data)
+    interpreter.invoke()
+    
+    boxes = interpreter.get_tensor(output_details[0]['index'])
+    classes = interpreter.get_tensor(output_details[1]['index'])
+    scores = interpreter.get_tensor(output_details[2]['index'])
+    
+    return boxes, classes, scores
+
+# === Strategy 3: SSD MobileNet in Keras ===
+# Fine-tune for custom objects
+base = tf.keras.applications.MobileNetV2(
+    input_shape=(224, 224, 3), include_top=False, weights='imagenet'
+)
+base.trainable = False
+
+model = tf.keras.Sequential([
+    base,
+    tf.keras.layers.GlobalAveragePooling2D(),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(4 + num_classes)  # bbox (4) + class scores
+])
+```
+
+| Model | FPS | Accuracy (mAP) | Best For |
+|-------|-----|----------------|----------|
+| YOLOv8n | ~60+ | 37.3 | Real-time, general |
+| SSD MobileNet | ~30 | 22.0 | Mobile/edge |
+| EfficientDet | ~15 | 51.0 | High accuracy |
+| Faster R-CNN | ~5 | 42.0 | Accuracy over speed |
+
+| Optimization | Effect |
+|-------------|--------|
+| Quantization (INT8) | 2-4x faster, 4x smaller |
+| TensorRT | 2-5x faster on NVIDIA GPUs |
+| Model pruning | Remove unused weights |
+| Input resolution | Lower = faster (trade accuracy) |
+
+> **Interview Tip:** For real-time detection, YOLO family models dominate. For edge deployment, convert to TFLite with quantization. The key trade-off is always speed vs. accuracy—choose based on latency requirements.
+
+## Question 14
+
+**Describe how you would use Keras to develop a recommendation system.**
+
+### Answer
+
+**Definition**: Recommendation systems predict user preferences for items. Keras can implement various recommendation approaches including collaborative filtering (learning user-item interactions), content-based filtering, and hybrid models using neural networks.
+
+### Recommendation Approaches
+
+| Approach | Method | When to Use |
+|----------|--------|-------------|
+| **Collaborative Filtering** | User-item interaction patterns | Sufficient user history |
+| **Content-Based** | Item/user feature similarity | Cold-start items |
+| **Neural Collaborative Filtering** | Deep learning embeddings | Large-scale, complex patterns |
+| **Hybrid** | Combine multiple approaches | Production systems |
+
+### Python Code Example — Neural Collaborative Filtering
+```python
+from tensorflow import keras
+from tensorflow.keras import layers
+import numpy as np
+
+# Assume: user_ids, item_ids, ratings as training data
+num_users = 10000
+num_items = 5000
+embedding_dim = 64
+
+# METHOD 1: Matrix Factorization with Embeddings
+user_input = keras.Input(shape=(1,), name='user_id')
+item_input = keras.Input(shape=(1,), name='item_id')
+
+# User embedding
+user_embedding = layers.Embedding(num_users, embedding_dim,
+                                   name='user_embedding')(user_input)
+user_vec = layers.Flatten()(user_embedding)
+
+# Item embedding
+item_embedding = layers.Embedding(num_items, embedding_dim,
+                                   name='item_embedding')(item_input)
+item_vec = layers.Flatten()(item_embedding)
+
+# Dot product → predicted rating
+dot_product = layers.Dot(axes=1)([user_vec, item_vec])
+output = layers.Dense(1, activation='sigmoid')(dot_product)  # Scale to [0, 1]
+
+mf_model = keras.Model([user_input, item_input], output)
+mf_model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+mf_model.fit([user_ids, item_ids], ratings, epochs=20, batch_size=256,
+             validation_split=0.2)
+
+# METHOD 2: Deep Neural Collaborative Filtering (NCF)
+user_input = keras.Input(shape=(1,), name='user_id')
+item_input = keras.Input(shape=(1,), name='item_id')
+
+# GMF path (Generalized Matrix Factorization)
+user_emb_gmf = layers.Embedding(num_users, 32)(user_input)
+item_emb_gmf = layers.Embedding(num_items, 32)(item_input)
+gmf = layers.Multiply()([layers.Flatten()(user_emb_gmf),
+                          layers.Flatten()(item_emb_gmf)])
+
+# MLP path (Multi-Layer Perceptron)
+user_emb_mlp = layers.Embedding(num_users, 32)(user_input)
+item_emb_mlp = layers.Embedding(num_items, 32)(item_input)
+mlp = layers.Concatenate()([layers.Flatten()(user_emb_mlp),
+                             layers.Flatten()(item_emb_mlp)])
+mlp = layers.Dense(128, activation='relu')(mlp)
+mlp = layers.Dropout(0.3)(mlp)
+mlp = layers.Dense(64, activation='relu')(mlp)
+mlp = layers.Dropout(0.3)(mlp)
+
+# Combine GMF + MLP
+combined = layers.Concatenate()([gmf, mlp])
+output = layers.Dense(32, activation='relu')(combined)
+output = layers.Dense(1, activation='sigmoid')(output)
+
+ncf_model = keras.Model([user_input, item_input], output)
+ncf_model.compile(optimizer='adam', loss='binary_crossentropy',
+                  metrics=['accuracy'])
+
+# METHOD 3: Content-Based with Side Features
+user_input = keras.Input(shape=(1,), name='user_id')
+item_input = keras.Input(shape=(1,), name='item_id')
+user_features = keras.Input(shape=(20,), name='user_features')  # Age, etc.
+item_features = keras.Input(shape=(50,), name='item_features')  # Genre, etc.
+
+user_emb = layers.Flatten()(layers.Embedding(num_users, 32)(user_input))
+item_emb = layers.Flatten()(layers.Embedding(num_items, 32)(item_input))
+
+# Combine embeddings with side features
+combined = layers.Concatenate()([user_emb, item_emb,
+                                  user_features, item_features])
+x = layers.Dense(256, activation='relu')(combined)
+x = layers.Dropout(0.3)(x)
+x = layers.Dense(128, activation='relu')(x)
+x = layers.Dense(64, activation='relu')(x)
+output = layers.Dense(1, activation='sigmoid')(x)
+
+hybrid_model = keras.Model(
+    [user_input, item_input, user_features, item_features], output
+)
+hybrid_model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+```
+
+### Making Recommendations
+```python
+# Predict ratings for all items for a user
+user_id = 42
+all_items = np.arange(num_items)
+user_array = np.full_like(all_items, user_id)
+
+predicted_ratings = mf_model.predict([user_array, all_items])
+
+# Get top-10 recommendations
+top_10_items = np.argsort(predicted_ratings.flatten())[-10:][::-1]
+print(f"Top 10 recommended items for user {user_id}: {top_10_items}")
+```
+
+### Interview Tips
+- Embedding layers are the foundation of neural recommendation — they learn latent representations of users and items
+- Neural Collaborative Filtering (NCF) combines matrix factorization with deep learning for superior performance
+- Cold-start problem (new users/items): use content-based features alongside embeddings
+- For production, consider approximate nearest neighbor (ANN) search for fast retrieval from millions of items
+- Mention evaluation metrics: NDCG, Hit Rate, MAP, and not just MSE/MAE
+
+---
+
+## Question 15
+
+**Present a framework for anomaly detection using autoencoders in Keras.**
+
+**Answer:**
+
+Autoencoders learn to reconstruct normal data. High reconstruction error = anomaly.
+
+```python
+import tensorflow as tf
+from tensorflow.keras import layers, models
+import numpy as np
+
+# === 1. Build Autoencoder ===
+def build_autoencoder(input_dim, encoding_dim=32):
+    # Encoder
+    inputs = layers.Input(shape=(input_dim,))
+    encoded = layers.Dense(128, activation='relu')(inputs)
+    encoded = layers.Dense(64, activation='relu')(encoded)
+    encoded = layers.Dense(encoding_dim, activation='relu')(encoded)  # Bottleneck
+    
+    # Decoder
+    decoded = layers.Dense(64, activation='relu')(encoded)
+    decoded = layers.Dense(128, activation='relu')(decoded)
+    decoded = layers.Dense(input_dim, activation='sigmoid')(decoded)
+    
+    autoencoder = models.Model(inputs, decoded)
+    encoder = models.Model(inputs, encoded)
+    return autoencoder, encoder
+
+autoencoder, encoder = build_autoencoder(input_dim=100)
+autoencoder.compile(optimizer='adam', loss='mse')
+
+# === 2. Train on Normal Data Only ===
+# X_normal = ... (only non-anomalous samples)
+autoencoder.fit(
+    X_normal, X_normal,  # Input = Target (reconstruction)
+    epochs=100,
+    batch_size=32,
+    validation_split=0.1,
+    callbacks=[tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)]
+)
+
+# === 3. Detect Anomalies ===
+def detect_anomalies(model, data, threshold=None, percentile=95):
+    reconstructed = model.predict(data)
+    mse = np.mean(np.power(data - reconstructed, 2), axis=1)
+    
+    if threshold is None:
+        threshold = np.percentile(mse, percentile)
+    
+    anomalies = mse > threshold
+    return anomalies, mse, threshold
+
+anomalies, errors, threshold = detect_anomalies(autoencoder, X_test)
+print(f"Threshold: {threshold:.4f}")
+print(f"Anomalies found: {anomalies.sum()} / {len(X_test)}")
+
+# === 4. Variational Autoencoder (Better) ===
+class Sampling(layers.Layer):
+    def call(self, inputs):
+        z_mean, z_log_var = inputs
+        epsilon = tf.random.normal(shape=tf.shape(z_mean))
+        return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+
+def build_vae(input_dim, latent_dim=16):
+    # Encoder
+    inputs = layers.Input(shape=(input_dim,))
+    x = layers.Dense(64, activation='relu')(inputs)
+    z_mean = layers.Dense(latent_dim)(x)
+    z_log_var = layers.Dense(latent_dim)(x)
+    z = Sampling()([z_mean, z_log_var])
+    encoder = models.Model(inputs, [z_mean, z_log_var, z])
+    
+    # Decoder
+    latent_inputs = layers.Input(shape=(latent_dim,))
+    x = layers.Dense(64, activation='relu')(latent_inputs)
+    outputs = layers.Dense(input_dim, activation='sigmoid')(x)
+    decoder = models.Model(latent_inputs, outputs)
+    
+    return encoder, decoder
+```
+
+| Component | Purpose |
+|-----------|--------|
+| Encoder | Compress input to latent representation |
+| Bottleneck | Force learning of essential features |
+| Decoder | Reconstruct from compressed representation |
+| Reconstruction Error | High error = input doesn't match learned "normal" |
+| Threshold | Percentile-based or domain-specific cutoff |
+
+> **Interview Tip:** VAEs are generally better than vanilla autoencoders for anomaly detection because they learn a smooth latent space. The reconstruction error + KL divergence together provide a more robust anomaly score.
