@@ -1,76 +1,6 @@
 # Ensemble Learning Interview Questions - Coding Questions
 
-## Question 1: Can you implement ensemble models with imbalanced datasets? If yes, how?
-
-### Definition
-Yes, ensemble methods can handle imbalanced data through class weighting, resampling techniques (SMOTE, undersampling), cost-sensitive learning, or specialized algorithms like BalancedRandomForest.
-
-### Approach 1: Class Weights
-```python
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-
-# Create imbalanced data (1:10 ratio)
-X, y = make_classification(n_samples=10000, weights=[0.9, 0.1], random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Random Forest with balanced class weights
-model = RandomForestClassifier(
-    n_estimators=100,
-    class_weight='balanced',  # Automatically adjusts weights
-    random_state=42
-)
-model.fit(X_train, y_train)
-
-# Evaluate
-y_pred = model.predict(X_test)
-print(classification_report(y_test, y_pred))
-```
-
-### Approach 2: SMOTE + Ensemble
-```python
-from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
-
-# Pipeline: SMOTE then Random Forest
-pipeline = Pipeline([
-    ('smote', SMOTE(random_state=42)),
-    ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
-])
-
-pipeline.fit(X_train, y_train)
-y_pred = pipeline.predict(X_test)
-print(classification_report(y_test, y_pred))
-```
-
-### Approach 3: Balanced Random Forest
-```python
-from imblearn.ensemble import BalancedRandomForestClassifier
-
-# Built-in balanced sampling
-brf = BalancedRandomForestClassifier(
-    n_estimators=100,
-    sampling_strategy='all',  # Balance all classes
-    random_state=42
-)
-brf.fit(X_train, y_train)
-
-y_pred = brf.predict(X_test)
-print(classification_report(y_test, y_pred))
-```
-
-### Key Points
-- Use F1-score, precision-recall, not just accuracy
-- `class_weight='balanced'` is simplest approach
-- SMOTE creates synthetic minority samples
-- BalancedRandomForest undersamples majority per tree
-
----
-
-## Question 2: Implement a simple bagging classifier in Python using decision trees as base learners
+## Question 1: Implement a simple bagging classifier in Python using decision trees as base learners
 
 ### Algorithm Steps
 1. Create B bootstrap samples from training data
@@ -155,7 +85,7 @@ Single Tree Accuracy: 0.8500
 
 ---
 
-## Question 3: Write a Python script to perform K-fold cross-validation on a Random Forest model
+## Question 2: Write a Python script to perform K-fold cross-validation on a Random Forest model
 
 ### Implementation
 ```python
@@ -218,7 +148,7 @@ print(f"Mean Accuracy: {stratified_scores.mean():.4f} (+/- {stratified_scores.st
 
 ---
 
-## Question 4: Create a stacking ensemble of classifiers using scikit-learn and evaluate its performance
+## Question 3: Create a stacking ensemble of classifiers using scikit-learn and evaluate its performance
 
 ### Implementation
 ```python
@@ -284,7 +214,7 @@ print(f"\nStacking CV Score: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})"
 
 ---
 
-## Question 5: Code a Boosting algorithm from scratch using Python
+## Question 4: Code a Boosting algorithm from scratch using Python
 
 ### AdaBoost Implementation
 ```python
@@ -377,7 +307,7 @@ print(f"Sklearn AdaBoost: {sklearn_acc:.4f}")
 
 ---
 
-## Question 6: Use XGBoost in Python to train and fine-tune a model on a given dataset
+## Question 5: Use XGBoost in Python to train and fine-tune a model on a given dataset
 
 ### Implementation
 ```python
@@ -470,7 +400,7 @@ for i in np.argsort(importance)[-5:][::-1]:
 
 ---
 
-## Question 7: Implement feature bagging in Python to see its effect on a classification problem
+## Question 6: Implement feature bagging in Python to see its effect on a classification problem
 
 ### Implementation
 ```python
@@ -567,7 +497,7 @@ print(f"Improvement: {(bag_acc - single_acc) * 100:.2f}%")
 
 ---
 
-## Question 8: Develop a voting ensemble classifier in Python with different weighting strategies for base learners
+## Question 7: Develop a voting ensemble classifier in Python with different weighting strategies for base learners
 
 ### Implementation
 ```python
@@ -650,7 +580,7 @@ print(f"Custom Weights:  {accuracy_score(y_test, custom_voting.predict(X_test)):
 
 ---
 
-## Question 9: Simulate overfitting in an ensemble model and implement a method to reduce it
+## Question 8: Simulate overfitting in an ensemble model and implement a method to reduce it
 
 ### Implementation
 ```python
@@ -748,7 +678,7 @@ print(f"Early Stopping Test Accuracy: {accuracy_score(y_test, final_model.predic
 
 ---
 
-## Question 10: Demonstrate the use of out-of-bag samples to estimate model accuracy in Random Forest using Python
+## Question 9: Demonstrate the use of out-of-bag samples to estimate model accuracy in Random Forest using Python
 
 ### Implementation
 ```python
@@ -825,7 +755,7 @@ for n_trees in [10, 50, 100, 200, 500]:
 
 ---
 
-## Question 11: Write a Python routine to identify the least important features in a Gradient Boosting model
+## Question 10: Write a Python routine to identify the least important features in a Gradient Boosting model
 
 ### Implementation
 ```python
@@ -941,7 +871,7 @@ print(least_important.to_string(index=False))
 
 ---
 
-## Question 12: Implement ensemble learning to improve accuracy on a multi-class classification problem
+## Question 11: Implement ensemble learning to improve accuracy on a multi-class classification problem
 
 ### Implementation
 ```python
@@ -1026,7 +956,7 @@ print(classification_report(y_test, best_ensemble.predict(X_test)))
 
 ---
 
-## Question 13: Using scikit-learn, compare the performance of a single decision tree and a Random Forest on the same dataset
+## Question 12: Using scikit-learn, compare the performance of a single decision tree and a Random Forest on the same dataset
 
 ### Implementation
 ```python
@@ -1112,7 +1042,7 @@ print(f"4. Trade-off: Random Forest takes {rf_train_time/dt_train_time:.1f}x lon
 
 ---
 
-## Question 14: Build an ensemble model that combines predictions from a neural network and a boosting classifier
+## Question 13: Build an ensemble model that combines predictions from a neural network and a boosting classifier
 
 ### Implementation
 ```python
@@ -1208,7 +1138,7 @@ print(f"Improvement over best individual: {best_acc - max(nn_acc, gb_acc):.4f}")
 
 ---
 
-## Question 15: Create a weighted ensemble that dynamically adjusts weights based on the performance of each learner
+## Question 14: Create a weighted ensemble that dynamically adjusts weights based on the performance of each learner
 
 ### Implementation
 ```python
@@ -1344,7 +1274,7 @@ for name, model in models.items():
 
 ---
 
-## Question 16: Develop a mechanism to periodically retrain an ensemble model with new streaming data
+## Question 15: Develop a mechanism to periodically retrain an ensemble model with new streaming data
 
 ### Implementation
 ```python
@@ -1493,7 +1423,7 @@ print(f"\nTotal retrains: {ensemble.retrain_count}")
 
 ---
 
-## Question 17: Write a script in Python that utilizes early stopping with gradient boosting methods
+## Question 16: Write a script in Python that utilizes early stopping with gradient boosting methods
 
 ### Implementation
 ```python
@@ -1609,7 +1539,7 @@ print(f"Sklearn:  {best_n_estimators} iterations, Test Acc: {accuracy_score(y_te
 
 ---
 
-## Question 18: Create an end-to-end pipeline for training, validating, and selecting the best ensemble setup automatically
+## Question 17: Create an end-to-end pipeline for training, validating, and selecting the best ensemble setup automatically
 
 ### Implementation
 ```python
@@ -1762,7 +1692,7 @@ print(f"\nBest model selected: {selector.best_name}")
 
 ---
 
-## Question 19: Script a solution for an imbalanced classification problem using ensemble learning with proper sampling techniques
+## Question 18: Script a solution for an imbalanced classification problem using ensemble learning with proper sampling techniques
 
 ### Implementation
 ```python
@@ -1873,7 +1803,7 @@ print(f"Best by AUC: {best_auc[0]} ({best_auc[1]['auc']:.4f})")
 
 ---
 
-## Question 20: Generate a synthetic dataset with Python and apply different ensemble learning models to compare their generalization capabilities
+## Question 19: Generate a synthetic dataset with Python and apply different ensemble learning models to compare their generalization capabilities
 
 ### Implementation
 ```python
@@ -2024,7 +1954,7 @@ for ds_name in datasets:
 
 ---
 
-## Question 21: Implement a collaborative filtering recommendation system using a stack of matrix factorization models as an ensemble
+## Question 20: Implement a collaborative filtering recommendation system using a stack of matrix factorization models as an ensemble
 
 ### Implementation
 ```python
@@ -2232,3 +2162,4 @@ for item, score in recommendations:
 ```
 
 ---
+

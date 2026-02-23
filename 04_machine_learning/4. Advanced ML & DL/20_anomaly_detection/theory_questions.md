@@ -2,888 +2,238 @@
 
 ---
 
-## Question 1: What is anomaly detection?
+## Question 1: What preprocessing steps are important before applying anomaly detection algorithms?
 
 ### Answer
 
-**Definition**: Anomaly detection (also called outlier detection) is the identification of data points, observations, or patterns that deviate significantly from the expected behavior or the majority of the data.
-
-**Core Concepts**:
-
-| Term | Description |
-|------|-------------|
-| Anomaly | Data point significantly different from normal observations |
-| Normal Behavior | Expected pattern established from training data |
-| Anomaly Score | Numerical measure of how anomalous a point is |
-
-**Mathematical Formulation**:
-
-For a data point $x$ in dataset $D$:
-$$\text{Anomaly Score}(x) = f(x) \quad \text{where } f: \mathbb{R}^d \rightarrow \mathbb{R}$$
-
-A point is flagged as anomaly if:
-$$f(x) > \tau \quad \text{(threshold)}$$
-
-**Types of Learning Approaches**:
+**Essential Preprocessing Pipeline**:
 
 ```
-Anomaly Detection Approaches
-├── Supervised (labeled anomalies available)
-├── Semi-supervised (only normal data for training)
-└── Unsupervised (no labels, assume anomalies are rare)
+Raw Data
+    ↓
+1. Handle Missing Values
+    ↓
+2. Remove/Fix Data Errors
+    ↓
+3. Feature Scaling
+    ↓
+4. Handle Categorical Variables
+    ↓
+5. Feature Engineering
+    ↓
+6. Dimensionality Reduction (if needed)
+    ↓
+Preprocessed Data → Anomaly Detection
 ```
 
-**Interview Tip**: Emphasize that anomaly detection assumes anomalies are rare and different - this distinguishes it from binary classification where both classes may be equally represented.
-
----
-
-## Question 2: What are the main types of anomalies in data?
-
-### Answer
-
-**Three Main Types**:
-
-| Type | Description | Example |
-|------|-------------|---------|
-| **Point Anomalies** | Single data point deviating from the rest | Unusually large transaction |
-| **Contextual Anomalies** | Normal in one context, anomalous in another | High temperature in summer vs winter |
-| **Collective Anomalies** | Group of points anomalous together | Sequence of failed login attempts |
-
-**Visual Representation**:
-
-```
-Point Anomaly:        Contextual Anomaly:       Collective Anomaly:
-                      
-    *                     * (summer)            [* * * * *] ← anomalous
-                                                   sequence
-  • • •                 • • • •               
- • • • •               • • • •                • • • • • • •
-• • • • •             • * (winter)            • • • • • • •
-```
-
-**Contextual Anomaly Components**:
-- **Contextual attributes**: Define the context (e.g., time, location)
-- **Behavioral attributes**: Actual values being evaluated
-
-**Mathematical Example** (Contextual):
-$$x_t \text{ is anomalous if } |x_t - \mu_{\text{context}}| > k \cdot \sigma_{\text{context}}$$
-
-**Interview Tip**: Always ask about the context of the data - the same value might be normal or anomalous depending on the situation.
-
----
-
-## Question 3: How does anomaly detection differ from noise removal?
-
-### Answer
-
-**Key Differences**:
-
-| Aspect | Anomaly Detection | Noise Removal |
-|--------|-------------------|---------------|
-| **Goal** | Find interesting deviations | Remove unwanted variations |
-| **Value** | Anomalies are valuable | Noise is discarded |
-| **Interpretation** | Anomalies carry meaning | Noise is random error |
-| **Action** | Investigate anomalies | Filter out noise |
-
-**Conceptual Difference**:
-
-```
-Signal Decomposition:
-Data = True Signal + Noise + Anomalies
-         ↓            ↓         ↓
-       Keep       Remove     Detect!
-```
-
-**Example**:
-- **Noise**: Sensor measurement jitter (±0.1°C random fluctuation)
-- **Anomaly**: Sudden temperature spike indicating equipment failure
-
-**Mathematical Perspective**:
-
-Noise follows expected distribution:
-$$\epsilon \sim \mathcal{N}(0, \sigma^2_{\text{known}})$$
-
-Anomalies violate expected distribution:
-$$P(x|\text{normal}) < \tau$$
-
-**Interview Tip**: A key insight is that noise is expected and modeled, while anomalies are unexpected and interesting.
-
----
-
-## Question 4: Explain the concepts of outliers and their impact on dataset
-
-### Answer
-
-**Definition**: Outliers are observations that lie at an abnormal distance from other values in a dataset.
-
-**Types of Outliers by Cause**:
-
-| Type | Description | Action |
-|------|-------------|--------|
-| **Data Entry Errors** | Typos, measurement mistakes | Correct or remove |
-| **Measurement Errors** | Instrument malfunction | Investigate and correct |
-| **Experimental Errors** | Procedure deviation | Document and decide |
-| **Natural Outliers** | Genuine extreme values | Keep and analyze |
-
-**Impact on Statistical Measures**:
-
-```python
-# Example impact
-normal_data = [10, 12, 11, 13, 12, 11, 10, 12]
-with_outlier = [10, 12, 11, 13, 12, 11, 10, 100]  # outlier: 100
-
-# Mean: 11.4 vs 22.4 (heavily affected)
-# Median: 11.5 vs 11.5 (robust)
-# Std Dev: 1.0 vs 30.7 (heavily affected)
-```
-
-**Impact on ML Models**:
-
-| Model Type | Impact of Outliers |
-|------------|-------------------|
-| Linear Regression | Severely distorts slope |
-| K-Means | Pulls centroids toward outliers |
-| PCA | Distorts principal components |
-| Tree-based | Relatively robust |
-
-**Mathematical Impact** (Least Squares):
-$$\hat{\beta} = (X^TX)^{-1}X^Ty$$
-
-Single outlier can dramatically change $\hat{\beta}$ due to squared error penalty.
-
-**Interview Tip**: Always discuss whether outliers should be removed, transformed, or kept based on domain knowledge and analysis goals.
-
----
-
-## Question 5: What is the difference between supervised and unsupervised anomaly detection?
-
-### Answer
-
-**Comparison Table**:
-
-| Aspect | Supervised | Unsupervised |
-|--------|------------|--------------|
-| **Training Data** | Labeled normal + anomalies | Unlabeled data only |
-| **Assumption** | Labels are accurate | Anomalies are rare |
-| **Approach** | Classification problem | Density/distance based |
-| **Accuracy** | Generally higher | May miss novel anomalies |
-| **Practical Use** | When labels available | Most real scenarios |
-
-**Semi-Supervised** (Important Third Category):
-- Train only on normal data
-- Flag deviations as anomalies
-- Most practical in many domains
-
-**Visual Comparison**:
-
-```
-Supervised:                 Unsupervised:
-                           
-Training:                  Training:
-• = normal, × = anomaly    • = data (no labels)
-                           
-• • • ×                    • • • •
-• • × •                    • • • •
-× • • •                    • • • •
-                           Assumes: rare points = anomalies
-
-Test: Classify new point   Test: Score by density/distance
-```
-
-**Algorithm Examples**:
-
-| Type | Algorithms |
-|------|------------|
-| Supervised | Random Forest, SVM, Neural Networks |
-| Semi-supervised | One-Class SVM, Autoencoders |
-| Unsupervised | Isolation Forest, LOF, DBSCAN |
-
-**Interview Tip**: In practice, labeled anomaly data is rare and expensive. Semi-supervised and unsupervised methods are most common.
-
----
-
-## Question 6: What are some real-world applications of anomaly detection?
-
-### Answer
-
-**Major Application Domains**:
-
-| Domain | Application | Anomaly Type |
-|--------|-------------|--------------|
-| **Cybersecurity** | Intrusion detection | Unusual network traffic |
-| **Finance** | Fraud detection | Suspicious transactions |
-| **Healthcare** | Disease detection | Abnormal vital signs |
-| **Manufacturing** | Quality control | Defective products |
-| **IT Operations** | System monitoring | Server failures |
-
-**Detailed Examples**:
-
-```
-1. Credit Card Fraud:
-   Normal: $50 coffee shop, $200 grocery
-   Anomaly: $5000 electronics in foreign country
-   
-2. Network Security:
-   Normal: 100 requests/min from IP
-   Anomaly: 10,000 requests/min (DDoS)
-   
-3. Medical Diagnosis:
-   Normal: Heart rate 60-100 bpm
-   Anomaly: Sudden spike to 180 bpm
-   
-4. Manufacturing:
-   Normal: Part dimensions within ±0.1mm
-   Anomaly: Part 2mm off specification
-```
-
-**Business Impact**:
-
-| Application | Cost of Missing Anomaly |
-|-------------|------------------------|
-| Fraud Detection | Financial loss |
-| Medical Diagnosis | Patient harm |
-| Predictive Maintenance | Equipment damage |
-| Security | Data breach |
-
-**Interview Tip**: Tailor your anomaly detection approach to the domain - false positive/negative costs vary dramatically across applications.
-
----
-
-## Question 7: What is the role of statistics in anomaly detection?
-
-### Answer
-
-**Statistical Foundation**:
-
-Statistics provides the theoretical basis for defining "normal" and measuring deviation from it.
-
-**Key Statistical Concepts**:
-
-| Concept | Role in Anomaly Detection |
-|---------|---------------------------|
-| **Distribution** | Model normal behavior |
-| **Mean/Variance** | Define center and spread |
-| **Percentiles** | Set thresholds |
-| **Hypothesis Testing** | Formal anomaly decisions |
-
-**Statistical Approach Flow**:
-
-```
-Data → Fit Distribution → Calculate Probability → Flag if P < threshold
-         ↓
-    Estimate μ, σ
-         ↓
-    P(x|μ,σ) for new point
-         ↓
-    If P(x) < 0.01 → Anomaly
-```
-
-**Mathematical Framework**:
-
-For Gaussian assumption:
-$$P(x|\mu,\sigma) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
-
-Anomaly if:
-$$P(x|\mu,\sigma) < \epsilon \quad \text{or equivalently} \quad |x - \mu| > k\sigma$$
-
-**Limitations**:
-- Assumes known distribution (often Gaussian)
-- Struggles with multimodal or complex distributions
-- High-dimensional data challenges (curse of dimensionality)
-
-**Interview Tip**: Statistical methods are interpretable but make assumptions. Always validate distributional assumptions before applying.
-
----
-
-## Question 8: What are some common statistical methods for anomaly detection?
-
-### Answer
-
-**Common Methods**:
-
-| Method | Approach | Best For |
-|--------|----------|----------|
-| **Z-Score** | Standard deviations from mean | Univariate, Gaussian |
-| **IQR** | Quartile-based bounds | Robust to outliers |
-| **Grubbs' Test** | Hypothesis testing | Single outlier |
-| **Mahalanobis Distance** | Multivariate distance | Correlated features |
-
-**Z-Score Method**:
-$$z = \frac{x - \mu}{\sigma}$$
-
-Anomaly if $|z| > 3$ (3-sigma rule)
-
-**IQR Method**:
-$$\text{Lower} = Q_1 - 1.5 \times IQR$$
-$$\text{Upper} = Q_3 + 1.5 \times IQR$$
-
-**Mahalanobis Distance** (Multivariate):
-$$D_M(x) = \sqrt{(x-\mu)^T \Sigma^{-1} (x-\mu)}$$
-
-**Comparison**:
-
-```python
-import numpy as np
-from scipy import stats
-
-def z_score_anomalies(data, threshold=3):
-    z = np.abs(stats.zscore(data))
-    return z > threshold
-
-def iqr_anomalies(data, k=1.5):
-    q1, q3 = np.percentile(data, [25, 75])
-    iqr = q3 - q1
-    return (data < q1 - k*iqr) | (data > q3 + k*iqr)
-```
-
-**Method Selection**:
-
-| Data Characteristic | Recommended Method |
-|--------------------|-------------------|
-| Gaussian, no outliers | Z-Score |
-| Non-Gaussian, heavy tails | IQR |
-| Multivariate, correlated | Mahalanobis |
-| Unknown distribution | Non-parametric (IQR) |
-
-**Interview Tip**: IQR is more robust than Z-score because quartiles are less sensitive to extreme values than mean and standard deviation.
-
----
-
-## Question 9: Explain the working principle of k-NN in anomaly detection
-
-### Answer
-
-**Core Idea**: Points far from their k nearest neighbors are anomalies.
-
-**Algorithm**:
-
-```
-1. For each point x:
-   a. Find k nearest neighbors
-   b. Calculate distance to k-th neighbor (or average distance)
-   c. Assign anomaly score = distance
-2. Flag points with high scores as anomalies
-```
-
-**Distance Metrics**:
-
-| Metric | Formula | Use Case |
-|--------|---------|----------|
-| Euclidean | $\sqrt{\sum(x_i-y_i)^2}$ | Continuous features |
-| Manhattan | $\sum|x_i-y_i|$ | Sparse data |
-| Minkowski | $(\sum|x_i-y_i|^p)^{1/p}$ | General purpose |
-
-**Anomaly Score Variants**:
-
-1. **Distance to k-th neighbor**: $d_k(x)$
-2. **Average distance to k neighbors**: $\frac{1}{k}\sum_{i=1}^k d_i(x)$
-3. **Average distance from k neighbors**: Consider reverse neighbors
-
-**Visual Example**:
-
-```
-Normal point (dense region):     Anomaly (isolated):
-    • •                              
-   • x • ← k=3 neighbors close      x ← k=3 neighbors far
-    • •                            
-  • • • •                         • • • • •
-                                  • • • • •
-```
+**Detailed Steps**:
+
+| Step | Methods | Importance for AD |
+|------|---------|-------------------|
+| **Missing Values** | Imputation, deletion | Missing patterns may be anomalies |
+| **Scaling** | StandardScaler, MinMaxScaler | Distance-based methods require it |
+| **Encoding** | One-hot, target encoding | Handle categorical features |
+| **Outlier Handling** | Winsorization, capping | Extreme values affect scaling |
 
 **Python Implementation**:
 
 ```python
-from sklearn.neighbors import NearestNeighbors
 import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.impute import SimpleImputer, KNNImputer
 
-def knn_anomaly_scores(X, k=5):
-    nn = NearestNeighbors(n_neighbors=k+1)  # +1 excludes self
-    nn.fit(X)
-    distances, _ = nn.kneighbors(X)
-    return distances[:, -1]  # Distance to k-th neighbor
+class AnomalyDetectionPreprocessor:
+    def __init__(self, scaling='robust', impute_strategy='median'):
+        self.scaling = scaling
+        self.impute_strategy = impute_strategy
+        self.scaler = None
+        self.imputer = None
+    
+    def fit_transform(self, X):
+        """Full preprocessing pipeline."""
+        X = X.copy()
+        
+        # 1. Handle missing values
+        if self.impute_strategy == 'knn':
+            self.imputer = KNNImputer(n_neighbors=5)
+        else:
+            self.imputer = SimpleImputer(strategy=self.impute_strategy)
+        X = self.imputer.fit_transform(X)
+        
+        # 2. Feature scaling
+        if self.scaling == 'robust':
+            # Robust to outliers
+            self.scaler = RobustScaler()
+        else:
+            self.scaler = StandardScaler()
+        X = self.scaler.fit_transform(X)
+        
+        return X
+    
+    def transform(self, X):
+        """Transform new data."""
+        X = self.imputer.transform(X)
+        X = self.scaler.transform(X)
+        return X
+
+
+def handle_categorical_for_anomaly(df, categorical_cols):
+    """Handle categorical variables for anomaly detection."""
+    df_processed = df.copy()
+    
+    for col in categorical_cols:
+        # Frequency encoding (useful for rare categories as anomalies)
+        freq = df[col].value_counts(normalize=True)
+        df_processed[f'{col}_freq'] = df[col].map(freq)
+        
+        # Rare category flag
+        rare_threshold = 0.01
+        df_processed[f'{col}_is_rare'] = (df_processed[f'{col}_freq'] < rare_threshold).astype(int)
+    
+    return df_processed
 ```
 
-**Choosing k**:
-- Small k: Sensitive to local variations
-- Large k: Smoother but may miss local anomalies
-- Rule of thumb: $k \approx \sqrt{n}$
+**Scaling Choice Impact**:
 
-**Interview Tip**: k-NN is simple and intuitive but computationally expensive for large datasets ($O(n^2)$ naive).
+| Scaler | Formula | When to Use |
+|--------|---------|-------------|
+| StandardScaler | $(x-\mu)/\sigma$ | Gaussian-like data |
+| RobustScaler | $(x-Q2)/(Q3-Q1)$ | Data with outliers |
+| MinMaxScaler | $(x-min)/(max-min)$ | Bounded features |
+
+**Common Mistakes to Avoid**:
+
+1. ❌ Fitting scaler on test data (data leakage)
+2. ❌ Removing outliers before anomaly detection (might remove true anomalies!)
+3. ❌ Using StandardScaler when outliers present
+4. ❌ Ignoring missing value patterns
+
+**Interview Tip**: RobustScaler is preferred for anomaly detection preprocessing because StandardScaler is sensitive to the very outliers you're trying to detect.
 
 ---
 
-## Question 10: Describe how cluster analysis can be used for detecting anomalies
+## Question 2: How do you select the threshold for flagging anomalies using a given method?
 
 ### Answer
 
-**Core Approaches**:
+**Threshold Selection Approaches**:
 
-| Approach | Anomaly Definition |
-|----------|-------------------|
-| **Distance-based** | Far from nearest cluster centroid |
-| **Density-based** | In sparse regions (DBSCAN noise points) |
-| **Size-based** | In very small clusters |
+| Approach | Method | When to Use |
+|----------|--------|-------------|
+| **Statistical** | Percentile, standard deviations | Known contamination rate |
+| **Domain-based** | Business rules, expert knowledge | Clear operational limits |
+| **Validation-based** | Optimize metric on labeled data | Labels available |
+| **Visual** | Elbow method, score distribution | Exploratory analysis |
 
-**K-Means Based Detection**:
-
-```
-1. Cluster data using K-Means
-2. For each point, calculate distance to assigned centroid
-3. Points with large distances are anomalies
-```
-
-**DBSCAN for Anomaly Detection**:
-
-```
-Core Point: ≥ minPts neighbors within ε
-Border Point: < minPts but neighbor of core
-Noise Point: Neither → ANOMALY
-```
-
-**Visual Representation**:
-
-```
-K-Means approach:          DBSCAN approach:
-                           
-    ○ ○                       • •
-   ○ C ○    * anomaly        • • •   * noise (anomaly)
-    ○ ○                       • •
-                    *                        *
-   ○ ○ ○
-  ○ C ○                      • • •
-   ○ ○                        • •
-```
-
-**Python Implementation**:
+**Statistical Methods**:
 
 ```python
-from sklearn.cluster import KMeans, DBSCAN
 import numpy as np
-
-def kmeans_anomaly_detection(X, n_clusters=5, threshold_percentile=95):
-    kmeans = KMeans(n_clusters=n_clusters)
-    labels = kmeans.fit_predict(X)
-    
-    # Distance to assigned centroid
-    distances = np.min(kmeans.transform(X), axis=1)
-    threshold = np.percentile(distances, threshold_percentile)
-    
-    return distances > threshold
-
-def dbscan_anomaly_detection(X, eps=0.5, min_samples=5):
-    dbscan = DBSCAN(eps=eps, min_samples=min_samples)
-    labels = dbscan.fit_predict(X)
-    
-    return labels == -1  # Noise points are anomalies
-```
-
-**Interview Tip**: DBSCAN naturally identifies anomalies as noise points without needing to specify anomaly proportion.
-
----
-
-## Question 11: Explain how the Isolation Forest algorithm works
-
-### Answer
-
-**Core Insight**: Anomalies are easier to isolate (separate) than normal points.
-
-**Algorithm**:
-
-```
-Building Trees:
-1. Randomly select a feature
-2. Randomly select split value between min and max
-3. Recursively partition until each point is isolated
-4. Record path length (number of splits) to isolate each point
-
-Scoring:
-- Shorter path = easier to isolate = more anomalous
-- Longer path = harder to isolate = more normal
-```
-
-**Path Length Intuition**:
-
-```
-Normal point (dense):        Anomaly (isolated):
-      |                           |
-     / \                         / \
-    /   \                       *   \
-   / \   \                          / \
-  / \ /\  /\                       / \ /\
- *                              (many more splits needed)
- 
-Path length: 5                 Path length: 1
-Score: Low (normal)            Score: High (anomaly)
-```
-
-**Anomaly Score Formula**:
-
-$$s(x, n) = 2^{-\frac{E[h(x)]}{c(n)}}$$
-
-Where:
-- $h(x)$ = path length for point x
-- $E[h(x)]$ = average path length over all trees
-- $c(n)$ = average path length in unsuccessful BST search
-
-**Score Interpretation**:
-- $s \approx 1$: Definitely anomaly
-- $s \approx 0.5$: Normal point
-- $s \approx 0$: Very normal (but rare)
-
-**Python Implementation**:
-
-```python
 from sklearn.ensemble import IsolationForest
-import numpy as np
 
-def isolation_forest_detection(X, contamination=0.1):
-    iso_forest = IsolationForest(
-        n_estimators=100,
-        contamination=contamination,
-        random_state=42
-    )
-    predictions = iso_forest.fit_predict(X)
-    scores = iso_forest.decision_function(X)
-    
-    return predictions == -1, scores  # -1 = anomaly
+def threshold_by_percentile(scores, contamination=0.05):
+    """Set threshold at percentile based on expected contamination."""
+    threshold = np.percentile(scores, contamination * 100)
+    return threshold
+
+def threshold_by_std(scores, n_std=3):
+    """Set threshold at n standard deviations from mean."""
+    threshold = scores.mean() - n_std * scores.std()
+    return threshold
+
+def threshold_by_iqr(scores, k=1.5):
+    """Set threshold using IQR method."""
+    q1, q3 = np.percentile(scores, [25, 75])
+    iqr = q3 - q1
+    threshold = q1 - k * iqr
+    return threshold
 ```
 
-**Advantages**:
-- Linear time complexity: $O(n \log n)$
-- No distance calculations
-- Handles high dimensions well
-- Few hyperparameters
-
-**Interview Tip**: Isolation Forest is often the go-to algorithm for anomaly detection due to efficiency and effectiveness.
-
----
-
-## Question 12: Explain the concept of a Z-Score and how it is used in anomaly detection
-
-### Answer
-
-**Definition**: Z-score measures how many standard deviations a point is from the mean.
-
-**Formula**:
-$$z = \frac{x - \mu}{\sigma}$$
-
-**Interpretation**:
-
-| Z-Score | Interpretation | % of Data (Normal) |
-|---------|----------------|-------------------|
-| \|z\| < 1 | Normal | 68.3% |
-| \|z\| < 2 | Somewhat unusual | 95.4% |
-| \|z\| < 3 | Unusual | 99.7% |
-| \|z\| > 3 | **Anomaly** | 0.3% |
-
-**Visual Representation**:
-
-```
-Normal Distribution:
-                    
-          ▄▄▄▄
-        ▄██████▄
-      ▄██████████▄
-    ▄██████████████▄
-  ▄████████████████████▄
-──┴──┴──┴──┴──┴──┴──┴──┴──
- -3σ -2σ -1σ  μ  +1σ +2σ +3σ
-  │                       │
-  └─── Anomaly zone ──────┘
-```
-
-**Python Implementation**:
+**Validation-Based Selection**:
 
 ```python
-import numpy as np
-from scipy import stats
-
-def z_score_anomaly_detection(data, threshold=3):
-    """
-    Detect anomalies using Z-score method.
-    
-    Args:
-        data: 1D array of values
-        threshold: Z-score threshold (default 3)
-    
-    Returns:
-        Boolean array (True = anomaly)
-    """
-    z_scores = np.abs(stats.zscore(data))
-    return z_scores > threshold
-
-# Robust version using median and MAD
-def robust_z_score(data, threshold=3.5):
-    """Modified Z-score using median absolute deviation."""
-    median = np.median(data)
-    mad = np.median(np.abs(data - median))
-    modified_z = 0.6745 * (data - median) / mad
-    return np.abs(modified_z) > threshold
-```
-
-**Limitations**:
-- Assumes Gaussian distribution
-- Sensitive to outliers (mean and std affected)
-- Not suitable for multimodal distributions
-
-**Robust Alternative** (Modified Z-Score):
-$$M_i = \frac{0.6745(x_i - \tilde{x})}{MAD}$$
-
-Where MAD = Median Absolute Deviation
-
-**Interview Tip**: Use modified Z-score when data may already contain outliers that would skew mean and standard deviation.
-
----
-
-## Question 13: Describe the autoencoder approach for anomaly detection in neural networks
-
-### Answer
-
-**Core Idea**: Train autoencoder on normal data; anomalies have high reconstruction error.
-
-**Architecture**:
-
-```
-Input → Encoder → Bottleneck → Decoder → Reconstruction
-  x        ↓          z           ↓          x̂
-         compress            decompress
-         
-Anomaly Score = ||x - x̂||²
-```
-
-**Mathematical Formulation**:
-
-Encoder: $z = f_\theta(x)$
-Decoder: $\hat{x} = g_\phi(z)$
-
-Loss (reconstruction error):
-$$\mathcal{L} = \frac{1}{n}\sum_{i=1}^n ||x_i - g_\phi(f_\theta(x_i))||^2$$
-
-**Why It Works for Anomaly Detection**:
-
-```
-Normal data:                 Anomaly:
-x ──[Encoder]──> z           x ──[Encoder]──> z
-        │                            │
-   (learned                    (not learned
-    pattern)                    pattern)
-        │                            │
-z ──[Decoder]──> x̂           z ──[Decoder]──> x̂
-        │                            │
-    x ≈ x̂                       x ≠ x̂
-    (low error)                (HIGH ERROR!)
-```
-
-**Python Implementation**:
-
-```python
-import tensorflow as tf
-from tensorflow import keras
-
-def build_autoencoder(input_dim, encoding_dim=32):
-    # Encoder
-    encoder = keras.Sequential([
-        keras.layers.Dense(128, activation='relu', input_shape=(input_dim,)),
-        keras.layers.Dense(64, activation='relu'),
-        keras.layers.Dense(encoding_dim, activation='relu')
-    ])
-    
-    # Decoder
-    decoder = keras.Sequential([
-        keras.layers.Dense(64, activation='relu', input_shape=(encoding_dim,)),
-        keras.layers.Dense(128, activation='relu'),
-        keras.layers.Dense(input_dim, activation='sigmoid')
-    ])
-    
-    # Autoencoder
-    autoencoder = keras.Sequential([encoder, decoder])
-    autoencoder.compile(optimizer='adam', loss='mse')
-    
-    return autoencoder
-
-def detect_anomalies(autoencoder, X_train, X_test, threshold_percentile=95):
-    # Train on normal data only
-    autoencoder.fit(X_train, X_train, epochs=50, batch_size=32, verbose=0)
-    
-    # Calculate reconstruction errors
-    reconstructions = autoencoder.predict(X_test)
-    errors = np.mean(np.square(X_test - reconstructions), axis=1)
-    
-    # Set threshold from training data errors
-    train_recon = autoencoder.predict(X_train)
-    train_errors = np.mean(np.square(X_train - train_recon), axis=1)
-    threshold = np.percentile(train_errors, threshold_percentile)
-    
-    return errors > threshold
-```
-
-**Variants**:
-- **Variational Autoencoder (VAE)**: Probabilistic latent space
-- **Denoising Autoencoder**: Trained to reconstruct from noisy input
-- **Sparse Autoencoder**: Regularized latent representation
-
-**Interview Tip**: Autoencoders are powerful for high-dimensional data (images, sequences) where traditional methods fail.
-
----
-
-## Question 14: How does Principal Component Analysis (PCA) help in identifying anomalies?
-
-### Answer
-
-**Core Idea**: Anomalies have high reconstruction error when projected onto principal components.
-
-**Two Approaches**:
-
-| Approach | Method | Intuition |
-|----------|--------|-----------|
-| **Major PC** | Distance in PC space | Anomalies far from center |
-| **Minor PC** | Reconstruction error | Anomalies violate correlation structure |
-
-**Mathematical Framework**:
-
-PCA decomposition:
-$$X = T P^T + E$$
-
-Where:
-- $T$ = scores (projections onto PCs)
-- $P$ = loadings (principal components)
-- $E$ = residual (reconstruction error)
-
-**Anomaly Scores**:
-
-1. **Hotelling's T² (Major Components)**:
-$$T^2 = \sum_{i=1}^k \frac{t_i^2}{\lambda_i}$$
-
-2. **Q-statistic/SPE (Residual)**:
-$$Q = ||e||^2 = ||x - \hat{x}||^2$$
-
-**Visual Intuition**:
-
-```
-PC2 ↑
-    │         * (T² high - far from center)
-    │    
-    │  ○ ○ ○
-    │ ○ ○ ○ ○
-    │  ○ ○ ○
-    │________→ PC1
-    
-    * (Q high - off the plane)
-      ↓
-    ○ ○ ○ (normal data lies on PC1-PC2 plane)
-```
-
-**Python Implementation**:
-
-```python
-from sklearn.decomposition import PCA
+from sklearn.metrics import f1_score, precision_recall_curve
 import numpy as np
 
-def pca_anomaly_detection(X, n_components=2, threshold_percentile=95):
-    pca = PCA(n_components=n_components)
-    pca.fit(X)
+def optimize_threshold(y_true, scores, metric='f1'):
+    """Find optimal threshold using labeled data."""
+    # Try different thresholds
+    thresholds = np.percentile(scores, np.linspace(1, 20, 100))
     
-    # Transform and reconstruct
-    X_transformed = pca.transform(X)
-    X_reconstructed = pca.inverse_transform(X_transformed)
+    best_threshold = None
+    best_score = -np.inf
     
-    # Reconstruction error (Q-statistic)
-    reconstruction_error = np.sum((X - X_reconstructed) ** 2, axis=1)
+    for thresh in thresholds:
+        y_pred = (scores < thresh).astype(int)
+        
+        if metric == 'f1':
+            score = f1_score(y_true, y_pred)
+        elif metric == 'precision':
+            score = (y_true[y_pred == 1] == 1).mean()
+        
+        if score > best_score:
+            best_score = score
+            best_threshold = thresh
     
-    # T² statistic
-    t_squared = np.sum(X_transformed ** 2 / pca.explained_variance_, axis=1)
-    
-    # Combine scores
-    threshold_q = np.percentile(reconstruction_error, threshold_percentile)
-    threshold_t = np.percentile(t_squared, threshold_percentile)
-    
-    anomalies = (reconstruction_error > threshold_q) | (t_squared > threshold_t)
-    return anomalies, reconstruction_error, t_squared
+    return best_threshold, best_score
+
+def precision_at_k(y_true, scores, k):
+    """Precision when flagging top-k anomalies."""
+    top_k_indices = np.argsort(scores)[:k]
+    return y_true[top_k_indices].mean()
 ```
 
-**When to Use**:
-- High-dimensional data with correlated features
-- When anomalies violate normal correlation structure
-- Process monitoring in manufacturing
-
-**Interview Tip**: Choosing number of components is crucial - too few misses variance, too many includes noise.
-
----
-
-## Question 15: What are the benefits and drawbacks of using Gaussian Mixture Models for anomaly detection?
-
-### Answer
-
-**How GMM Works for Anomaly Detection**:
-
-```
-1. Fit GMM to data: P(x) = Σ πₖ N(x|μₖ, Σₖ)
-2. Calculate probability density for each point
-3. Low probability points = anomalies
-```
-
-**Benefits**:
-
-| Benefit | Description |
-|---------|-------------|
-| **Flexible distributions** | Models multimodal data |
-| **Soft clustering** | Probabilistic assignments |
-| **Density estimation** | Provides probability scores |
-| **Handles elliptical clusters** | Full covariance matrices |
-
-**Drawbacks**:
-
-| Drawback | Description |
-|----------|-------------|
-| **Requires k selection** | Number of components unknown |
-| **Sensitive to initialization** | EM can find local optima |
-| **Assumes Gaussian components** | May not fit all data |
-| **Struggles high dimensions** | Covariance estimation issues |
-
-**Mathematical Formulation**:
-
-$$P(x) = \sum_{k=1}^K \pi_k \mathcal{N}(x|\mu_k, \Sigma_k)$$
-
-Anomaly score:
-$$s(x) = -\log P(x)$$
-
-**Python Implementation**:
+**Visual Elbow Method**:
 
 ```python
-from sklearn.mixture import GaussianMixture
+import matplotlib.pyplot as plt
 import numpy as np
 
-def gmm_anomaly_detection(X, n_components=3, threshold_percentile=5):
-    gmm = GaussianMixture(
-        n_components=n_components,
-        covariance_type='full',
-        random_state=42
-    )
-    gmm.fit(X)
+def elbow_threshold(scores):
+    """Find threshold using elbow in sorted scores."""
+    sorted_scores = np.sort(scores)
     
-    # Log probability density
-    log_probs = gmm.score_samples(X)
+    # Calculate second derivative (curvature)
+    first_diff = np.diff(sorted_scores)
+    second_diff = np.diff(first_diff)
     
-    # Low probability = anomaly
-    threshold = np.percentile(log_probs, threshold_percentile)
+    # Elbow at maximum curvature
+    elbow_idx = np.argmax(np.abs(second_diff)) + 1
     
-    return log_probs < threshold, log_probs
+    plt.figure(figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    plt.plot(sorted_scores)
+    plt.axvline(elbow_idx, color='r', linestyle='--', label='Elbow')
+    plt.title('Sorted Anomaly Scores')
+    plt.legend()
+    
+    plt.subplot(1, 2, 2)
+    plt.hist(scores, bins=50)
+    plt.axvline(sorted_scores[elbow_idx], color='r', linestyle='--')
+    plt.title('Score Distribution')
+    plt.show()
+    
+    return sorted_scores[elbow_idx]
 ```
 
-**Comparison with Other Methods**:
+**Business-Driven Threshold**:
 
-| Aspect | GMM | K-Means | Isolation Forest |
-|--------|-----|---------|------------------|
-| Output | Probability | Distance | Anomaly score |
-| Cluster shape | Elliptical | Spherical | N/A |
-| Interpretability | High | High | Low |
-| Scalability | Medium | High | High |
+```
+Consider:
+- Cost of false positive (unnecessary investigation)
+- Cost of false negative (missed anomaly)
+- Operational capacity (how many alerts can team handle?)
 
-**Interview Tip**: GMM is excellent when data has clear cluster structure but you need probabilistic anomaly scores rather than hard decisions.
+If FP cost << FN cost: Lower threshold (more sensitive)
+If FP cost >> FN cost: Higher threshold (more specific)
+```
+
+**Interview Tip**: Always ask about the cost of false positives vs. false negatives - the threshold should be optimized for business impact, not just statistical measures.
 
 ---
 
-## Question 16: Explain the importance of feature selection in improving anomaly detection
+## Question 3: Explain the importance of feature selection in improving anomaly detection
 
 ### Answer
 
@@ -954,7 +304,415 @@ Location → Distance_from_home, country_code
 
 ---
 
-## Question 17: Describe a process for tuning hyperparameters of anomaly detection algorithms
+## Question 4: How would you deal with class imbalance in a dataset for supervised anomaly detection?
+
+### Answer
+
+**Challenge**: Anomalies are rare (often <1%), causing classifiers to be biased toward the majority class.
+
+**Impact of Imbalance**:
+
+```
+Imbalanced Dataset:
+Normal:   █████████████████████████ 99%
+Anomaly:  █                          1%
+
+Model behavior:
+- Predicts all as "normal" → 99% accuracy but 0% anomaly recall
+- Decision boundary biased toward majority class
+```
+
+**Solution Strategies**:
+
+| Strategy | Approach | When to Use |
+|----------|----------|-------------|
+| **Resampling** | SMOTE, undersampling | Moderate imbalance |
+| **Cost-sensitive** | Higher misclassification cost for anomalies | Business-driven |
+| **Ensemble** | Balanced bagging, EasyEnsemble | Large datasets |
+| **Threshold adjustment** | Lower decision threshold | Post-training |
+| **One-class methods** | Train only on normal | Extreme imbalance |
+
+**Python Implementation**:
+
+```python
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from imblearn.over_sampling import SMOTE, ADASYN
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.ensemble import BalancedRandomForestClassifier, EasyEnsembleClassifier
+
+class ImbalancedAnomalyDetector:
+    """Handle class imbalance for supervised anomaly detection."""
+    
+    def __init__(self, method='smote', class_weight=None):
+        self.method = method
+        self.class_weight = class_weight
+        self.resampler = None
+        self.classifier = None
+    
+    def fit(self, X, y):
+        """Fit with imbalance handling."""
+        
+        if self.method == 'smote':
+            # Oversample minority class
+            self.resampler = SMOTE(random_state=42)
+            X_resampled, y_resampled = self.resampler.fit_resample(X, y)
+            self.classifier = RandomForestClassifier(random_state=42)
+            self.classifier.fit(X_resampled, y_resampled)
+        
+        elif self.method == 'adasyn':
+            # Adaptive synthetic sampling
+            self.resampler = ADASYN(random_state=42)
+            X_resampled, y_resampled = self.resampler.fit_resample(X, y)
+            self.classifier = RandomForestClassifier(random_state=42)
+            self.classifier.fit(X_resampled, y_resampled)
+        
+        elif self.method == 'class_weight':
+            # Cost-sensitive learning
+            weights = {0: 1, 1: (y == 0).sum() / (y == 1).sum()}
+            self.classifier = RandomForestClassifier(class_weight=weights, random_state=42)
+            self.classifier.fit(X, y)
+        
+        elif self.method == 'balanced_ensemble':
+            # Balanced Random Forest
+            self.classifier = BalancedRandomForestClassifier(
+                n_estimators=100,
+                random_state=42
+            )
+            self.classifier.fit(X, y)
+        
+        elif self.method == 'easy_ensemble':
+            # EasyEnsemble: Multiple balanced subsets
+            self.classifier = EasyEnsembleClassifier(
+                n_estimators=10,
+                random_state=42
+            )
+            self.classifier.fit(X, y)
+        
+        return self
+    
+    def predict_proba(self, X):
+        """Get probability scores."""
+        return self.classifier.predict_proba(X)
+    
+    def predict(self, X, threshold=0.5):
+        """Predict with adjustable threshold."""
+        proba = self.predict_proba(X)[:, 1]
+        return (proba >= threshold).astype(int)
+
+
+def optimize_threshold_for_imbalanced(model, X_val, y_val, metric='f1'):
+    """Find optimal threshold for imbalanced classification."""
+    from sklearn.metrics import f1_score, precision_score, recall_score
+    
+    probas = model.predict_proba(X_val)[:, 1]
+    
+    thresholds = np.linspace(0.1, 0.9, 50)
+    best_threshold = 0.5
+    best_score = 0
+    
+    for thresh in thresholds:
+        preds = (probas >= thresh).astype(int)
+        
+        if metric == 'f1':
+            score = f1_score(y_val, preds)
+        elif metric == 'recall':
+            score = recall_score(y_val, preds)
+        elif metric == 'precision':
+            score = precision_score(y_val, preds)
+        
+        if score > best_score:
+            best_score = score
+            best_threshold = thresh
+    
+    return best_threshold, best_score
+
+
+# Cost-sensitive loss for neural networks
+import tensorflow as tf
+
+def create_cost_sensitive_model(input_dim, pos_weight=10):
+    """Neural network with cost-sensitive loss."""
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(64, activation='relu', input_shape=(input_dim,)),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+    
+    # Weighted binary crossentropy
+    def weighted_bce(y_true, y_pred):
+        bce = tf.keras.losses.binary_crossentropy(y_true, y_pred)
+        weight = y_true * pos_weight + (1 - y_true)
+        return bce * weight
+    
+    model.compile(optimizer='adam', loss=weighted_bce, metrics=['accuracy'])
+    return model
+```
+
+**Strategy Selection Guide**:
+
+| Imbalance Ratio | Recommended Approach |
+|-----------------|---------------------|
+| 1:10 | Class weights |
+| 1:100 | SMOTE + class weights |
+| 1:1000 | One-class methods or EasyEnsemble |
+| 1:10000+ | One-class SVM or Isolation Forest |
+
+**Interview Tip**: Always evaluate with appropriate metrics (PR-AUC, F1) not accuracy. Consider the business cost of false positives vs. false negatives.
+
+---
+
+## Question 5: What metrics would you use to evaluate the performance of an anomaly detection model?
+
+### Answer
+
+**Key Challenge**: Extreme class imbalance (anomalies are rare).
+
+**Metrics Overview**:
+
+| Metric | Formula | Best For |
+|--------|---------|----------|
+| **Precision** | TP / (TP + FP) | When FP cost is high |
+| **Recall** | TP / (TP + FN) | When FN cost is high |
+| **F1 Score** | 2 × (P × R) / (P + R) | Balance P and R |
+| **AUC-ROC** | Area under ROC curve | Overall ranking ability |
+| **AUC-PR** | Area under PR curve | Imbalanced data |
+| **Precision@K** | Precision in top K | Limited review capacity |
+
+**Why Accuracy Fails**:
+
+```
+Example: 1% anomaly rate
+Predict all normal → 99% accuracy! (but useless)
+
+Confusion Matrix:
+                 Predicted
+                 Normal  Anomaly
+Actual  Normal    990      0
+        Anomaly    10      0
+
+Accuracy = 99%, but missed ALL anomalies
+```
+
+**Python Implementation**:
+
+```python
+import numpy as np
+from sklearn.metrics import (
+    precision_score, recall_score, f1_score,
+    roc_auc_score, average_precision_score,
+    precision_recall_curve, roc_curve
+)
+import matplotlib.pyplot as plt
+
+def evaluate_anomaly_detector(y_true, y_pred, scores=None):
+    """
+    Comprehensive evaluation of anomaly detection.
+    
+    Args:
+        y_true: Ground truth (1 = anomaly, 0 = normal)
+        y_pred: Binary predictions
+        scores: Continuous anomaly scores (optional)
+    """
+    results = {}
+    
+    # Basic metrics
+    results['precision'] = precision_score(y_true, y_pred)
+    results['recall'] = recall_score(y_true, y_pred)
+    results['f1'] = f1_score(y_true, y_pred)
+    
+    if scores is not None:
+        # ROC-AUC and PR-AUC
+        results['roc_auc'] = roc_auc_score(y_true, scores)
+        results['pr_auc'] = average_precision_score(y_true, scores)
+        
+        # Precision at K
+        k_values = [10, 50, 100]
+        for k in k_values:
+            top_k = np.argsort(scores)[-k:]  # Top k highest scores
+            results[f'precision@{k}'] = y_true[top_k].mean()
+    
+    return results
+
+def plot_evaluation_curves(y_true, scores):
+    """Plot ROC and PR curves."""
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # ROC Curve
+    fpr, tpr, _ = roc_curve(y_true, scores)
+    roc_auc = roc_auc_score(y_true, scores)
+    axes[0].plot(fpr, tpr, label=f'AUC = {roc_auc:.3f}')
+    axes[0].plot([0, 1], [0, 1], 'k--')
+    axes[0].set_xlabel('False Positive Rate')
+    axes[0].set_ylabel('True Positive Rate')
+    axes[0].set_title('ROC Curve')
+    axes[0].legend()
+    
+    # PR Curve
+    precision, recall, _ = precision_recall_curve(y_true, scores)
+    pr_auc = average_precision_score(y_true, scores)
+    axes[1].plot(recall, precision, label=f'AP = {pr_auc:.3f}')
+    axes[1].axhline(y=y_true.mean(), color='k', linestyle='--', 
+                    label=f'Baseline = {y_true.mean():.3f}')
+    axes[1].set_xlabel('Recall')
+    axes[1].set_ylabel('Precision')
+    axes[1].set_title('Precision-Recall Curve')
+    axes[1].legend()
+    
+    plt.tight_layout()
+    plt.show()
+```
+
+**Metric Selection Guide**:
+
+| Scenario | Primary Metric | Reason |
+|----------|----------------|--------|
+| Fraud detection | Recall, then Precision | Missing fraud is costly |
+| Manufacturing QC | Precision@K | Limited inspection capacity |
+| Medical screening | High Recall | Don't miss disease |
+| Spam filtering | F1 Score | Balance user experience |
+
+**PR-AUC vs ROC-AUC**:
+
+```
+Use PR-AUC when:
+- Class imbalance is severe (< 5% anomalies)
+- You care more about positive class performance
+
+Use ROC-AUC when:
+- Classes are more balanced
+- You want to evaluate overall ranking
+```
+
+**Interview Tip**: For imbalanced anomaly detection, PR-AUC is more informative than ROC-AUC because it focuses on the minority class performance.
+
+---
+
+## Question 6: How can you ensure your anomaly detection model is not overfitting?
+
+### Answer
+
+**Overfitting in Anomaly Detection**:
+
+```
+Overfitting symptoms:
+- Model memorizes training data noise
+- Flags normal variations as anomalies (false positives)
+- Misses true anomalies similar to training noise
+```
+
+**Prevention Strategies**:
+
+| Strategy | Implementation | Effect |
+|----------|----------------|--------|
+| **Cross-validation** | K-fold on normal data | Estimate generalization |
+| **Holdout set** | Temporal split | Test on future data |
+| **Regularization** | L1/L2 penalties | Simplify model |
+| **Early stopping** | Monitor validation loss | Prevent overtraining |
+| **Ensemble** | Multiple models | Reduce variance |
+
+**Validation Approaches**:
+
+```python
+import numpy as np
+from sklearn.model_selection import TimeSeriesSplit, KFold
+
+def cross_validate_anomaly_detector(X, detector_class, n_splits=5):
+    """
+    Cross-validation for unsupervised anomaly detection.
+    Evaluates consistency of scores across folds.
+    """
+    kfold = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+    
+    all_scores = []
+    score_correlations = []
+    
+    for train_idx, test_idx in kfold.split(X):
+        X_train, X_test = X[train_idx], X[test_idx]
+        
+        # Train on fold
+        detector = detector_class()
+        detector.fit(X_train)
+        
+        # Score test set
+        scores = detector.decision_function(X_test)
+        all_scores.append((test_idx, scores))
+    
+    # Check consistency: do different folds rank same points similarly?
+    # (Good model should be consistent)
+    return all_scores
+
+def temporal_validation(X, timestamps, detector, train_ratio=0.7):
+    """
+    Temporal validation for time-series anomaly detection.
+    Train on past, test on future.
+    """
+    n = len(X)
+    train_size = int(n * train_ratio)
+    
+    # Sort by time
+    sorted_idx = np.argsort(timestamps)
+    X_sorted = X[sorted_idx]
+    
+    X_train = X_sorted[:train_size]
+    X_test = X_sorted[train_size:]
+    
+    detector.fit(X_train)
+    scores_train = detector.decision_function(X_train)
+    scores_test = detector.decision_function(X_test)
+    
+    # Check for distribution shift
+    print(f"Train score mean: {scores_train.mean():.4f}")
+    print(f"Test score mean: {scores_test.mean():.4f}")
+    
+    return scores_train, scores_test
+```
+
+**Regularization in Autoencoders**:
+
+```python
+import tensorflow as tf
+
+def regularized_autoencoder(input_dim, encoding_dim, l2_lambda=0.01, dropout_rate=0.3):
+    """Build autoencoder with regularization to prevent overfitting."""
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(128, activation='relu', 
+                             kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+                             input_shape=(input_dim,)),
+        tf.keras.layers.Dropout(dropout_rate),
+        tf.keras.layers.Dense(encoding_dim, activation='relu',
+                             kernel_regularizer=tf.keras.regularizers.l2(l2_lambda)),
+        tf.keras.layers.Dropout(dropout_rate),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(input_dim, activation='sigmoid')
+    ])
+    
+    model.compile(optimizer='adam', loss='mse')
+    return model
+
+# Early stopping callback
+early_stopping = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    patience=10,
+    restore_best_weights=True
+)
+```
+
+**Signs of Overfitting**:
+
+| Sign | Diagnosis |
+|------|-----------|
+| Train error << Test error | Clear overfitting |
+| Unstable across folds | High variance |
+| Sensitive to noise | Model too complex |
+| Too many anomalies flagged | Learned noise as anomalies |
+
+**Interview Tip**: For anomaly detection, consistency check across different subsets is key - an overfit model will give very different results on different samples.
+
+---
+
+## Question 7: Describe a process for tuning hyperparameters of anomaly detection algorithms
 
 ### Answer
 
@@ -1057,7 +815,158 @@ def inject_synthetic_anomalies(X, n_anomalies=100, method='gaussian'):
 
 ---
 
-## Question 18: Explain how Support Vector Machines (SVM) can be adapted for anomaly detection
+## Question 8: How can anomaly detection models be updated over time as new data comes in?
+
+### Answer
+
+**Challenge**: Normal behavior evolves (concept drift), requiring model updates.
+
+**Update Strategies**:
+
+| Strategy | Approach | When to Use |
+|----------|----------|-------------|
+| **Periodic retraining** | Full retrain on recent data | Batch processing |
+| **Incremental learning** | Update with new samples | Streaming data |
+| **Sliding window** | Train on recent N samples | Time-based drift |
+| **Ensemble replacement** | Replace oldest sub-models | Continuous learning |
+
+**Concept Drift Types**:
+
+```
+Sudden Drift:          Gradual Drift:         Recurring Drift:
+    │                      │                      │
+────┼────┐            ────/                  ────┼────┐
+         │               /                   │   │    │
+         └────        ──/                    └───┼────┘
+                                                 │
+```
+
+**Python Implementation**:
+
+```python
+import numpy as np
+from collections import deque
+from sklearn.ensemble import IsolationForest
+
+class OnlineAnomalyDetector:
+    """Anomaly detector with online updates."""
+    
+    def __init__(self, window_size=10000, update_frequency=1000):
+        self.window_size = window_size
+        self.update_frequency = update_frequency
+        self.data_buffer = deque(maxlen=window_size)
+        self.model = None
+        self.samples_since_update = 0
+    
+    def partial_fit(self, X_new):
+        """Update model with new data."""
+        # Add to buffer
+        for x in X_new:
+            self.data_buffer.append(x)
+        
+        self.samples_since_update += len(X_new)
+        
+        # Retrain if enough new samples
+        if self.samples_since_update >= self.update_frequency:
+            self._retrain()
+            self.samples_since_update = 0
+    
+    def _retrain(self):
+        """Retrain model on current buffer."""
+        X_train = np.array(list(self.data_buffer))
+        self.model = IsolationForest(contamination=0.1, random_state=42)
+        self.model.fit(X_train)
+    
+    def predict(self, X):
+        """Predict anomalies."""
+        if self.model is None:
+            raise ValueError("Model not trained yet")
+        return self.model.predict(X)
+    
+    def score_samples(self, X):
+        """Get anomaly scores."""
+        return self.model.decision_function(X)
+
+
+class EnsembleOnlineDetector:
+    """Ensemble of models trained on different time windows."""
+    
+    def __init__(self, n_models=5, window_size=5000):
+        self.n_models = n_models
+        self.window_size = window_size
+        self.models = []
+        self.model_ages = []
+    
+    def update(self, X_new):
+        """Add new model, remove oldest if needed."""
+        # Train new model on recent data
+        new_model = IsolationForest(contamination=0.1)
+        new_model.fit(X_new)
+        
+        self.models.append(new_model)
+        self.model_ages.append(0)
+        
+        # Remove oldest model if exceeds limit
+        if len(self.models) > self.n_models:
+            self.models.pop(0)
+            self.model_ages.pop(0)
+        
+        # Age all models
+        self.model_ages = [age + 1 for age in self.model_ages]
+    
+    def predict(self, X):
+        """Ensemble prediction with recency weighting."""
+        if not self.models:
+            raise ValueError("No models trained")
+        
+        # Weight by recency (newer models have higher weight)
+        weights = [1 / (age + 1) for age in self.model_ages]
+        weights = np.array(weights) / sum(weights)
+        
+        predictions = np.zeros(len(X))
+        for model, weight in zip(self.models, weights):
+            pred = model.predict(X)
+            predictions += weight * pred
+        
+        return np.sign(predictions)
+```
+
+**Drift Detection**:
+
+```python
+def detect_drift(old_scores, new_scores, threshold=0.05):
+    """
+    Detect if score distribution has shifted significantly.
+    Uses Kolmogorov-Smirnov test.
+    """
+    from scipy import stats
+    
+    statistic, p_value = stats.ks_2samp(old_scores, new_scores)
+    
+    drift_detected = p_value < threshold
+    
+    return drift_detected, p_value
+
+def adaptive_update(detector, X_new, old_scores, significance=0.05):
+    """Update model only if drift detected."""
+    new_scores = detector.score_samples(X_new)
+    
+    drift, p_value = detect_drift(old_scores, new_scores, significance)
+    
+    if drift:
+        print(f"Drift detected (p={p_value:.4f}), retraining...")
+        detector.fit(X_new)
+    else:
+        print(f"No significant drift (p={p_value:.4f})")
+    
+    return drift
+```
+
+**Interview Tip**: Mention the trade-off between model freshness and stability - frequent updates catch drift but may introduce noise.
+
+---
+
+## Question 9: Explain how Support Vector Machines (SVM) can be adapted for anomaly detection
 
 ### Answer
 
@@ -1170,7 +1079,146 @@ $$||x_i - c||^2 \leq R^2 + \xi_i$$
 
 ---
 
-## Question 19: What is the Local Outlier Factor algorithm and how does it work?
+## Question 10: How is DBSCAN clustering used for anomaly detection?
+
+### Answer
+
+**Core Idea**: DBSCAN labels sparse points as "noise" - these are natural anomalies.
+
+**DBSCAN Concepts**:
+
+```
+Core Point:    ≥ minPts neighbors within ε
+Border Point:  < minPts but neighbor of core
+Noise Point:   Neither → ANOMALY
+
+Visual:
+    •──•──•     Core points (dense)
+    │  │  │
+    •──•──•
+        │
+        ∘       Border point
+        
+        
+        *       Noise point (ANOMALY)
+```
+
+**Parameters**:
+
+| Parameter | Description | Effect on Anomaly Detection |
+|-----------|-------------|----------------------------|
+| **eps (ε)** | Neighborhood radius | Larger → fewer anomalies |
+| **min_samples** | Min neighbors for core | Larger → more anomalies |
+
+**Python Implementation**:
+
+```python
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+def dbscan_anomaly_detection(X, eps=0.5, min_samples=5):
+    """
+    Detect anomalies using DBSCAN.
+    
+    Args:
+        X: Feature matrix
+        eps: Maximum distance for neighborhood
+        min_samples: Minimum points for core status
+    
+    Returns:
+        anomalies: Boolean mask (True = anomaly)
+        labels: Cluster labels (-1 = noise/anomaly)
+    """
+    # Standardize features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    # Fit DBSCAN
+    dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+    labels = dbscan.fit_predict(X_scaled)
+    
+    # Noise points (-1) are anomalies
+    anomalies = labels == -1
+    
+    return anomalies, labels
+
+
+def tune_dbscan_eps(X, min_samples=5):
+    """
+    Tune eps parameter using k-distance graph.
+    """
+    from sklearn.neighbors import NearestNeighbors
+    import matplotlib.pyplot as plt
+    
+    # Find k-nearest neighbor distances
+    nn = NearestNeighbors(n_neighbors=min_samples)
+    nn.fit(X)
+    distances, _ = nn.kneighbors(X)
+    
+    # Sort distances to min_samples-th neighbor
+    k_distances = np.sort(distances[:, min_samples - 1])
+    
+    # Plot k-distance graph
+    plt.figure(figsize=(10, 5))
+    plt.plot(k_distances)
+    plt.xlabel('Points (sorted)')
+    plt.ylabel(f'{min_samples}-NN Distance')
+    plt.title('K-Distance Graph (elbow = good eps)')
+    plt.grid(True)
+    plt.show()
+    
+    # Suggest eps at elbow (maximum curvature)
+    gradient = np.gradient(k_distances)
+    elbow_idx = np.argmax(gradient)
+    suggested_eps = k_distances[elbow_idx]
+    
+    return suggested_eps
+```
+
+**Advantages for Anomaly Detection**:
+
+| Advantage | Explanation |
+|-----------|-------------|
+| No contamination assumption | Doesn't require specifying anomaly rate |
+| Handles varying densities | With appropriate parameters |
+| Discovers clusters | Simultaneously clusters and finds anomalies |
+| No cluster count needed | Unlike K-means |
+
+**Disadvantages**:
+
+| Disadvantage | Mitigation |
+|--------------|------------|
+| Sensitive to eps | Use k-distance graph |
+| Uniform density assumption | Use HDBSCAN for varying densities |
+| High dimensions issues | Reduce dimensions first |
+
+**HDBSCAN Alternative**:
+
+```python
+import hdbscan
+
+def hdbscan_anomaly_detection(X, min_cluster_size=15, min_samples=5):
+    """
+    Hierarchical DBSCAN handles varying densities better.
+    """
+    clusterer = hdbscan.HDBSCAN(
+        min_cluster_size=min_cluster_size,
+        min_samples=min_samples
+    )
+    labels = clusterer.fit_predict(X)
+    
+    # Get outlier scores (probability of being outlier)
+    outlier_scores = clusterer.outlier_scores_
+    
+    return labels == -1, outlier_scores
+```
+
+**Interview Tip**: DBSCAN's main advantage for anomaly detection is that it doesn't require specifying the contamination rate upfront - it discovers anomalies organically as noise points.
+
+---
+
+## Question 11: What is the Local Outlier Factor algorithm and how does it work?
 
 ### Answer
 
@@ -1278,7 +1326,7 @@ def lof_novelty_detection(X_train, X_test, n_neighbors=20):
 
 ---
 
-## Question 20: Explain the concept of anomaly detection using the One-Class SVM
+## Question 12: Explain the concept of anomaly detection using the One-Class SVM
 
 ### Answer
 
@@ -1411,7 +1459,7 @@ if __name__ == "__main__":
 
 ---
 
-## Question 21: How does a Random Cut Forest algorithm detect anomalies?
+## Question 13: How does a Random Cut Forest algorithm detect anomalies?
 
 ### Answer
 
@@ -1545,7 +1593,7 @@ scores = rcf.score_samples(X_test)
 
 ---
 
-## Question 22: Explain the concept of time-series anomaly detection and the unique challenges it presents
+## Question 14: Explain the concept of time-series anomaly detection and the unique challenges it presents
 
 ### Answer
 
@@ -1690,7 +1738,277 @@ def create_time_features(df, timestamp_col):
 
 ---
 
-## Question 23: How does the concept of collective anomalies apply to anomaly detection, and what are the challenges associated with it?
+## Question 15: Discuss recent advances in deep learning for anomaly detection
+
+### Answer
+
+**Recent Deep Learning Advances**:
+
+| Approach | Method | Key Innovation |
+|----------|--------|----------------|
+| **Autoencoders** | VAE, AE-GAN | Probabilistic latent space |
+| **Transformers** | Anomaly Transformer | Attention for temporal |
+| **Self-supervised** | Contrastive learning | No labels needed |
+| **Graph Neural Networks** | GNN-AD | Structural anomalies |
+
+**1. Variational Autoencoders (VAE) for Anomaly Detection**:
+
+```python
+import tensorflow as tf
+import numpy as np
+
+class VAEAnomalyDetector:
+    """Variational Autoencoder for anomaly detection."""
+    
+    def __init__(self, input_dim, latent_dim=32):
+        self.input_dim = input_dim
+        self.latent_dim = latent_dim
+        self.model = self._build_model()
+    
+    def _build_model(self):
+        # Encoder
+        encoder_inputs = tf.keras.layers.Input(shape=(self.input_dim,))
+        x = tf.keras.layers.Dense(128, activation='relu')(encoder_inputs)
+        x = tf.keras.layers.Dense(64, activation='relu')(x)
+        
+        z_mean = tf.keras.layers.Dense(self.latent_dim)(x)
+        z_log_var = tf.keras.layers.Dense(self.latent_dim)(x)
+        
+        # Sampling layer
+        def sampling(args):
+            z_mean, z_log_var = args
+            epsilon = tf.random.normal(shape=tf.shape(z_mean))
+            return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+        
+        z = tf.keras.layers.Lambda(sampling)([z_mean, z_log_var])
+        
+        # Decoder
+        decoder_inputs = tf.keras.layers.Dense(64, activation='relu')(z)
+        decoder_outputs = tf.keras.layers.Dense(128, activation='relu')(decoder_inputs)
+        outputs = tf.keras.layers.Dense(self.input_dim)(decoder_outputs)
+        
+        # Full model
+        model = tf.keras.Model(encoder_inputs, outputs)
+        
+        # VAE loss
+        reconstruction_loss = tf.keras.losses.mse(encoder_inputs, outputs)
+        reconstruction_loss *= self.input_dim
+        kl_loss = -0.5 * tf.reduce_sum(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var), axis=-1)
+        vae_loss = tf.reduce_mean(reconstruction_loss + kl_loss)
+        
+        model.add_loss(vae_loss)
+        model.compile(optimizer='adam')
+        
+        return model
+    
+    def fit(self, X_normal, epochs=100):
+        """Train on normal data."""
+        self.model.fit(X_normal, X_normal, epochs=epochs, batch_size=32, validation_split=0.1, verbose=0)
+        
+        # Compute threshold from training data
+        reconstructions = self.model.predict(X_normal)
+        self.reconstruction_errors = np.mean((X_normal - reconstructions)**2, axis=1)
+        self.threshold = np.percentile(self.reconstruction_errors, 95)
+    
+    def detect(self, X):
+        """Detect anomalies."""
+        reconstructions = self.model.predict(X)
+        errors = np.mean((X - reconstructions)**2, axis=1)
+        return errors > self.threshold, errors
+```
+
+**2. Transformer-based Anomaly Detection**:
+
+```python
+import tensorflow as tf
+
+class AnomalyTransformer:
+    """Transformer for time-series anomaly detection."""
+    
+    def __init__(self, seq_len, n_features, d_model=64, n_heads=4, n_layers=2):
+        self.seq_len = seq_len
+        self.n_features = n_features
+        self.model = self._build_model(d_model, n_heads, n_layers)
+    
+    def _build_model(self, d_model, n_heads, n_layers):
+        inputs = tf.keras.layers.Input(shape=(self.seq_len, self.n_features))
+        
+        # Positional encoding
+        positions = tf.range(start=0, limit=self.seq_len, delta=1)
+        position_embedding = tf.keras.layers.Embedding(self.seq_len, d_model)(positions)
+        
+        # Project input
+        x = tf.keras.layers.Dense(d_model)(inputs)
+        x = x + position_embedding
+        
+        # Transformer blocks
+        for _ in range(n_layers):
+            # Multi-head attention
+            attn_output = tf.keras.layers.MultiHeadAttention(
+                num_heads=n_heads, key_dim=d_model // n_heads
+            )(x, x)
+            x = tf.keras.layers.LayerNormalization()(x + attn_output)
+            
+            # Feed-forward
+            ff = tf.keras.layers.Dense(d_model * 4, activation='relu')(x)
+            ff = tf.keras.layers.Dense(d_model)(ff)
+            x = tf.keras.layers.LayerNormalization()(x + ff)
+        
+        # Output projection
+        outputs = tf.keras.layers.Dense(self.n_features)(x)
+        
+        model = tf.keras.Model(inputs, outputs)
+        model.compile(optimizer='adam', loss='mse')
+        
+        return model
+    
+    def fit(self, X_sequences, epochs=50):
+        """Train on normal sequences."""
+        # Self-supervised: predict next step
+        X_input = X_sequences[:, :-1, :]
+        X_target = X_sequences[:, 1:, :]
+        
+        self.model.fit(X_input, X_target, epochs=epochs, batch_size=32, validation_split=0.1, verbose=0)
+    
+    def detect(self, X_sequence):
+        """Detect anomalies in sequence."""
+        X_input = X_sequence[:-1].reshape(1, -1, self.n_features)
+        X_target = X_sequence[1:]
+        
+        prediction = self.model.predict(X_input)[0]
+        errors = np.mean((X_target - prediction)**2, axis=1)
+        
+        return errors
+```
+
+**3. Self-Supervised Contrastive Learning**:
+
+```python
+class ContrastiveAnomalyDetector:
+    """Contrastive learning for anomaly detection."""
+    
+    def __init__(self, input_dim, embedding_dim=64, temperature=0.5):
+        self.temperature = temperature
+        self.encoder = self._build_encoder(input_dim, embedding_dim)
+    
+    def _build_encoder(self, input_dim, embedding_dim):
+        return tf.keras.Sequential([
+            tf.keras.layers.Dense(128, activation='relu', input_shape=(input_dim,)),
+            tf.keras.layers.Dense(64, activation='relu'),
+            tf.keras.layers.Dense(embedding_dim),
+            tf.keras.layers.Lambda(lambda x: tf.math.l2_normalize(x, axis=1))
+        ])
+    
+    def _augment(self, x):
+        """Create augmented views of data."""
+        # Add noise
+        noise = tf.random.normal(tf.shape(x), stddev=0.1)
+        x_aug1 = x + noise
+        
+        # Random masking
+        mask = tf.random.uniform(tf.shape(x)) > 0.1
+        x_aug2 = x * tf.cast(mask, tf.float32)
+        
+        return x_aug1, x_aug2
+    
+    def contrastive_loss(self, z1, z2):
+        """NT-Xent loss."""
+        batch_size = tf.shape(z1)[0]
+        
+        # Similarity matrix
+        z = tf.concat([z1, z2], axis=0)
+        sim = tf.matmul(z, z, transpose_b=True) / self.temperature
+        
+        # Positive pairs
+        pos_mask = tf.eye(batch_size * 2, dtype=tf.bool)
+        pos_mask = tf.roll(pos_mask, batch_size, axis=1)
+        
+        # Negative pairs (all others)
+        neg_mask = ~tf.eye(batch_size * 2, dtype=tf.bool)
+        
+        # Loss
+        exp_sim = tf.exp(sim)
+        pos_sim = tf.reduce_sum(exp_sim * tf.cast(pos_mask, tf.float32), axis=1)
+        neg_sim = tf.reduce_sum(exp_sim * tf.cast(neg_mask, tf.float32), axis=1)
+        
+        loss = -tf.reduce_mean(tf.math.log(pos_sim / (pos_sim + neg_sim)))
+        
+        return loss
+    
+    def fit(self, X_normal, epochs=100, batch_size=256):
+        """Train encoder with contrastive learning."""
+        optimizer = tf.keras.optimizers.Adam(1e-3)
+        
+        for epoch in range(epochs):
+            # Sample batch
+            idx = np.random.choice(len(X_normal), batch_size)
+            x_batch = X_normal[idx]
+            
+            with tf.GradientTape() as tape:
+                x_aug1, x_aug2 = self._augment(x_batch)
+                z1 = self.encoder(x_aug1)
+                z2 = self.encoder(x_aug2)
+                loss = self.contrastive_loss(z1, z2)
+            
+            gradients = tape.gradient(loss, self.encoder.trainable_variables)
+            optimizer.apply_gradients(zip(gradients, self.encoder.trainable_variables))
+        
+        # Store normal embeddings for detection
+        self.normal_embeddings = self.encoder.predict(X_normal)
+    
+    def detect(self, X):
+        """Detect anomalies based on embedding distance."""
+        embeddings = self.encoder.predict(X)
+        
+        # Distance to nearest normal embedding
+        distances = []
+        for emb in embeddings:
+            dist = np.min(np.linalg.norm(self.normal_embeddings - emb, axis=1))
+            distances.append(dist)
+        
+        return np.array(distances)
+```
+
+**4. Graph Neural Networks for Anomaly Detection**:
+
+```python
+# Simplified GNN for structural anomalies
+class GNNAnomalyDetector:
+    """Graph-based anomaly detection."""
+    
+    def compute_structural_features(self, adjacency_matrix, node_features):
+        """Compute graph structural features."""
+        import networkx as nx
+        
+        G = nx.from_numpy_array(adjacency_matrix)
+        
+        features = []
+        for node in G.nodes():
+            node_feat = {
+                'degree': G.degree(node),
+                'clustering': nx.clustering(G, node),
+                'betweenness': nx.betweenness_centrality(G)[node],
+                'pagerank': nx.pagerank(G)[node]
+            }
+            features.append(node_feat)
+        
+        return pd.DataFrame(features)
+```
+
+**Comparison of Deep Learning Methods**:
+
+| Method | Strengths | Weaknesses | Best For |
+|--------|-----------|------------|----------|
+| VAE | Probabilistic, interpretable | Blurry reconstructions | Continuous data |
+| Transformer | Long-range dependencies | Computational cost | Sequential data |
+| Contrastive | No reconstruction needed | Requires good augmentations | High-dimensional |
+| GNN | Captures structure | Requires graph structure | Network data |
+
+**Interview Tip**: Highlight that deep learning methods shine for high-dimensional, complex data but traditional methods often work well for simpler cases with less computational cost.
+
+---
+
+## Question 16: How does the concept of collective anomalies apply to anomaly detection, and what are the challenges associated with it?
 
 ### Answer
 
@@ -1818,7 +2136,7 @@ def sliding_window_anomaly(sequence, window_size=10, step=1):
 
 ---
 
-## Question 24: What are the implications of adversarial attacks on anomaly detection systems?
+## Question 17: What are the implications of adversarial attacks on anomaly detection systems?
 
 ### Answer
 
@@ -1966,7 +2284,191 @@ class EnsembleAnomalyDetector:
 
 ---
 
-## Question 25: What is the role of active learning in the context of anomaly detection?
+## Question 18: How can transfer learning be applied to anomaly detection in different domains?
+
+### Answer
+
+**Concept**: Leverage knowledge from a source domain with labeled anomalies to detect anomalies in a target domain with limited/no labels.
+
+**Transfer Learning Scenarios**:
+
+| Scenario | Source | Target | Transfer Method |
+|----------|--------|--------|-----------------|
+| **Cross-domain** | Manufacturing defects | Medical imaging | Feature transfer |
+| **Cross-task** | Fraud detection | Money laundering | Model adaptation |
+| **Cross-time** | Historical patterns | Current data | Incremental learning |
+
+**Approaches**:
+
+```
+1. Feature-based Transfer:
+   Source domain → Feature extractor → Shared features → Target detector
+   
+2. Instance-based Transfer:
+   Select relevant source samples → Weight by similarity → Train on weighted data
+   
+3. Model-based Transfer:
+   Pre-trained model → Fine-tune on target → Detect anomalies
+```
+
+**Python Implementation**:
+
+```python
+import numpy as np
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import IsolationForest
+import tensorflow as tf
+
+class TransferAnomalyDetector:
+    """Transfer learning for anomaly detection across domains."""
+    
+    def __init__(self, feature_dim=64):
+        self.feature_dim = feature_dim
+        self.feature_extractor = None
+        self.detector = None
+    
+    def build_feature_extractor(self, input_dim):
+        """Build neural network feature extractor."""
+        self.feature_extractor = tf.keras.Sequential([
+            tf.keras.layers.Dense(128, activation='relu', input_shape=(input_dim,)),
+            tf.keras.layers.Dense(self.feature_dim, activation='relu')
+        ])
+        return self.feature_extractor
+    
+    def train_on_source(self, X_source, y_source):
+        """
+        Train feature extractor on source domain with labels.
+        """
+        input_dim = X_source.shape[1]
+        
+        # Build full classifier for source
+        model = tf.keras.Sequential([
+            self.build_feature_extractor(input_dim),
+            tf.keras.layers.Dense(1, activation='sigmoid')
+        ])
+        
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+        model.fit(X_source, y_source, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+        
+        print(f"Source domain training complete")
+        return self
+    
+    def transfer_to_target(self, X_target, freeze_features=True):
+        """
+        Transfer to target domain (unsupervised or few-shot).
+        """
+        # Extract features using pre-trained extractor
+        target_features = self.feature_extractor.predict(X_target)
+        
+        # Train anomaly detector on target features
+        self.detector = IsolationForest(contamination=0.1)
+        self.detector.fit(target_features)
+        
+        return self
+    
+    def detect(self, X):
+        """Detect anomalies in target domain."""
+        features = self.feature_extractor.predict(X)
+        return self.detector.predict(features)
+
+
+class DomainAdaptiveDetector:
+    """Domain adaptation for anomaly detection using MMD."""
+    
+    def __init__(self, kernel_bandwidth=1.0):
+        self.kernel_bandwidth = kernel_bandwidth
+    
+    def compute_mmd(self, X_source, X_target):
+        """
+        Compute Maximum Mean Discrepancy between domains.
+        """
+        def rbf_kernel(X, Y, bandwidth):
+            XX = np.sum(X ** 2, axis=1, keepdims=True)
+            YY = np.sum(Y ** 2, axis=1, keepdims=True)
+            distances = XX + YY.T - 2 * np.dot(X, Y.T)
+            return np.exp(-distances / (2 * bandwidth ** 2))
+        
+        K_ss = rbf_kernel(X_source, X_source, self.kernel_bandwidth)
+        K_tt = rbf_kernel(X_target, X_target, self.kernel_bandwidth)
+        K_st = rbf_kernel(X_source, X_target, self.kernel_bandwidth)
+        
+        mmd = K_ss.mean() + K_tt.mean() - 2 * K_st.mean()
+        return mmd
+    
+    def select_transferable_samples(self, X_source, X_target, n_samples=100):
+        """
+        Select source samples most similar to target domain.
+        """
+        from sklearn.neighbors import NearestNeighbors
+        
+        # Find nearest target samples for each source sample
+        nn = NearestNeighbors(n_neighbors=5)
+        nn.fit(X_target)
+        
+        distances, _ = nn.kneighbors(X_source)
+        mean_distances = distances.mean(axis=1)
+        
+        # Select source samples closest to target
+        selected_idx = np.argsort(mean_distances)[:n_samples]
+        
+        return X_source[selected_idx]
+
+
+# Pre-trained anomaly detection (like using ImageNet features)
+class PretrainedFeatureAnomalyDetector:
+    """Use pre-trained deep learning features for anomaly detection."""
+    
+    def __init__(self, model_name='resnet50'):
+        from tensorflow.keras.applications import ResNet50
+        
+        # Load pre-trained model without top layers
+        base_model = ResNet50(weights='imagenet', include_top=False, pooling='avg')
+        self.feature_extractor = base_model
+        self.detector = None
+    
+    def extract_features(self, images):
+        """Extract features from images."""
+        from tensorflow.keras.applications.resnet50 import preprocess_input
+        
+        images_processed = preprocess_input(images)
+        features = self.feature_extractor.predict(images_processed)
+        return features
+    
+    def fit(self, images):
+        """Fit anomaly detector on extracted features."""
+        features = self.extract_features(images)
+        self.detector = IsolationForest(contamination=0.1)
+        self.detector.fit(features)
+        return self
+    
+    def predict(self, images):
+        """Detect anomalies in new images."""
+        features = self.extract_features(images)
+        return self.detector.predict(features)
+```
+
+**When Transfer Learning Helps**:
+
+| Condition | Benefit |
+|-----------|---------|
+| Similar feature spaces | Direct feature transfer |
+| Shared anomaly patterns | Model transfer |
+| Limited target labels | Leverage source labels |
+| Domain shift is moderate | Adaptation techniques |
+
+**Challenges**:
+
+| Challenge | Mitigation |
+|-----------|------------|
+| Negative transfer | Measure domain similarity first |
+| Different anomaly types | Focus on shared patterns |
+| Feature mismatch | Domain adaptation techniques |
+
+**Interview Tip**: Transfer learning for anomaly detection is powerful when the underlying patterns of "normal" and "anomalous" share characteristics across domains.
+
+---
+
+## Question 19: What is the role of active learning in the context of anomaly detection?
 
 ### Answer
 
@@ -2128,6 +2630,7 @@ def active_learning_simulation(X, y_true, n_iterations=10, batch_size=10):
 
 
 ---
+
 
 # --- Missing Questions Restored from Source (Q26-Q40) ---
 

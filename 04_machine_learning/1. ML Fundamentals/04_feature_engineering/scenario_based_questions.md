@@ -1,415 +1,155 @@
 # Feature Engineering Interview Questions - Scenario-Based Questions
 
-## Question 1: You are using a Random Forest model and need to identify the most important features. How would you use the model's feature importance scores to guide your feature selection?
+## Question 1: Explain how you would perform feature engineering for a recommendation system.
 
 ### Answer
 
-**Approach:**
+**Three Categories of Features:**
 
-Random Forest provides built-in feature importance through two methods:
-1. **Mean Decrease in Impurity (MDI)** - Gini/entropy importance
-2. **Mean Decrease in Accuracy (MDA)** - Permutation importance
-
-**Step-by-Step Implementation:**
-
+**1. User Features:**
 ```python
-import numpy as np
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.inspection import permutation_importance
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-
-# Load data
-from sklearn.datasets import load_breast_cancer
-data = load_breast_cancer()
-X = pd.DataFrame(data.data, columns=data.feature_names)
-y = data.target
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train Random Forest
-rf = RandomForestClassifier(n_estimators=100, random_state=42)
-rf.fit(X_train, y_train)
-
-# Method 1: Built-in Feature Importance (MDI)
-mdi_importance = pd.DataFrame({
-    'feature': X.columns,
-    'importance_mdi': rf.feature_importances_
-}).sort_values('importance_mdi', ascending=False)
-
-print("Top 10 Features (MDI):")
-print(mdi_importance.head(10))
-
-# Method 2: Permutation Importance (MDA) - More reliable
-perm_importance = permutation_importance(rf, X_test, y_test, n_repeats=10, random_state=42)
-perm_df = pd.DataFrame({
-    'feature': X.columns,
-    'importance_perm': perm_importance.importances_mean,
-    'std': perm_importance.importances_std
-}).sort_values('importance_perm', ascending=False)
-
-print("\nTop 10 Features (Permutation):")
-print(perm_df.head(10))
+user_features = {
+    'user_age': 28,
+    'user_gender': 'M',
+    'user_location': 'NYC',
+    'avg_rating_given': 3.8,
+    'num_ratings': 150,
+    'favorite_genres': ['action', 'comedy'],
+    'user_embedding': [0.1, 0.3, ...]  # From collaborative filtering
+}
 ```
 
-**Feature Selection Strategy:**
-
+**2. Item Features:**
 ```python
-def select_features_by_importance(X, y, threshold_pct=0.90, min_features=5):
-    """
-    Select features based on cumulative importance.
-    
-    Args:
-        threshold_pct: Keep features until this % of importance is covered
-        min_features: Minimum features to keep
-    """
-    rf = RandomForestClassifier(n_estimators=100, random_state=42)
-    rf.fit(X, y)
-    
-    # Get importance
-    importance_df = pd.DataFrame({
-        'feature': X.columns,
-        'importance': rf.feature_importances_
-    }).sort_values('importance', ascending=False)
-    
-    # Calculate cumulative importance
-    importance_df['cumulative'] = importance_df['importance'].cumsum()
-    importance_df['cumulative_pct'] = importance_df['cumulative'] / importance_df['importance'].sum()
-    
-    # Select features
-    mask = importance_df['cumulative_pct'] <= threshold_pct
-    selected = importance_df[mask]['feature'].tolist()
-    
-    # Ensure minimum features
-    if len(selected) < min_features:
-        selected = importance_df.head(min_features)['feature'].tolist()
-    
-    return selected, importance_df
-
-selected_features, importance_df = select_features_by_importance(X, y, threshold_pct=0.90)
-print(f"Selected {len(selected_features)} features covering 90% importance")
+item_features = {
+    'item_category': 'electronics',
+    'item_price': 299.99,
+    'item_avg_rating': 4.2,
+    'num_reviews': 1500,
+    'description_embedding': [0.2, 0.4, ...],  # From NLP
+    'item_popularity': 0.85
+}
 ```
 
-**Visualization:**
-
+**3. Interaction Features (Most Powerful):**
 ```python
-def plot_feature_importance(importance_df, top_n=15):
-    """Visualize feature importance."""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    
-    # Bar plot
-    top_features = importance_df.head(top_n)
-    axes[0].barh(top_features['feature'], top_features['importance'])
-    axes[0].set_xlabel('Importance')
-    axes[0].set_title(f'Top {top_n} Feature Importances')
-    axes[0].invert_yaxis()
-    
-    # Cumulative plot
-    axes[1].plot(range(len(importance_df)), importance_df['cumulative_pct'])
-    axes[1].axhline(y=0.90, color='r', linestyle='--', label='90% threshold')
-    axes[1].set_xlabel('Number of Features')
-    axes[1].set_ylabel('Cumulative Importance')
-    axes[1].set_title('Cumulative Feature Importance')
-    axes[1].legend()
-    
-    plt.tight_layout()
-    plt.show()
+interaction_features = {
+    'user_item_similarity': 0.72,
+    'user_category_affinity': 0.8,
+    'days_since_last_interaction': 5,
+    'num_previous_purchases': 3,
+    'context_time_of_day': 'evening',
+    'context_device': 'mobile'
+}
 ```
 
-**Best Practices:**
-1. **Use Permutation Importance** for final selection (less biased)
-2. **Cross-validate** the selection process
-3. **Compare** MDI and Permutation results
-4. **Consider domain knowledge** - important features should make sense
-5. **Check for multicollinearity** - correlated features split importance
-
----
-
-## Question 2: Explain how ICA can be used for feature extraction. Give a practical example.
-
-### Answer
-
-**ICA (Independent Component Analysis):**
-
-ICA separates a multivariate signal into independent, non-Gaussian source signals. Unlike PCA which maximizes variance, ICA maximizes statistical independence.
-
-**Key Differences from PCA:**
-
-| Aspect | PCA | ICA |
-|--------|-----|-----|
-| **Goal** | Maximize variance | Maximize independence |
-| **Assumption** | Orthogonal components | Independent components |
-| **Distribution** | Gaussian assumed | Non-Gaussian required |
-| **Use Case** | Dimensionality reduction | Signal separation |
-
-**Practical Example: Blind Source Separation**
-
+**Feature Engineering Pipeline:**
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import FastICA, PCA
+# Collaborative filtering embeddings
+from sklearn.decomposition import TruncatedSVD
 
-# Create mixed signals (simulating real-world scenario)
-np.random.seed(42)
-n_samples = 2000
-time = np.linspace(0, 8, n_samples)
+# Create user-item matrix
+user_item_matrix = create_user_item_matrix(interactions)
 
-# Original source signals
-s1 = np.sin(2 * time)  # Sinusoidal
-s2 = np.sign(np.sin(3 * time))  # Square wave
-s3 = (time % 1) - 0.5  # Sawtooth
+# Get embeddings
+svd = TruncatedSVD(n_components=50)
+user_embeddings = svd.fit_transform(user_item_matrix)
+item_embeddings = svd.components_.T
 
-sources = np.c_[s1, s2, s3]
-
-# Mix signals (unknown mixing matrix in real scenario)
-mixing_matrix = np.array([[1, 1, 1], [0.5, 2, 1], [1.5, 1, 2]])
-mixed_signals = np.dot(sources, mixing_matrix.T)
-
-# Apply ICA
-ica = FastICA(n_components=3, random_state=42, max_iter=500)
-recovered_signals = ica.fit_transform(mixed_signals)
-
-# Compare with PCA
-pca = PCA(n_components=3)
-pca_signals = pca.fit_transform(mixed_signals)
-
-# Visualization
-fig, axes = plt.subplots(4, 3, figsize=(15, 12))
-
-titles = ['Original Sources', 'Mixed Signals', 'ICA Recovered']
-for i, (signals, title) in enumerate([(sources, titles[0]), 
-                                       (mixed_signals, titles[1]),
-                                       (recovered_signals, titles[2])]):
-    for j in range(3):
-        axes[j, i].plot(time, signals[:, j])
-        axes[j, i].set_title(f'{title} - Component {j+1}')
-
-# PCA comparison
-for j in range(3):
-    axes[3, j].plot(time, pca_signals[:, j], alpha=0.7)
-    axes[3, j].set_title(f'PCA - Component {j+1}')
-
-plt.tight_layout()
-plt.show()
-
-print("ICA successfully separated mixed signals into original sources!")
-```
-
-**Feature Extraction Use Case: EEG Signal Processing**
-
-```python
-from sklearn.decomposition import FastICA
-
-def extract_ica_features(data, n_components=10):
-    """
-    Extract ICA features from multi-channel signal data.
-    
-    Args:
-        data: Shape (n_samples, n_channels)
-        n_components: Number of independent components
-        
-    Returns:
-        Independent components as features
-    """
-    ica = FastICA(n_components=n_components, random_state=42, max_iter=1000)
-    ica_features = ica.fit_transform(data)
-    
-    # Get mixing matrix for interpretation
-    mixing_matrix = ica.mixing_
-    
-    return ica_features, ica, mixing_matrix
-
-
-# Example with sensor data
-np.random.seed(42)
-n_samples = 1000
-n_channels = 20
-
-# Simulated multi-channel sensor data
-sensor_data = np.random.randn(n_samples, n_channels)
-
-# Extract ICA features
-ica_features, ica_model, mixing = extract_ica_features(sensor_data, n_components=5)
-
-print(f"Original shape: {sensor_data.shape}")
-print(f"ICA features shape: {ica_features.shape}")
-print(f"Mixing matrix shape: {mixing.shape}")
-```
-
-**When to Use ICA:**
-- Separating mixed signals (audio, EEG, financial)
-- When sources are statistically independent
-- When non-Gaussianity is important
-- Cocktail party problem (separating voices)
-
-**Limitations:**
-- Cannot determine scale of components
-- Order of components is arbitrary
-- Requires enough samples
-- Assumes linear mixing
-
----
-
-## Question 3: How would you balance the trade-off between overfitting and underfitting while engineering features?
-
-### Answer
-
-**The Feature Engineering Bias-Variance Trade-off:**
-
-| Problem | Cause | Symptoms |
-|---------|-------|----------|
-| **Underfitting** | Too few/simple features | High training error, high test error |
-| **Overfitting** | Too many/complex features | Low training error, high test error |
-
-**Strategy Framework:**
-
-```
-1. Start Simple → Add Complexity → Regularize → Validate
-```
-
-**Step-by-Step Approach:**
-
-```python
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import cross_val_score, learning_curve
-from sklearn.linear_model import Ridge, Lasso
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.pipeline import Pipeline
-import matplotlib.pyplot as plt
-
-def evaluate_feature_complexity(X, y, max_degree=5):
-    """
-    Evaluate model performance across feature complexity levels.
-    """
-    results = []
-    
-    for degree in range(1, max_degree + 1):
-        pipeline = Pipeline([
-            ('poly', PolynomialFeatures(degree=degree, include_bias=False)),
-            ('scaler', StandardScaler()),
-            ('model', Ridge(alpha=1.0))
-        ])
-        
-        scores = cross_val_score(pipeline, X, y, cv=5, scoring='neg_mean_squared_error')
-        
-        pipeline.fit(X, y)
-        n_features = pipeline.named_steps['poly'].n_output_features_
-        
-        results.append({
-            'degree': degree,
-            'n_features': n_features,
-            'cv_rmse_mean': np.sqrt(-scores.mean()),
-            'cv_rmse_std': np.sqrt(-scores).std()
-        })
-    
-    return pd.DataFrame(results)
-```
-
-**Techniques to Prevent Overfitting:**
-
-```python
-# 1. Feature Selection with Regularization
-from sklearn.linear_model import LassoCV
-
-def regularized_feature_selection(X, y, alpha_range=None):
-    """Use Lasso for automatic feature selection."""
-    if alpha_range is None:
-        alpha_range = np.logspace(-4, 1, 50)
-    
-    lasso_cv = LassoCV(alphas=alpha_range, cv=5, random_state=42)
-    lasso_cv.fit(X, y)
-    
-    # Get selected features (non-zero coefficients)
-    selected_mask = lasso_cv.coef_ != 0
-    selected_features = X.columns[selected_mask].tolist()
-    
-    print(f"Optimal alpha: {lasso_cv.alpha_:.4f}")
-    print(f"Selected {len(selected_features)} of {X.shape[1]} features")
-    
-    return selected_features, lasso_cv
-
-# 2. Learning Curves for Diagnosis
-def plot_learning_curve(estimator, X, y, title="Learning Curve"):
-    """Plot learning curve to diagnose bias-variance."""
-    train_sizes, train_scores, test_scores = learning_curve(
-        estimator, X, y, cv=5, 
-        train_sizes=np.linspace(0.1, 1.0, 10),
-        scoring='neg_mean_squared_error'
+# Interaction features
+def create_interaction_features(user_id, item_id, df):
+    features = {}
+    features['user_item_sim'] = cosine_similarity(
+        user_embeddings[user_id], item_embeddings[item_id]
     )
-    
-    train_rmse = np.sqrt(-train_scores.mean(axis=1))
-    test_rmse = np.sqrt(-test_scores.mean(axis=1))
-    
-    plt.figure(figsize=(10, 6))
-    plt.plot(train_sizes, train_rmse, 'o-', label='Training RMSE')
-    plt.plot(train_sizes, test_rmse, 'o-', label='Validation RMSE')
-    plt.xlabel('Training Set Size')
-    plt.ylabel('RMSE')
-    plt.title(title)
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-    
-    # Diagnosis
-    gap = test_rmse[-1] - train_rmse[-1]
-    if gap > 0.1 * test_rmse[-1]:
-        print("Diagnosis: HIGH VARIANCE (Overfitting) - Reduce features or add regularization")
-    elif train_rmse[-1] > 0.5:  # Adjust threshold based on problem
-        print("Diagnosis: HIGH BIAS (Underfitting) - Add more features")
-    else:
-        print("Diagnosis: Good balance")
+    features['user_avg_rating_for_category'] = df[
+        (df['user_id'] == user_id) & 
+        (df['category'] == item_category)
+    ]['rating'].mean()
+    return features
 ```
-
-**Balanced Feature Engineering Pipeline:**
-
-```python
-def balanced_feature_engineering(X, y, target_variance_explained=0.95):
-    """
-    Balanced approach to feature engineering.
-    """
-    from sklearn.decomposition import PCA
-    from sklearn.feature_selection import SelectFromModel
-    
-    # Step 1: Generate rich features
-    poly = PolynomialFeatures(degree=2, include_bias=False, interaction_only=True)
-    X_poly = poly.fit_transform(X)
-    print(f"Step 1: Generated {X_poly.shape[1]} polynomial features")
-    
-    # Step 2: Scale features
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X_poly)
-    
-    # Step 3: Apply regularized selection
-    lasso = LassoCV(cv=5, random_state=42)
-    lasso.fit(X_scaled, y)
-    selector = SelectFromModel(lasso, prefit=True)
-    X_selected = selector.transform(X_scaled)
-    print(f"Step 2: Selected {X_selected.shape[1]} features via Lasso")
-    
-    # Step 4: Optional PCA for remaining multicollinearity
-    pca = PCA(n_components=target_variance_explained)
-    X_final = pca.fit_transform(X_selected)
-    print(f"Step 3: PCA reduced to {X_final.shape[1]} components")
-    
-    return X_final
-```
-
-**Best Practices Summary:**
-
-| Stage | Action | Purpose |
-|-------|--------|---------|
-| **Initial** | Start with domain-driven features | Avoid random complexity |
-| **Expansion** | Add polynomial/interaction features | Increase expressiveness |
-| **Selection** | Apply Lasso/RF importance | Remove noise features |
-| **Validation** | Use cross-validation | Detect overfitting early |
-| **Regularization** | Tune regularization strength | Control complexity |
-| **Monitoring** | Plot learning curves | Diagnose bias-variance |
 
 ---
 
-## Question 4: You're building a predictive maintenance model. What types of features would you engineer from sensor data?
+## Question 2: Describe the feature engineering process you would use for a customer churn prediction model.
+
+### Answer
+
+**Feature Categories:**
+
+**1. Static/Demographic Features:**
+```python
+static_features = [
+    'age', 'gender', 'location', 'acquisition_channel',
+    'subscription_tier', 'payment_method', 'signup_date'
+]
+```
+
+**2. Behavioral Features (Time-Windowed):**
+```python
+def create_behavioral_features(df, window_days):
+    features = {
+        'login_frequency_30d': count_logins(df, 30),
+        'login_frequency_90d': count_logins(df, 90),
+        'time_since_last_login': days_since_last_login(df),
+        'feature_usage_counts': count_feature_usage(df),
+        'session_duration_avg': avg_session_duration(df),
+        'pages_viewed_per_session': avg_pages_per_session(df)
+    }
+    return features
+```
+
+**3. Trend Features (Critical for Churn):**
+```python
+def create_trend_features(df):
+    return {
+        'usage_trend_30d_vs_90d': (
+            usage_30d - usage_90d_avg
+        ) / usage_90d_avg,
+        'activity_slope': calculate_activity_slope(df),
+        'engagement_decay_rate': calculate_decay_rate(df)
+    }
+```
+
+**4. Support/Billing Features:**
+```python
+support_features = {
+    'num_support_tickets_90d': count_tickets(df, 90),
+    'avg_satisfaction_score': avg_csat(df),
+    'num_failed_payments': count_failed_payments(df),
+    'days_since_last_complaint': days_since_complaint(df)
+}
+```
+
+**Complete Pipeline:**
+```python
+def engineer_churn_features(df, snapshot_date):
+    features = {}
+    
+    # Static
+    features.update(get_static_features(df))
+    
+    # Behavioral (multiple windows)
+    for window in [7, 30, 90]:
+        features.update(create_behavioral_features(df, window))
+    
+    # Trends
+    features.update(create_trend_features(df))
+    
+    # Support
+    features.update(get_support_features(df))
+    
+    # Preprocessing
+    features_df = pd.DataFrame([features])
+    features_df = pd.get_dummies(features_df, columns=categorical_cols)
+    features_df = StandardScaler().fit_transform(features_df)
+    
+    return features_df
+```
+
+---
+
+## Question 3: You're building a predictive maintenance model. What types of features would you engineer from sensor data?
 
 ### Answer
 
@@ -615,7 +355,7 @@ def predictive_maintenance_features(df, sensor_cols, sampling_rate=100):
 
 ---
 
-## Question 5: You're implementing a real-time anomaly detection system. What feature engineering strategies would you employ to detect anomalies in streaming data?
+## Question 4: You're implementing a real-time anomaly detection system. What feature engineering strategies would you employ to detect anomalies in streaming data?
 
 ### Answer
 
@@ -940,7 +680,7 @@ for reading in data_stream:
 
 ---
 
-## Question 6: You're working on a sentiment analysis project for social media. What features would you engineer from the text data to improve the model's performance?
+## Question 5: You're working on a sentiment analysis project for social media. What features would you engineer from the text data to improve the model's performance?
 
 ### Answer
 

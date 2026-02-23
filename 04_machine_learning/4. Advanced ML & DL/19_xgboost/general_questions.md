@@ -2,617 +2,505 @@
 
 ## Question 1
 
-**How do you interpret XGBoost models and understand feature importance?**
+**What is XGBoost and why is it considered an effective machine learning algorithm?**
 
 ### Answer
 
 **Definition:**
-XGBoost provides multiple ways to interpret models: built-in feature importance (gain, weight, cover), SHAP values for local/global explanations, and partial dependence plots for feature effects.
+XGBoost (eXtreme Gradient Boosting) is an optimized, scalable gradient boosting library that implements machine learning algorithms under the gradient boosting framework. It's known for speed, performance, and regularization capabilities.
 
-**Feature Importance Types:**
+**Core Concepts:**
+- Sequential ensemble of weak learners (decision trees)
+- Additive training: each tree corrects previous errors
+- Second-order gradient optimization (uses Hessian)
+- Built-in regularization (L1 and L2)
+- Sparsity-aware split finding
 
-| Type | Meaning | Use Case |
-|------|---------|----------|
-| `weight` | Number of times feature is used in splits | Feature usage frequency |
-| `gain` | Average gain when feature is used | Feature contribution to model |
-| `cover` | Average coverage (samples affected) | Feature impact breadth |
-| `total_gain` | Total gain across all splits | Overall importance |
-| `total_cover` | Total coverage | Overall sample impact |
+**Why It's Effective:**
 
-**Code Example:**
+| Feature | Benefit |
+|---------|---------|
+| **Regularization** | Prevents overfitting |
+| **Parallel processing** | Faster training |
+| **Tree pruning** | Optimal tree structure |
+| **Built-in CV** | Easy model selection |
+| **Missing value handling** | No imputation needed |
+| **Cache optimization** | Efficient memory usage |
 
-```python
-import xgboost as xgb
-import matplotlib.pyplot as plt
-import pandas as pd
+**Mathematical Formulation:**
+$$\mathcal{L}(\phi) = \sum_i l(y_i, \hat{y}_i) + \sum_k \Omega(f_k)$$
 
-# Train model
-model = xgb.XGBClassifier(n_estimators=100)
-model.fit(X_train, y_train)
+Where:
+- $l$ = loss function (e.g., squared error)
+- $\Omega(f) = \gamma T + \frac{1}{2}\lambda||w||^2$ = regularization term
+- $T$ = number of leaves, $w$ = leaf weights
 
-# Method 1: Built-in importance
-importance_types = ['weight', 'gain', 'cover']
-for imp_type in importance_types:
-    importance = model.get_booster().get_score(importance_type=imp_type)
-    print(f"\n{imp_type.upper()} Importance:")
-    for feat, score in sorted(importance.items(), key=lambda x: x[1], reverse=True)[:5]:
-        print(f"  {feat}: {score:.4f}")
-
-# Method 2: Plot importance
-xgb.plot_importance(model, importance_type='gain', max_num_features=10)
-plt.title('Feature Importance (Gain)')
-plt.tight_layout()
-plt.show()
-
-# Method 3: SHAP values (recommended)
-import shap
-
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(X_test)
-
-# Summary plot (global importance)
-shap.summary_plot(shap_values, X_test, feature_names=feature_names)
-
-# Force plot (single prediction)
-shap.force_plot(explainer.expected_value, shap_values[0], X_test.iloc[0])
-```
-
-**Interpretation Techniques:**
-
-**1. Global Importance (What features matter overall?):**
-```python
-# SHAP summary
-shap.summary_plot(shap_values, X_test)
-```
-
-**2. Local Importance (Why this prediction?):**
-```python
-# SHAP waterfall for single instance
-shap.waterfall_plot(shap.Explanation(
-    values=shap_values[i],
-    base_values=explainer.expected_value,
-    data=X_test.iloc[i]
-))
-```
-
-**3. Feature Interactions:**
-```python
-# SHAP interaction values
-shap_interaction = explainer.shap_interaction_values(X_test)
-shap.summary_plot(shap_interaction, X_test)
-```
-
-**Best Practice:**
-- Use SHAP for comprehensive interpretation
-- Gain importance for quick feature selection
-- Combine with domain knowledge
+**Practical Relevance:**
+- Top performer in Kaggle competitions
+- Handles tabular data exceptionally well
+- Supports classification, regression, ranking
 
 ---
 
 ## Question 2
 
-**What methods can be employed to improve the computational efficiency of XGBoost training?**
+**Can you explain the differences between gradient boosting machines (GBM) and XGBoost?**
 
 ### Answer
 
 **Definition:**
-XGBoost training efficiency can be improved through hardware acceleration (GPU), algorithmic choices (histogram method), sampling techniques, and parameter optimization.
+XGBoost is an optimized implementation of gradient boosting with additional features like regularization, parallel processing, and advanced tree-building algorithms that traditional GBM lacks.
 
-**Efficiency Techniques:**
+**Key Differences:**
 
-**1. Use Histogram-Based Method:**
-```python
-import xgboost as xgb
+| Aspect | Traditional GBM | XGBoost |
+|--------|-----------------|---------|
+| **Regularization** | None | L1 + L2 regularization |
+| **Gradient Order** | First-order | Second-order (Hessian) |
+| **Tree Building** | Greedy | Level-wise with pruning |
+| **Missing Values** | Requires imputation | Handles natively |
+| **Parallelization** | Sequential | Parallel at node level |
+| **Sparsity** | Not optimized | Sparsity-aware |
+| **Cache** | Basic | Cache-optimized |
+| **Cross-validation** | External | Built-in |
 
-# Histogram method (much faster for large data)
-model = xgb.XGBClassifier(
-    tree_method='hist',   # Histogram-based splits
-    max_bin=256           # Number of bins (256 is default)
-)
-```
+**Objective Function Comparison:**
 
-**2. GPU Acceleration:**
-```python
-# GPU training
-model = xgb.XGBClassifier(
-    tree_method='gpu_hist',  # GPU histogram
-    gpu_id=0,                # GPU device ID
-    predictor='gpu_predictor'
-)
-```
+**GBM:**
+$$\mathcal{L} = \sum_i l(y_i, \hat{y}_i)$$
 
-**3. Subsampling:**
-```python
-model = xgb.XGBClassifier(
-    subsample=0.8,           # Use 80% of rows per tree
-    colsample_bytree=0.8,    # Use 80% of columns per tree
-    colsample_bylevel=0.8    # Per level
-)
-```
+**XGBoost:**
+$$\mathcal{L} = \sum_i l(y_i, \hat{y}_i) + \gamma T + \frac{1}{2}\lambda \sum_j w_j^2$$
 
-**4. Early Stopping:**
-```python
-model = xgb.XGBClassifier(
-    n_estimators=1000,
-    early_stopping_rounds=50
-)
-model.fit(
-    X_train, y_train,
-    eval_set=[(X_val, y_val)],
-    verbose=10
-)
-print(f"Best iteration: {model.best_iteration}")
-```
+**Gradient Optimization:**
 
-**5. Reduce Tree Complexity:**
-```python
-model = xgb.XGBClassifier(
-    max_depth=6,             # Limit depth
-    max_leaves=31,           # Limit leaves
-    min_child_weight=5       # Limit splits
-)
-```
+**GBM:** Uses first derivative only
+$$f_m(x) = f_{m-1}(x) + \nu \cdot h_m(x)$$
 
-**6. Parallel Processing:**
-```python
-model = xgb.XGBClassifier(
-    nthread=-1  # Use all CPU cores (default)
-)
-```
+**XGBoost:** Uses both first and second derivatives
+$$\text{Gain} = \frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda} + \frac{G_R^2}{H_R+\lambda} - \frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right] - \gamma$$
 
-**7. External Memory for Large Datasets:**
-```python
-# For data larger than RAM
-dtrain = xgb.DMatrix('data.csv#dtrain.cache')
-```
+Where $G$ = gradient sum, $H$ = Hessian sum.
 
-**Comparison:**
-
-| Method | Speedup | When to Use |
-|--------|---------|-------------|
-| `hist` | 2-5x | Medium to large datasets |
-| `gpu_hist` | 10-50x | When GPU available |
-| Subsampling | 1.5-2x | Any dataset, also regularizes |
-| Early stopping | Variable | Always recommended |
-| Lower max_depth | 2-3x | When acceptable accuracy |
-
-**Recommended Setup:**
-```python
-# Fast training configuration
-model = xgb.XGBClassifier(
-    tree_method='hist',       # Or 'gpu_hist' if GPU
-    n_estimators=1000,
-    early_stopping_rounds=50,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    max_depth=6,
-    learning_rate=0.1,
-    n_jobs=-1
-)
-```
+**Interview Point:**
+"XGBoost adds regularization to prevent overfitting and uses second-order gradients for better optimization. It's also engineered for speed with parallel processing and cache optimization."
 
 ---
 
 ## Question 3
 
-**How can you use XGBoost for a multi-class classification problem?**
+**How does XGBoost handle missing or null values in the dataset?**
 
 ### Answer
 
 **Definition:**
-XGBoost handles multi-class classification using either softmax (returns class labels) or softprob (returns probabilities) objectives, extending binary classification to multiple classes.
+XGBoost handles missing values by learning the optimal default direction for missing values at each split during training. It doesn't require imputation.
 
-**Implementation:**
+**Mechanism:**
 
-**Method 1: Using XGBClassifier (Recommended):**
-```python
-import xgboost as xgb
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix
+1. At each split, XGBoost tries both directions for missing values:
+   - Send missing to left child
+   - Send missing to right child
+2. Chooses direction that maximizes gain
+3. Stores optimal direction in the tree
 
-# Load multi-class data
-iris = load_iris()
-X, y = iris.data, iris.target  # 3 classes
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-# Multi-class classification
-model = xgb.XGBClassifier(
-    objective='multi:softprob',  # Returns probabilities
-    num_class=3,                  # Number of classes
-    n_estimators=100,
-    max_depth=4
-)
-model.fit(X_train, y_train)
-
-# Predictions
-y_pred = model.predict(X_test)          # Class labels
-y_proba = model.predict_proba(X_test)   # Probabilities for each class
-
-print("Classification Report:")
-print(classification_report(y_test, y_pred, target_names=iris.target_names))
+**Algorithm (Sparsity-Aware Split Finding):**
+```
+For each split candidate:
+    Compute gain if missing → left
+    Compute gain if missing → right
+    Choose direction with higher gain
+    Store default direction
 ```
 
-**Method 2: Using DMatrix API:**
+**Example:**
 ```python
 import xgboost as xgb
 import numpy as np
 
-# Create DMatrix
-dtrain = xgb.DMatrix(X_train, label=y_train)
-dtest = xgb.DMatrix(X_test, label=y_test)
+# Data with missing values (no imputation needed)
+X = np.array([[1, 2], [np.nan, 3], [4, np.nan], [5, 6]])
+y = np.array([0, 1, 0, 1])
 
-# Parameters
-params = {
-    'objective': 'multi:softmax',  # Returns class labels
-    'num_class': 3,
-    'max_depth': 4,
-    'eta': 0.1,
-    'eval_metric': 'mlogloss'
-}
+# XGBoost handles missing automatically
+model = xgb.XGBClassifier()
+model.fit(X, y)  # Works without imputation
 
-# Train
-model = xgb.train(
-    params, 
-    dtrain, 
-    num_boost_round=100,
-    evals=[(dtrain, 'train'), (dtest, 'test')]
-)
-
-# Predict
-y_pred = model.predict(dtest)
+# Prediction with missing values
+X_test = np.array([[np.nan, 5]])
+pred = model.predict(X_test)  # Handles missing in prediction too
 ```
 
-**Objectives for Multi-class:**
+**Benefits:**
+- No information loss from imputation
+- Learns from missingness pattern (informative missingness)
+- Consistent handling in train and test
 
-| Objective | Output | Use Case |
-|-----------|--------|----------|
-| `multi:softmax` | Class labels | When only class needed |
-| `multi:softprob` | Probabilities | When probabilities needed |
-
-**Evaluation Metrics:**
-```python
-model = xgb.XGBClassifier(
-    objective='multi:softprob',
-    num_class=3,
-    eval_metric=['mlogloss', 'merror']  # Multi-class metrics
-)
-
-# mlogloss: Multi-class log loss
-# merror: Multi-class error rate
-```
-
-**Handling Many Classes:**
-```python
-# For many classes (e.g., 100+)
-model = xgb.XGBClassifier(
-    objective='multi:softprob',
-    num_class=100,
-    max_depth=6,
-    learning_rate=0.05,
-    n_estimators=500,
-    tree_method='hist'  # Faster for many classes
-)
-```
+**When to Still Impute:**
+- Very high missing rate (>50%)
+- Domain knowledge suggests specific imputation
+- Comparing with models that require imputation
 
 ---
 
 ## Question 4
 
-**How can you combine XGBoost with other machine learning models in an ensemble?**
+**What is meant by 'regularization' in XGBoost and how does it help in preventing overfitting?**
 
 ### Answer
 
 **Definition:**
-XGBoost can be combined with other models through stacking (meta-learner), blending (weighted averaging), or voting to leverage diverse model strengths and improve predictions.
+Regularization in XGBoost adds penalty terms to the objective function that discourage complex models, helping prevent overfitting by penalizing large leaf weights and too many leaves.
 
-**Ensemble Approaches:**
+**Regularization Terms:**
 
-**1. Stacking with Meta-Learner:**
+$$\Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^{T} w_j^2 + \alpha \sum_{j=1}^{T} |w_j|$$
+
+Where:
+- $T$ = number of leaves (complexity penalty via $\gamma$)
+- $w_j$ = weight of leaf j
+- $\lambda$ = L2 regularization (Ridge)
+- $\alpha$ = L1 regularization (Lasso)
+
+**Regularization Parameters:**
+
+| Parameter | Name | Effect |
+|-----------|------|--------|
+| `gamma` | min_split_loss | Minimum gain required for split |
+| `lambda` | reg_lambda | L2 regularization on weights |
+| `alpha` | reg_alpha | L1 regularization on weights |
+| `max_depth` | - | Limits tree depth |
+| `min_child_weight` | - | Minimum Hessian sum in child |
+
+**How They Help:**
+
+**1. gamma (γ):**
+- Split only if gain > γ
+- Higher γ = simpler trees (fewer splits)
+
+**2. lambda (λ) - L2:**
+- Shrinks leaf weights toward zero
+- Prevents extreme predictions
+- Smoother output
+
+**3. alpha (α) - L1:**
+- Can zero out some leaf weights
+- Feature selection effect
+- Sparser model
+
+**Code Example:**
 ```python
-from sklearn.ensemble import StackingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 import xgboost as xgb
 
-# Base models
-base_models = [
-    ('rf', RandomForestClassifier(n_estimators=100)),
-    ('xgb', xgb.XGBClassifier(n_estimators=100)),
-    ('svm', SVC(probability=True))
-]
-
-# Stacking ensemble
-stacking = StackingClassifier(
-    estimators=base_models,
-    final_estimator=LogisticRegression(),
-    cv=5,
-    stack_method='predict_proba'
+# Regularized XGBoost
+model = xgb.XGBClassifier(
+    reg_lambda=1.0,      # L2 regularization
+    reg_alpha=0.1,       # L1 regularization
+    gamma=0.5,           # Min split gain
+    max_depth=5,         # Depth limit
+    min_child_weight=5   # Min samples per leaf
 )
-
-stacking.fit(X_train, y_train)
-y_pred = stacking.predict(X_test)
 ```
 
-**2. Weighted Blending:**
-```python
-import numpy as np
-from sklearn.model_selection import cross_val_predict
-
-# Train base models
-rf = RandomForestClassifier(n_estimators=100).fit(X_train, y_train)
-xgb_model = xgb.XGBClassifier(n_estimators=100).fit(X_train, y_train)
-
-# Get predictions
-rf_proba = rf.predict_proba(X_test)[:, 1]
-xgb_proba = xgb_model.predict_proba(X_test)[:, 1]
-
-# Weighted blend (tune weights via CV)
-weights = [0.4, 0.6]  # RF=0.4, XGB=0.6
-blended_proba = weights[0] * rf_proba + weights[1] * xgb_proba
-blended_pred = (blended_proba > 0.5).astype(int)
-```
-
-**3. Voting Ensemble:**
-```python
-from sklearn.ensemble import VotingClassifier
-
-# Voting ensemble
-voting = VotingClassifier(
-    estimators=[
-        ('rf', RandomForestClassifier(n_estimators=100)),
-        ('xgb', xgb.XGBClassifier(n_estimators=100)),
-        ('lgb', lgb.LGBMClassifier(n_estimators=100))
-    ],
-    voting='soft',  # Use probabilities
-    weights=[1, 2, 1]  # XGBoost gets more weight
-)
-
-voting.fit(X_train, y_train)
-```
-
-**4. Neural Network + XGBoost:**
-```python
-from tensorflow import keras
-import numpy as np
-
-# Neural network embeddings as features
-nn_model = keras.Sequential([
-    keras.layers.Dense(64, activation='relu'),
-    keras.layers.Dense(32, activation='relu'),
-    keras.layers.Dense(16, activation='relu')
-])
-
-# Get embeddings
-embeddings = nn_model.predict(X_train)
-
-# Combine with original features
-X_combined = np.hstack([X_train, embeddings])
-
-# Train XGBoost on combined features
-xgb_model = xgb.XGBClassifier()
-xgb_model.fit(X_combined, y_train)
-```
-
-**Best Practices:**
-- Combine diverse model types (tree-based + linear + NN)
-- Use cross-validation to avoid leakage in stacking
-- Tune weights based on validation performance
-- XGBoost often works well as the meta-learner
+**Interview Point:**
+"XGBoost's regularization is a key differentiator from GBM. I typically start with lambda=1, alpha=0, gamma=0 and increase if overfitting."
 
 ---
 
 ## Question 5
 
-**How can XGBoost be integrated within a distributed computing environment for large-scale problems?**
+**How does XGBoost differ from Random Forests?**
 
 ### Answer
 
 **Definition:**
-XGBoost supports distributed training across multiple machines using Dask, Spark, or its native distributed mode, enabling training on datasets that don't fit in single-machine memory.
+XGBoost uses sequential boosting (trees correct previous errors) while Random Forest uses parallel bagging (independent trees vote). This fundamental difference leads to different strengths and use cases.
 
-**Distributed Options:**
+**Key Differences:**
 
-**1. Dask Integration:**
-```python
-import xgboost as xgb
-import dask.dataframe as dd
-from dask.distributed import Client
-from dask_ml.model_selection import train_test_split
+| Aspect | XGBoost | Random Forest |
+|--------|---------|---------------|
+| **Method** | Boosting (sequential) | Bagging (parallel) |
+| **Trees** | Shallow, dependent | Deep, independent |
+| **What it Reduces** | Bias (primarily) | Variance |
+| **Learning** | Additive, corrective | Independent, averaging |
+| **Regularization** | Built-in (L1, L2) | Via tree structure |
+| **Speed (Training)** | Slower (sequential) | Faster (parallel) |
+| **Speed (Inference)** | Similar | Similar |
+| **Sensitivity to Noise** | Higher | Lower |
+| **Hyperparameter Sensitivity** | Higher | Lower |
 
-# Start Dask cluster
-client = Client()
+**When to Use Each:**
 
-# Load data with Dask
-ddf = dd.read_csv('large_data.csv')
-X = ddf.drop('target', axis=1)
-y = ddf['target']
+| Scenario | Recommended |
+|----------|-------------|
+| Need best accuracy | XGBoost |
+| Noisy data | Random Forest |
+| Quick baseline | Random Forest |
+| Time for tuning | XGBoost |
+| Interpretability | Random Forest |
+| Feature importance | Both work well |
 
-# Create DaskDMatrix
-dtrain = xgb.dask.DaskDMatrix(client, X, y)
+**Mathematical Comparison:**
 
-# Train distributed
-output = xgb.dask.train(
-    client,
-    {'objective': 'binary:logistic', 'tree_method': 'hist'},
-    dtrain,
-    num_boost_round=100
-)
+**Random Forest:**
+$$\hat{f}(x) = \frac{1}{B}\sum_{b=1}^{B} T_b(x) \quad \text{(average)}$$
 
-model = output['booster']
-```
+**XGBoost:**
+$$\hat{f}(x) = \sum_{m=1}^{M} \eta \cdot h_m(x) \quad \text{(additive)}$$
 
-**2. Spark Integration (SparkXGBoost):**
-```python
-from sparkxgb import XGBoostClassifier
-from pyspark.sql import SparkSession
-
-# Create Spark session
-spark = SparkSession.builder.appName("XGBoost").getOrCreate()
-
-# Load data
-df = spark.read.csv("large_data.csv", header=True, inferSchema=True)
-
-# XGBoost on Spark
-xgb_spark = XGBoostClassifier(
-    featuresCol="features",
-    labelCol="label",
-    numRound=100,
-    maxDepth=6,
-    eta=0.1,
-    numWorkers=4
-)
-
-model = xgb_spark.fit(df)
-```
-
-**3. Native Distributed Mode:**
-```python
-# On each worker machine, run:
-import xgboost as xgb
-
-# Rabit tracker coordinates workers
-# Each worker reads its partition of data
-
-dtrain = xgb.DMatrix('worker_data.txt')
-
-params = {
-    'objective': 'binary:logistic',
-    'tree_method': 'hist'
-}
-
-# Train (Rabit handles communication)
-bst = xgb.train(params, dtrain, num_boost_round=100)
-```
-
-**4. Ray Integration:**
-```python
-from xgboost_ray import RayDMatrix, train
-
-# Create Ray DMatrix
-dtrain = RayDMatrix(X_train, y_train)
-
-# Distributed training
-result = train(
-    {"objective": "binary:logistic"},
-    dtrain,
-    num_boost_round=100,
-    ray_params={"num_actors": 4}
-)
-```
-
-**Comparison:**
-
-| Framework | Best For |
-|-----------|----------|
-| Dask | Python-native, flexible |
-| Spark | Existing Spark infrastructure |
-| Ray | ML workloads, elastic scaling |
-| Native | Custom setups |
-
-**Tips for Distributed Training:**
-- Use histogram method (`tree_method='hist'`)
-- Partition data evenly across workers
-- Monitor memory usage per worker
-- Start with fewer workers, scale up
+**Practical Tips:**
+- Start with Random Forest for baseline
+- Try XGBoost if RF performance is insufficient
+- XGBoost often wins with proper tuning
+- RF is more robust out-of-the-box
 
 ---
 
 ## Question 6
 
-**How do recent advancements in hardware (such as GPU acceleration) impact the use of XGBoost?**
+**Explain the concept of gradient boosting. How does it work in the context of XGBoost?**
 
 ### Answer
 
 **Definition:**
-GPU acceleration dramatically speeds up XGBoost training (10-50x faster) and enables handling larger datasets. Recent GPU developments have made XGBoost more practical for real-time applications and larger scale problems.
+Gradient boosting builds an ensemble by sequentially adding trees that predict the negative gradient (residuals) of the loss function. Each new tree corrects errors made by all previous trees combined.
 
-**GPU Benefits:**
+**Core Concept:**
 
-| Aspect | CPU | GPU |
-|--------|-----|-----|
-| Training speed | Baseline | 10-50x faster |
-| Large datasets | Memory limited | Can handle larger |
-| Hyperparameter tuning | Slow iteration | Rapid experimentation |
-| Real-time retraining | Impractical | Feasible |
+$$F_m(x) = F_{m-1}(x) + \eta \cdot h_m(x)$$
 
-**Using GPU in XGBoost:**
+Where:
+- $F_m$ = ensemble after m trees
+- $h_m$ = new tree predicting residuals
+- $\eta$ = learning rate (shrinkage)
+
+**Algorithm Steps:**
+
+```
+1. Initialize: F_0(x) = constant (e.g., mean of y)
+
+2. For m = 1 to M:
+   a. Compute pseudo-residuals:
+      r_im = -[∂L(y_i, F(x_i))/∂F(x_i)] at F=F_{m-1}
+   
+   b. Fit tree h_m to residuals r_im
+   
+   c. Update model:
+      F_m(x) = F_{m-1}(x) + η · h_m(x)
+
+3. Output: F_M(x)
+```
+
+**XGBoost Enhancements:**
+
+**1. Second-Order Approximation:**
+$$\mathcal{L}^{(t)} \approx \sum_i [g_i f_t(x_i) + \frac{1}{2}h_i f_t^2(x_i)] + \Omega(f_t)$$
+
+Where:
+- $g_i = \partial l / \partial \hat{y}$ (gradient)
+- $h_i = \partial^2 l / \partial \hat{y}^2$ (Hessian)
+
+**2. Optimal Leaf Weight:**
+$$w_j^* = -\frac{G_j}{H_j + \lambda}$$
+
+**3. Split Gain:**
+$$\text{Gain} = \frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda} + \frac{G_R^2}{H_R+\lambda} - \frac{G^2}{H+\lambda}\right] - \gamma$$
+
+**Intuition:**
+"Imagine aiming at a target. First shot hits roughly. Each subsequent shot aims at the remaining distance from the target, getting progressively closer."
+
+---
+
+## Question 7
+
+**What are the loss functions used in XGBoost for regression and classification problems?**
+
+### Answer
+
+**Definition:**
+XGBoost supports various loss functions (objectives) tailored to different tasks. The loss function determines what the model optimizes and how gradients are computed.
+
+**Common Loss Functions:**
+
+**Regression:**
+
+| Objective | Formula | Use Case |
+|-----------|---------|----------|
+| `reg:squarederror` | $\frac{1}{2}(y - \hat{y})^2$ | Standard regression |
+| `reg:squaredlogerror` | $\frac{1}{2}[\log(\hat{y}+1) - \log(y+1)]^2$ | Targets with large range |
+| `reg:pseudohubererror` | Huber-like | Robust to outliers |
+| `reg:absoluteerror` | $\|y - \hat{y}\|$ | MAE, outlier-robust |
+| `reg:gamma` | Gamma deviance | Positive continuous targets |
+| `reg:tweedie` | Tweedie deviance | Insurance claims |
+
+**Binary Classification:**
+
+| Objective | Formula | Use Case |
+|-----------|---------|----------|
+| `binary:logistic` | $y\log(p) + (1-y)\log(1-p)$ | Binary classification |
+| `binary:hinge` | Hinge loss | SVM-like |
+
+**Multi-class Classification:**
+
+| Objective | Use Case |
+|-----------|----------|
+| `multi:softmax` | Returns class labels |
+| `multi:softprob` | Returns probabilities |
+
+**Code Examples:**
 
 ```python
 import xgboost as xgb
 
-# GPU training
+# Regression
+reg_model = xgb.XGBRegressor(objective='reg:squarederror')
+
+# Binary classification
+clf_model = xgb.XGBClassifier(objective='binary:logistic')
+
+# Multi-class (3 classes)
+multi_model = xgb.XGBClassifier(
+    objective='multi:softprob',
+    num_class=3
+)
+
+# Custom objective (example: asymmetric loss)
+def custom_loss(y_true, y_pred):
+    grad = np.where(y_true > y_pred, -2*(y_true-y_pred), -0.5*(y_true-y_pred))
+    hess = np.where(y_true > y_pred, 2, 0.5)
+    return grad, hess
+
+model = xgb.XGBRegressor(objective=custom_loss)
+```
+
+**Choosing Loss Function:**
+- Standard tasks: Use defaults
+- Outliers in regression: Use Huber or MAE
+- Positive targets: Consider Gamma or Tweedie
+- Class imbalance: Adjust scale_pos_weight
+
+---
+
+## Question 8
+
+**How does XGBoost use tree pruning and why is it important?**
+
+### Answer
+
+**Definition:**
+XGBoost uses "max_depth + post-pruning" strategy: it grows trees to maximum depth first, then prunes back splits that don't improve the objective by at least gamma. This is more effective than pre-pruning (stopping early).
+
+**Pruning Mechanism:**
+
+**1. Grow Phase:**
+- Build tree to max_depth
+- Evaluate all possible splits
+
+**2. Prune Phase:**
+- Starting from leaves, remove splits where:
+$$\text{Gain} < \gamma$$
+
+**Gain Formula:**
+$$\text{Gain} = \frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda} + \frac{G_R^2}{H_R+\lambda} - \frac{G^2}{H+\lambda}\right] - \gamma$$
+
+If Gain ≤ 0, the split is pruned.
+
+**Why Post-Pruning is Better:**
+
+| Pre-Pruning | Post-Pruning (XGBoost) |
+|-------------|------------------------|
+| Stops when gain < threshold | Grows fully, then prunes |
+| May miss beneficial splits | Considers deeper patterns |
+| Greedy decision | Global optimization |
+
+**Example:**
+```
+Pre-pruning might stop here (low immediate gain):
+    [Node A] → gain=0.1 (stop)
+    
+But the children might have high gain:
+    [Node A] → gain=0.1
+       ├── [Node B] → gain=2.0
+       └── [Node C] → gain=1.5
+
+Post-pruning keeps the beneficial splits.
+```
+
+**Controlling Pruning:**
+
+```python
+import xgboost as xgb
+
 model = xgb.XGBClassifier(
-    tree_method='gpu_hist',      # GPU histogram method
-    gpu_id=0,                     # Which GPU to use
-    predictor='gpu_predictor',   # GPU for prediction too
-    n_estimators=1000,
-    max_depth=8
+    max_depth=6,        # Initial tree depth
+    gamma=0.5,          # Min split gain (pruning threshold)
+    min_child_weight=5  # Min Hessian sum in child
 )
-
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
 ```
 
-**Multi-GPU Training:**
+**Interview Point:**
+"XGBoost's post-pruning allows it to discover patterns that require multiple splits to be useful, which pre-pruning would miss."
+
+---
+
+## Question 9
+
+**Describe the role of shrinkage (learning rate) in XGBoost.**
+
+### Answer
+
+**Definition:**
+Shrinkage (learning rate, eta/η) scales down the contribution of each tree, requiring more trees to reach the same solution but with better generalization. It's a form of regularization.
+
+**Mathematical Role:**
+$$F_m(x) = F_{m-1}(x) + \eta \cdot h_m(x)$$
+
+Where η ∈ (0, 1], typically 0.01-0.3.
+
+**Effect of Learning Rate:**
+
+| Low η (0.01-0.1) | High η (0.3-1.0) |
+|------------------|------------------|
+| Needs more trees | Needs fewer trees |
+| Better generalization | Risk of overfitting |
+| Slower training | Faster training |
+| Smoother learning | Aggressive learning |
+| More robust | Can overshoot optimal |
+
+**Tradeoff with n_estimators:**
+```
+High η + Few trees = Fast, may overfit
+Low η + Many trees = Slow, better generalization
+```
+
+**Rule of Thumb:**
+- Lower η + more trees usually performs better
+- But: training time increases
+- Sweet spot: η = 0.1-0.3, tune n_estimators
+
+**Code Example:**
+
 ```python
 import xgboost as xgb
-from dask_cuda import LocalCUDACluster
-from dask.distributed import Client
+from sklearn.model_selection import cross_val_score
 
-# Create multi-GPU cluster
-cluster = LocalCUDACluster()
-client = Client(cluster)
-
-# Distributed GPU training
-dtrain = xgb.dask.DaskDMatrix(client, X, y)
-output = xgb.dask.train(
-    client,
-    {'tree_method': 'gpu_hist', 'objective': 'binary:logistic'},
-    dtrain,
-    num_boost_round=100
-)
+# Compare different learning rates
+for eta in [0.01, 0.1, 0.3]:
+    model = xgb.XGBClassifier(
+        learning_rate=eta,
+        n_estimators=int(100 / eta),  # Compensate
+        early_stopping_rounds=10
+    )
+    scores = cross_val_score(model, X, y, cv=5, 
+                             fit_params={'eval_set': [(X, y)]})
+    print(f"eta={eta}: {scores.mean():.4f}")
 ```
 
-**Performance Benchmarks:**
+**Best Practice:**
+1. Start with η = 0.1, n_estimators = 100
+2. Use early stopping to find optimal n_estimators
+3. Lower η if overfitting, increase n_estimators proportionally
 
-```python
-import time
+---
 
-# CPU benchmark
-model_cpu = xgb.XGBClassifier(tree_method='hist', n_estimators=100)
-start = time.time()
-model_cpu.fit(X_train, y_train)
-cpu_time = time.time() - start
-
-# GPU benchmark
-model_gpu = xgb.XGBClassifier(tree_method='gpu_hist', n_estimators=100)
-start = time.time()
-model_gpu.fit(X_train, y_train)
-gpu_time = time.time() - start
-
-print(f"CPU time: {cpu_time:.2f}s")
-print(f"GPU time: {gpu_time:.2f}s")
-print(f"Speedup: {cpu_time/gpu_time:.1f}x")
-```
-
-**Hardware Considerations:**
-
-| GPU Feature | Impact on XGBoost |
-|-------------|-------------------|
-| VRAM size | Max dataset size in memory |
-| CUDA cores | Training parallelism |
-| Memory bandwidth | Data transfer speed |
-| Tensor cores | Not utilized (tree-based) |
-
-**Best Practices:**
-- Ensure data fits in GPU memory
-- Use `gpu_hist` (not exact method)
-- Monitor GPU memory with `nvidia-smi`
-- For inference: CPU may be sufficient for small batches
-
-**Recent Developments:**
-- RAPIDS cuML integration
-- Improved multi-GPU support
-- Better memory management
-- Support for newer GPU architectures

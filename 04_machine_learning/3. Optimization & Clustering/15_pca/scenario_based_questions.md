@@ -2,82 +2,6 @@
 
 ## Question 1
 
-**Discuss the importance of the trace of a matrix in the context of PCA.**
-
-### Answer
-
-**Definition:**
-The trace of a matrix is the sum of its diagonal elements. In PCA context, the trace of the covariance matrix equals the total variance of the dataset.
-
-**Why It Matters:**
-
-**1. Total Variance:**
-$$Tr(C) = \sum_{i=1}^{p} \lambda_i = \text{Total Variance}$$
-
-The trace of covariance matrix = sum of all eigenvalues = total variance.
-
-**2. Variance Preservation:**
-When selecting k components, the preserved variance is:
-$$\text{Preserved} = \sum_{i=1}^{k} \lambda_i$$
-
-Explained variance ratio = Preserved / Tr(C)
-
-**3. Reconstruction Error:**
-$$\text{Reconstruction Error} = Tr(C) - \sum_{i=1}^{k} \lambda_i$$
-
-**Practical Implication:**
-- Trace remains constant regardless of PCA transformation
-- Helps verify PCA implementation correctness
-- Used in deriving reconstruction error formulas
-
-**Interview Point:**
-"The trace tells us the total information budget. PCA redistributes this into components, with top components getting larger shares."
-
----
-
-## Question 2
-
-**Discuss the application of PCA in feature engineering.**
-
-### Answer
-
-**How PCA Helps Feature Engineering:**
-
-**1. Decorrelation:**
-- Original features often correlated
-- PCA produces uncorrelated components
-- Benefits: Removes multicollinearity, helps linear models
-
-**2. Noise Filtering:**
-- Keep top components, discard low-variance ones
-- Low-variance components often capture noise
-- Result: Cleaner features for downstream models
-
-**3. Dimensionality Reduction:**
-- Reduce 1000 features to 50 components (95% variance)
-- Faster training, less storage
-- Prevents overfitting
-
-**4. Creating New Features:**
-- PC scores as new engineered features
-- Can combine with original features
-- Components capture underlying patterns
-
-**Scenario Example:**
-Customer dataset with 100 purchase features:
-1. Apply PCA → First 3 components
-2. PC1 = "Overall spending" (high loadings on all purchase types)
-3. PC2 = "Online vs Offline preference"
-4. PC3 = "Luxury vs Necessity preference"
-5. Use these 3 interpretable components for segmentation
-
-**Caution:**
-PCA is unsupervised—components maximize variance, not predictive power. Validate with downstream task performance.
-
----
-
-## Question 3
-
 **Discuss how PCA can suffer from outlier sensitivity and ways to address it.**
 
 ### Answer
@@ -121,7 +45,7 @@ Always visualize data before PCA. If outliers exist, address them first—PCA re
 
 ---
 
-## Question 4
+## Question 2
 
 **How would you use PCA for data compression in a real-time streaming application?**
 
@@ -186,7 +110,7 @@ reconstructed = ipca.inverse_transform(compressed)
 
 ---
 
-## Question 5
+## Question 3
 
 **How would you decide whether to use PCA or a classification algorithm for a given dataset?**
 
@@ -234,7 +158,7 @@ Data → Standardize → PCA → Classification Algorithm → Prediction
 
 ---
 
-## Question 6
+## Question 4
 
 **Discuss a case where PCA helped improve model performance by reducing overfitting.**
 
@@ -291,7 +215,7 @@ PCA acts as implicit regularization by constraining the model to a lower-dimensi
 
 ---
 
-## Question 7
+## Question 5
 
 **Give an example of how PCA might be incorrectly applied to a dataset and propose a solution.**
 
@@ -345,7 +269,7 @@ X_pca = pca.fit_transform(X_scaled)
 
 ---
 
-## Question 8
+## Question 6
 
 **Discuss how you would ensure the robustness of PCA results against variations in the dataset.**
 
@@ -415,116 +339,81 @@ for _ in range(n_bootstrap):
 
 ---
 
-## Question 9
+## Question 7
 
-**Discuss how Randomized PCA is used and its benefits over traditional PCA.**
+**Explain how you would apply PCA in a stock market data analysis situation.**
 
 ### Answer
 
-**What is Randomized PCA?**
-A probabilistic algorithm that computes approximate SVD using random projections, much faster than exact methods for large matrices.
+**Definition:**
+PCA on stock return data identifies independent factors driving market movements. The first component typically captures overall market movement, while subsequent components reveal sector or style factors.
 
-**How It Works:**
+**Step-by-Step Application:**
 
-1. **Random Projection**: Project data onto random low-dimensional subspace
-2. **Find Basis**: Compute orthonormal basis of projected space
-3. **Small SVD**: Do exact SVD on smaller projected matrix
-4. **Reconstruct**: Approximate original SVD from smaller decomposition
+1. **Data Preparation:**
+   - Select stocks (e.g., S&P 500)
+   - Convert prices to returns (daily/weekly)
+   - Matrix: rows = days, columns = stocks
+   - Standardize returns per stock
 
-**Benefits Over Traditional PCA:**
+2. **Apply PCA:**
+   - Compute principal components of returns matrix
+   - Each PC = orthogonal source of market variation
 
-| Aspect | Traditional PCA | Randomized PCA |
-|--------|-----------------|----------------|
-| **Complexity** | O(np²) or O(n²p) | O(npk) |
-| **Memory** | Full matrix operations | Lower memory footprint |
-| **Speed** | Slow for large data | 10-100x faster |
-| **Accuracy** | Exact | Near-exact for top k |
-| **When Faster** | Always exact | k << min(n,p) |
+3. **Interpretation:**
+   - **PC1 (Market Factor)**: Positive loadings on all stocks → overall market movement
+   - **PC2+**: Sector/style factors (e.g., Tech vs Utilities, Growth vs Value)
 
-**When to Use Randomized PCA:**
-- Large datasets (millions of rows)
-- High-dimensional data (thousands of features)
-- Only need top k components (k << p)
-- Speed matters more than exact precision
+**Example Interpretation:**
+| Component | Interpretation | Loadings Pattern |
+|-----------|----------------|------------------|
+| PC1 | Market movement | All stocks positive |
+| PC2 | Growth vs Value | Tech +, Utilities - |
+| PC3 | Small vs Large cap | Small cap +, Large cap - |
 
-**sklearn Usage:**
-```python
-from sklearn.decomposition import PCA
-
-# Randomized (fast)
-pca_fast = PCA(n_components=50, svd_solver='randomized')
-
-# Auto-select (sklearn chooses best)
-pca_auto = PCA(n_components=50, svd_solver='auto')
-
-# Full exact (slower)
-pca_exact = PCA(n_components=50, svd_solver='full')
-```
-
-**Practical Note:**
-sklearn defaults to 'auto' which uses randomized for large data with small k. Results are typically indistinguishable from exact PCA.
+**Use Cases in Finance:**
+- **Factor investing**: Build strategies around principal components
+- **Risk management**: Hedge exposure to specific factors
+- **Portfolio diversification**: Ensure exposure across different PCs
+- **Anomaly detection**: Extreme PC scores = unusual market behavior
 
 ---
 
-## Question 10
+## Question 8
 
-**Discuss how robust PCA attempts to handle outliers and its practical implications.**
+**Describe a scenario where using PCA might be detrimental to the performance of a machine learning model.**
 
 ### Answer
 
-**Problem:**
-Standard PCA is highly sensitive to outliers due to squared error objective.
+**Scenario: Low-Variance, High-Predictive-Power Features**
 
-**Robust PCA Approach:**
-Decompose data matrix D into:
-$$D = L + S$$
+**Setup:**
+Predicting customer churn with features:
+- `total_spend`: Range $10-$10,000 (high variance)
+- `monthly_usage`: Range 1-500 GB (high variance)  
+- `complaints_filed`: Binary 0/1 (very low variance, <5% have complaints)
 
-- $L$: Low-rank matrix (true data structure)
-- $S$: Sparse matrix (outliers/corruptions)
+**The Problem:**
+- Most customers never filed complaints → low variance
+- BUT filing a complaint strongly predicts churn → high predictive power
+- PCA focuses on high-variance features (spend, usage)
+- `complaints_filed` contributes little to top components
+- When reducing dimensions, complaint information is lost
 
-**Optimization Objective:**
-$$\min_{L,S} ||L||_* + \lambda ||S||_1 \quad \text{s.t.} \quad D = L + S$$
+**The Outcome:**
+- Model trained on PCA-transformed data performs worse
+- Critical predictor was discarded by unsupervised PCA
+- PCA equated low variance with low importance (incorrectly!)
 
-- $||L||_*$: Nuclear norm (encourages low rank)
-- $||S||_1$: L1 norm (encourages sparsity)
+**Key Lesson:**
+PCA is unsupervised—it has NO knowledge of the target variable. High variance ≠ High predictive power.
 
-**How It Handles Outliers:**
-1. Outliers captured in sparse matrix S
-2. Low-rank L contains clean structure
-3. PCA on L is robust to original outliers
+**When PCA Can Hurt:**
+- Low-variance features are strong predictors
+- Important information exists in small variations
+- Classes differ in subtle ways (not variance directions)
 
-**Practical Implications:**
-
-| Implication | Description |
-|-------------|-------------|
-| **Automatic outlier detection** | S matrix identifies corrupted entries |
-| **Better components** | L gives clean structure |
-| **No manual preprocessing** | Algorithm handles outliers internally |
-| **Higher computation** | Slower than standard PCA |
-
-**Applications:**
-- **Video surveillance**: Background (L) vs moving objects (S)
-- **Image denoising**: Clean image (L) vs corrupted pixels (S)
-- **Data cleaning**: Identify and separate outliers
-
-**Implementation:**
-```python
-# Not in sklearn, but available in specialized packages
-# Pseudocode concept:
-from robust_pca import RobustPCA
-
-rpca = RobustPCA()
-L, S = rpca.fit_transform(X)
-
-# L contains clean low-rank approximation
-# S contains sparse outliers
-standard_pca.fit(L)  # PCA on clean data
-```
-
-**Trade-offs:**
-- More robust results
-- Higher computational cost
-- Requires tuning λ parameter
-- Best for data with gross errors, not just noisy data
+**Alternative:**
+Use supervised feature selection (feature importance from Random Forest, RFE) when target-feature relationship matters.
 
 ---

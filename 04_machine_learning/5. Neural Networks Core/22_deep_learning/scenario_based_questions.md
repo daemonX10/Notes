@@ -315,3 +315,68 @@ High variance = overfitting = model memorizes training data
 - Trade-off: Can't maximize both
 
 ---
+
+## Question 13: Steps to create a recommendation system using deep learning
+
+### Architecture Approaches
+
+| Approach | Description |
+|----------|-------------|
+| **Neural Collaborative Filtering** | Learn user-item interactions |
+| **Content-Based** | Encode item features |
+| **Two-Tower** | Separate user and item encoders |
+| **Sequential** | Model user history with RNN/Transformer |
+
+### Pipeline
+1. **Data**: User-item interactions, item features
+2. **Embedding**: Learn user and item embeddings
+3. **Interaction**: Combine embeddings (dot product, MLP)
+4. **Training**: Binary cross-entropy or ranking loss
+5. **Serving**: Approximate nearest neighbor for retrieval
+
+### Python Code Example
+```python
+class TwoTowerModel(nn.Module):
+    def __init__(self, num_users, num_items, embed_dim):
+        super().__init__()
+        self.user_embed = nn.Embedding(num_users, embed_dim)
+        self.item_embed = nn.Embedding(num_items, embed_dim)
+        
+    def forward(self, user_id, item_id):
+        user_vec = self.user_embed(user_id)
+        item_vec = self.item_embed(item_id)
+        return (user_vec * item_vec).sum(dim=1)  # Dot product
+```
+
+---
+
+## Question 14: Approach for sentiment analysis on social media using deep learning
+
+### Pipeline
+
+| Step | Implementation |
+|------|----------------|
+| **Preprocessing** | Handle mentions, hashtags, emojis |
+| **Tokenization** | Subword tokenization (BPE) |
+| **Model** | Fine-tuned BERT or DistilBERT |
+| **Output** | Positive/Negative/Neutral |
+
+### Preprocessing
+```python
+def preprocess(text):
+    text = text.lower()
+    text = re.sub(r'@\w+', '<USER>', text)
+    text = re.sub(r'http\S+', '<URL>', text)
+    return text
+```
+
+### Model Approach
+```python
+from transformers import pipeline
+
+classifier = pipeline("sentiment-analysis")
+result = classifier("This product is amazing!")
+# {'label': 'POSITIVE', 'score': 0.99}
+```
+
+---

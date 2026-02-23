@@ -104,19 +104,3 @@ Key metrics: training loss, validation loss, gradient norm, learning rate.
 | Loss NaN | LR too high |
 
 ---
-
-## Question 7
-
-**Present a strategy to choose the right optimizer for a given ML problem.**
-
-**Answer:**
-
-Start with AdamW as robust default. For CNN SOTA, use SGD + momentum. For Transformers, use AdamW + warmup. For RNNs, use Adam + gradient clipping.
-
-| Architecture | Optimizer | Extra |
-|--------------|-----------|-------|
-| CNN | SGD + Momentum or AdamW | LR schedule |
-| RNN/LSTM | Adam | Gradient Clipping |
-| Transformer | AdamW | Warmup + Decay |
-
----

@@ -1,4 +1,4 @@
-# Llmops Interview Questions - General Questions
+﻿# Llmops Interview Questions - General Questions
 
 ## Question 1
 
@@ -58,7 +58,7 @@
 
 ## Question 8
 
-**What steps would you take if you noticed a sudden drop in amodel’s performance?**
+**Discuss the importance ofmonitoringandlogginginMLOps.**
 
 **Answer:** _[To be filled]_
 
@@ -80,3 +80,42 @@
 
 ---
 
+## Question 11
+
+**Discussfeature storesand their importance inMLOps workflows.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 12
+
+**Discuss strategies forteam collaborationandrole delineationwithin anMLOps framework.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 13
+
+**Discuss the concept ofA/B testingformachine learning modelsin anMLOpssetting.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 14
+
+**Discuss the incorporation ofexplainable AI (XAI)inMLOps workflows.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 15
+
+**Discuss the role ofedge deploymentinMLOpsand the associated challenges.**
+
+**Answer:** _[To be filled]_
+
+---

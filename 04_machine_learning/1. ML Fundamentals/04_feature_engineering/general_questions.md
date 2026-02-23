@@ -736,3 +736,162 @@ print(f"Selected {len(selected_cols)} features with score {best_score:.4f}")
 
 ---
 
+---
+
+## Question 11: How would you balance the trade-off between overfitting and underfitting while engineering features?
+
+### Answer
+
+**The Feature Engineering Bias-Variance Trade-off:**
+
+| Problem | Cause | Symptoms |
+|---------|-------|----------|
+| **Underfitting** | Too few/simple features | High training error, high test error |
+| **Overfitting** | Too many/complex features | Low training error, high test error |
+
+**Strategy Framework:**
+
+```
+1. Start Simple → Add Complexity → Regularize → Validate
+```
+
+**Step-by-Step Approach:**
+
+```python
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import cross_val_score, learning_curve
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.pipeline import Pipeline
+import matplotlib.pyplot as plt
+
+def evaluate_feature_complexity(X, y, max_degree=5):
+    """
+    Evaluate model performance across feature complexity levels.
+    """
+    results = []
+    
+    for degree in range(1, max_degree + 1):
+        pipeline = Pipeline([
+            ('poly', PolynomialFeatures(degree=degree, include_bias=False)),
+            ('scaler', StandardScaler()),
+            ('model', Ridge(alpha=1.0))
+        ])
+        
+        scores = cross_val_score(pipeline, X, y, cv=5, scoring='neg_mean_squared_error')
+        
+        pipeline.fit(X, y)
+        n_features = pipeline.named_steps['poly'].n_output_features_
+        
+        results.append({
+            'degree': degree,
+            'n_features': n_features,
+            'cv_rmse_mean': np.sqrt(-scores.mean()),
+            'cv_rmse_std': np.sqrt(-scores).std()
+        })
+    
+    return pd.DataFrame(results)
+```
+
+**Techniques to Prevent Overfitting:**
+
+```python
+# 1. Feature Selection with Regularization
+from sklearn.linear_model import LassoCV
+
+def regularized_feature_selection(X, y, alpha_range=None):
+    """Use Lasso for automatic feature selection."""
+    if alpha_range is None:
+        alpha_range = np.logspace(-4, 1, 50)
+    
+    lasso_cv = LassoCV(alphas=alpha_range, cv=5, random_state=42)
+    lasso_cv.fit(X, y)
+    
+    # Get selected features (non-zero coefficients)
+    selected_mask = lasso_cv.coef_ != 0
+    selected_features = X.columns[selected_mask].tolist()
+    
+    print(f"Optimal alpha: {lasso_cv.alpha_:.4f}")
+    print(f"Selected {len(selected_features)} of {X.shape[1]} features")
+    
+    return selected_features, lasso_cv
+
+# 2. Learning Curves for Diagnosis
+def plot_learning_curve(estimator, X, y, title="Learning Curve"):
+    """Plot learning curve to diagnose bias-variance."""
+    train_sizes, train_scores, test_scores = learning_curve(
+        estimator, X, y, cv=5, 
+        train_sizes=np.linspace(0.1, 1.0, 10),
+        scoring='neg_mean_squared_error'
+    )
+    
+    train_rmse = np.sqrt(-train_scores.mean(axis=1))
+    test_rmse = np.sqrt(-test_scores.mean(axis=1))
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(train_sizes, train_rmse, 'o-', label='Training RMSE')
+    plt.plot(train_sizes, test_rmse, 'o-', label='Validation RMSE')
+    plt.xlabel('Training Set Size')
+    plt.ylabel('RMSE')
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+    # Diagnosis
+    gap = test_rmse[-1] - train_rmse[-1]
+    if gap > 0.1 * test_rmse[-1]:
+        print("Diagnosis: HIGH VARIANCE (Overfitting) - Reduce features or add regularization")
+    elif train_rmse[-1] > 0.5:  # Adjust threshold based on problem
+        print("Diagnosis: HIGH BIAS (Underfitting) - Add more features")
+    else:
+        print("Diagnosis: Good balance")
+```
+
+**Balanced Feature Engineering Pipeline:**
+
+```python
+def balanced_feature_engineering(X, y, target_variance_explained=0.95):
+    """
+    Balanced approach to feature engineering.
+    """
+    from sklearn.decomposition import PCA
+    from sklearn.feature_selection import SelectFromModel
+    
+    # Step 1: Generate rich features
+    poly = PolynomialFeatures(degree=2, include_bias=False, interaction_only=True)
+    X_poly = poly.fit_transform(X)
+    print(f"Step 1: Generated {X_poly.shape[1]} polynomial features")
+    
+    # Step 2: Scale features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_poly)
+    
+    # Step 3: Apply regularized selection
+    lasso = LassoCV(cv=5, random_state=42)
+    lasso.fit(X_scaled, y)
+    selector = SelectFromModel(lasso, prefit=True)
+    X_selected = selector.transform(X_scaled)
+    print(f"Step 2: Selected {X_selected.shape[1]} features via Lasso")
+    
+    # Step 4: Optional PCA for remaining multicollinearity
+    pca = PCA(n_components=target_variance_explained)
+    X_final = pca.fit_transform(X_selected)
+    print(f"Step 3: PCA reduced to {X_final.shape[1]} components")
+    
+    return X_final
+```
+
+**Best Practices Summary:**
+
+| Stage | Action | Purpose |
+|-------|--------|---------|
+| **Initial** | Start with domain-driven features | Avoid random complexity |
+| **Expansion** | Add polynomial/interaction features | Increase expressiveness |
+| **Selection** | Apply Lasso/RF importance | Remove noise features |
+| **Validation** | Use cross-validation | Detect overfitting early |
+| **Regularization** | Tune regularization strength | Control complexity |
+| **Monitoring** | Plot learning curves | Diagnose bias-variance |
+
+---

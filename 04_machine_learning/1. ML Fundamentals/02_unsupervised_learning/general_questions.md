@@ -1,6 +1,27 @@
 # Unsupervised Learning - General Questions
 
-## Question 1: Name the main types of problems addressed by unsupervised learning.
+## Question 1: What is unsupervised learning and how does it differ from supervised learning?
+
+### Definition
+Unsupervised learning is a paradigm where algorithms are trained on **unlabeled data** to discover hidden patterns, structures, and relationships without a "teacher" providing correct outputs.
+
+### Key Differences
+
+| Feature | Supervised Learning | Unsupervised Learning |
+|---------|--------------------|-----------------------|
+| **Input Data** | Labeled (X, y) | Unlabeled (X only) |
+| **Goal** | Prediction | Discovery of patterns |
+| **Feedback** | Loss function compares predictions to true labels | No direct feedback; learns from data structure |
+| **Tasks** | Classification, Regression | Clustering, Dimensionality Reduction, Association Rules |
+| **Evaluation** | Objective (accuracy, RMSE) | More subjective (silhouette score) |
+
+### Analogy
+- **Supervised**: Learning with flashcards (question + answer)
+- **Unsupervised**: Sorting a box of mixed Lego bricks into logical groups
+
+---
+
+## Question 2: Name the main types of problems addressed by unsupervised learning.
 
 ### The Four Main Problem Types
 
@@ -20,82 +41,78 @@
 
 ---
 
-## Question 2: How can association rule learning be applied in a market-basket analysis?
+## Question 3: Explain the concept of dimensionality reduction and why it's important.
 
-### The Process
+### Definition
+Dimensionality reduction transforms high-dimensional data into lower-dimensional space while retaining meaningful information.
 
-1. **Data**: Transaction database (items bought together)
-2. **Algorithm**: Apriori or FP-Growth
-3. **Output**: Rules like {Diapers} → {Beer}
+### Why It's Important
 
-### Business Applications
+| Reason | Explanation |
+|--------|-------------|
+| **Curse of Dimensionality** | High dimensions → sparse data → poor model performance |
+| **Reduce Overfitting** | Fewer features = simpler model = better generalization |
+| **Computational Efficiency** | Less data to process = faster training |
+| **Visualization** | Reduce to 2D/3D for human understanding |
+| **Remove Redundancy** | Eliminate correlated/collinear features |
 
-| Application | Insight | Action |
-|-------------|---------|--------|
-| **Store Layout** | Diapers → Beer association | Place beer near diapers |
-| **Cross-selling** | Steak → Red Wine | Recommend wine at checkout |
-| **Product Bundling** | Printer, Ink, Paper | Create "Home Office Kit" |
-| **Loss-Leader Strategy** | Milk appears with high-margin items | Discount milk to draw customers |
-
-### Metrics Used
-- **Support**: How frequent is the itemset?
-- **Confidence**: How reliable is the rule?
-- **Lift**: Is the relationship real or coincidence?
+### Two Approaches
+1. **Feature Selection**: Keep subset of original features
+2. **Feature Extraction**: Create new features by combining originals (e.g., PCA)
 
 ---
 
-## Question 3: How can you determine the optimal number of clusters for a dataset?
+## Question 4: What is clustering, and how can it be used to gain insights into data?
 
-### Three Main Methods
+### Definition
+Clustering groups data points into subsets (clusters) where:
+- Points **within** a cluster are similar
+- Points **across** clusters are dissimilar
 
-**1. Elbow Method**
-- Plot WCSS vs K (K = 1, 2, 3...)
-- Find "elbow" where decrease slows
-- Limitation: Elbow can be ambiguous
+### Business Insights from Clustering
 
-**2. Silhouette Score**
-- Plot silhouette score vs K
-- Choose K with **highest** score
-- More reliable than Elbow
-
-**3. Gap Statistic**
-- Compare observed WCSS to null reference
-- Choose K maximizing the "gap"
-- More rigorous, but complex
-
-### Best Practice
-Combine methods: Use Elbow for range, Silhouette to pick best K. Also consider domain knowledge (how many segments can marketing handle?).
+| Application | How It's Used | Insight |
+|-------------|---------------|---------|
+| **Customer Segmentation** | Cluster by purchase behavior | "High-spenders" vs "Bargain hunters" |
+| **Anomaly Detection** | Points not in any cluster | Fraud, outliers, errors |
+| **Document Grouping** | Cluster text by topic | Organize news, route support tickets |
+| **Image Segmentation** | Cluster pixels by color/position | Separate objects from background |
 
 ---
 
-## Question 4: What challenges do you face when clustering high-dimensional data?
+## Question 5: Can you discuss the differences between hard and soft clustering?
 
-### The Curse of Dimensionality
+### Definition
 
-| Challenge | Impact |
-|-----------|--------|
-| **Meaningless Distances** | All points become roughly equidistant |
-| **Data Sparsity** | Points spread out, hard to find dense regions |
-| **Irrelevant Features** | Noise masks true cluster structure |
-| **Computational Cost** | Time/memory increase exponentially |
+| | Hard Clustering | Soft Clustering |
+|---|----------------|-----------------|
+| **Assignment** | Each point belongs to exactly one cluster | Each point has probability of belonging to each cluster |
+| **Output** | Single label per point | Vector of probabilities per point |
+| **Example** | K-means, DBSCAN | GMM, Fuzzy C-Means |
 
-### Solutions
+### Example Output
 
-1. **Dimensionality Reduction**
-   - PCA before clustering
-   - Autoencoders for non-linear compression
+**Hard (K-means)**:
+- Point A → Cluster 1
 
-2. **Feature Selection**
-   - Remove low-variance features
-   - Use domain knowledge
+**Soft (GMM)**:
+- Point A → 70% Cluster 1, 30% Cluster 2
 
-3. **Specialized Algorithms**
-   - Subspace clustering (CLIQUE)
-   - Algorithms designed for high-D data
+### When to Use Each
+
+| Use Hard When | Use Soft When |
+|---------------|---------------|
+| Clear, actionable segmentation needed | Clusters naturally overlap |
+| Each customer gets one marketing campaign | Need to represent uncertainty |
+| Simple interpretation required | Mixed membership is realistic (e.g., genres) |
+
+### Analogy
+- **Hard**: Mail goes into one mailbox only
+- **Soft**: Song is "70% rock, 20% pop, 10% jazz"
 
 ---
 
-## Question 5: What preprocessing steps are suggested before performing unsupervised learning?
+## Question 6: What preprocessing steps are suggested before performing unsupervised learning?
 
 ### Essential Preprocessing Pipeline
 
@@ -124,7 +141,7 @@ Missing Values → One-Hot Encode → Scale → PCA → K-means
 
 ---
 
-## Question 6: How do you handle missing values in an unsupervised learning context?
+## Question 7: How do you handle missing values in an unsupervised learning context?
 
 ### Strategies by Complexity
 
@@ -158,7 +175,233 @@ Missing Values → One-Hot Encode → Scale → PCA → K-means
 
 ---
 
-## Question 7: How can unsupervised learning be applied to anomaly detection?
+## Question 8: Describe the steps you would take to scale and normalize data for clustering.
+
+### Why Scale?
+Distance-based algorithms (K-means, DBSCAN) are dominated by features with larger scales.
+
+### Steps
+
+**1. Separate Features**
+- Identify numerical features to scale
+- Handle categorical separately (one-hot encoding)
+
+**2. Choose Scaling Method**
+
+| Method | Formula | Result | When to Use |
+|--------|---------|--------|-------------|
+| **Standardization** | (x - μ) / σ | mean=0, std=1 | Most common, robust |
+| **Min-Max** | (x - min) / (max - min) | [0, 1] | Sensitive to outliers |
+
+**3. Apply Scaling**
+```python
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+```
+
+**Important**: Fit scaler on training data only, then transform test data.
+
+---
+
+## Question 9: Discuss how you could evaluate the performance of a clustering algorithm.
+
+### Without Ground Truth (Real-World Scenario)
+
+**Internal Validation Indices**
+
+| Index | Measures | Better |
+|-------|----------|--------|
+| **Silhouette** | Cohesion vs separation | Higher (max 1) |
+| **Davies-Bouldin** | Cluster similarity | Lower |
+| **Calinski-Harabasz** | Variance ratio | Higher |
+
+### With Ground Truth (Benchmarking)
+
+**External Validation Indices**
+
+| Index | Description | Perfect Score |
+|-------|-------------|---------------|
+| **Adjusted Rand Index** | Agreement corrected for chance | 1.0 |
+| **Normalized Mutual Information** | Mutual information normalized | 1.0 |
+| **V-measure** | Harmonic mean of homogeneity & completeness | 1.0 |
+
+### Practical Strategy
+
+1. **Quantitative**: Use silhouette score to guide K selection
+2. **Qualitative**: Analyze cluster characteristics
+   - Plot feature distributions per cluster
+   - Use domain knowledge to validate meaningfulness
+3. **Business Validation**: Do clusters make sense? Are they actionable?
+
+**Key Point**: High silhouette score ≠ useful clusters. Always validate with domain expertise.
+
+---
+
+## Question 10: Explain the importance of feature selection in unsupervised learning.
+
+### Why It Matters
+
+| Benefit | Explanation |
+|---------|-------------|
+| **Better Clusters** | Irrelevant features add noise, obscure true structure |
+| **Curse of Dimensionality** | Fewer features = denser, more meaningful space |
+| **Interpretability** | Clusters from 5 features easier to explain than 100 |
+| **Computational Efficiency** | Faster training |
+
+### Methods for Unsupervised Feature Selection
+
+1. **Variance Threshold**: Remove low-variance features
+2. **Correlation Analysis**: Remove highly correlated (redundant) features
+3. **PCA Loadings**: Identify most influential original features
+4. **Domain Knowledge**: Expert judgment on relevance
+
+---
+
+## Question 11: How would you implement clustering on a large, distributed dataset?
+
+### Approach: Use Apache Spark MLlib
+
+For datasets that don't fit in memory, use distributed computing frameworks like Spark.
+
+### Implementation
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.ml.feature import VectorAssembler, StandardScaler
+from pyspark.ml.clustering import KMeans
+from pyspark.ml.evaluation import ClusteringEvaluator
+
+# 1. Initialize Spark
+spark = SparkSession.builder.appName("DistributedClustering").getOrCreate()
+
+# 2. Load data from distributed storage
+df = spark.read.csv("s3://bucket/large_data.csv", header=True, inferSchema=True)
+
+# 3. Assemble features into vector column
+feature_cols = ["col1", "col2", "col3"]
+assembler = VectorAssembler(inputCols=feature_cols, outputCol="features_raw")
+df = assembler.transform(df)
+
+# 4. Scale features
+scaler = StandardScaler(inputCol="features_raw", outputCol="features")
+scaler_model = scaler.fit(df)
+df = scaler_model.transform(df)
+
+# 5. Run distributed K-means
+kmeans = KMeans(featuresCol="features", k=5, seed=42)
+model = kmeans.fit(df)
+
+# 6. Get predictions
+predictions = model.transform(df)
+
+# 7. Evaluate with silhouette score
+evaluator = ClusteringEvaluator(featuresCol="features", metricName="silhouette")
+silhouette = evaluator.evaluate(predictions)
+print(f"Silhouette Score: {silhouette:.4f}")
+```
+
+### Key Points
+- Spark distributes data across cluster nodes
+- MLlib provides parallel K-means, Bisecting K-means, LDA
+- Only 2 passes over data needed
+
+---
+
+## Question 12: Describe a scenario where unsupervised learning could add value to a business process.
+
+### Scenario: E-commerce Customer Segmentation
+
+**Problem**: One-size-fits-all marketing is inefficient
+
+**Solution**: K-means clustering on customer behavior
+
+**Features Used (RFM)**:
+- Recency: Days since last purchase
+- Frequency: Number of purchases
+- Monetary: Total spend
+
+**Process**:
+1. Scale features
+2. Run K-means, use silhouette score for optimal K
+3. Analyze cluster characteristics
+
+**Resulting Segments**:
+- **Champions**: High frequency, high value, recent
+- **At-Risk**: High past value, but long since purchase
+- **Bargain Hunters**: Medium frequency, buys only on sale
+
+**Business Action**:
+- Champions → Loyalty rewards
+- At-Risk → Re-engagement campaign
+- Bargain Hunters → Sale notifications
+
+---
+
+## Question 13: Discuss how unsupervised learning can be used in image segmentation.
+
+### Core Idea
+Treat each pixel as a data point → Cluster pixels → Segments = Clusters
+
+### Feature Representation
+
+| Feature | Description |
+|---------|-------------|
+| **Color** | (R, G, B) per pixel |
+| **Spatial** | (x, y) coordinates |
+| **Combined** | (R, G, B, x, y) for color + location |
+
+### Algorithm Choice
+
+**K-means**:
+- Choose K (number of segments)
+- Cluster by color/position
+- Replace pixels with centroid color
+- Good for color quantization
+
+**DBSCAN / Mean-Shift**:
+- No K needed
+- Better for irregular shapes
+- Can identify varying density regions
+
+### Example: Background Removal
+1. Represent pixels by RGB
+2. K-means with K=2
+3. One cluster = foreground, one = background
+4. Create mask to separate
+
+### Limitations
+- Simple approach; deep learning (U-Net) is state-of-the-art for complex segmentation
+- Works well for color-based separation, less for semantic understanding
+
+---
+
+## Question 14: Explain how recommendation systems utilize unsupervised learning techniques.
+
+### Collaborative Filtering (Unsupervised)
+
+**Core Idea**: "Users who liked similar items will like similar items in future"
+
+**Data**: User-item interaction matrix (ratings, purchases, clicks)
+
+### Types
+
+**1. Memory-Based**
+- **User-Based**: Find similar users → recommend what they liked
+- **Item-Based**: Find similar items to what user liked
+
+**2. Model-Based (Matrix Factorization)**
+- Decompose sparse user-item matrix into: **User-Factor** × **Item-Factor**
+- Discovers latent factors (genres, styles) automatically
+- Predict rating = dot product of user and item factor vectors
+
+### Why It's Unsupervised
+- No explicit labels
+- Learns "similarity" and "latent tastes" from patterns in interaction data
+
+---
+
+## Question 15: How can unsupervised learning be applied to anomaly detection?
 
 ### Core Idea
 Learn what "normal" looks like → Flag points that don't fit
@@ -183,117 +426,3 @@ Learn what "normal" looks like → Flag points that don't fit
 
 ### Why Unsupervised?
 No labeled anomaly examples needed - learns "normal" from data structure.
-
----
-
-## Question 8: How do unsupervised learning techniques contribute to the field of natural language processing (NLP)?
-
-### Key Contributions
-
-**1. Word Embeddings (Word2Vec, GloVe)**
-- Learn vector representations from context
-- Capture semantic relationships: king - man + woman ≈ queen
-
-**2. Topic Modeling (LDA)**
-- Discover topics in document collections
-- Each document = mixture of topics
-
-**3. Pre-trained Language Models (BERT, GPT)**
-
-| Task | Description |
-|------|-------------|
-| **Masked LM (BERT)** | Predict masked words from context |
-| **Causal LM (GPT)** | Predict next word |
-
-**Impact**: 
-- Train on massive unlabeled text
-- Fine-tune on small labeled data
-- State-of-the-art on all NLP tasks
-
-This is the **foundation of modern NLP** - unsupervised pre-training revolutionized the field.
-
----
-
-## Question 9: Design an approach to group similar documents using unsupervised learning.
-
-### Pipeline
-
-**Step 1: Text Preprocessing**
-```python
-text = text.lower()                    # Lowercase
-text = remove_punctuation(text)        # Clean
-tokens = tokenize(text)                # Split into words
-tokens = remove_stopwords(tokens)      # Remove "the", "a", etc.
-tokens = lemmatize(tokens)             # "running" → "run"
-```
-
-**Step 2: Vectorization (TF-IDF)**
-- Captures word importance (frequent in doc, rare overall)
-- Output: Document-term matrix
-
-**Step 3: Dimensionality Reduction (Optional)**
-- Apply LSA (SVD on TF-IDF) or PCA
-- Reduce to ~100-300 dimensions
-
-**Step 4: Clustering**
-- K-means with Elbow/Silhouette for optimal K
-- Or DBSCAN if K unknown
-
-**Step 5: Interpretation**
-- Analyze top TF-IDF words per cluster
-- Assign topic labels: "Sports", "Politics", "Tech"
-
----
-
-## Question 10: How has unsupervised learning been used in the field of reinforcement learning?
-
-### Two Major Applications
-
-**1. Representation Learning**
-- **Problem**: High-dimensional states (e.g., raw pixels)
-- **Solution**: Use autoencoders or contrastive learning to compress state space
-- **Result**: RL agent learns policy on simpler representation
-
-**Example**: CURL (Contrastive Unsupervised Representations for RL)
-
-**2. Intrinsic Motivation for Exploration**
-- **Problem**: Sparse rewards → agent never finds signal
-- **Solution**: Create "curiosity" reward from unsupervised learning
-
-**Methods**:
-- **Prediction Error**: Reward for surprising (hard-to-predict) states
-- **State Novelty**: Reward for visiting low-density regions
-- **Skill Discovery**: Learn diverse skills unsupervised
-
-### Impact
-Makes RL more scalable and sample-efficient for complex environments.
-
----
-
-## Question 11: How can you use unsupervised learning for cross-lingual or multilingual text analysis?
-
-### Core Approach: Multilingual Embeddings
-Create shared vector space where words/sentences from different languages with similar meanings are close together.
-
-### Methods
-
-**1. Multilingual Word Embeddings**
-- Train separate embeddings per language
-- Learn rotation matrix to align spaces
-- "cat" (English) ≈ "gato" (Spanish) ≈ "chat" (French)
-
-**2. Multilingual Transformers (State-of-the-Art)**
-- **mBERT**, **XLM-R**: Pre-trained on 100+ languages
-- Self-supervised (Masked LM) on combined multilingual corpus
-- Automatically learns shared representation space
-
-### Key Application: Zero-Shot Cross-Lingual Transfer
-
-1. Fine-tune mBERT on English sentiment data
-2. Model works on German, Spanish, French sentiment
-3. **No labeled data needed in target languages**
-
-### Other Applications
-- Cross-lingual information retrieval
-- Machine translation
-- Multilingual document clustering

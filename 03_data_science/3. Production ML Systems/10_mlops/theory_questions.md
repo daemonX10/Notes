@@ -170,7 +170,7 @@
 
 ## Question 22
 
-**Explain end-to-end how you woulddeploy a machine learning modelinto a production environment with zero downtime.**
+**How would you approach versioning for machine learning models?**
 
 **Answer:** _[To be filled]_
 
@@ -205,6 +205,22 @@
 ## Question 26
 
 **What are some of the benefits of implementingMLOps practicesin a machine learning project?**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 27
+
+**Discuss the importance ofA/B testingin machine learning model deployment.**
+
+**Answer:** _[To be filled]_
+
+---
+
+## Question 28
+
+**Discuss the concept ofML pipelinesinKubeflowand their benefits.**
 
 **Answer:** _[To be filled]_
 

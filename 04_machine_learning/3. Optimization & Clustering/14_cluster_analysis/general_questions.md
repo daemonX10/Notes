@@ -2,51 +2,6 @@
 
 ## Question 1
 
-**How do Gaussian Mixture Models (GMM) contribute to cluster analysis?**
-
-### Answer
-
-**Definition:**
-GMM is a probabilistic, model-based clustering algorithm that assumes data is generated from a mixture of Gaussian distributions. Each Gaussian represents a cluster, and GMM provides soft (probabilistic) cluster assignments.
-
-**Core Concepts:**
-- Each cluster = one Gaussian distribution with mean μ and covariance Σ
-- Provides probability of belonging to each cluster (soft clustering)
-- Can model elliptical clusters of different sizes and orientations
-- Trained using Expectation-Maximization (EM) algorithm
-
-**Comparison with K-Means:**
-
-| Aspect | K-Means | GMM |
-|--------|---------|-----|
-| Cluster Shape | Spherical only | Elliptical (any orientation) |
-| Assignment | Hard (one cluster) | Soft (probabilities) |
-| Output | Label | [0.7, 0.2, 0.1] probabilities |
-
-**EM Algorithm Steps:**
-1. **E-Step:** Calculate probability each point belongs to each Gaussian
-2. **M-Step:** Update Gaussian parameters (mean, covariance, weight) based on probabilities
-3. **Repeat:** Until convergence
-
-**Python Code:**
-```python
-from sklearn.mixture import GaussianMixture
-
-gmm = GaussianMixture(n_components=3, covariance_type='full')
-gmm.fit(X)
-labels = gmm.predict(X)          # Hard assignments
-probs = gmm.predict_proba(X)     # Soft probabilities
-```
-
-**Use When:**
-- Clusters are non-spherical
-- Probabilistic assignments are meaningful
-- Points may belong to multiple categories
-
----
-
-## Question 2
-
 **What preprocessing steps would you suggest before performing cluster analysis?**
 
 ### Answer
@@ -86,7 +41,7 @@ X_preprocessed = pipeline.fit_transform(X)
 
 ---
 
-## Question 3
+## Question 2
 
 **How might you address missing values in a dataset before clustering?**
 
@@ -133,7 +88,7 @@ Start with median imputation, use k-NN for important applications.
 
 ---
 
-## Question 4
+## Question 3
 
 **How can the elbow method help in selecting the optimal number of clusters?**
 
@@ -184,53 +139,5 @@ WCSS
 - Elbow often not clear/ambiguous
 - Subjective interpretation
 - Use with Silhouette Score for confirmation
-
----
-
-## Question 5
-
-**How can reinforcement learning theoretically be utilized for optimizing cluster analysis tasks?**
-
-### Answer
-
-**Definition:**
-RL can theoretically frame clustering as sequential decision-making, where an agent learns to assign points to clusters by maximizing rewards tied to clustering quality metrics.
-
-**Conceptual Framework:**
-
-| RL Component | Clustering Mapping |
-|--------------|-------------------|
-| Agent | Decision-maker for assignments |
-| State | Current cluster configuration |
-| Action | Assign point, move centroid, adjust k |
-| Reward | Silhouette score improvement |
-| Environment | Dataset + current partition |
-
-**Possible Actions:**
-- Incremental: Assign one point at a time
-- Center adjustment: Move centroids
-- Parameter selection: Learn optimal k, ε, etc.
-
-**Theoretical Algorithm:**
-```
-1. Initialize random clustering state
-2. For each episode:
-   - Observe current state (cluster config)
-   - Choose action (assign/move/split/merge)
-   - Execute action, observe new state
-   - Calculate reward (Δ silhouette score)
-   - Update policy using RL algorithm
-3. Repeat until policy converges
-```
-
-**Challenges:**
-- Huge state/action space (exponential in n)
-- Reward function design is difficult
-- Computationally much more expensive than traditional algorithms
-
-**Practical Status:**
-- Primarily research area
-- Not practical for standard clustering tasks
-- Potential for complex adaptive scenarios
 
 ---

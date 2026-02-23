@@ -956,72 +956,7 @@ Multimodal learning processes and relates information from multiple modalities (
 
 ---
 
-## Question 37: Steps to create a recommendation system using deep learning
-
-### Architecture Approaches
-
-| Approach | Description |
-|----------|-------------|
-| **Neural Collaborative Filtering** | Learn user-item interactions |
-| **Content-Based** | Encode item features |
-| **Two-Tower** | Separate user and item encoders |
-| **Sequential** | Model user history with RNN/Transformer |
-
-### Pipeline
-1. **Data**: User-item interactions, item features
-2. **Embedding**: Learn user and item embeddings
-3. **Interaction**: Combine embeddings (dot product, MLP)
-4. **Training**: Binary cross-entropy or ranking loss
-5. **Serving**: Approximate nearest neighbor for retrieval
-
-### Python Code Example
-```python
-class TwoTowerModel(nn.Module):
-    def __init__(self, num_users, num_items, embed_dim):
-        super().__init__()
-        self.user_embed = nn.Embedding(num_users, embed_dim)
-        self.item_embed = nn.Embedding(num_items, embed_dim)
-        
-    def forward(self, user_id, item_id):
-        user_vec = self.user_embed(user_id)
-        item_vec = self.item_embed(item_id)
-        return (user_vec * item_vec).sum(dim=1)  # Dot product
-```
-
----
-
-## Question 38: Approach for sentiment analysis on social media using deep learning
-
-### Pipeline
-
-| Step | Implementation |
-|------|----------------|
-| **Preprocessing** | Handle mentions, hashtags, emojis |
-| **Tokenization** | Subword tokenization (BPE) |
-| **Model** | Fine-tuned BERT or DistilBERT |
-| **Output** | Positive/Negative/Neutral |
-
-### Preprocessing
-```python
-def preprocess(text):
-    text = text.lower()
-    text = re.sub(r'@\w+', '<USER>', text)
-    text = re.sub(r'http\S+', '<URL>', text)
-    return text
-```
-
-### Model Approach
-```python
-from transformers import pipeline
-
-classifier = pipeline("sentiment-analysis")
-result = classifier("This product is amazing!")
-# {'label': 'POSITIVE', 'score': 0.99}
-```
-
----
-
-## Question 39: Significance of ROC curves and AUC in model performance
+## Question 37: Significance of ROC curves and AUC in model performance
 
 ### Definition
 **ROC curve** plots True Positive Rate vs False Positive Rate at various thresholds. **AUC** (Area Under Curve) summarizes discriminative ability as a single number (0.5 = random, 1.0 = perfect).
@@ -1049,7 +984,7 @@ roc_auc = auc(fpr, tpr)
 
 ---
 
-## Question 40: Methods for model introspection and feature importance
+## Question 38: Methods for model introspection and feature importance
 
 ### Techniques
 
@@ -1073,7 +1008,7 @@ saliency = input_image.grad.abs()
 
 ---
 
-## Question 41: What is model explainability, and why is it important?
+## Question 39: What is model explainability, and why is it important?
 
 ### Definition
 Model explainability is the ability to understand and interpret why a model makes specific predictions, making it trustworthy, debuggable, and compliant with regulations.

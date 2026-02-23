@@ -2,303 +2,6 @@
 
 ## Question 1
 
-**Discuss the difference between linear and non-linear SVM.**
-
-### Answer
-
-**Core Difference:**
-Linear SVM finds a straight hyperplane in the original feature space, while non-linear SVM uses the kernel trick to find curved decision boundaries by implicitly mapping data to higher dimensions.
-
-**Detailed Comparison:**
-
-| Aspect | Linear SVM | Non-Linear SVM |
-|--------|------------|----------------|
-| **Decision Boundary** | Straight line/hyperplane | Curved, complex shapes |
-| **Kernel** | K(x,y) = xᵀy | RBF, polynomial, sigmoid |
-| **Feature Space** | Original space | Implicitly transformed space |
-| **Complexity** | O(n × d) | O(n² × d) to O(n³) |
-| **Interpretability** | High (weights = feature importance) | Low (black box) |
-| **Best For** | High-dim data, text, linearly separable | Complex patterns, low-dim data |
-
-**When to Use Linear SVM:**
-- Text classification (TF-IDF features)
-- High-dimensional sparse data
-- n_features >> n_samples
-- Large datasets (scalability needed)
-- Interpretability required
-
-**When to Use Non-Linear SVM:**
-- Data has complex, non-linear patterns
-- Linear SVM underperforms significantly
-- Small to medium sized datasets
-- Image classification, pattern recognition
-
-**Mathematical Insight:**
-- Linear: $f(x) = w^Tx + b$
-- Non-Linear: $f(x) = \sum \alpha_i y_i K(x_i, x) + b$
-
-**Practical Tip:**
-Always try linear kernel first. If accuracy is poor, then try RBF kernel. Use cross-validation to compare.
-
----
-
-## Question 2
-
-**Discuss the significance of the kernel parameters like sigma in the Gaussian (RBF) kernel.**
-
-### Answer
-
-**Core Concept:**
-In the RBF kernel $K(x,y) = \exp(-\gamma||x-y||^2)$, the parameter gamma (γ = 1/(2σ²)) controls the "reach" of each training example. It determines how much influence a single training point has on the decision boundary.
-
-**Impact of Gamma (γ):**
-
-| Gamma Value | Effect | Risk |
-|-------------|--------|------|
-| **High γ (small σ)** | Each point has local influence only | Overfitting: wiggly boundary, memorizes training data |
-| **Low γ (large σ)** | Each point has wide influence | Underfitting: too smooth, ignores local patterns |
-| **Optimal γ** | Balanced influence | Good generalization |
-
-**Visual Intuition:**
-- **High γ**: Decision boundary wraps tightly around individual points
-- **Low γ**: Decision boundary is smooth, may miss class clusters
-- Think of γ as "how far can a support vector's influence reach"
-
-**Relationship with C:**
-- High γ + High C = Very complex boundary (high risk of overfitting)
-- Low γ + Low C = Very simple boundary (high risk of underfitting)
-- Must tune both together
-
-**Practical Guidelines:**
-- Default: `gamma='scale'` (γ = 1 / (n_features × X.var()))
-- Try range: [0.001, 0.01, 0.1, 1, 10]
-- Use GridSearchCV to find optimal value
-- Always combine with C tuning
-
-**Mathematical Insight:**
-$$\sigma^2 = \frac{1}{2\gamma}$$
-
-Large σ → points far apart still similar (K ≈ 1)
-Small σ → only very close points similar
-
----
-
-## Question 3
-
-**Discuss the trade-off between model complexity and generalization in SVM.**
-
-### Answer
-
-**Core Concept:**
-SVM's generalization ability depends on balancing margin width (simplicity) against training error (complexity). The C parameter controls this trade-off: high C prioritizes correct classification (complex model), low C prioritizes wide margins (simple model).
-
-**The Bias-Variance Trade-off in SVM:**
-
-| Setting | Bias | Variance | Model | Risk |
-|---------|------|----------|-------|------|
-| Low C + Low γ | High | Low | Simple, wide margin | Underfitting |
-| High C + High γ | Low | High | Complex, tight boundary | Overfitting |
-| Optimal C + γ | Balanced | Balanced | Good generalization | Best |
-
-**Factors Affecting Complexity:**
-
-1. **C Parameter (Regularization):**
-   - High C: Narrow margin, few violations, complex
-   - Low C: Wide margin, allows violations, simpler
-
-2. **Kernel Choice:**
-   - Linear: Simplest (hyperplane only)
-   - Polynomial: Moderate (degree controls complexity)
-   - RBF: Most flexible (gamma controls complexity)
-
-3. **Number of Support Vectors:**
-   - Many SVs: Complex model, potential overfitting
-   - Few SVs: Simpler model, better generalization
-
-**Practical Strategy:**
-
-1. Start with default parameters
-2. If underfitting: Increase C, increase gamma (for RBF)
-3. If overfitting: Decrease C, decrease gamma
-4. Use cross-validation to find sweet spot
-5. Monitor: training accuracy vs validation accuracy gap
-
-**Key Insight:**
-SVM's maximum margin principle inherently favors simpler solutions. The margin acts as a regularizer—wider margins = simpler decision boundaries = better generalization.
-
----
-
-## Question 4
-
-**Discuss strategies for reducing model storage and inference time for SVMs.**
-
-### Answer
-
-**Core Challenge:**
-SVM inference time is O(n_sv × d) where n_sv = number of support vectors. Large n_sv leads to slow predictions and high memory usage since all support vectors must be stored.
-
-**Strategies for Reducing Storage and Inference Time:**
-
-| Strategy | How It Works | Trade-off |
-|----------|--------------|-----------|
-| **Reduced Set Methods** | Approximate SVs with fewer vectors | Some accuracy loss |
-| **Linear SVM** | Store only weight vector w | Limited to linear kernel |
-| **Budget SVMs** | Limit max support vectors during training | Accuracy vs speed |
-| **Nystrom Approximation** | Approximate kernel matrix | Faster but approximate |
-| **Random Fourier Features** | Map RBF kernel to finite features | Then use linear SVM |
-
-**Practical Solutions:**
-
-1. **Use LinearSVC for Large Data:**
-   - Stores only weight vector (d floats)
-   - Inference: O(d) instead of O(n_sv × d)
-
-2. **Reduce Support Vectors:**
-   - Increase C (fewer SVs but tighter margin)
-   - Use simpler kernel (linear over RBF)
-   - Sample/cluster support vectors post-training
-
-3. **Approximate Kernel Methods:**
-   ```python
-   from sklearn.kernel_approximation import RBFSampler
-   rbf_feature = RBFSampler(n_components=100)
-   X_features = rbf_feature.fit_transform(X)
-   # Now use LinearSVC on transformed features
-   ```
-
-4. **Model Compression:**
-   - Quantize support vector values
-   - Prune least important support vectors
-
-**Inference Time Comparison:**
-| Model | Storage | Inference |
-|-------|---------|-----------|
-| SVC (RBF, 1000 SVs) | 1000 × d floats | O(1000 × d) |
-| LinearSVC | d floats | O(d) |
-| RBF Approximation (100 components) | d floats + 100 | O(100 + d) |
-
----
-
-## Question 5
-
-**Discuss the purpose of using a sigmoid kernel in SVM.**
-
-### Answer
-
-**Definition:**
-Sigmoid kernel: $K(x, y) = \tanh(\alpha x^T y + c)$
-
-It mimics the behavior of a two-layer neural network (perceptron). However, it's rarely used in practice as RBF typically performs better.
-
-**Core Concepts:**
-- Equivalent to a single hidden layer neural network
-- Parameters: α (slope) and c (intercept)
-- Not a valid Mercer kernel for all parameter values
-- Can produce negative similarity values
-
-**When to Consider Sigmoid Kernel:**
-- Replicating neural network behavior with SVM framework
-- When data characteristics match sigmoid activation
-- Legacy systems that used sigmoid
-
-**Why It's Rarely Used:**
-1. Not positive semi-definite (violates Mercer's condition for some α, c)
-2. RBF kernel almost always performs better
-3. Requires careful parameter tuning
-4. For neural network behavior, better to use actual neural networks
-
-**Practical Recommendation:**
-- Start with RBF kernel
-- Only try sigmoid if domain knowledge suggests it
-- Ensure parameters satisfy Mercer's condition
-
----
-
-## Question 6
-
-**Discuss the Quasi-Newton methods in the context of SVM training.**
-
-### Answer
-
-**Core Concept:**
-Quasi-Newton methods (like L-BFGS) are optimization algorithms that approximate the Hessian matrix to find the minimum of the SVM objective function. They're faster than computing exact second derivatives and converge faster than basic gradient descent.
-
-**Why Used in SVM:**
-- SVM optimization is a quadratic programming problem
-- Quasi-Newton provides fast convergence for smooth objectives
-- Used in primal SVM formulations (less common than SMO for dual)
-
-**Key Quasi-Newton Methods:**
-
-| Method | Description | Use in SVM |
-|--------|-------------|------------|
-| **L-BFGS** | Limited-memory BFGS, stores few vectors | sklearn's LinearSVC default |
-| **BFGS** | Full Hessian approximation | Small problems |
-
-**Comparison with SMO:**
-- **SMO**: Optimizes dual problem, works with any kernel
-- **Quasi-Newton**: Optimizes primal, mainly linear SVM
-
-**In sklearn:**
-```python
-from sklearn.svm import LinearSVC
-# Uses liblinear which uses coordinate descent (similar efficiency)
-# For L-BFGS, use LogisticRegression or SGDClassifier
-```
-
-**Practical Relevance:**
-- Most kernel SVM implementations use SMO (not Quasi-Newton)
-- Linear SVM often uses coordinate descent or L-BFGS
-- For very large linear SVM: SGD is preferred
-
----
-
-## Question 7
-
-**Discuss the Resse kernel and its use cases in SVM.**
-
-### Answer
-
-**Note:** "Resse kernel" appears to be a typo or less common term. The likely intended topic is either:
-1. **String kernels** (for sequence data)
-2. **ANOVA kernel** (Analysis of Variance kernel)
-3. **Custom kernels**
-
-**If referring to String/Sequence Kernels:**
-
-String kernels measure similarity between sequences (text, DNA, proteins) without explicit feature extraction.
-
-**Common String Kernels:**
-| Kernel | Use Case |
-|--------|----------|
-| **Spectrum Kernel** | Counts k-mer frequencies |
-| **Subsequence Kernel** | Matches non-contiguous subsequences |
-| **Edit Distance Kernel** | Based on Levenshtein distance |
-
-**Use Cases:**
-- Bioinformatics: Protein classification, gene prediction
-- NLP: Document similarity, spam detection
-- Genomics: DNA sequence classification
-
-**Custom Kernel Implementation:**
-```python
-from sklearn.svm import SVC
-
-def custom_kernel(X, Y):
-    # Must return similarity matrix
-    return X @ Y.T  # Example: linear kernel
-
-svm = SVC(kernel=custom_kernel)
-```
-
-**Requirements for Valid Kernel:**
-- Must satisfy Mercer's condition (positive semi-definite)
-- Symmetric: K(x,y) = K(y,x)
-
----
-
-## Question 8
-
 **Discuss the use of SVM in bioinformatics and computational biology.**
 
 ### Answer
@@ -338,7 +41,7 @@ svm = SVC(kernel=custom_kernel)
 
 ---
 
-## Question 9
+## Question 2
 
 **How would you apply SVM for image classification tasks?**
 
@@ -392,7 +95,7 @@ svm.fit(X_train, y_train)
 
 ---
 
-## Question 10
+## Question 3
 
 **Discuss the application of SVMs in text categorization.**
 
@@ -447,7 +150,7 @@ predictions = pipeline.predict(texts_test)
 
 ---
 
-## Question 11
+## Question 4
 
 **How would you leverage SVM for intrusion detection in cybersecurity?**
 
@@ -502,7 +205,7 @@ oc_svm.fit(normal_data)
 
 ---
 
-## Question 12
+## Question 5
 
 **Propose an application of SVM in the healthcare industry for disease diagnosis.**
 
@@ -559,54 +262,7 @@ proba = pipeline.predict_proba(X_test)  # Probability for clinical use
 
 ---
 
-## Question 13
-
-**Discuss recent advances in SVM and their implications for Machine Learning.**
-
-### Answer
-
-**Current State:**
-SVMs remain relevant for specific use cases despite deep learning dominance. Recent advances focus on scalability, efficiency, and integration with modern techniques.
-
-**Recent Advances:**
-
-| Advance | Description | Implication |
-|---------|-------------|-------------|
-| **Online/Incremental SVM** | Update model with streaming data | Real-time applications |
-| **Kernel Approximation** | Random Fourier Features, Nystrom | Scale kernel SVM to big data |
-| **Deep Kernel Learning** | Learn kernels with neural networks | Best of both worlds |
-| **Sparse SVMs** | Reduce support vectors | Faster inference |
-| **Multi-task SVM** | Share information across tasks | Transfer learning |
-
-**Kernel Approximation Revolution:**
-```python
-from sklearn.kernel_approximation import RBFSampler
-# Approximate RBF kernel with random features
-# Then use fast linear SVM
-rbf_sampler = RBFSampler(n_components=1000)
-X_transformed = rbf_sampler.fit_transform(X)
-```
-
-**Integration with Deep Learning:**
-- CNN features + SVM classifier
-- Learned kernels from neural networks
-- SVM loss for neural network training
-
-**Where SVM Still Wins:**
-1. Small datasets (n < 10,000)
-2. High-dimensional sparse data (text)
-3. When interpretability matters (linear SVM)
-4. Strong theoretical guarantees needed
-
-**Industry Trends:**
-- SVM in edge devices (small, efficient)
-- Hybrid models (deep features + SVM)
-- AutoML includes SVM in model search
-- Quantum SVM research (future potential)
-
----
-
-## Question 14
+## Question 6
 
 **Discuss the role of SVMs in the development of self-driving cars.**
 

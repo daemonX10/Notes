@@ -1,208 +1,6 @@
 # Unsupervised Learning - Scenario-Based Questions
 
-## Question 1: Can you discuss the differences between hard and soft clustering?
-
-### Definition
-
-| | Hard Clustering | Soft Clustering |
-|---|----------------|-----------------|
-| **Assignment** | Each point belongs to exactly one cluster | Each point has probability of belonging to each cluster |
-| **Output** | Single label per point | Vector of probabilities per point |
-| **Example** | K-means, DBSCAN | GMM, Fuzzy C-Means |
-
-### Example Output
-
-**Hard (K-means)**:
-- Point A → Cluster 1
-
-**Soft (GMM)**:
-- Point A → 70% Cluster 1, 30% Cluster 2
-
-### When to Use Each
-
-| Use Hard When | Use Soft When |
-|---------------|---------------|
-| Clear, actionable segmentation needed | Clusters naturally overlap |
-| Each customer gets one marketing campaign | Need to represent uncertainty |
-| Simple interpretation required | Mixed membership is realistic (e.g., genres) |
-
-### Analogy
-- **Hard**: Mail goes into one mailbox only
-- **Soft**: Song is "70% rock, 20% pop, 10% jazz"
-
----
-
-## Question 2: Discuss the concepts of support, confidence, and lift in association rule learning.
-
-### For Rule: {A} → {B}
-
-| Metric | Formula | Meaning |
-|--------|---------|---------|
-| **Support** | P(A ∩ B) | How frequent is itemset? |
-| **Confidence** | P(A ∩ B) / P(A) | Given A, how likely is B? |
-| **Lift** | Support(A,B) / (Support(A) × Support(B)) | Is relationship real or coincidence? |
-
-### Example: {Diapers} → {Beer}
-
-- **Support = 0.1**: 10% of transactions have both
-- **Confidence = 0.8**: 80% of diaper buyers also buy beer
-- **Lift = 2.0**: Diaper buyers are 2× more likely to buy beer than average customer
-
-### Lift Interpretation
-
-| Lift | Meaning |
-|------|---------|
-| **> 1** | Positive correlation (useful rule) |
-| **= 1** | Independent (no relationship) |
-| **< 1** | Negative correlation (substitute products) |
-
-### Why Confidence Alone Isn't Enough
-High confidence {X} → {Bread} might just mean bread is very popular (appears in 90% of transactions), not that X drives bread purchases. Lift corrects for this.
-
----
-
-## Question 3: Discuss the Expectation-Maximization (EM) algorithm and its application in clustering.
-
-### Definition
-EM is an iterative algorithm for finding maximum likelihood estimates when there are latent (hidden) variables.
-
-### Application: Training GMMs
-
-**The Problem**: We don't know which Gaussian generated each point (latent variable)
-
-### The Two Steps
-
-**E-Step (Expectation)**:
-- Given current parameters, calculate probability each point belongs to each Gaussian
-- "Soft assignment" based on current beliefs
-
-**M-Step (Maximization)**:
-- Given soft assignments, update parameters to maximize likelihood
-- New μ = weighted average of points
-- New Σ = weighted covariance
-- New π = average responsibility
-
-### The Loop
-```
-Initialize parameters randomly
-Repeat:
-    E-step: Calculate responsibilities (who generated what?)
-    M-step: Update parameters (what are the Gaussians?)
-Until convergence
-```
-
-### Analogy
-- **E-step**: "Based on my theory, what's probability this evidence belongs to Suspect A vs B?"
-- **M-step**: "Update my theory about suspects based on these probabilities"
-
----
-
-## Question 4: Discuss how you could evaluate the performance of a clustering algorithm.
-
-### Without Ground Truth (Real-World Scenario)
-
-**Internal Validation Indices**
-
-| Index | Measures | Better |
-|-------|----------|--------|
-| **Silhouette** | Cohesion vs separation | Higher (max 1) |
-| **Davies-Bouldin** | Cluster similarity | Lower |
-| **Calinski-Harabasz** | Variance ratio | Higher |
-
-### With Ground Truth (Benchmarking)
-
-**External Validation Indices**
-
-| Index | Description | Perfect Score |
-|-------|-------------|---------------|
-| **Adjusted Rand Index** | Agreement corrected for chance | 1.0 |
-| **Normalized Mutual Information** | Mutual information normalized | 1.0 |
-| **V-measure** | Harmonic mean of homogeneity & completeness | 1.0 |
-
-### Practical Strategy
-
-1. **Quantitative**: Use silhouette score to guide K selection
-2. **Qualitative**: Analyze cluster characteristics
-   - Plot feature distributions per cluster
-   - Use domain knowledge to validate meaningfulness
-3. **Business Validation**: Do clusters make sense? Are they actionable?
-
-**Key Point**: High silhouette score ≠ useful clusters. Always validate with domain expertise.
-
----
-
-## Question 5: Discuss how unsupervised learning can be used in image segmentation.
-
-### Core Idea
-Treat each pixel as a data point → Cluster pixels → Segments = Clusters
-
-### Feature Representation
-
-| Feature | Description |
-|---------|-------------|
-| **Color** | (R, G, B) per pixel |
-| **Spatial** | (x, y) coordinates |
-| **Combined** | (R, G, B, x, y) for color + location |
-
-### Algorithm Choice
-
-**K-means**:
-- Choose K (number of segments)
-- Cluster by color/position
-- Replace pixels with centroid color
-- Good for color quantization
-
-**DBSCAN / Mean-Shift**:
-- No K needed
-- Better for irregular shapes
-- Can identify varying density regions
-
-### Example: Background Removal
-1. Represent pixels by RGB
-2. K-means with K=2
-3. One cluster = foreground, one = background
-4. Create mask to separate
-
-### Limitations
-- Simple approach; deep learning (U-Net) is state-of-the-art for complex segmentation
-- Works well for color-based separation, less for semantic understanding
-
----
-
-## Question 6: Discuss the use of self-organizing maps in unsupervised learning.
-
-### Definition
-Self-Organizing Map (SOM) is a neural network that projects high-dimensional data onto a 2D grid while preserving topological relationships.
-
-### Architecture
-- **Input Layer**: Receives high-D vectors
-- **Output Layer**: 2D grid of neurons, each with weight vector same dimension as input
-
-### Training (Competitive Learning)
-
-1. **Competition**: For each input, find Best Matching Unit (BMU) - neuron with most similar weights
-2. **Cooperation**: Update BMU and its neighbors on the grid
-3. **Adaptation**: Move weights closer to input; neighbors move less
-
-### Result
-- Neurons close on map have similar weight vectors
-- Preserves topology: similar inputs activate nearby neurons
-
-### Use Cases
-
-| Application | How |
-|-------------|-----|
-| **Visualization** | Project high-D data to 2D map |
-| **Clustering** | Neurons form natural clusters |
-| **Feature Extraction** | BMU position as new feature |
-
-### Comparison to t-SNE
-- SOM: Discrete grid, faster, good for large data
-- t-SNE: Continuous space, better local structure preservation
-
----
-
-## Question 7: Propose an unsupervised learning strategy to segment customers for targeted marketing.
+## Question 1: Propose an unsupervised learning strategy to segment customers for targeted marketing.
 
 ### Strategy Pipeline
 
@@ -256,7 +54,7 @@ labels = kmeans.fit_predict(X_scaled)
 
 ---
 
-## Question 8: How would you use clustering to inform feature creation in a supervised learning task?
+## Question 2: How would you use clustering to inform feature creation in a supervised learning task?
 
 ### The Approach
 Use cluster labels as a new feature for supervised model.
@@ -302,7 +100,38 @@ distances = kmeans.transform(X_scaled)  # (n_samples, k)
 
 ---
 
-## Question 9: Discuss a framework for detecting communities in social networks via unsupervised learning.
+## Question 3: Design an approach to group similar documents using unsupervised learning.
+
+### Pipeline
+
+**Step 1: Text Preprocessing**
+```python
+text = text.lower()                    # Lowercase
+text = remove_punctuation(text)        # Clean
+tokens = tokenize(text)                # Split into words
+tokens = remove_stopwords(tokens)      # Remove "the", "a", etc.
+tokens = lemmatize(tokens)             # "running" → "run"
+```
+
+**Step 2: Vectorization (TF-IDF)**
+- Captures word importance (frequent in doc, rare overall)
+- Output: Document-term matrix
+
+**Step 3: Dimensionality Reduction (Optional)**
+- Apply LSA (SVD on TF-IDF) or PCA
+- Reduce to ~100-300 dimensions
+
+**Step 4: Clustering**
+- K-means with Elbow/Silhouette for optimal K
+- Or DBSCAN if K unknown
+
+**Step 5: Interpretation**
+- Analyze top TF-IDF words per cluster
+- Assign topic labels: "Sports", "Politics", "Tech"
+
+---
+
+## Question 4: Discuss a framework for detecting communities in social networks via unsupervised learning.
 
 ### Framework
 
@@ -351,52 +180,37 @@ print(f"Communities: {n_communities}, Modularity: {modularity:.3f}")
 
 ---
 
-## Question 10: Discuss the challenges of interpretability in unsupervised learning models.
+## Question 5: Explain how unsupervised learning could assist in identifying patterns in genomic data.
 
-### Core Challenge
-No ground truth → No way to verify if discovered patterns are "correct"
+### Answer
 
-### Specific Challenges
+Unsupervised learning is extremely valuable in genomics because biological data is high-dimensional, complex, and often lacks clear labels.
 
-| Challenge | Description |
-|-----------|-------------|
-| **Cluster Labeling** | Clusters are just "0, 1, 2..." - no inherent meaning |
-| **Ambiguity** | Different algorithms/parameters → different results |
-| **Black-box Features** | PCA components, autoencoder latent space have no intuitive meaning |
-| **Validation Difficulty** | High silhouette ≠ business value |
+**Key Applications:**
 
-### Strategies to Improve Interpretability
+| Application | Technique | Purpose |
+|-------------|-----------|---------|
+| **Gene Expression Clustering** | K-means, Hierarchical Clustering | Group genes with similar expression profiles to identify co-regulated genes |
+| **Patient Subtyping** | NMF, Consensus Clustering | Discover disease subtypes (e.g., cancer subtypes) from molecular data |
+| **Dimensionality Reduction** | PCA, t-SNE, UMAP | Visualize high-dimensional genomic data (thousands of genes) in 2D/3D |
+| **Variant Detection** | Autoencoders, GMMs | Identify rare genetic variants or mutations |
+| **Pathway Discovery** | Network Clustering | Find functional modules in gene interaction networks |
 
-**1. Start Simple**
-- Use K-means before GMM
-- Centroid-based clusters easier to explain
-
-**2. Feature Importance for Clusters**
-```python
-# Train decision tree to predict cluster labels
-from sklearn.tree import DecisionTreeClassifier
-
-dt = DecisionTreeClassifier(max_depth=3)
-dt.fit(X, cluster_labels)
-# Inspect feature importances and rules
+**Workflow Example:**
+```
+Raw Gene Expression Data (20,000+ genes)
+    → Preprocessing (normalization, filtering)
+    → Dimensionality Reduction (PCA to ~50 components)
+    → Clustering (K-means or DBSCAN)
+    → Biological Interpretation (pathway enrichment analysis)
 ```
 
-**3. Extensive Visualization**
-- Box plots of features per cluster
-- Parallel coordinate plots
-- t-SNE/UMAP colored by cluster
+**Why Unsupervised Over Supervised?**
+- **Labels are scarce**: Most genomic data lacks ground-truth annotations
+- **Discovery-driven**: The goal is to find *unknown* patterns, not predict known ones
+- **Heterogeneity**: Diseases like cancer have subtypes not yet fully catalogued
+- **High dimensionality**: Thousands of features with few samples (p >> n)
 
-**4. Domain Expert Validation**
-- Have experts review cluster characteristics
-- Ask: "Do these segments make business sense?"
-
-**5. Cluster Profiling Report**
-```python
-# For each cluster, show:
-# - Size (% of data)
-# - Mean/median of key features
-# - Distinguishing characteristics vs other clusters
-```
-
-### Key Takeaway
-Interpretability requires **human-in-the-loop** analysis. Quantitative metrics are necessary but not sufficient - domain knowledge is essential for validation.
+**Real-World Impact:**
+- The Cancer Genome Atlas (TCGA) used unsupervised clustering to identify molecular subtypes of breast cancer (Luminal A, Luminal B, HER2-enriched, Basal-like)
+- Single-cell RNA sequencing uses UMAP + Leiden clustering to identify novel cell types

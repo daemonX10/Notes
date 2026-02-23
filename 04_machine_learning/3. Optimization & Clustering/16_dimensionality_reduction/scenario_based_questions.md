@@ -2,395 +2,6 @@
 
 ## Question 1
 
-**Discuss the difference between linear and nonlinear dimensionality reduction techniques.**
-
-### Answer
-
-**Definition:**  
-Linear methods (PCA, LDA) find linear projections preserving global structure, while nonlinear methods (t-SNE, UMAP, Kernel PCA) can capture complex manifold structures and curved relationships that linear methods miss.
-
-**Key Differences:**
-
-| Aspect | Linear | Nonlinear |
-|--------|--------|-----------|
-| **Transformation** | Z = X × W (matrix multiplication) | Complex nonlinear function |
-| **Assumptions** | Data lies on linear subspace | Data lies on curved manifold |
-| **Global vs Local** | Preserves global structure | Often focuses on local structure |
-| **Interpretability** | High (loadings meaningful) | Low (abstract) |
-| **Scalability** | Fast, O(nd²) | Slower, O(n²) or worse |
-| **Inverse Transform** | Easy | Often impossible |
-
-**Linear Methods:**
-- **PCA:** Maximizes variance along orthogonal directions
-- **LDA:** Maximizes class separation
-- **Factor Analysis:** Assumes latent factors with noise
-
-**Nonlinear Methods:**
-- **Kernel PCA:** Implicit mapping via kernel trick
-- **t-SNE:** Preserves local neighborhoods via probability distributions
-- **UMAP:** Graph-based, preserves both local and global
-- **Autoencoders:** Neural network learns nonlinear encoding
-- **Isomap:** Preserves geodesic distances on manifold
-- **LLE:** Preserves local linear reconstructions
-
-**When to Use:**
-
-| Scenario | Method Type | Reason |
-|----------|-------------|--------|
-| Data is linearly separable | Linear | Simpler, interpretable |
-| Need to transform new data | Linear | Has transform method |
-| Complex manifold structure | Nonlinear | Captures curves |
-| Visualization of clusters | Nonlinear (t-SNE/UMAP) | Better separation |
-| Preprocessing for ML | Linear (PCA) | Stable, fast |
-
-**Visual Example:**
-```
-Linear (PCA):           Nonlinear (t-SNE):
-   Can separate:          Can separate:
-   Linear clusters        Concentric circles
-   Elongated blobs        Swiss roll
-   
-   Cannot separate:       Cannot preserve:
-   Concentric circles     Global distances
-   Swiss roll            Cluster sizes
-```
-
-**Python Comparison:**
-```python
-from sklearn.decomposition import PCA, KernelPCA
-from sklearn.manifold import TSNE
-import umap
-
-# Linear - PCA
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X)
-
-# Nonlinear - Kernel PCA
-kpca = KernelPCA(n_components=2, kernel='rbf')
-X_kpca = kpca.fit_transform(X)
-
-# Nonlinear - t-SNE
-tsne = TSNE(n_components=2)
-X_tsne = tsne.fit_transform(X)
-
-# Nonlinear - UMAP
-reducer = umap.UMAP(n_components=2)
-X_umap = reducer.fit_transform(X)
-```
-
-**Decision Logic:**
-```
-Is data structure linear?
-├─ Yes → Use PCA/LDA (faster, interpretable)
-└─ No → Is goal visualization only?
-    ├─ Yes → Use t-SNE/UMAP
-    └─ No → Use Kernel PCA or Autoencoder
-```
-
----
-
-## Question 2
-
-**Discuss the concept of t-Distributed Stochastic Neighbor Embedding (t-SNE).**
-
-### Answer
-
-**Definition:**  
-t-SNE is a nonlinear dimensionality reduction technique that converts high-dimensional pairwise similarities into probabilities and finds a low-dimensional embedding where similar points stay close and dissimilar points stay far, using t-distribution to handle crowding.
-
-**Core Concept:**
-- Models similarity as probability of picking neighbor
-- High-dim: Gaussian distribution for similarities
-- Low-dim: Student t-distribution (heavy tails)
-- Minimizes KL divergence between the two distributions
-
-**Algorithm Steps:**
-
-1. **Compute high-dim similarities (pᵢⱼ):**
-   - For each point, compute Gaussian similarity to neighbors
-   - pⱼ|ᵢ = exp(-||xᵢ-xⱼ||²/2σᵢ²) / Σₖ exp(-||xᵢ-xₖ||²/2σᵢ²)
-   - Symmetrize: pᵢⱼ = (pⱼ|ᵢ + pᵢ|ⱼ) / 2n
-
-2. **Initialize low-dim embedding:**
-   - Random initialization (usually from N(0, 0.01))
-
-3. **Compute low-dim similarities (qᵢⱼ):**
-   - Use t-distribution: qᵢⱼ = (1 + ||yᵢ-yⱼ||²)⁻¹ / Σₖ≠ₗ (1 + ||yₖ-yₗ||²)⁻¹
-
-4. **Minimize KL divergence:**
-   - Cost = KL(P||Q) = Σᵢⱼ pᵢⱼ log(pᵢⱼ/qᵢⱼ)
-   - Gradient descent to update y positions
-
-**Key Parameters:**
-
-| Parameter | Description | Typical Value |
-|-----------|-------------|---------------|
-| **perplexity** | Effective number of neighbors | 5-50 |
-| **learning_rate** | Step size for optimization | 10-1000 |
-| **n_iter** | Number of iterations | 1000+ |
-| **early_exaggeration** | Initial separation boost | 12 |
-
-**Why t-Distribution?**
-- Heavy tails allow moderate distances in high-dim to map to larger distances in low-dim
-- Solves "crowding problem" in low-dimensional space
-- Prevents collapse of distant points into center
-
-**Practical Considerations:**
-
-| Consideration | Action |
-|---------------|--------|
-| Non-deterministic | Set `random_state` for reproducibility |
-| Slow for large n | Reduce with PCA first (to 50 dims) |
-| Perplexity matters | Try multiple values, compare results |
-| Cluster sizes distorted | Don't interpret cluster sizes |
-| No inverse transform | Cannot project new points |
-
-**Python Example:**
-```python
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-
-# Step 1: PCA to reduce dimensions (speeds up t-SNE)
-pca = PCA(n_components=50)
-X_pca = pca.fit_transform(X)
-
-# Step 2: t-SNE
-tsne = TSNE(
-    n_components=2,
-    perplexity=30,
-    learning_rate='auto',
-    n_iter=1000,
-    random_state=42
-)
-X_tsne = tsne.fit_transform(X_pca)
-
-# Visualize
-plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=labels, cmap='tab10', s=5)
-plt.title('t-SNE Visualization')
-```
-
-**Key Interview Points:**
-- Use for visualization ONLY, not as features for models
-- Distances between clusters are NOT meaningful
-- Run multiple times with different perplexities
-- t-distribution handles crowding in low dimensions
-
----
-
-## Question 3
-
-**Discuss the role of manifold learning in dimensionality reduction. Give examples like Isomap or Locally Linear Embedding (LLE).**
-
-### Answer
-
-**Definition:**  
-Manifold learning assumes high-dimensional data lies on a lower-dimensional curved surface (manifold) embedded in the space. It aims to "unfold" this manifold to reveal the true intrinsic structure, preserving geodesic distances or local geometry.
-
-**Key Concept:**
-- **Manifold:** A smooth, curved surface embedded in higher dimensions
-- **Intrinsic Dimensionality:** True dimensionality of the manifold
-- **Geodesic Distance:** Distance along the manifold surface (not straight-line)
-
-**Example: Swiss Roll**
-```
-3D View:          Unfolded (2D):
-  ╭──╮             ┌──────────┐
- ╱    ╲            │          │
-│      │    →      │   true   │
- ╲    ╱            │ structure│
-  ╰──╯             └──────────┘
-```
-
-**Popular Manifold Learning Methods:**
-
-**1. Isomap (Isometric Mapping):**
-- Preserves geodesic distances along manifold
-- Algorithm:
-  1. Build k-nearest neighbor graph
-  2. Compute shortest paths (geodesic approximation)
-  3. Apply classical MDS on geodesic distance matrix
-
-```python
-from sklearn.manifold import Isomap
-
-isomap = Isomap(n_neighbors=10, n_components=2)
-X_isomap = isomap.fit_transform(X)
-```
-
-**2. LLE (Locally Linear Embedding):**
-- Assumes locally linear structure
-- Preserves local reconstruction weights
-- Algorithm:
-  1. Find k-nearest neighbors for each point
-  2. Compute weights that reconstruct each point from neighbors
-  3. Find low-dim embedding that preserves same weights
-
-```python
-from sklearn.manifold import LocallyLinearEmbedding
-
-lle = LocallyLinearEmbedding(n_neighbors=10, n_components=2)
-X_lle = lle.fit_transform(X)
-```
-
-**Comparison:**
-
-| Method | Preserves | Complexity | Handles Holes? |
-|--------|-----------|------------|----------------|
-| **Isomap** | Geodesic distances | O(n²log n) | No |
-| **LLE** | Local linearity | O(n²) | Yes |
-| **Laplacian Eigenmaps** | Local distances | O(n²) | Yes |
-| **t-SNE** | Local neighborhoods | O(n²) | N/A |
-
-**When to Use Manifold Learning:**
-- Data clearly lies on curved surface
-- Linear methods (PCA) fail to separate
-- Intrinsic dimensionality << ambient dimensionality
-- Examples: image patches, sensor data, molecular conformations
-
-**Limitations:**
-- Sensitive to noise and outliers
-- k (neighbors) parameter critical
-- Computationally expensive for large n
-- May not work if manifold has holes (Isomap)
-- Cannot transform new points (need out-of-sample extension)
-
-**Python Example - Comparing Methods:**
-```python
-from sklearn.manifold import Isomap, LocallyLinearEmbedding
-from sklearn.datasets import make_swiss_roll
-
-# Generate Swiss Roll
-X, color = make_swiss_roll(n_samples=1000, noise=0.1)
-
-# Isomap
-isomap = Isomap(n_neighbors=12, n_components=2)
-X_isomap = isomap.fit_transform(X)
-
-# LLE
-lle = LocallyLinearEmbedding(n_neighbors=12, n_components=2)
-X_lle = lle.fit_transform(X)
-
-# Both should unfold the Swiss Roll successfully
-```
-
-**Interview Tip:** Manifold learning is powerful for visualization but less useful for ML preprocessing due to scalability issues and inability to transform new data reliably.
-
----
-
-## Question 4
-
-**Discuss the advantages and disadvantages of using Autoencoders for dimensionality reduction.**
-
-### Answer
-
-**Definition:**  
-Autoencoders are neural networks that learn to compress data into a lower-dimensional latent space (encoder) and reconstruct it (decoder). They can capture nonlinear relationships but require more data and compute than traditional methods.
-
-**Architecture:**
-```
-Input (d dims) → Encoder → Latent Space (k dims) → Decoder → Output (d dims)
-     x              f(x)         z                  g(z)        x̂
-
-Loss = ||x - x̂||² (reconstruction error)
-```
-
-**Advantages:**
-
-| Advantage | Explanation |
-|-----------|-------------|
-| **Nonlinear** | Captures complex patterns PCA cannot |
-| **Flexible architecture** | Can design for specific data types |
-| **Learns features** | Latent space may capture meaningful concepts |
-| **Handles various data** | Images, text, sequences with appropriate architecture |
-| **Denoising capability** | Denoising autoencoders robust to noise |
-| **Generative (VAE)** | Can sample new data from latent space |
-
-**Disadvantages:**
-
-| Disadvantage | Explanation |
-|--------------|-------------|
-| **Requires more data** | Neural networks need large datasets |
-| **Computationally expensive** | GPU often needed, slow training |
-| **Hyperparameter tuning** | Architecture, learning rate, regularization |
-| **No closed-form solution** | Iterative training, may not converge |
-| **Black box** | Latent dimensions not interpretable |
-| **Overfitting risk** | Can memorize instead of generalize |
-| **No variance explained** | No equivalent to PCA's explained variance |
-
-**Types of Autoencoders:**
-
-| Type | Use Case |
-|------|----------|
-| **Vanilla AE** | Basic nonlinear DR |
-| **Denoising AE** | Robust features, noise removal |
-| **Sparse AE** | Sparse representations |
-| **Variational AE (VAE)** | Generative, regularized latent space |
-| **Convolutional AE** | Image data |
-
-**Comparison with PCA:**
-
-| Aspect | PCA | Autoencoder |
-|--------|-----|-------------|
-| Linearity | Linear only | Nonlinear |
-| Training | Closed-form | Iterative |
-| Data needed | Small | Large |
-| Compute | CPU, fast | GPU, slow |
-| Interpretability | High | Low |
-| New data | Easy transform | Forward pass |
-
-**When to Use Autoencoders:**
-- Large dataset available
-- Nonlinear relationships expected
-- PCA insufficient
-- Need generative capability (VAE)
-- Image/sequence data
-
-**When to Use PCA Instead:**
-- Small dataset
-- Linear relationships
-- Need interpretability
-- Limited compute
-
-**Python Example:**
-```python
-import tensorflow as tf
-from tensorflow.keras import layers, Model
-
-# Define autoencoder
-input_dim = X.shape[1]
-latent_dim = 10
-
-# Encoder
-encoder_input = layers.Input(shape=(input_dim,))
-x = layers.Dense(128, activation='relu')(encoder_input)
-x = layers.Dense(64, activation='relu')(x)
-latent = layers.Dense(latent_dim, activation='linear')(x)
-encoder = Model(encoder_input, latent, name='encoder')
-
-# Decoder
-decoder_input = layers.Input(shape=(latent_dim,))
-x = layers.Dense(64, activation='relu')(decoder_input)
-x = layers.Dense(128, activation='relu')(x)
-output = layers.Dense(input_dim, activation='linear')(x)
-decoder = Model(decoder_input, output, name='decoder')
-
-# Autoencoder
-autoencoder_input = layers.Input(shape=(input_dim,))
-encoded = encoder(autoencoder_input)
-decoded = decoder(encoded)
-autoencoder = Model(autoencoder_input, decoded, name='autoencoder')
-
-autoencoder.compile(optimizer='adam', loss='mse')
-autoencoder.fit(X_train, X_train, epochs=50, batch_size=32, validation_split=0.1)
-
-# Get reduced representation
-X_reduced = encoder.predict(X)
-```
-
----
-
-## Question 5
-
 **How would you use dimensionality reduction for a dataset containing thousands of features, such as gene expression data?**
 
 ### Answer
@@ -497,7 +108,7 @@ UMAP/t-SNE for visualization
 
 ---
 
-## Question 6
+## Question 2
 
 **Discuss your approach to reduce dimensionality for text data before performing sentiment analysis.**
 
@@ -614,95 +225,286 @@ clf.fit(X_embeddings[train_idx], labels[train_idx])
 
 ---
 
-## Question 7
+## Question 3
 
-**Discuss current research topics in the field of dimensionality reduction.**
+**How could dimensionality reduction be applied effectively when visualizing high-dimensional data?**
 
 ### Answer
 
 **Definition:**  
-Current DR research focuses on scalability for massive datasets, preserving interpretability, handling multimodal data, self-supervised representation learning, fairness-aware reduction, and topological methods that preserve data structure.
+For visualization, reduce data to 2D or 3D using appropriate methods: PCA for global linear structure, t-SNE for local cluster structure, UMAP for both global and local preservation. Choice depends on what patterns you want to reveal.
 
-**Active Research Areas:**
+**Method Selection for Visualization:**
 
-**1. Scalable Methods for Big Data:**
-- Randomized algorithms for PCA/SVD
-- Streaming dimensionality reduction
-- Distributed implementations (Spark, Dask)
-- Neural network-based approximations
+| Method | Best For | Preserves |
+|--------|----------|-----------|
+| **PCA** | Quick overview, linear relationships | Global variance |
+| **t-SNE** | Cluster visualization | Local neighborhoods |
+| **UMAP** | General purpose, balanced | Global + local |
+| **MDS** | Distance preservation | Pairwise distances |
 
-**2. Contrastive and Self-Supervised Learning:**
-- Learn representations without labels
-- SimCLR, BYOL, MoCo for images
-- Contrastive learning for embeddings
-- Key idea: similar samples should be close in latent space
+**Best Practices:**
 
-**3. Interpretable Dimensionality Reduction:**
-- Sparse PCA variants with meaningful loadings
-- Concept bottleneck models
-- Disentangled representations (β-VAE)
-- Supervised DR that aligns with human concepts
+1. **Preprocess First:**
+   - Scale features before any method
+   - For large data: PCA to 50 dims, then t-SNE/UMAP
 
-**4. Fair and Debiased Representations:**
-- Remove sensitive information while preserving utility
-- Adversarial learning for fair embeddings
-- Certified fairness in latent space
-- Application: prevent discrimination in ML models
+2. **Choose Method Based on Goal:**
+   - Explore clusters → t-SNE or UMAP
+   - Understand feature relationships → PCA biplot
+   - Quick check → PCA
 
-**5. Topological Data Analysis (TDA):**
-- Persistent homology to capture shape
-- Mapper algorithm for data visualization
-- Preserves topological features (holes, clusters)
-- Robust to noise and coordinate changes
+3. **Parameter Tuning (t-SNE):**
+   - Perplexity: 5-50 (try multiple values)
+   - Iterations: ≥1000
 
-**6. Graph-based and Network Methods:**
-- UMAP improvements (parametric UMAP)
-- Graph neural network embeddings
-- Multi-scale representations
-- Dynamic/temporal network embedding
+**Python Example:**
+```python
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import umap
 
-**7. Multimodal Representation Learning:**
-- CLIP: images + text jointly
-- Multi-view learning
-- Cross-modal retrieval
-- Fusion strategies for heterogeneous data
+# Preprocessing
+X_scaled = StandardScaler().fit_transform(X)
 
-**8. Neural Compression and Autoencoders:**
-- Variational autoencoders (VAE) improvements
-- Neural compression for storage/transmission
-- Discrete latent codes (VQ-VAE)
-- Flow-based models for invertible DR
+# Method 1: PCA (fast, global)
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
 
-**Research Comparison:**
+# Method 2: t-SNE (slow, local clusters)
+# First reduce with PCA for speed
+X_pca_50 = PCA(n_components=50).fit_transform(X_scaled)
+tsne = TSNE(n_components=2, perplexity=30, n_iter=1000)
+X_tsne = tsne.fit_transform(X_pca_50)
 
-| Area | Focus | Example Methods |
-|------|-------|-----------------|
-| Scalability | Handle billions of points | Randomized SVD, NN-based |
-| Interpretability | Human-understandable | Sparse PCA, Concept bottlenecks |
-| Fairness | Remove bias | Adversarial debiasing |
-| Topology | Preserve shape | Persistent homology, UMAP |
-| Self-supervised | No labels needed | Contrastive learning |
+# Method 3: UMAP (fast, balanced)
+reducer = umap.UMAP(n_components=2, n_neighbors=15)
+X_umap = reducer.fit_transform(X_scaled)
 
-**Emerging Techniques:**
+# Plot comparison
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
-```
-Traditional: PCA, LDA, t-SNE
-     ↓
-Current: UMAP, VAE, Contrastive Learning
-     ↓
-Emerging: Topological methods, Fair representations,
-          Large-scale foundation model embeddings
+for ax, data, title in zip(axes, [X_pca, X_tsne, X_umap], 
+                           ['PCA', 't-SNE', 'UMAP']):
+    ax.scatter(data[:, 0], data[:, 1], c=y, cmap='viridis', s=5)
+    ax.set_title(title)
+plt.show()
 ```
 
-**Practical Research Impact:**
+**Interpretation Tips:**
+- t-SNE/UMAP: Cluster distance not meaningful, only cluster existence
+- PCA: Direction matters, can interpret via loadings
+- Always show multiple views, don't rely on single method
 
-| Research Area | Industry Application |
-|---------------|---------------------|
-| Contrastive learning | Better image/text search |
-| Fair representations | Unbiased hiring, lending |
-| Scalable methods | Real-time recommendations |
-| Interpretable DR | Healthcare, finance |
+---
 
-**Interview Tip:** Mention UMAP as current state-of-art for visualization, contrastive learning for modern embeddings, and fairness as increasingly important research direction.
+## Question 4
+
+**Explain the process you would follow to select features for a predictive model in a marketing dataset.**
+
+### Answer
+
+**Definition:**  
+Feature selection for marketing involves a systematic process: understanding business context, exploratory analysis, removing irrelevant/redundant features, applying statistical tests, using model-based selection, and validating with cross-validation—always keeping interpretability in mind for stakeholder communication.
+
+**Step-by-Step Process:**
+
+**Step 1: Understand Business Context**
+- What is the target? (conversion, churn, CLV)
+- What features are actionable?
+- What features are available at prediction time?
+- Any regulatory constraints? (GDPR, fairness)
+
+**Step 2: Initial Data Exploration**
+```python
+# Check data types, missing values, cardinality
+df.info()
+df.describe()
+df.isnull().sum()
+```
+
+**Step 3: Remove Obvious Irrelevant Features**
+- IDs, timestamps (unless engineered)
+- Features with single value (zero variance)
+- Features with >50% missing values
+- Leakage features (derived from target)
+
+**Step 4: Handle Multicollinearity**
+```python
+import seaborn as sns
+# Correlation matrix
+corr = df.corr()
+# Remove one of highly correlated pairs (>0.9)
+```
+
+**Step 5: Statistical Feature Selection**
+```python
+from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif
+
+# For categorical target (classification)
+selector = SelectKBest(score_func=f_classif, k=20)
+X_selected = selector.fit_transform(X, y)
+
+# Get selected feature names
+selected_mask = selector.get_support()
+selected_features = X.columns[selected_mask]
+```
+
+**Step 6: Model-Based Selection**
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectFromModel
+
+# Tree-based importance
+rf = RandomForestClassifier(n_estimators=100)
+rf.fit(X, y)
+
+# Select features above median importance
+selector = SelectFromModel(rf, threshold='median')
+X_selected = selector.fit_transform(X, y)
+```
+
+**Step 7: Recursive Feature Elimination (Optional)**
+```python
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+
+rfe = RFE(LogisticRegression(), n_features_to_select=15)
+rfe.fit(X, y)
+selected_features = X.columns[rfe.support_]
+```
+
+**Step 8: Validate with Cross-Validation**
+```python
+from sklearn.model_selection import cross_val_score
+
+# Compare performance with all vs selected features
+score_all = cross_val_score(model, X, y, cv=5).mean()
+score_selected = cross_val_score(model, X_selected, y, cv=5).mean()
+```
+
+**Marketing-Specific Considerations:**
+
+| Feature Type | Selection Approach |
+|--------------|-------------------|
+| Demographics | Keep interpretable ones |
+| Behavioral | Check recency (RFM) |
+| Campaign history | Avoid leakage |
+| External data | Verify availability at inference |
+
+**Final Feature Selection Strategy:**
+1. Start with domain knowledge
+2. Apply multiple selection methods
+3. Intersect selected features from different methods
+4. Validate improvement in CV score
+5. Ensure interpretability for business stakeholders
+
+**Interview Tip:** Emphasize interpretability for marketing—stakeholders need to understand why customers convert.
+
+---
+
+## Question 5
+
+**What are some potential pitfalls when applying dimensionality reduction to time-series data?**
+
+### Answer
+
+**Definition:**  
+Time-series dimensionality reduction has unique challenges including destroying temporal dependencies, data leakage from future values, loss of sequential structure, and inappropriateness of standard methods that assume i.i.d. samples.
+
+**Key Pitfalls:**
+
+| Pitfall | Description |
+|---------|-------------|
+| **Temporal Structure Loss** | PCA/t-SNE ignore time ordering |
+| **Data Leakage** | Fitting on future data contaminates model |
+| **Non-stationarity** | Time-varying statistics break assumptions |
+| **Autocorrelation** | Standard methods assume independence |
+| **Sequence Length Variation** | Different length series hard to handle |
+
+**Detailed Explanation:**
+
+**1. Loss of Temporal Dependencies:**
+- Standard PCA treats each time point as independent feature
+- Destroys lag relationships, trends, seasonality
+- Solution: Use time-aware methods (Dynamic PCA, wavelet decomposition)
+
+**2. Data Leakage:**
+```python
+# WRONG: Fit scaler/PCA on entire dataset
+pca = PCA().fit(full_data)  # Leaks future info into past
+
+# CORRECT: Fit only on training (past) data
+pca = PCA().fit(train_data)
+test_transformed = pca.transform(test_data)
+```
+
+**3. Non-stationarity Issues:**
+- Mean and variance change over time
+- Covariance matrix computed over all time is meaningless
+- Solution: Difference the series, use rolling windows
+
+**4. Autocorrelation Violation:**
+- PCA assumes uncorrelated observations
+- Time series have serial correlation
+- Eigenvalue estimates become biased
+
+**5. Sequence-specific Challenges:**
+
+| Issue | Standard DR Problem | Time Series Context |
+|-------|---------------------|---------------------|
+| Alignment | N/A | Different length sequences |
+| Lag features | N/A | Must preserve lag structure |
+| Trend | Treated as feature | Should be modeled separately |
+
+**Better Approaches for Time Series:**
+
+1. **Time-aware feature engineering:**
+   - Extract features: mean, std, trend, seasonality, autocorrelation
+   - Apply DR to extracted features
+
+2. **Dynamic PCA:**
+   - Extends PCA to capture lagged covariances
+   - Preserves temporal dynamics
+
+3. **Recurrent Autoencoders:**
+   - LSTM/GRU autoencoders for sequence compression
+   - Preserves temporal structure
+
+4. **Wavelets/Fourier:**
+   - Transform to frequency domain
+   - Reduce high-frequency components
+
+**Python Example - Safe Approach:**
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Time-series cross-validation approach
+def reduce_time_series(train, test):
+    # Fit only on training data
+    scaler = StandardScaler()
+    scaler.fit(train)
+    
+    train_scaled = scaler.transform(train)
+    test_scaled = scaler.transform(test)
+    
+    pca = PCA(n_components=0.95)
+    pca.fit(train_scaled)  # Only train!
+    
+    return pca.transform(train_scaled), pca.transform(test_scaled)
+
+# Feature extraction approach (better)
+def extract_ts_features(series):
+    return {
+        'mean': series.mean(),
+        'std': series.std(),
+        'trend': np.polyfit(range(len(series)), series, 1)[0],
+        'autocorr_1': series.autocorr(lag=1)
+    }
+```
+
+**Interview Tip:** Always mention the leakage risk and that you would use time-aware cross-validation (walk-forward or expanding window).
 
 ---

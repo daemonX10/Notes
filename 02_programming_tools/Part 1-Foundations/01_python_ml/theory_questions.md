@@ -613,7 +613,7 @@ Feature scaling is the process of normalizing or standardizing the range of inde
 | **Min-Max Scaling** | $(x - x_{min}) / (x_{max} - x_{min})$ | [0, 1] | When data has a bounded range; neural networks |
 | **Standardization (Z-score)** | $(x - \mu) / \sigma$ | ~[-3, 3] | When data is normally distributed; SVM, logistic regression |
 | **Robust Scaling** | $(x - median) / IQR$ | Varies | When outliers are present |
-| **Max Abs Scaling** | $x / |x_{max}|$ | [-1, 1] | Sparse data |
+| **Max Abs Scaling** | $x / x_{max}$ | [-1, 1] | Sparse data |
 
 ### Why It's Necessary
 - **Gradient Descent**: Without scaling, gradients oscillate and convergence is slow

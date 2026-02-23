@@ -2,213 +2,6 @@
 
 ## Question 1
 
-**Discuss the impact of imbalanced datasets on Random Forest.**
-
-### Answer
-
-**Definition:**
-Imbalanced datasets (e.g., 95% negative, 5% positive) cause Random Forest to be biased toward the majority class because the algorithm optimizes overall accuracy. Trees tend to predict the majority class more often.
-
-**Impact on Random Forest:**
-
-| Issue | Description |
-|-------|-------------|
-| **Majority Bias** | Most splits favor majority class |
-| **Poor Minority Recall** | Rare class often missed |
-| **Misleading Accuracy** | 95% accuracy by always predicting majority |
-| **Bootstrap Imbalance** | Some trees may have no minority samples |
-
-**Solutions:**
-
-**1. Class Weights:**
-```python
-from sklearn.ensemble import RandomForestClassifier
-
-# Inversely weight classes by frequency
-rf = RandomForestClassifier(
-    n_estimators=100,
-    class_weight='balanced',  # Auto-weight by inverse frequency
-    random_state=42
-)
-rf.fit(X_train, y_train)
-```
-
-**2. Resampling Techniques:**
-```python
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.combine import SMOTETomek
-
-# SMOTE (oversample minority)
-smote = SMOTE(random_state=42)
-X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
-
-# Undersampling (reduce majority)
-under = RandomUnderSampler(random_state=42)
-X_resampled, y_resampled = under.fit_resample(X_train, y_train)
-```
-
-**3. Balanced Random Forest:**
-```python
-from imblearn.ensemble import BalancedRandomForestClassifier
-
-# Automatically balances each bootstrap sample
-brf = BalancedRandomForestClassifier(n_estimators=100, random_state=42)
-brf.fit(X_train, y_train)
-```
-
-**4. Threshold Adjustment:**
-```python
-# Lower threshold for minority class
-probas = rf.predict_proba(X_test)[:, 1]
-predictions = (probas >= 0.3).astype(int)  # Instead of 0.5
-```
-
-**Evaluation for Imbalanced Data:**
-- Use Precision, Recall, F1, AUC-ROC (not accuracy)
-- Precision-Recall curve preferred for heavy imbalance
-- Cost-sensitive evaluation if business costs known
-
----
-
-## Question 2
-
-**Discuss strategies to deal with high dimensionality in Random Forest.**
-
-### Answer
-
-**Definition:**
-High-dimensional data (many features, p >> n) can slow training, increase memory usage, and potentially hurt performance if many features are irrelevant. Random Forest is relatively robust to high dimensions due to feature sampling, but strategies exist to improve efficiency.
-
-**Challenges:**
-
-| Challenge | Impact |
-|-----------|--------|
-| Slow training | More features = more split evaluations |
-| Memory usage | Storing large trees |
-| Curse of dimensionality | Sparse data, irrelevant features |
-| Feature importance dilution | Important features obscured |
-
-**Strategies:**
-
-**1. Adjust max_features:**
-```python
-# Default is sqrt(n_features), can reduce further
-rf = RandomForestClassifier(
-    n_estimators=100,
-    max_features=0.1,  # Only 10% of features per split
-    random_state=42
-)
-```
-
-**2. Pre-filtering with Variance:**
-```python
-from sklearn.feature_selection import VarianceThreshold
-
-# Remove zero or near-zero variance features
-selector = VarianceThreshold(threshold=0.01)
-X_filtered = selector.fit_transform(X)
-print(f"Reduced from {X.shape[1]} to {X_filtered.shape[1]} features")
-```
-
-**3. Two-Stage Feature Selection:**
-```python
-# Stage 1: Quick RF for feature importance
-rf_quick = RandomForestClassifier(n_estimators=50, max_depth=10)
-rf_quick.fit(X_train, y_train)
-
-# Select top k features
-top_k = 100
-top_features = np.argsort(rf_quick.feature_importances_)[-top_k:]
-X_selected = X_train[:, top_features]
-
-# Stage 2: Full RF on selected features
-rf_final = RandomForestClassifier(n_estimators=200)
-rf_final.fit(X_selected, y_train)
-```
-
-**4. Dimensionality Reduction:**
-```python
-from sklearn.decomposition import PCA
-
-# Reduce dimensions first
-pca = PCA(n_components=50)
-X_pca = pca.fit_transform(X)
-
-# Then train RF
-rf = RandomForestClassifier(n_estimators=100)
-rf.fit(X_pca, y)
-```
-
-**5. Correlation-Based Removal:**
-```python
-# Remove highly correlated features
-correlation_matrix = pd.DataFrame(X).corr().abs()
-upper = correlation_matrix.where(np.triu(np.ones(correlation_matrix.shape), k=1).astype(bool))
-to_drop = [column for column in upper.columns if any(upper[column] > 0.95)]
-X_reduced = pd.DataFrame(X).drop(to_drop, axis=1)
-```
-
-**Best Practice:**
-1. Start with variance threshold (remove useless features)
-2. Train quick RF, keep top features
-3. Train final RF on selected features
-4. Compare performance with/without selection
-
----
-
-## Question 3
-
-**How would you explain the Random Forest model to a non-technical stakeholder?**
-
-### Answer
-
-**Definition:**
-Random Forest is like getting opinions from many experts (trees) who each see slightly different information, then taking a vote to make the final decision.
-
-**Simple Explanation:**
-
-**Analogy 1 - Medical Diagnosis:**
-"Imagine you're sick and want a diagnosis. Instead of asking one doctor, you ask 100 doctors:
-- Each doctor only sees some of your test results (not all)
-- Each doctor has studied different patient cases
-- Each doctor gives their diagnosis
-- The final diagnosis is what most doctors agree on
-
-Random Forest works the same way - it builds 100 'decision trees' (like doctors), each with partial information, and takes a vote."
-
-**Analogy 2 - Hiring Committee:**
-"Think of hiring decisions:
-- One interviewer might have biases
-- Many interviewers with different perspectives → better decisions
-- Random Forest is like having many interviewers, each focused on different qualities, then voting"
-
-**Visual Explanation:**
-```
-        [Your Data]
-             ↓
-    Split into random subsets
-    ↓       ↓       ↓       ↓
- [Tree1] [Tree2] [Tree3] ... [Tree100]
-    ↓       ↓       ↓       ↓
-   Yes     Yes     No      Yes    ← Individual votes
-             ↓
-    [Majority Vote = YES]
-```
-
-**Why It Works:**
-"Individual trees might make mistakes, but when many trees vote together, errors cancel out and the correct answer emerges - wisdom of the crowd."
-
-**Key Points for Stakeholders:**
-- **Accuracy**: Often one of the best methods out-of-the-box
-- **Reliability**: Multiple opinions better than one
-- **Transparency**: Can see which factors (features) matter most
-- **Trust**: Widely used in healthcare, finance, tech
-
----
-
-## Question 4
-
 **How would you use Random Forest for a real-time recommendation system?**
 
 ### Answer
@@ -303,7 +96,142 @@ def get_recommendations(user, candidate_items, top_n=10):
 
 ---
 
-## Question 5
+## Question 2
+
+**Describe a scenario where Random Forest could be applied to detect credit card fraud.**
+
+### Answer
+
+**Definition:**
+Random Forest can detect credit card fraud by learning patterns from historical transaction features (amount, time, location, etc.) to classify transactions as legitimate or fraudulent.
+
+**Scenario Setup:**
+
+**Features:**
+- Transaction amount
+- Time since last transaction
+- Distance from last transaction location
+- Merchant category
+- Card-present vs card-not-present
+- Velocity features (transactions per hour)
+- Historical spending patterns
+
+**Challenges & Solutions:**
+
+| Challenge | RF Solution |
+|-----------|-------------|
+| **Class Imbalance** (0.1% fraud) | Use class_weight='balanced' or SMOTE |
+| **Real-time Prediction** | Pre-trained model, fast inference |
+| **Feature Engineering** | RF handles raw + engineered features |
+| **Concept Drift** | Retrain periodically |
+
+**Implementation:**
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+from imblearn.over_sampling import SMOTE
+
+# Handle imbalance
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+
+# Train RF
+rf = RandomForestClassifier(
+    n_estimators=200,
+    max_depth=20,
+    min_samples_leaf=5,
+    class_weight='balanced',
+    n_jobs=-1
+)
+rf.fit(X_resampled, y_resampled)
+
+# Predict probabilities for threshold tuning
+proba = rf.predict_proba(X_test)[:, 1]
+# Use threshold that maximizes recall while maintaining precision
+```
+
+**Evaluation Metrics:**
+- Precision-Recall curve (not accuracy)
+- F1 score or F2 score (emphasize recall)
+- Cost-based: Cost of false negative >> false positive
+
+**Why RF Works Well:**
+- Handles mixed feature types
+- Captures non-linear fraud patterns
+- Provides feature importance for explainability
+- OOB error for quick validation
+
+---
+
+## Question 3
+
+**Explain how Random Forest might be used for customer segmentation.**
+
+### Answer
+
+**Definition:**
+Random Forest can be used for customer segmentation through its proximity matrix (unsupervised clustering) or by predicting customer value tiers/segments as a supervised classification task.
+
+**Approach 1: Proximity-Based Clustering (Unsupervised)**
+
+1. Train RF on a related supervised task (e.g., predict purchase behavior)
+2. Extract proximity matrix
+3. Use (1 - proximity) as distance matrix
+4. Apply hierarchical clustering or MDS visualization
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+from scipy.cluster.hierarchy import linkage, fcluster
+from sklearn.manifold import MDS
+
+# Train RF (even dummy target works)
+rf = RandomForestClassifier(n_estimators=100)
+rf.fit(X_customers, y_dummy)
+
+# Get proximity matrix
+leaf_indices = rf.apply(X_customers)
+proximity = compute_proximity_matrix(leaf_indices)
+
+# Cluster
+distance = 1 - proximity
+linkage_matrix = linkage(distance, method='ward')
+segments = fcluster(linkage_matrix, t=5, criterion='maxclust')
+```
+
+**Approach 2: Supervised Segmentation**
+
+If you have labeled segments (e.g., High-Value, Medium, Low):
+
+```python
+# Features: RFM, demographics, behavior
+# Target: Customer segment label
+
+rf = RandomForestClassifier(n_estimators=100)
+rf.fit(X_train, y_segment_labels)
+
+# Segment new customers
+new_customer_segments = rf.predict(X_new_customers)
+
+# Understand segments via feature importance
+importance = rf.feature_importances_
+```
+
+**Features for Segmentation:**
+- RFM (Recency, Frequency, Monetary)
+- Demographic data
+- Purchase categories
+- Engagement metrics
+- Channel preferences
+
+**Why RF for Segmentation:**
+- Handles mixed feature types
+- Non-linear segment boundaries
+- Feature importance reveals segment drivers
+- Robust to outliers
+
+---
+
+## Question 4
 
 **How would you apply Random Forest for predictive maintenance in manufacturing?**
 
@@ -407,7 +335,7 @@ importance_df = pd.DataFrame({
 
 ---
 
-## Question 6
+## Question 5
 
 **Discuss the use of Random Forest in natural language processing (NLP) applications.**
 
@@ -502,109 +430,3 @@ rf.fit(embeddings, labels)
 
 ---
 
-## Question 7
-
-**Discuss current research trends in ensemble learning and Random Forest.**
-
-### Answer
-
-**Definition:**
-Current research focuses on improving interpretability, handling complex data types, reducing computational costs, and combining Random Forest with deep learning approaches.
-
-**Research Trends:**
-
-**1. Explainability and Interpretability:**
-```python
-# SHAP values for global/local explanations
-import shap
-
-explainer = shap.TreeExplainer(rf)
-shap_values = explainer.shap_values(X_test)
-
-# Visualize
-shap.summary_plot(shap_values, X_test, feature_names=feature_names)
-```
-
-Research directions:
-- Beyond feature importance: interaction effects
-- Counterfactual explanations
-- Rule extraction from forests
-
-**2. Deep Forest (gcForest):**
-```python
-# Multi-layer cascade forest - RF analog to deep learning
-# Each layer is an ensemble; representations passed to next layer
-
-from deepforest import CascadeForestClassifier
-
-cf = CascadeForestClassifier(random_state=42)
-cf.fit(X_train, y_train)
-```
-
-Key idea: Stack forests like neural network layers.
-
-**3. Neural-Random Forest Hybrids:**
-- Neural networks for feature extraction
-- RF for final classification
-- Differentiable decision trees
-
-```python
-# Example: Embedding + RF
-from tensorflow.keras.applications import ResNet50
-
-# Deep learning feature extraction
-feature_extractor = ResNet50(weights='imagenet', include_top=False, pooling='avg')
-embeddings = feature_extractor.predict(images)
-
-# RF on embeddings
-rf = RandomForestClassifier(n_estimators=200)
-rf.fit(embeddings, labels)
-```
-
-**4. Streaming/Online Random Forests:**
-- Update forests incrementally with new data
-- Handle concept drift
-- Memory-efficient for continuous data
-
-**5. Fairness and Bias:**
-- Ensuring RF doesn't discriminate
-- Fair feature selection
-- Calibration for protected groups
-
-**6. AutoML Integration:**
-```python
-# Automated RF tuning
-from autosklearn.classification import AutoSklearnClassifier
-
-automl = AutoSklearnClassifier(time_left_for_this_task=120)
-automl.fit(X_train, y_train)
-# May select RF with optimal hyperparameters
-```
-
-**7. Uncertainty Quantification:**
-```python
-# Beyond point predictions
-# Prediction intervals via:
-# - Quantile regression forests
-# - Conformal prediction
-
-from sklearn.ensemble import GradientBoostingRegressor
-
-# Quantile regression (similar approach for RF)
-lower = GradientBoostingRegressor(loss='quantile', alpha=0.1)
-upper = GradientBoostingRegressor(loss='quantile', alpha=0.9)
-```
-
-**8. Efficient Implementations:**
-- GPU-accelerated forests (RAPIDS cuML)
-- Hardware-optimized inference (ONNX, Treelite)
-- Pruning and compression
-
-**Emerging Applications:**
-- Federated learning with forests
-- RF for graph-structured data
-- Temporal/dynamic forests
-- Multi-task forest learning
-
-**Interview Point:**
-"Key trends are explainability (SHAP), combining with deep learning (Deep Forest), and scalability. RF remains relevant due to its robustness, interpretability, and effectiveness on tabular data."

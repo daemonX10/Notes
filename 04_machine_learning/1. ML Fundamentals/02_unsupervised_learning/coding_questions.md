@@ -1,56 +1,6 @@
 # Unsupervised Learning - Coding Questions
 
-## Question 1: How would you implement clustering on a large, distributed dataset?
-
-### Approach: Use Apache Spark MLlib
-
-For datasets that don't fit in memory, use distributed computing frameworks like Spark.
-
-### Implementation
-
-```python
-from pyspark.sql import SparkSession
-from pyspark.ml.feature import VectorAssembler, StandardScaler
-from pyspark.ml.clustering import KMeans
-from pyspark.ml.evaluation import ClusteringEvaluator
-
-# 1. Initialize Spark
-spark = SparkSession.builder.appName("DistributedClustering").getOrCreate()
-
-# 2. Load data from distributed storage
-df = spark.read.csv("s3://bucket/large_data.csv", header=True, inferSchema=True)
-
-# 3. Assemble features into vector column
-feature_cols = ["col1", "col2", "col3"]
-assembler = VectorAssembler(inputCols=feature_cols, outputCol="features_raw")
-df = assembler.transform(df)
-
-# 4. Scale features
-scaler = StandardScaler(inputCol="features_raw", outputCol="features")
-scaler_model = scaler.fit(df)
-df = scaler_model.transform(df)
-
-# 5. Run distributed K-means
-kmeans = KMeans(featuresCol="features", k=5, seed=42)
-model = kmeans.fit(df)
-
-# 6. Get predictions
-predictions = model.transform(df)
-
-# 7. Evaluate with silhouette score
-evaluator = ClusteringEvaluator(featuresCol="features", metricName="silhouette")
-silhouette = evaluator.evaluate(predictions)
-print(f"Silhouette Score: {silhouette:.4f}")
-```
-
-### Key Points
-- Spark distributes data across cluster nodes
-- MLlib provides parallel K-means, Bisecting K-means, LDA
-- Only 2 passes over data needed
-
----
-
-## Question 2: Implement K-means clustering from scratch in Python.
+## Question 1: Implement K-means clustering from scratch in Python.
 
 ### Algorithm
 1. Initialize K random centroids
@@ -111,7 +61,7 @@ print(f"Centroids:\n{kmeans.centroids}")
 
 ---
 
-## Question 3: Write a Python function to compute the silhouette coefficient for a given clustering.
+## Question 2: Write a Python function to compute the silhouette coefficient for a given clustering.
 
 ### Formula
 $$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}$$
@@ -185,7 +135,7 @@ print(f"Sklearn: {sk_silhouette(X, labels):.4f}")
 
 ---
 
-## Question 4: Use PCA with scikit-learn to reduce the dimensions of a dataset.
+## Question 3: Use PCA with scikit-learn to reduce the dimensions of a dataset.
 
 ### Steps
 1. Standardize the data
@@ -237,7 +187,7 @@ print(f"Components for 95% variance: {pca_auto.n_components_}")
 
 ---
 
-## Question 5: Code an example using the DBSCAN algorithm to cluster a given spatial dataset.
+## Question 4: Code an example using the DBSCAN algorithm to cluster a given spatial dataset.
 
 ### DBSCAN Advantages
 - No need to specify K
@@ -293,7 +243,7 @@ plt.show()
 
 ---
 
-## Question 6: Implement an Apriori algorithm in Python to find frequent itemsets in transaction data.
+## Question 5: Implement an Apriori algorithm in Python to find frequent itemsets in transaction data.
 
 ### Apriori Principle
 If {A, B} is infrequent, then {A, B, C} must be infrequent. This prunes the search space.

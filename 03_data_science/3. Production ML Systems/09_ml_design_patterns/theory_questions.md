@@ -77,7 +77,7 @@ Feature stores enable feature sharing across teams.
 - Version control
 
 ### Components
-Data → Transform → Train → Evaluate → Deploy
+Data â†’ Transform â†’ Train â†’ Evaluate â†’ Deploy
 
 ### Tools
 Airflow, Kubeflow, MLflow
@@ -303,7 +303,7 @@ Models that predict the causal effect of an intervention.
 - A/B test analysis
 
 ### Interview Tip
-Correlation ≠ causation; treatment effects need causal methods.
+Correlation â‰  causation; treatment effects need causal methods.
 
 ---
 
@@ -317,8 +317,8 @@ Correlation ≠ causation; treatment effects need causal methods.
 Prediction Cache is a design pattern where frequently requested predictions are stored in a cache (in-memory or distributed) to avoid redundant model inference calls. Instead of recomputing predictions for the same input, the system retrieves pre-computed results from cache.
 
 ### 2. Core Concepts
-- **Cache Hit**: Request found in cache → return cached prediction
-- **Cache Miss**: Request not in cache → compute prediction, store in cache
+- **Cache Hit**: Request found in cache â†’ return cached prediction
+- **Cache Miss**: Request not in cache â†’ compute prediction, store in cache
 - **TTL (Time To Live)**: Expiration time for cached predictions
 - **Cache Invalidation**: Strategy to remove stale predictions
 - **Key Generation**: Hash input features to create cache key
@@ -330,7 +330,7 @@ Without cache: `latency = T_model`
 With cache (hit): `latency = T_cache` where `T_cache << T_model`  
 
 **Cache Hit Ratio**: `CHR = hits / (hits + misses)`  
-**Latency Reduction**: `Reduction = CHR × (T_model - T_cache)`
+**Latency Reduction**: `Reduction = CHR Ã— (T_model - T_cache)`
 
 ### 4. Intuition
 Think of it like a librarian keeping popular books at the front desk instead of fetching them from the stacks every time. If users repeatedly ask for the same book (prediction), the librarian (cache) can hand it over instantly.
@@ -402,7 +402,7 @@ if prediction is None:
 
 print(f"Prediction: {prediction}")
 
-# Step 4: Same request → cache hit
+# Step 4: Same request â†’ cache hit
 prediction2 = cache.get(user_features)
 print(f"Prediction: {prediction2}")
 ```
@@ -416,11 +416,11 @@ Prediction: 25005.0
 ```
 
 ### 7. Common Pitfalls & Interview Tips
-- **Stale predictions**: Cache TTL too long → outdated predictions
-- **Cache size explosion**: No eviction policy (LRU, LFU) → memory issues
+- **Stale predictions**: Cache TTL too long â†’ outdated predictions
+- **Cache size explosion**: No eviction policy (LRU, LFU) â†’ memory issues
 - **Feature drift**: Model updated but cache not invalidated
-- **Cold start**: Cache empty initially → no benefit until warmed up
-- **Key collisions**: Poor hash function → incorrect predictions
+- **Cold start**: Cache empty initially â†’ no benefit until warmed up
+- **Key collisions**: Poor hash function â†’ incorrect predictions
 
 **Interview Tip**: Mention cache warming strategies (pre-populate popular queries) and distributed caching (Redis, Memcached) for production systems.
 
@@ -430,8 +430,8 @@ Prediction: 25005.0
 1. Generate cache key from input features (hash or serialize)
 2. Check if key exists in cache
 3. If YES: Check TTL validity
-   - Valid → Return cached prediction (Cache Hit)
-   - Expired → Remove entry, proceed to step 4
+   - Valid â†’ Return cached prediction (Cache Hit)
+   - Expired â†’ Remove entry, proceed to step 4
 4. If NO (Cache Miss):
    - Call model inference
    - Store result with timestamp
@@ -455,7 +455,7 @@ Prediction: 25005.0
 Embeddings are a design pattern that transforms high-cardinality categorical variables into dense, low-dimensional continuous vector representations. Instead of one-hot encoding (sparse, high-dimensional), embeddings learn compact representations that capture semantic relationships between categories.
 
 ### 2. Core Concepts
-- **Dimensionality Reduction**: Map 10,000 categories → 50-dimensional vectors
+- **Dimensionality Reduction**: Map 10,000 categories â†’ 50-dimensional vectors
 - **Semantic Similarity**: Similar categories have similar embeddings
 - **Learned Representations**: Embeddings learned during training, not pre-defined
 - **Shared Embeddings**: Reuse across multiple tasks/models
@@ -464,14 +464,14 @@ Embeddings are a design pattern that transforms high-cardinality categorical var
 ### 3. Mathematical Formulation
 For categorical variable with `V` unique values:
 
-**One-Hot Encoding**: `x ∈ {0,1}^V` (sparse)  
-**Embedding**: `E ∈ R^(V × d)` where `d << V`  
-**Lookup**: `e = E[i]` for category `i`, resulting in `e ∈ R^d`
+**One-Hot Encoding**: `x âˆˆ {0,1}^V` (sparse)  
+**Embedding**: `E âˆˆ R^(V Ã— d)` where `d << V`  
+**Lookup**: `e = E[i]` for category `i`, resulting in `e âˆˆ R^d`
 
-**Embedding Layer**: `y = W × E[i] + b`  
+**Embedding Layer**: `y = W Ã— E[i] + b`  
 where `E[i]` is the embedding vector for category `i`
 
-**Distance Metric**: `similarity(e_i, e_j) = cos(e_i, e_j) = (e_i · e_j) / (||e_i|| ||e_j||)`
+**Distance Metric**: `similarity(e_i, e_j) = cos(e_i, e_j) = (e_i Â· e_j) / (||e_i|| ||e_j||)`
 
 ### 4. Intuition
 Imagine representing cities. One-hot encoding treats NYC and Boston as equally different from each other as NYC and Tokyo. Embeddings learn that NYC and Boston (both US East Coast) should be closer in vector space than NYC and Tokyo. The model discovers patterns like geography, population, culture during training.
@@ -490,8 +490,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-# Process: Categorical → Embedding → Prediction
-# Pipeline: user_id → embedding_lookup → dense_vector → neural_network → output
+# Process: Categorical â†’ Embedding â†’ Prediction
+# Pipeline: user_id â†’ embedding_lookup â†’ dense_vector â†’ neural_network â†’ output
 
 # Example: Movie recommendation with user and movie embeddings
 
@@ -506,7 +506,7 @@ class EmbeddingModel(nn.Module):
         self.fc = nn.Linear(embedding_dim * 2, 1)
     
     def forward(self, user_ids, movie_ids):
-        # Step 3: Lookup embeddings (converts category → vector)
+        # Step 3: Lookup embeddings (converts category â†’ vector)
         user_embeds = self.user_embedding(user_ids)  # [batch, 32]
         movie_embeds = self.movie_embedding(movie_ids)  # [batch, 32]
         
@@ -520,7 +520,7 @@ class EmbeddingModel(nn.Module):
 # Usage
 num_users = 1000  # High cardinality
 num_movies = 500
-embedding_dim = 32  # Much smaller than one-hot (1000 → 32)
+embedding_dim = 32  # Much smaller than one-hot (1000 â†’ 32)
 
 model = EmbeddingModel(num_users, num_movies, embedding_dim)
 
@@ -563,10 +563,10 @@ Encoded categories: [0 1 0 2 1]
 ```
 
 ### 7. Common Pitfalls & Interview Tips
-- **Embedding size choice**: Rule of thumb: `dim ≈ cardinality^0.25` or `min(50, cardinality/2)`
+- **Embedding size choice**: Rule of thumb: `dim â‰ˆ cardinality^0.25` or `min(50, cardinality/2)`
 - **Overfitting**: Large embeddings for small datasets
-- **Cold start**: New categories unseen in training → use default embedding or hash trick
-- **No regularization**: Embeddings can overfit → use dropout, L2 regularization
+- **Cold start**: New categories unseen in training â†’ use default embedding or hash trick
+- **No regularization**: Embeddings can overfit â†’ use dropout, L2 regularization
 - **Treating as black box**: Inspect embeddings (t-SNE visualization) to validate learning
 
 **Interview Tip**: Mention that embeddings can be pre-trained (transfer learning) or learned end-to-end. Discuss trade-offs: One-hot works for low cardinality (<10), embeddings essential for high cardinality (>100).
@@ -585,7 +585,7 @@ Encoded categories: [0 1 0 2 1]
 
 **Embedding Size Selection:**
 - Small cardinality (<50): `dim = cardinality / 2`
-- Medium (50-10,000): `dim = log2(cardinality) × 2 to 4`
+- Medium (50-10,000): `dim = log2(cardinality) Ã— 2 to 4`
 - Large (>10,000): `dim = 32 to 256`
 - Never exceed: `dim < cardinality / 1.5`
 
@@ -620,13 +620,13 @@ Given feature tables:
 
 **Join Operation**:
 ```
-X = F_user[user_id] ⊕ F_product[product_id] ⊕ F_context[timestamp]
+X = F_user[user_id] âŠ• F_product[product_id] âŠ• F_context[timestamp]
 ```
-where `⊕` represents concatenation
+where `âŠ•` represents concatenation
 
 **Point-in-Time Join**:
 ```
-X(t) = {f ∈ F : f.timestamp ≤ t}
+X(t) = {f âˆˆ F : f.timestamp â‰¤ t}
 ```
 Only features computed before time `t` are used
 
@@ -646,7 +646,7 @@ Think of assembling a puzzle: You have pieces (features) scattered across differ
 import pandas as pd
 from datetime import datetime, timedelta
 
-# Process: Multiple Tables → Join on Keys → Unified Feature Vector → Model
+# Process: Multiple Tables â†’ Join on Keys â†’ Unified Feature Vector â†’ Model
 
 # Example: E-commerce purchase prediction
 
@@ -772,10 +772,10 @@ Feature matrix shape: (3, 4)
 
 ### 7. Common Pitfalls & Interview Tips
 - **Data Leakage**: Future data joins into training (use point-in-time joins)
-- **Missing Keys**: Unmatched joins create NULLs → use left/outer joins carefully
+- **Missing Keys**: Unmatched joins create NULLs â†’ use left/outer joins carefully
 - **Training-Serving Skew**: Different join logic in training vs production
-- **Performance**: Large joins are slow → use indexed columns, partition data
-- **Duplicate Keys**: Multiple matches create row explosion → use groupby/aggregation
+- **Performance**: Large joins are slow â†’ use indexed columns, partition data
+- **Duplicate Keys**: Multiple matches create row explosion â†’ use groupby/aggregation
 
 **Interview Tip**: Emphasize the importance of point-in-time correctness. Mention feature stores solve this problem by maintaining feature versioning and time-travel capabilities.
 
@@ -786,7 +786,7 @@ Feature matrix shape: (3, 4)
 2. Identify temporal keys (timestamp, event_date)
 3. For each prediction request at time `t`:
    - Join static features (demographics) using entity key
-   - Join temporal features using point-in-time constraint: `feature_time ≤ t`
+   - Join temporal features using point-in-time constraint: `feature_time â‰¤ t`
    - Aggregate temporal features (last 7 days, cumulative sum)
    - Handle missing values (default, imputation)
 4. Validate: No future data in features
@@ -816,38 +816,38 @@ Auto Feature Engineering is a design pattern that uses algorithms to automatical
 - **Feature Selection**: Filter irrelevant/redundant features (correlation, importance)
 - **Deep Feature Synthesis**: Multi-level aggregations and transformations
 - **Entity Relationships**: Exploit table relationships (one-to-many, many-to-many)
-- **Iterative Refinement**: Generate → Evaluate → Select → Repeat
+- **Iterative Refinement**: Generate â†’ Evaluate â†’ Select â†’ Repeat
 
 ### 3. Mathematical Formulation
-Given raw features `X = {x₁, x₂, ..., xₙ}`:
+Given raw features `X = {xâ‚, xâ‚‚, ..., xâ‚™}`:
 
 **Transformation Functions**:
 ```
 T = {log, sqrt, square, exp, sin, cos, ...}
-f_new = T(xᵢ)
+f_new = T(xáµ¢)
 ```
 
 **Interaction Features**:
 ```
-f_interaction = xᵢ × xⱼ, xᵢ / xⱼ, xᵢ + xⱼ
+f_interaction = xáµ¢ Ã— xâ±¼, xáµ¢ / xâ±¼, xáµ¢ + xâ±¼
 ```
 
 **Aggregation (for grouped data)**:
 ```
 f_agg = AGG(x | group_key)
-where AGG ∈ {mean, sum, count, std, min, max}
+where AGG âˆˆ {mean, sum, count, std, min, max}
 ```
 
 **Feature Score** (e.g., mutual information):
 ```
-I(f; y) = ∑ p(f, y) log(p(f, y) / (p(f)p(y)))
+I(f; y) = âˆ‘ p(f, y) log(p(f, y) / (p(f)p(y)))
 ```
 
 ### 4. Intuition
-Imagine you're cooking and need to discover which ingredient combinations taste best. Instead of manually trying every combination, you use a systematic approach: try basic seasonings, then pairs, then cooking methods (fry, boil, bake). Auto feature engineering does this for data—it systematically tries transformations and combinations, measuring which ones help predict the outcome.
+Imagine you're cooking and need to discover which ingredient combinations taste best. Instead of manually trying every combination, you use a systematic approach: try basic seasonings, then pairs, then cooking methods (fry, boil, bake). Auto feature engineering does this for dataâ€”it systematically tries transformations and combinations, measuring which ones help predict the outcome.
 
 ### 5. Practical Relevance in ML/Data Science
-- **Time-to-Model Reduction**: Weeks → hours for feature development
+- **Time-to-Model Reduction**: Weeks â†’ hours for feature development
 - **Domain Agnostic**: Works without deep domain expertise
 - **Exploratory Analysis**: Discover non-obvious feature interactions
 - **Baseline Features**: Quick feature set for prototyping
@@ -862,7 +862,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-# Pipeline: Raw Data → Generate Features → Select Features → Train Model
+# Pipeline: Raw Data â†’ Generate Features â†’ Select Features â†’ Train Model
 
 # Example: Predict loan default
 
@@ -992,11 +992,11 @@ Features: ['debt_to_income_ratio', 'credit_score', 'debt', 'income', 'age']...
 ```
 
 ### 7. Common Pitfalls & Interview Tips
-- **Overfitting**: Too many generated features on small data → regularization needed
-- **Computational Cost**: Combinatorial explosion of features → limit depth/interactions
-- **Multicollinearity**: Highly correlated features → remove redundant ones
-- **Interpretability**: Complex features hard to explain → balance performance vs interpretability
-- **Data Leakage**: Aggregations that use future data → point-in-time correctness
+- **Overfitting**: Too many generated features on small data â†’ regularization needed
+- **Computational Cost**: Combinatorial explosion of features â†’ limit depth/interactions
+- **Multicollinearity**: Highly correlated features â†’ remove redundant ones
+- **Interpretability**: Complex features hard to explain â†’ balance performance vs interpretability
+- **Data Leakage**: Aggregations that use future data â†’ point-in-time correctness
 
 **Interview Tip**: Mention that auto feature engineering is great for exploration but domain knowledge often beats automated approaches. Discuss tools like Featuretools (deep feature synthesis), tsfresh (time series), and AutoML frameworks (H2O, AutoGluon).
 
@@ -1007,9 +1007,9 @@ Features: ['debt_to_income_ratio', 'credit_score', 'debt', 'income', 'age']...
    - Log, sqrt, exp, power
    - Standardization, normalization
 2. **Interaction Generation**:
-   - Pairwise products: `x₁ × x₂`
-   - Ratios: `x₁ / x₂`
-   - Differences: `x₁ - x₂`
+   - Pairwise products: `xâ‚ Ã— xâ‚‚`
+   - Ratios: `xâ‚ / xâ‚‚`
+   - Differences: `xâ‚ - xâ‚‚`
 3. **Aggregations** (for grouped/temporal data):
    - Group by entity: mean, sum, count, std
    - Rolling windows: last 7 days average
@@ -1023,8 +1023,8 @@ Features: ['debt_to_income_ratio', 'credit_score', 'debt', 'income', 'age']...
 
 **Deep Feature Synthesis (Multi-level):**
 1. Level 0: Raw features `[income, debt]`
-2. Level 1: Direct transforms `[log(income), debt²]`
-3. Level 2: Interactions `[log(income) × debt²]`
+2. Level 1: Direct transforms `[log(income), debtÂ²]`
+3. Level 2: Interactions `[log(income) Ã— debtÂ²]`
 4. Stop at max_depth or performance plateau
 5. Prune features with importance < threshold
 
@@ -1854,7 +1854,7 @@ print(f"Serving normalized: {serving_normalizer.transform(np.array([[6, 5, 4]]))
 
 ## Question 30
 
-**What is the â€˜Feature Projectionâ€™ design pattern and how is it implemented?**
+**What is the Ã¢â‚¬ËœFeature ProjectionÃ¢â‚¬â„¢ design pattern and how is it implemented?**
 
 **Answer:**
 
@@ -2029,7 +2029,7 @@ print("\nVisualization saved to feature_projection.png")
 
 ## Question 31
 
-**Explain how the â€˜Periodic Trainingâ€™ design pattern is implemented in an actual system.**
+**Explain how the Ã¢â‚¬ËœPeriodic TrainingÃ¢â‚¬â„¢ design pattern is implemented in an actual system.**
 
 **Answer:**
 
@@ -2271,3 +2271,727 @@ print(f"\nTest predictions: {predictions}")
 - Always keep rollback capability
 
 ---
+## Question 32
+
+**Discuss the purpose of the 'Replay' design pattern in machine learning.**
+
+**Answer:**
+
+### 1. Definition
+The Replay pattern stores historical data/events and replays them to retrain models, test new algorithms, or simulate past scenarios. It enables reproducibility and experimentation on historical data.
+
+### 2. Core Concepts
+- **Event Logging**: Store all input data with timestamps
+- **Time Travel**: Recreate exact state at any past moment
+- **A/B Backtesting**: Test new models on historical data before deployment
+- **Debugging**: Reproduce bugs by replaying exact inputs
+
+### 3. Scenario Application
+**Problem**: New recommendation model deployed, metrics dropped.
+
+**Using Replay Pattern**:
+1. Retrieve historical request logs from past week
+2. Replay same requests through old model and new model
+3. Compare predictions side-by-side
+4. Identify which request patterns caused degradation
+5. Fix model, replay again to validate
+
+### 4. When to Use
+- Model debugging and root cause analysis
+- Backtesting before production deployment
+- Training on exact historical scenarios
+- Regulatory audits requiring decision reconstruction
+
+### 5. Python Code Example
+
+```python
+import json
+from datetime import datetime
+from collections import deque
+
+class ReplayBuffer:
+    def __init__(self, max_size=10000):
+        self.buffer = deque(maxlen=max_size)
+    
+    def log_event(self, features, prediction, timestamp=None):
+        event = {
+            'timestamp': timestamp or datetime.utcnow().isoformat(),
+            'features': features,
+            'prediction': prediction
+        }
+        self.buffer.append(event)
+    
+    def replay(self, model, start_time=None, end_time=None):
+        """Replay historical events through a model"""
+        results = []
+        for event in self.buffer:
+            if start_time and event['timestamp'] < start_time:
+                continue
+            if end_time and event['timestamp'] > end_time:
+                continue
+            
+            new_pred = model.predict(event['features'])
+            results.append({
+                'original': event['prediction'],
+                'replayed': new_pred,
+                'match': event['prediction'] == new_pred
+            })
+        return results
+
+# Usage
+buffer = ReplayBuffer()
+buffer.log_event({'user_id': 1, 'item_id': 100}, prediction='buy')
+buffer.log_event({'user_id': 2, 'item_id': 200}, prediction='skip')
+
+class NewModel:
+    def predict(self, features):
+        return 'buy' if features['item_id'] > 150 else 'skip'
+
+results = buffer.replay(NewModel())
+print(f"Replay results: {results}")
+```
+
+### 6. Interview Tips
+- Replay enables offline evaluation without production risk
+- Combine with A/B testing for comprehensive validation
+- Storage cost is a trade-off - sample if full logging is expensive
+
+---
+
+## Question 33
+
+**Discuss the 'Microservice' design pattern in deploying ML models.**
+
+**Answer:**
+
+### 1. Definition
+The Microservice pattern deploys ML models as independent, loosely-coupled services that communicate via APIs. Each model/functionality runs in its own container with separate scaling, deployment, and lifecycle.
+
+### 2. Core Concepts
+- **Single Responsibility**: Each service does one thing well
+- **Independent Deployment**: Update one model without affecting others
+- **Technology Agnostic**: Python service, Java caller - doesn't matter
+- **Fault Isolation**: One service failure doesn't crash entire system
+- **Independent Scaling**: Scale recommendation service more than fraud service
+
+### 3. Architecture Example
+```
+API Gateway
+    |
+    +-- User Service (authentication)
+    +-- Feature Service (feature engineering)
+    +-- Model Service A (recommendations)
+    +-- Model Service B (fraud detection)
+    +-- Model Service C (pricing)
+```
+
+### 4. Scenario Application
+**E-commerce Platform**:
+- **Recommendation Service**: Product suggestions, scales during peak hours
+- **Fraud Service**: Transaction validation, always-on critical service
+- **Search Ranking Service**: Query understanding + ranking
+- Each team owns their service, deploys independently
+
+### 5. Advantages vs Monolith
+
+| Aspect | Microservice | Monolith |
+|--------|--------------|----------|
+| Deployment | Independent | All-or-nothing |
+| Scaling | Per-service | Entire app |
+| Failure | Isolated | Cascading |
+| Tech stack | Flexible | Uniform |
+| Complexity | Higher | Lower |
+
+### 6. Python Code Example
+
+```python
+# Microservice architecture example
+
+# Service 1: Feature Service
+from flask import Flask, request, jsonify
+
+feature_app = Flask('feature_service')
+
+@feature_app.route('/features/<user_id>', methods=['GET'])
+def get_features(user_id):
+    features = {'user_id': user_id, 'age': 25, 'segment': 'premium'}
+    return jsonify(features)
+
+# Service 2: Recommendation Service
+import requests
+
+recommendation_app = Flask('recommendation_service')
+
+@recommendation_app.route('/recommend', methods=['POST'])
+def recommend():
+    data = request.get_json()
+    user_id = data['user_id']
+    
+    # Call Feature Service (inter-service communication)
+    features = requests.get(f'http://feature-service:5001/features/{user_id}').json()
+    
+    # Generate recommendations based on features
+    recommendations = ['item_1', 'item_2', 'item_3']
+    return jsonify({'user_id': user_id, 'items': recommendations})
+
+# Docker Compose for orchestration
+docker_compose = """
+version: '3'
+services:
+  feature-service:
+    build: ./feature_service
+    ports: ["5001:5001"]
+  recommendation-service:
+    build: ./recommendation_service
+    ports: ["5002:5002"]
+    depends_on: [feature-service]
+"""
+```
+
+### 7. Common Pitfalls
+- **Network Latency**: Multiple service calls add latency
+- **Distributed Tracing**: Hard to debug across services
+- **Data Consistency**: Each service may have stale data
+- **Operational Overhead**: More services = more to manage
+
+### 8. Interview Tips
+- Discuss trade-offs: simplicity of monolith vs flexibility of microservices
+- Mention service mesh (Istio), API gateways, container orchestration (K8s)
+
+---
+
+## Question 34
+
+**Can you discuss the 'Warm Start' pattern in machine learning model training?**
+
+**Answer:**
+
+### 1. Definition
+Warm Start initializes model training with pre-trained weights instead of random initialization. This accelerates convergence and often improves final performance, especially with limited data.
+
+### 2. Core Concepts
+- **Weight Initialization**: Start from pre-trained parameters
+- **Transfer Learning**: Leverage knowledge from related tasks
+- **Incremental Training**: Continue from previous checkpoint
+- **Faster Convergence**: Skip early training phases
+
+### 3. Types of Warm Start
+- **Self Warm Start**: Continue training from own checkpoint
+- **Transfer Warm Start**: Initialize from model trained on different task
+- **Partial Warm Start**: Initialize some layers, randomize others
+
+### 4. Scenario Application
+**Scenario**: Monthly model retraining for credit scoring.
+
+**Without Warm Start**:
+- Train from scratch each month
+- 10 hours training time
+- Model may not converge to same quality
+
+**With Warm Start**:
+- Initialize from last month's model
+- 2 hours training (80% reduction)
+- Stable performance across retrains
+- New patterns learned on top of existing knowledge
+
+### 5. When to Use
+- Periodic retraining with similar data distribution
+- Limited compute budget
+- Fine-tuning pre-trained models (BERT, ResNet)
+- Online learning scenarios
+
+### 6. Python Code Example
+
+```python
+import numpy as np
+from sklearn.linear_model import SGDClassifier
+import joblib
+
+# Scenario: Monthly model retraining with warm start
+
+# Month 1: Train from scratch
+X_month1 = np.random.randn(1000, 10)
+y_month1 = (X_month1.sum(axis=1) > 0).astype(int)
+
+model = SGDClassifier(warm_start=True, max_iter=1000)
+model.fit(X_month1, y_month1)
+print(f"Month 1 Score: {model.score(X_month1, y_month1):.4f}")
+
+# Save model checkpoint
+joblib.dump(model, 'model_month1.pkl')
+
+# Month 2: Warm start from previous model
+model_warm = joblib.load('model_month1.pkl')
+
+X_month2 = np.random.randn(500, 10)  # New data
+y_month2 = (X_month2.sum(axis=1) > 0).astype(int)
+
+# Continue training (warm_start=True allows this)
+model_warm.fit(X_month2, y_month2)
+print(f"Month 2 Score: {model_warm.score(X_month2, y_month2):.4f}")
+
+# Compare with cold start
+model_cold = SGDClassifier(max_iter=1000)
+model_cold.fit(X_month2, y_month2)
+print(f"Cold Start Score: {model_cold.score(X_month2, y_month2):.4f}")
+
+# PyTorch warm start example
+import torch
+
+def warm_start_pytorch(model, checkpoint_path):
+    checkpoint = torch.load(checkpoint_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    # Optionally load optimizer state for exact resume
+    return model
+```
+
+### 7. Common Pitfalls
+- **Distribution Shift**: Warm start may hurt if new data is very different
+- **Overfitting**: Model may be too tuned to old patterns
+- **Catastrophic Forgetting**: New training overwrites old knowledge
+
+### 8. Interview Tips
+- Discuss when NOT to use warm start (major data distribution change)
+- Mention learning rate adjustment - often use lower LR for fine-tuning
+- Warm start + early stopping is powerful combination
+
+---
+
+## Question 35
+
+**Discuss the 'Rebalancing' design pattern and its importance in training datasets.**
+
+**Answer:**
+
+### 1. Definition
+Rebalancing addresses class imbalance in training data by adjusting sample weights or modifying the dataset to ensure the model learns effectively from minority classes.
+
+### 2. Core Concepts
+- **Class Imbalance**: 99% negative, 1% positive (fraud detection)
+- **Oversampling**: Duplicate minority class samples (SMOTE)
+- **Undersampling**: Remove majority class samples
+- **Class Weights**: Penalize misclassification of minority class more
+- **Threshold Adjustment**: Tune decision threshold post-training
+
+### 3. Rebalancing Techniques
+
+| Technique | Method | Pros | Cons |
+|-----------|--------|------|------|
+| Random Oversampling | Duplicate minority | Simple | Overfitting |
+| SMOTE | Synthetic samples | Better generalization | Noisy for high-dim |
+| Random Undersampling | Remove majority | Faster training | Lose information |
+| Class Weights | Weight loss function | No data change | May not be enough |
+
+### 4. Scenario Application
+**Fraud Detection**: 100,000 transactions, only 200 frauds (0.2%)
+
+**Problem**: Model predicts "no fraud" for everything - 99.8% accuracy but useless.
+
+**Rebalancing Solution**:
+1. Apply SMOTE to generate synthetic fraud samples
+2. Balance to 50-50 or 70-30 ratio
+3. Use class_weight='balanced' in model
+4. Evaluate with precision/recall, not accuracy
+
+### 5. Python Code Example
+
+```python
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+
+# Create imbalanced dataset
+X, y = make_classification(n_samples=10000, n_features=20, 
+                           weights=[0.99, 0.01], random_state=42)
+print(f"Class distribution: {np.bincount(y)}")  # [9900, 100]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Method 1: No rebalancing (baseline)
+model_baseline = RandomForestClassifier()
+model_baseline.fit(X_train, y_train)
+print("\n=== Baseline (No Rebalancing) ===")
+print(classification_report(y_test, model_baseline.predict(X_test)))
+
+# Method 2: Class Weights
+model_weighted = RandomForestClassifier(class_weight='balanced')
+model_weighted.fit(X_train, y_train)
+print("\n=== Class Weights ===")
+print(classification_report(y_test, model_weighted.predict(X_test)))
+
+# Method 3: SMOTE Oversampling
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+print(f"\nAfter SMOTE: {np.bincount(y_resampled)}")
+
+model_smote = RandomForestClassifier()
+model_smote.fit(X_resampled, y_resampled)
+print("\n=== SMOTE ===")
+print(classification_report(y_test, model_smote.predict(X_test)))
+
+# Method 4: Undersampling
+under = RandomUnderSampler(random_state=42)
+X_under, y_under = under.fit_resample(X_train, y_train)
+print(f"\nAfter Undersampling: {np.bincount(y_under)}")
+```
+
+### 6. When NOT to Rebalance
+- When class imbalance reflects true prior probability
+- When false positive cost differs from false negative cost (use cost-sensitive learning)
+- Very small minority class - consider anomaly detection instead
+
+### 7. Interview Tips
+- Always evaluate with appropriate metrics (F1, AUC-PR, not accuracy)
+- Discuss SMOTE variants (Borderline-SMOTE, ADASYN)
+- Mention threshold tuning as alternative to resampling
+
+---
+
+## Question 36
+
+**Discuss any recent research that effectively uses the 'Repeatable Process' design pattern.**
+
+**Answer:**
+
+### 1. Definition
+The Repeatable Process pattern ensures ML experiments, training, and deployments can be exactly reproduced. This includes versioning data, code, environment, hyperparameters, and random seeds.
+
+### 2. Core Components
+- **Data Versioning**: Track exact dataset used (DVC, Delta Lake)
+- **Code Versioning**: Git commit hash for training code
+- **Environment**: Docker, conda-lock for dependencies
+- **Configuration**: YAML/JSON for all hyperparameters
+- **Seed Control**: Fixed random seeds across all sources
+
+### 3. Recent Research Examples
+
+**a) MLflow + DVC Pipelines (Industry Standard)**
+- Track experiments with full lineage
+- Reproduce any past run with single command
+- Adopted by Databricks, Microsoft, and major companies
+
+**b) Hugging Face Transformers**
+- Training scripts with full reproducibility
+- Fixed seeds, deterministic operations
+- Model cards with training configuration
+
+**c) Google's ML Metadata (MLMD)**
+- Lineage tracking for TFX pipelines
+- Used in Vertex AI for production ML
+- Research: "Towards ML Engineering" papers
+
+**d) Papers With Code + OpenML**
+- Research reproducibility initiatives
+- Standardized benchmarks, datasets, code
+- Community verification of results
+
+### 4. Implementation Example
+
+```python
+import random
+import numpy as np
+import torch
+import hashlib
+import json
+import os
+from datetime import datetime
+
+class RepeatableExperiment:
+    """Ensures full reproducibility of ML experiments"""
+    
+    def __init__(self, config_path):
+        self.config = self._load_config(config_path)
+        self.experiment_id = self._generate_id()
+        self._set_seeds()
+        self._log_environment()
+    
+    def _load_config(self, path):
+        with open(path, 'r') as f:
+            return json.load(f)
+    
+    def _generate_id(self):
+        """Generate unique experiment ID from config hash"""
+        config_str = json.dumps(self.config, sort_keys=True)
+        return hashlib.md5(config_str.encode()).hexdigest()[:8]
+    
+    def _set_seeds(self):
+        """Set all random seeds for reproducibility"""
+        seed = self.config.get('seed', 42)
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+        os.environ['PYTHONHASHSEED'] = str(seed)
+    
+    def _log_environment(self):
+        """Log environment for reproducibility"""
+        self.environment = {
+            'python_version': os.popen('python --version').read().strip(),
+            'torch_version': torch.__version__,
+            'numpy_version': np.__version__,
+            'git_commit': os.popen('git rev-parse HEAD').read().strip(),
+            'timestamp': datetime.now().isoformat()
+        }
+    
+    def save_experiment(self, model, metrics, output_dir):
+        """Save all artifacts for reproducibility"""
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Save config
+        with open(f'{output_dir}/config.json', 'w') as f:
+            json.dump(self.config, f, indent=2)
+        
+        # Save environment
+        with open(f'{output_dir}/environment.json', 'w') as f:
+            json.dump(self.environment, f, indent=2)
+        
+        # Save metrics
+        with open(f'{output_dir}/metrics.json', 'w') as f:
+            json.dump(metrics, f, indent=2)
+        
+        # Save model
+        torch.save(model.state_dict(), f'{output_dir}/model.pt')
+        
+        print(f"Experiment {self.experiment_id} saved to {output_dir}")
+    
+    @classmethod
+    def reproduce(cls, experiment_dir):
+        """Reproduce experiment from saved artifacts"""
+        config = json.load(open(f'{experiment_dir}/config.json'))
+        env = json.load(open(f'{experiment_dir}/environment.json'))
+        
+        print(f"Reproducing experiment from {env['timestamp']}")
+        print(f"Original git commit: {env['git_commit']}")
+        
+        # User should checkout that commit and run
+        return config
+
+# Example config
+config = {
+    "seed": 42,
+    "model": "resnet18",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "epochs": 10,
+    "data_version": "v1.2.3"
+}
+
+# Save config
+with open('experiment_config.json', 'w') as f:
+    json.dump(config, f)
+
+# Run repeatable experiment
+experiment = RepeatableExperiment('experiment_config.json')
+print(f"Experiment ID: {experiment.experiment_id}")
+print(f"Environment: {experiment.environment}")
+```
+
+### 5. Key Research Contributions
+- **MLflow**: "Managing ML Experiments" (Zaharia et al.)
+- **DVC**: "Data Version Control" open-source project
+- **Weights & Biases**: Experiment tracking at scale
+- **Neptune.ai**: ML metadata management
+
+### 6. Interview Tips
+- Reproducibility is crucial for debugging and compliance
+- Mention specific tools: MLflow, DVC, Weights & Biases
+- Discuss challenges: non-deterministic GPU operations, floating-point precision
+
+---
+
+## Question 37
+
+**Discuss the potential impact of AI Ethics and Fairness considerations on ML design patterns.**
+
+**Answer:**
+
+### 1. Definition
+AI Ethics and Fairness in ML design patterns addresses bias detection, mitigation, transparency, and accountability throughout the ML lifecycle, ensuring models don't discriminate against protected groups.
+
+### 2. Core Concepts
+- **Fairness Metrics**: Demographic parity, equalized odds, calibration
+- **Bias Detection**: Identify disparate impact across groups
+- **Bias Mitigation**: Pre-processing, in-processing, post-processing techniques
+- **Explainability**: Model decisions must be interpretable
+- **Accountability**: Audit trails, human oversight
+
+### 3. Impact on Design Patterns
+
+| Pattern | Ethics Consideration |
+|---------|---------------------|
+| Data Ingestion | Check for representation bias, protected attributes |
+| Feature Engineering | Avoid proxies for protected attributes |
+| Model Training | Fairness constraints, bias-aware algorithms |
+| Evaluation | Disaggregated metrics by demographic groups |
+| Serving | Explanation with each prediction |
+| Monitoring | Track fairness metrics in production |
+
+### 4. Scenario Application
+**Credit Scoring Model**:
+
+**Ethical Concerns**:
+- Historical data reflects past discrimination
+- Zip code may proxy for race
+- Age discrimination in lending
+
+**Design Pattern Modifications**:
+1. **Data Pattern**: Audit training data for demographic imbalance
+2. **Feature Pattern**: Remove or de-bias proxy features
+3. **Training Pattern**: Add fairness constraints to loss function
+4. **Evaluation Pattern**: Report metrics per demographic group
+5. **Serving Pattern**: Provide rejection reasons (Right to Explanation)
+6. **Monitoring Pattern**: Alert on disparate impact
+
+### 5. Python Code Example
+
+```python
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+class FairMLPipeline:
+    """ML pipeline with fairness considerations built in"""
+    
+    def __init__(self, protected_attribute):
+        self.protected_attr = protected_attribute
+        self.model = LogisticRegression()
+        self.fairness_metrics = {}
+    
+    def check_data_bias(self, X, y, sensitive_col):
+        """Pre-training: Check for representation bias"""
+        positive_rate_by_group = {}
+        
+        for group in X[sensitive_col].unique():
+            mask = X[sensitive_col] == group
+            positive_rate = y[mask].mean()
+            positive_rate_by_group[group] = positive_rate
+            print(f"Group {group}: {positive_rate:.2%} positive rate, n={mask.sum()}")
+        
+        # Check for disparate impact
+        rates = list(positive_rate_by_group.values())
+        if max(rates) / min(rates) > 1.25:
+            print("WARNING: Potential representation bias detected")
+        
+        return positive_rate_by_group
+    
+    def train(self, X, y, drop_sensitive=True):
+        """Train with optional removal of sensitive attributes"""
+        X_train = X.copy()
+        if drop_sensitive:
+            X_train = X_train.drop(columns=[self.protected_attr], errors='ignore')
+        
+        self.model.fit(X_train, y)
+        return self
+    
+    def evaluate_fairness(self, X, y, sensitive_col):
+        """Post-training: Evaluate fairness metrics"""
+        X_pred = X.drop(columns=[self.protected_attr], errors='ignore')
+        predictions = self.model.predict(X_pred)
+        
+        groups = X[sensitive_col].unique()
+        
+        for group in groups:
+            mask = X[sensitive_col] == group
+            
+            # Accuracy per group
+            acc = accuracy_score(y[mask], predictions[mask])
+            
+            # Positive prediction rate (demographic parity check)
+            pred_positive_rate = predictions[mask].mean()
+            
+            # True positive rate (equalized odds check)
+            tpr = predictions[mask][y[mask] == 1].mean() if (y[mask] == 1).sum() > 0 else 0
+            
+            self.fairness_metrics[group] = {
+                'accuracy': acc,
+                'positive_rate': pred_positive_rate,
+                'true_positive_rate': tpr
+            }
+            
+            print(f"\nGroup {group}:")
+            print(f"  Accuracy: {acc:.2%}")
+            print(f"  Positive prediction rate: {pred_positive_rate:.2%}")
+            print(f"  True positive rate: {tpr:.2%}")
+        
+        # Check demographic parity
+        rates = [m['positive_rate'] for m in self.fairness_metrics.values()]
+        disparity = max(rates) - min(rates)
+        print(f"\nDemographic parity gap: {disparity:.2%}")
+        
+        if disparity > 0.1:
+            print("WARNING: Significant demographic disparity detected")
+        
+        return self.fairness_metrics
+    
+    def explain_prediction(self, x):
+        """Provide explanation for individual prediction"""
+        features = x.drop(self.protected_attr, errors='ignore')
+        prediction = self.model.predict([features])[0]
+        probability = self.model.predict_proba([features])[0]
+        
+        # Simple feature importance explanation
+        coefficients = dict(zip(features.index, self.model.coef_[0]))
+        top_factors = sorted(coefficients.items(), key=lambda x: abs(x[1]), reverse=True)[:3]
+        
+        return {
+            'prediction': prediction,
+            'confidence': max(probability),
+            'top_factors': top_factors,
+            'explanation': f"Decision based primarily on: {[f[0] for f in top_factors]}"
+        }
+
+# Usage example
+import pandas as pd
+
+# Simulated data
+np.random.seed(42)
+n = 1000
+data = pd.DataFrame({
+    'income': np.random.normal(50000, 15000, n),
+    'age': np.random.randint(18, 65, n),
+    'gender': np.random.choice(['M', 'F'], n),  # Protected attribute
+    'approved': np.random.choice([0, 1], n)
+})
+
+pipeline = FairMLPipeline(protected_attribute='gender')
+
+# Check data bias
+print("=== Data Bias Check ===")
+pipeline.check_data_bias(data, data['approved'], 'gender')
+
+# Train (dropping sensitive attribute)
+X = data.drop('approved', axis=1)
+y = data['approved']
+pipeline.train(X, y, drop_sensitive=True)
+
+# Evaluate fairness
+print("\n=== Fairness Evaluation ===")
+pipeline.evaluate_fairness(X, y, 'gender')
+
+# Explain individual prediction
+print("\n=== Individual Explanation ===")
+explanation = pipeline.explain_prediction(X.iloc[0])
+print(explanation)
+```
+
+### 6. Fairness Design Patterns
+- **Fairness-aware Training**: Add fairness constraint to loss
+- **Post-processing**: Adjust thresholds per group
+- **Adversarial Debiasing**: Train model to be unpredictive of protected class
+- **Counterfactual Fairness**: Would prediction change if protected attribute changed?
+
+### 7. Interview Tips
+- Fairness often involves trade-offs with accuracy
+- Different fairness metrics can conflict (impossible to satisfy all)
+- Mention regulations: GDPR, CCPA, Fair Lending laws
+- Human oversight is essential, not just technical solutions
+
+---
+

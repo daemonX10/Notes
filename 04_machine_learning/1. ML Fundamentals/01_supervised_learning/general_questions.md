@@ -2,7 +2,36 @@
 
 ---
 
-## Question 1: Distinguish between Supervised and Unsupervised Learning
+## Question 1: What is Supervised Learning?
+
+**Definition:**  
+Supervised learning is a machine learning paradigm where the model learns a mapping function from input features (X) to output labels (y) using a labeled dataset. The algorithm iteratively adjusts its parameters to minimize the error between predictions and true labels, enabling it to predict outputs for new, unseen inputs.
+
+**Core Concepts:**
+- Requires labeled data: (input, output) pairs
+- Learns mapping: f(X) → y
+- Two phases: Training (learning) and Inference (prediction)
+- Uses loss function to measure prediction error
+- Optimizer adjusts model parameters to minimize loss
+
+**Mathematical Formulation:**
+$$\hat{y} = f(X; \theta)$$
+$$\theta^* = \arg\min_\theta \mathcal{L}(y, \hat{y})$$
+
+Where $\theta$ are model parameters and $\mathcal{L}$ is the loss function.
+
+**Intuition:**  
+Like learning with a teacher - the model sees examples with correct answers, learns patterns, and then predicts on new examples.
+
+**Practical Relevance:**
+- Spam detection (email → spam/not spam)
+- House price prediction (features → price)
+- Medical diagnosis (symptoms → disease)
+- Credit scoring (customer data → approve/deny)
+
+---
+
+## Question 2: Distinguish between Supervised and Unsupervised Learning
 
 **Definition:**  
 **Supervised learning** learns from labeled data (input-output pairs) to predict outcomes. **Unsupervised learning** discovers hidden patterns in unlabeled data without predefined targets.
@@ -38,7 +67,129 @@ clusters = kmeans.labels_
 
 ---
 
-## Question 2: Methods to Prevent Overfitting
+## Question 3: What are the types of problems solved with Supervised Learning?
+
+**Definition:**  
+Supervised learning problems are categorized into **Classification** (predicting discrete categories) and **Regression** (predicting continuous values) based on the nature of the target variable.
+
+**Core Concepts:**
+
+| Type | Output | Examples |
+|------|--------|----------|
+| **Binary Classification** | 2 classes | Spam/Not Spam, Churn/No Churn |
+| **Multi-class Classification** | >2 classes, one per sample | Digit recognition (0-9) |
+| **Multi-label Classification** | Multiple classes per sample | Article tagging |
+| **Regression** | Continuous value | Price prediction, Temperature |
+
+**Algorithms:**
+- Classification: Logistic Regression, SVM, Decision Trees, Neural Networks
+- Regression: Linear Regression, Ridge, Lasso, Gradient Boosting
+
+**Practical Relevance:**
+- Classification: Fraud detection, image recognition, sentiment analysis
+- Regression: Sales forecasting, demand prediction, age estimation
+
+---
+
+## Question 4: Describe how Training and Testing datasets are used
+
+**Definition:**  
+The labeled dataset is split into a **training set** (to teach the model), **validation set** (to tune hyperparameters), and **test set** (to evaluate final performance on unseen data). This prevents overfitting and provides honest performance estimates.
+
+**Core Concepts:**
+- **Training Set (70-80%):** Model learns patterns by minimizing loss
+- **Validation Set (10-15%):** Used for hyperparameter tuning, early stopping
+- **Test Set (10-15%):** Final unbiased evaluation, used only once
+
+**Why This Split Matters:**
+- Test set simulates real-world unseen data
+- Validation set prevents test set contamination
+- Performance gap between train and test indicates overfitting
+
+**Python Code Example:**
+```python
+from sklearn.model_selection import train_test_split
+
+# Step 1: Split data into train+val and test
+X_temp, X_test, y_temp, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
+
+# Step 2: Split train+val into train and validation
+X_train, X_val, y_train, y_val = train_test_split(X_temp, y_temp, test_size=0.18, random_state=42)
+
+# Result: ~70% train, ~15% val, ~15% test
+print(f"Train: {len(X_train)}, Val: {len(X_val)}, Test: {len(X_test)}")
+```
+
+**Interview Tip:** Always emphasize that the test set must remain untouched until final evaluation.
+
+---
+
+## Question 5: What is the role of a Loss Function?
+
+**Definition:**  
+A loss function quantifies the error between predicted values and actual labels. It produces a single scalar value that the model minimizes during training through optimization algorithms like gradient descent.
+
+**Core Concepts:**
+- Measures "badness" of predictions
+- Guides the optimizer to adjust model parameters
+- Choice depends on problem type (classification vs regression)
+
+**Mathematical Formulation:**
+
+| Problem | Loss Function | Formula |
+|---------|---------------|---------|
+| Regression | MSE | $\frac{1}{N}\sum(y - \hat{y})^2$ |
+| Regression | MAE | $\frac{1}{N}\sum|y - \hat{y}|$ |
+| Classification | Cross-Entropy | $-\sum y \log(\hat{y})$ |
+| SVM | Hinge Loss | $\max(0, 1 - y \cdot \hat{y})$ |
+
+**Intuition:**
+- MSE: Penalizes large errors heavily (squared)
+- MAE: Robust to outliers (linear penalty)
+- Cross-Entropy: Penalizes confident wrong predictions severely
+
+**Training Loop:**
+1. Forward pass: Make prediction
+2. Calculate loss
+3. Backward pass: Compute gradients
+4. Update parameters
+
+---
+
+## Question 6: Explain Overfitting and Underfitting
+
+**Definition:**  
+**Underfitting** occurs when a model is too simple to capture data patterns (high bias). **Overfitting** occurs when a model memorizes training data including noise, failing to generalize (high variance). Both lead to poor performance on unseen data.
+
+**Core Concepts:**
+
+| Aspect | Underfitting | Overfitting |
+|--------|--------------|-------------|
+| Model | Too simple | Too complex |
+| Training Error | High | Very Low |
+| Test Error | High | High |
+| Cause | Insufficient capacity | Memorizes noise |
+| Bias-Variance | High bias | High variance |
+
+**Solutions:**
+
+| Underfitting | Overfitting |
+|--------------|-------------|
+| Use more complex model | Add regularization (L1/L2) |
+| Add more features | Get more training data |
+| Train longer | Use dropout (neural nets) |
+| Reduce regularization | Early stopping |
+| | Simplify model |
+
+**Intuition:**  
+- Underfitting: Student who didn't study - fails practice and exam
+- Overfitting: Student who memorized answers - aces practice, fails exam
+
+**Interview Tip:** Draw learning curves showing train/test error vs model complexity.
+
+---
+
+## Question 7: Methods to Prevent Overfitting
 
 **Definition:**  
 Overfitting occurs when a model learns training data too well, including noise, leading to poor generalization. Prevention involves reducing model complexity, adding regularization, or increasing effective data size.
@@ -78,176 +229,304 @@ model.fit(X, y, validation_split=0.2, callbacks=[early_stop])
 
 ---
 
-## Question 3: Handling Categorical Variables
+## Question 8: Explain the bias-variance tradeoff and its significance in supervised learning.
+
+### Definition
+The bias-variance tradeoff describes the fundamental tension between two sources of error that affect a model's ability to generalize to unseen data.
+
+### Core Concepts
+
+| Component | What It Means | Effect |
+|-----------|---------------|--------|
+| **Bias** | Error from oversimplified assumptions | Model misses relevant patterns (underfitting) |
+| **Variance** | Error from sensitivity to training data fluctuations | Model learns noise as patterns (overfitting) |
+| **Total Error** | Bias² + Variance + Irreducible Noise | What we're trying to minimize |
+
+### Mathematical Formulation
+
+$$\text{Expected Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}$$
+
+Where:
+- **Bias** = $E[\hat{f}(x)] - f(x)$ (difference between average prediction and true value)
+- **Variance** = $E[(\hat{f}(x) - E[\hat{f}(x)])^2]$ (how predictions vary across different training sets)
+
+### The Tradeoff
+
+| Model Complexity | Bias | Variance | Result |
+|-----------------|------|----------|--------|
+| Too Simple (e.g., Linear) | High | Low | Underfitting - misses patterns |
+| Too Complex (e.g., Deep Tree) | Low | High | Overfitting - learns noise |
+| Optimal | Balanced | Balanced | Best generalization |
+
+### Practical Significance
+
+1. **Model Selection**: Guides choice between simple vs complex models
+2. **Hyperparameter Tuning**: Regularization strength controls this tradeoff
+3. **Training Strategy**: More data reduces variance; better features reduce bias
+
+### How to Manage
+
+- **High Bias?** → Add features, use complex model, reduce regularization
+- **High Variance?** → Get more data, simplify model, add regularization, use ensemble methods
+
+---
+
+## Question 9: Explain Validation Sets and Cross-Validation
 
 **Definition:**  
-Categorical variables must be converted to numerical format for most ML models. The encoding method depends on whether the variable is **nominal** (no order) or **ordinal** (has order).
+A **validation set** is a held-out portion of training data used for hyperparameter tuning. **Cross-validation** rotates through multiple validation folds to get a more robust performance estimate, especially with limited data.
 
-**Encoding Methods:**
+**Core Concepts:**
 
-| Variable Type | Method | Description |
-|---------------|--------|-------------|
-| **Nominal** (no order) | One-Hot Encoding | Create binary column per category |
-| **Ordinal** (has order) | Label Encoding | Assign integers based on rank |
-| **High Cardinality** | Target Encoding | Replace with mean of target |
-| **High Cardinality** | Feature Hashing | Hash to fixed-size vector |
+**K-Fold Cross-Validation Process:**
+1. Split training data into K equal folds
+2. For each fold i:
+   - Use fold i as validation
+   - Train on remaining K-1 folds
+   - Record validation score
+3. Average all K scores
+
+**Mathematical Formulation:**
+$$CV_{score} = \frac{1}{K}\sum_{i=1}^{K} Score_i$$
 
 **Python Code Example:**
 ```python
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier()
+
+# 5-fold cross-validation
+scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')
+
+print(f"CV Scores: {scores}")
+print(f"Mean: {scores.mean():.4f} (+/- {scores.std():.4f})")
+```
+
+**Advantages of Cross-Validation:**
+- More robust estimate than single validation split
+- Every data point gets to be in validation once
+- Better for small datasets
+
+**Interview Tip:** Mention that CV is computationally expensive (K times training).
+
+---
+
+## Question 10: What is Regularization and how does it work?
+
+**Definition:**  
+Regularization adds a penalty term to the loss function that discourages model complexity (large weights), preventing overfitting by trading a small increase in bias for a large reduction in variance.
+
+**Mathematical Formulation:**
+$$\text{New Loss} = \text{Original Loss} + \lambda \cdot \text{Regularization Term}$$
+
+**Types:**
+
+| Type | Penalty Term | Effect |
+|------|--------------|--------|
+| L2 (Ridge) | $\lambda\sum w_j^2$ | Shrinks weights toward zero |
+| L1 (Lasso) | $\lambda\sum |w_j|$ | Forces some weights to exactly zero |
+| Elastic Net | $\lambda_1\sum|w_j| + \lambda_2\sum w_j^2$ | Combination of L1 and L2 |
+| Dropout | Random neuron deactivation | Prevents co-adaptation |
+
+**Intuition:**
+- Large weights → model too sensitive to specific features → overfitting
+- Penalty discourages large weights → simpler, more generalizable model
+
+**Python Code Example:**
+```python
+from sklearn.linear_model import Ridge, Lasso
+
+# Ridge Regression (L2)
+ridge = Ridge(alpha=1.0)  # alpha is lambda
+ridge.fit(X_train, y_train)
+
+# Lasso Regression (L1) - performs feature selection
+lasso = Lasso(alpha=0.1)
+lasso.fit(X_train, y_train)
+```
+
+**Interview Tip:** L1 produces sparse models (feature selection), L2 produces small but non-zero weights.
+
+---
+
+## Question 11: How would you approach a stock price prediction problem using supervised learning?
+
+### Problem Framing
+
+**Key Decision**: Predict exact price (regression) OR direction (classification)?
+
+→ **Recommendation**: Classification (up/down) is more stable and actionable
+
+### Approach
+
+#### Step 1: Define Target Variable
+
+```python
+# Binary: Will price go up tomorrow?
+df['target'] = (df['close'].shift(-1) > df['close']).astype(int)
+```
+
+#### Step 2: Feature Engineering
+
+| Feature Type | Examples |
+|-------------|----------|
+| **Technical Indicators** | SMA, EMA, RSI, MACD, Bollinger Bands |
+| **Lagged Returns** | Returns from past k days |
+| **Volatility** | Rolling standard deviation |
+| **Volume Features** | Volume changes, volume moving averages |
+| **Market Data** | Index performance, VIX |
+| **Sentiment** | News/social media sentiment scores |
+
+#### Step 3: Model Selection
+
+| Model | Why |
+|-------|-----|
+| **XGBoost/LightGBM** | Best for tabular data, handles noise well |
+| **LSTM** | Captures temporal patterns in sequences |
+| **Ensemble** | Combine multiple models for robustness |
+
+#### Step 4: Validation Strategy
+
+**Critical**: Use time-series cross-validation (walk-forward)
+
+```python
+# Never use random splits for time series!
+from sklearn.model_selection import TimeSeriesSplit
+
+tscv = TimeSeriesSplit(n_splits=5)
+for train_idx, test_idx in tscv.split(X):
+    # Train on past, test on future
+    pass
+```
+
+### Critical Caveats
+
+1. **Non-Stationarity**: Price data changes over time → work with returns, not prices
+2. **Efficient Market Hypothesis**: Markets incorporate information quickly
+3. **Overfitting Risk**: Very high due to noise → rigorous validation essential
+4. **Lookahead Bias**: Never use future information in features
+
+---
+
+## Question 12: Discuss the application of supervised learning in credit scoring.
+
+### Problem Definition
+
+- **Task**: Binary classification - will borrower default?
+- **Target**: 1 = default, 0 = paid back
+- **Challenge**: Highly imbalanced (defaults are rare)
+
+### Pipeline
+
+#### 1. Feature Categories
+
+| Category | Features |
+|----------|----------|
+| **Application Data** | Income, employment, loan amount, purpose |
+| **Credit History** | Payment history, credit length, open accounts |
+| **Debt Metrics** | Debt-to-income ratio, credit utilization |
+
+#### 2. Model Selection
+
+| Model | Pros | Cons |
+|-------|------|------|
+| **Logistic Regression** | Interpretable, regulatory compliant | Lower accuracy |
+| **XGBoost** | High accuracy | Black-box |
+| **Hybrid** | Best of both worlds | Complex setup |
+
+**Industry Practice**: Use XGBoost for predictions + SHAP for explanations
+
+#### 3. Training Considerations
+
+```python
+# Handle imbalance with class weights
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression(class_weight='balanced')
+# OR for XGBoost
+model = XGBClassifier(scale_pos_weight=ratio_negative/ratio_positive)
+```
+
+#### 4. Evaluation Metrics
+
+- **NOT Accuracy** (misleading for imbalanced data)
+- **AUC-ROC**: Overall discriminative power
+- **Precision-Recall**: Focus on minority class performance
+- **Cost-sensitive metrics**: Account for business cost of FP vs FN
+
+#### 5. Fairness Requirements
+
+- Must not discriminate on protected attributes (race, gender)
+- Audit model for disparate impact
+- Ensure explainability for regulatory compliance
+
+---
+
+## Question 13: Supervised Learning for Recommender Systems
+
+**Definition:**  
+Recommendation can be framed as supervised learning by predicting user-item interactions (ratings or click probability). Features are engineered from user attributes, item attributes, and contextual information, then fed to models like Gradient Boosting or Neural Networks.
+
+**Approach:**
+1. **Target:** Rating (regression) or Will interact? (classification)
+2. **Features:** User features + Item features + Context
+3. **Model:** XGBoost, Neural Network, Factorization Machines
+
+**Feature Categories:**
+- **User:** Demographics, history, preferences
+- **Item:** Category, price, popularity
+- **Context:** Time, device, location
+
+**Python Code Example:**
+```python
 import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier
 
-# One-Hot Encoding (nominal)
-ohe = OneHotEncoder(sparse=False, handle_unknown='ignore')
-X_encoded = ohe.fit_transform(df[['color']])  # color: red, blue, green
+# Features: user_age, user_history_count, item_category, item_price, etc.
+# Target: clicked (0/1)
 
-# Label Encoding (ordinal)
-le = LabelEncoder()
-df['education_encoded'] = le.fit_transform(df['education'])  # HS=0, BS=1, MS=2
+X = df[['user_age', 'user_avg_rating', 'item_popularity', 'item_price']]
+y = df['clicked']
 
-# Pandas get_dummies (quick one-hot)
-df_encoded = pd.get_dummies(df, columns=['color'], drop_first=True)
+model = GradientBoostingClassifier(n_estimators=100)
+model.fit(X_train, y_train)
+
+# Predict click probability for user-item pairs
+click_prob = model.predict_proba(X_candidates)[:, 1]
+
+# Recommend top-N items
+top_n_items = candidates.iloc[click_prob.argsort()[-10:][::-1]]
 ```
 
-**Interview Tip:** Never use Label Encoding for nominal variables - model assumes false ordering.
+**Advantage:** Handles cold start with features; Pure collaborative filtering cannot.
 
 ---
 
-## Question 4: Preventing Overfitting in Neural Networks
+## Question 14: Supervised Learning in Healthcare Diagnostics
 
 **Definition:**  
-Neural networks are especially prone to overfitting due to their high capacity. Key techniques include Dropout, weight regularization, data augmentation, early stopping, and batch normalization.
+Supervised learning in healthcare frames diagnosis as classification (disease present/absent, severity levels). Models are trained on labeled medical data (images, EHR) annotated by experts, requiring rigorous validation and interpretability.
 
-**Techniques:**
+**Key Applications:**
 
-| Technique | How It Works |
-|-----------|--------------|
-| **Dropout** | Randomly set neurons to 0 during training |
-| **L2 Regularization (Weight Decay)** | Add penalty for large weights |
-| **Data Augmentation** | Create modified training samples |
-| **Early Stopping** | Stop when validation loss plateaus |
-| **Batch Normalization** | Normalize layer inputs (slight regularization) |
-| **Reduce Architecture** | Fewer layers/neurons |
-| **Transfer Learning** | Start from pretrained weights |
+| Application | Data Type | Model | Example |
+|-------------|-----------|-------|---------|
+| Medical Imaging | X-ray, CT, MRI | CNN | Diabetic retinopathy detection |
+| Clinical Prediction | EHR tabular data | XGBoost | Sepsis prediction |
+| Genomics | Gene expression | Random Forest | Tumor subtyping |
 
-**Python Code Example (Keras):**
-```python
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
-from tensorflow.keras.regularizers import l2
-from tensorflow.keras.callbacks import EarlyStopping
+**Critical Considerations:**
+- **Interpretability:** Clinicians need to understand why (SHAP, Grad-CAM)
+- **Validation:** External validation on different hospital data
+- **Privacy:** HIPAA compliance
+- **Class Imbalance:** Diseases often rare
 
-model = Sequential([
-    Dense(128, activation='relu', kernel_regularizer=l2(0.01)),  # L2
-    BatchNormalization(),
-    Dropout(0.5),  # 50% dropout
-    Dense(64, activation='relu', kernel_regularizer=l2(0.01)),
-    Dropout(0.3),
-    Dense(1, activation='sigmoid')
-])
-
-early_stop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
-model.fit(X, y, validation_split=0.2, callbacks=[early_stop], epochs=100)
-```
+**Interview Tip:** Emphasize collaboration with medical experts for labeling and validation.
 
 ---
 
-## Question 5: Accuracy and Why It's Not Always the Best Metric
-
-**Definition:**  
-Accuracy = (Correct Predictions) / (Total Predictions). It's misleading for **imbalanced datasets** because a model predicting only the majority class achieves high accuracy while being useless.
-
-**Formula:**
-$$Accuracy = \frac{TP + TN}{TP + TN + FP + FN}$$
-
-**The Problem:**
-
-| Dataset | Class Distribution | Naive Model Strategy | Accuracy |
-|---------|-------------------|---------------------|----------|
-| Fraud Detection | 99% legit, 1% fraud | Always predict "legit" | 99% |
-| Disease Diagnosis | 95% healthy, 5% sick | Always predict "healthy" | 95% |
-
-**Better Metrics for Imbalanced Data:**
-- **Precision:** Of predicted positive, how many correct?
-- **Recall:** Of actual positive, how many found?
-- **F1 Score:** Harmonic mean of precision and recall
-- **AUC-ROC:** Discrimination ability across thresholds
-- **AUPRC:** Precision-Recall curve (best for severe imbalance)
-
-**Interview Tip:** Always ask about class distribution before choosing metrics.
-
----
-
-## Question 6: Compare RMSE and MAE
-
-**Definition:**  
-Both are regression error metrics. **MAE** (Mean Absolute Error) treats all errors equally. **RMSE** (Root Mean Squared Error) penalizes large errors more heavily due to squaring.
-
-**Formulas:**
-$$MAE = \frac{1}{N}\sum|y_i - \hat{y}_i|$$
-$$RMSE = \sqrt{\frac{1}{N}\sum(y_i - \hat{y}_i)^2}$$
-
-**Comparison:**
-
-| Aspect | MAE | RMSE |
-|--------|-----|------|
-| Error Penalty | Linear | Quadratic |
-| Outlier Sensitivity | Robust | Sensitive |
-| Interpretation | "Average error magnitude" | "Std dev of errors" |
-| Differentiability | Not at zero | Everywhere |
-
-**When to Use:**
-- **RMSE:** Large errors are especially bad (critical systems)
-- **MAE:** Outliers present, want robust metric
-
-**Python Code Example:**
-```python
-from sklearn.metrics import mean_squared_error, mean_absolute_error
-import numpy as np
-
-mae = mean_absolute_error(y_true, y_pred)
-rmse = np.sqrt(mean_squared_error(y_true, y_pred))
-
-print(f"MAE: {mae:.4f}")
-print(f"RMSE: {rmse:.4f}")
-```
-
----
-
-## Question 7: When to Use MAPE
-
-**Definition:**  
-MAPE (Mean Absolute Percentage Error) measures average percentage error. Use it when you need **relative error** that's easy to explain to stakeholders or when comparing forecasts across different scales.
-
-**Formula:**
-$$MAPE = \frac{100\%}{N}\sum\left|\frac{y_i - \hat{y}_i}{y_i}\right|$$
-
-**When to Use:**
-- Business stakeholders need intuitive interpretation ("5% error")
-- Comparing forecasts across different scales (sales of different products)
-
-**When to AVOID:**
-- Actual values can be **zero** (division by zero)
-- Data has values near zero (inflates percentage)
-- **Asymmetric penalty:** Under-predictions penalized less than over-predictions
-
-**Alternative:** sMAPE (Symmetric MAPE) uses average of actual and predicted in denominator.
-
-**Python Code Example:**
-```python
-import numpy as np
-
-def mape(y_true, y_pred):
-    # Avoid division by zero
-    mask = y_true != 0
-    return np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
-
-print(f"MAPE: {mape(y_true, y_pred):.2f}%")
-```
-
----
-
-## Question 8: Supervised Learning in NLP
+## Question 15: Supervised Learning in NLP
 
 **Definition:**  
 Supervised learning powers most NLP tasks by training models to map text inputs to labeled outputs. Modern NLP uses transfer learning: pretrain on unlabeled text, then fine-tune on task-specific labeled data.
@@ -279,152 +558,5 @@ print(result)  # [{'label': 'POSITIVE', 'score': 0.99}]
 ner = pipeline("ner")
 entities = ner("Apple was founded by Steve Jobs in California")
 ```
-
----
-
-## Question 9: Handling Imbalanced Datasets
-
-**Definition:**  
-Imbalanced datasets have skewed class distributions. Solutions include appropriate metrics, resampling techniques, and algorithm-level modifications like class weights.
-
-**Three-Pronged Strategy:**
-
-**1. Choose Right Metrics:**
-- F1-Score, Precision-Recall AUC (not accuracy)
-
-**2. Data-Level Techniques:**
-
-| Technique | Method |
-|-----------|--------|
-| **Oversampling** | Duplicate/SMOTE minority class |
-| **Undersampling** | Remove majority class samples |
-
-**3. Algorithm-Level Techniques:**
-
-| Technique | Method |
-|-----------|--------|
-| **Class Weights** | Penalize minority misclassification more |
-| **Threshold Adjustment** | Lower decision threshold |
-
-**Python Code Example:**
-```python
-from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import RandomForestClassifier
-
-# SMOTE oversampling
-smote = SMOTE(random_state=42)
-X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
-
-# Class weights
-rf = RandomForestClassifier(class_weight='balanced')  # Auto-adjust
-rf.fit(X_train, y_train)
-
-# Or manual weights
-rf = RandomForestClassifier(class_weight={0: 1, 1: 10})  # 10x penalty for class 1
-```
-
-**Interview Tip:** Never resample test set - it must reflect real distribution.
-
----
-
-## Question 10: When is Dimensionality Reduction Useful?
-
-**Definition:**  
-Dimensionality reduction reduces the number of features to combat curse of dimensionality, reduce overfitting, speed up training, handle multicollinearity, and enable visualization.
-
-**When to Use:**
-- Too many features relative to samples
-- Features are highly correlated
-- Need to visualize high-dimensional data
-- Training is too slow
-
-**Methods:**
-
-| Category | Technique | Description |
-|----------|-----------|-------------|
-| **Feature Selection** | Filter (correlation) | Rank features statistically |
-| **Feature Selection** | Wrapper (RFE) | Search feature subsets |
-| **Feature Selection** | Embedded (Lasso) | Built into model |
-| **Feature Extraction** | PCA | Linear, maximize variance |
-| **Feature Extraction** | t-SNE, UMAP | Non-linear, for visualization |
-| **Feature Extraction** | Autoencoder | Neural network compression |
-
-**Python Code Example:**
-```python
-from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest, f_classif
-
-# PCA - feature extraction
-pca = PCA(n_components=0.95)  # Keep 95% variance
-X_pca = pca.fit_transform(X)
-
-# SelectKBest - feature selection
-selector = SelectKBest(f_classif, k=10)
-X_selected = selector.fit_transform(X, y)
-```
-
----
-
-## Question 11: Framing RL as Supervised Learning
-
-**Definition:**  
-Reinforcement Learning can be framed as supervised learning through **Imitation Learning** (predict expert actions from states) or **Value Function Fitting** (predict Q-values using regression).
-
-**Method 1: Imitation Learning (Behavioral Cloning)**
-- Input (X): States observed by expert
-- Label (y): Actions expert took
-- Problem: Classification (discrete actions) or Regression (continuous actions)
-
-**Method 2: Q-Learning as Regression**
-- Input (X): State-action pairs
-- Target (y): Calculated target Q-value = r + gamma * max Q(s', a')
-- Problem: Regression
-
-**Python Code Example (Behavioral Cloning):**
-```python
-# Expert demonstrations: (state, action) pairs
-states = expert_states      # observations
-actions = expert_actions    # what expert did
-
-# Train supervised classifier to mimic expert
-from sklearn.ensemble import RandomForestClassifier
-policy = RandomForestClassifier()
-policy.fit(states, actions)
-
-# Agent uses learned policy
-predicted_action = policy.predict(new_state)
-```
-
-**Limitation:** Imitation learning can't exceed expert performance.
-
----
-
-## Question 12: Role of Attention Mechanisms
-
-**Definition:**  
-Attention mechanisms allow neural networks to dynamically focus on relevant parts of input when generating output. They compute weighted combinations of input elements, where weights indicate importance for the current task.
-
-**The Problem Before Attention:**
-- Entire input compressed to fixed-size vector (bottleneck)
-- Lost information for long sequences
-
-**How Attention Works:**
-1. **Query:** Current decoder state asks "what's relevant?"
-2. **Keys:** Each input element provides a key
-3. **Scores:** Compute similarity (Query x Keys)
-4. **Weights:** Softmax to get attention distribution
-5. **Context:** Weighted sum of Values
-
-**Mathematical Formulation:**
-$$Attention(Q, K, V) = softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
-
-**Benefits:**
-- Handles long sequences
-- Interpretable (visualize attention weights)
-- Foundation of Transformers (BERT, GPT)
-
-**Self-Attention:** Query, Key, Value all come from same sequence - each element attends to all others.
-
-**Interview Tip:** Transformers replaced RNNs/LSTMs by using only attention (no recurrence).
 
 ---

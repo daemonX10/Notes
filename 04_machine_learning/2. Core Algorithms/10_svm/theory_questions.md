@@ -871,7 +871,7 @@ svm_rbf.fit(X_scaled, y)
 
 ---
 
-## Question 22
+## Question 21
 
 **How can you create a custom kernel for SVM, and what are the considerations?**
 
@@ -920,7 +920,7 @@ predictions = svm.predict(K_test)
 
 ---
 
-## Question 23
+## Question 22
 
 **What is Sequential Minimal Optimization (SMO), and why is it important for SVM?**
 
@@ -960,7 +960,7 @@ Two-variable subproblem has closed-form solution — no numerical optimization n
 
 ---
 
-## Question 24
+## Question 23
 
 **Explain the concept and advantages of using probabilistic outputs in SVMs (Platt scaling).**
 
@@ -1011,7 +1011,7 @@ Use `decision_function()` for relative scores without calibration overhead.
 
 ---
 
-## Question 25
+## Question 24
 
 **Explain the use of SVM in feature selection.**
 
@@ -1072,7 +1072,7 @@ selected = np.where(svm_l1.coef_[0] != 0)[0]
 
 ---
 
-## Question 26
+## Question 25
 
 **Describe a financial application where SVMs can be used for forecasting.**
 
@@ -1125,7 +1125,7 @@ svr.fit(X_train, y_train)  # y = actual prices
 
 ---
 
-## Question 27
+## Question 26
 
 **Explain how SVM can be utilized for handwriting recognition.**
 
@@ -1185,7 +1185,7 @@ print(f"Accuracy: {accuracy:.2%}")
 
 ---
 
-## Question 28
+## Question 27
 
 **Explain the use of SVM in reinforcement learning contexts.**
 
@@ -1243,7 +1243,7 @@ Learn reward function from expert demonstrations using max-margin formulation (s
 
 ---
 
-## Question 29
+## Question 28
 
 **What are the potential uses of SVMs in recommendation systems?**
 
@@ -1296,7 +1296,7 @@ svm.fit(combined_features, ratings)
 
 ---
 
-## Question 30
+## Question 29
 
 **Explain the concept of bagging and boosting SVM classifiers.**
 
@@ -1357,7 +1357,7 @@ boosting_svm = AdaBoostClassifier(
 
 ---
 
-## Question 31
+## Question 30
 
 **Describe a scenario where an SVM is used as a weak learner in an ensemble method.**
 
@@ -1413,7 +1413,7 @@ Decision stumps (trees with depth=1) are more common weak learners than SVM beca
 
 ---
 
-## Question 32
+## Question 31
 
 **What are the mathematical foundations and optimization theory behind SVM?**
 
@@ -1453,7 +1453,7 @@ Kernel trick justified by Mercer's theorem — valid kernels correspond to dot p
 
 ---
 
-## Question 33
+## Question 32
 
 **How do you solve the quadratic programming problem in SVM optimization?**
 
@@ -1506,7 +1506,7 @@ linear_svc = LinearSVC()  # Uses coordinate descent
 
 ---
 
-## Question 34
+## Question 33
 
 **What is the dual formulation of SVM and why is it important?**
 
@@ -1533,7 +1533,7 @@ Subject to: $0 \leq \alpha_i \leq C$ and $\sum\alpha_i y_i = 0$
 
 ---
 
-## Question 35
+## Question 34
 
 **How do Lagrange multipliers work in SVM optimization?**
 
@@ -1559,7 +1559,7 @@ Subject to: $0 \leq \alpha_i \leq C$ and $\sum\alpha_i y_i = 0$
 
 ---
 
-## Question 36
+## Question 35
 
 **What are the KKT (Karush-Kuhn-Tucker) conditions in SVM?**
 
@@ -1591,7 +1591,7 @@ Necessary and sufficient conditions for optimal solution.
 
 ---
 
-## Question 37
+## Question 36
 
 **How do you implement SMO (Sequential Minimal Optimization) for SVM?**
 
@@ -1635,7 +1635,7 @@ While not converged:
 
 ---
 
-## Question 38
+## Question 37
 
 **What are the computational complexity considerations for SVM training?**
 
@@ -1670,7 +1670,7 @@ While not converged:
 
 ---
 
-## Question 39
+## Question 38
 
 **How do you handle large-scale datasets with SVM algorithms?**
 
@@ -1713,7 +1713,7 @@ PCA/feature selection before SVM.
 
 ---
 
-## Question 40
+## Question 39
 
 **What are approximate SVM methods for big data applications?**
 
@@ -1753,7 +1753,7 @@ clf.fit(X_rff, y)
 
 ---
 
-## Question 41
+## Question 40
 
 **How do you implement distributed and parallel SVM algorithms?**
 
@@ -1789,7 +1789,7 @@ model = lsvc.fit(training_data)
 
 ---
 
-## Question 42
+## Question 41
 
 **What is online SVM learning for streaming data?**
 
@@ -1825,7 +1825,7 @@ for X_batch, y_batch in data_stream:
 
 ---
 
-## Question 43
+## Question 42
 
 **How do you handle concept drift in SVM models?**
 
@@ -1871,7 +1871,7 @@ for new_batch in data_stream:
 
 ---
 
-## Question 44
+## Question 43
 
 **What are ensemble methods for SVM and their advantages?**
 
@@ -1899,7 +1899,7 @@ Combine multiple SVMs for better performance.
 
 ---
 
-## Question 45
+## Question 44
 
 **How do you implement bagging and boosting with SVM?**
 
@@ -1934,7 +1934,7 @@ boosting_svm.fit(X_train, y_train)
 
 ---
 
-## Question 46
+## Question 45
 
 **What is the role of SVM in anomaly detection applications?**
 
@@ -1964,7 +1964,7 @@ boosting_svm.fit(X_train, y_train)
 
 ---
 
-## Question 47
+## Question 46
 
 **How do you implement one-class SVM for novelty detection?**
 
@@ -1999,7 +1999,7 @@ scores = oc_svm.decision_function(X_test)
 
 ---
 
-## Question 48
+## Question 47
 
 **What are support vector regression (SVR) algorithms?**
 
@@ -2025,7 +2025,7 @@ scores = oc_svm.decision_function(X_test)
 
 ---
 
-## Question 49
+## Question 48
 
 **How do you implement epsilon-SVR and nu-SVR?**
 
@@ -2069,7 +2069,7 @@ svr_nu.fit(X_train, y_train)
 
 ---
 
-## Question 50
+## Question 49
 
 **What are the considerations for SVM in time-series analysis?**
 
@@ -2114,7 +2114,7 @@ for train_idx, test_idx in tscv.split(X):
 
 ---
 
-## Question 51
+## Question 50
 
 **How do you implement SVM for text classification and NLP tasks?**
 
@@ -2161,7 +2161,7 @@ svm.fit(X, y)
 
 ---
 
-## Question 52
+## Question 51
 
 **What is the role of SVM in image recognition and computer vision?**
 
@@ -2200,7 +2200,7 @@ svm.fit(X_train, y_train)
 
 ---
 
-## Question 53
+## Question 52
 
 **How do you handle high-dimensional feature spaces with SVM?**
 
@@ -2240,7 +2240,7 @@ pipe.fit(X_train, y_train)
 
 ---
 
-## Question 54
+## Question 53
 
 **What are the interpretability challenges and solutions for SVM?**
 
@@ -2277,7 +2277,7 @@ shap_values = explainer.shap_values(X_test[0:1])
 
 ---
 
-## Question 55
+## Question 54
 
 **How do you explain SVM predictions and decision boundaries?**
 
@@ -2317,7 +2317,7 @@ def plot_decision_boundary(svm, X, y):
 
 ---
 
-## Question 56
+## Question 55
 
 **What are feature importance measures in SVM models?**
 
@@ -2357,7 +2357,7 @@ importance = result.importances_mean
 
 ---
 
-## Question 57
+## Question 56
 
 **How do you implement SVM for bioinformatics and genomics applications?**
 
@@ -2396,7 +2396,7 @@ svm.fit(X_scaled, y)
 
 ---
 
-## Question 58
+## Question 57
 
 **What are the considerations for SVM in medical diagnosis systems?**
 
@@ -2434,7 +2434,7 @@ probs = calibrated_svm.predict_proba(X_test)
 
 ---
 
-## Question 59
+## Question 58
 
 **How do you handle privacy and security concerns with SVM?**
 
@@ -2472,7 +2472,7 @@ def predict(x):
 
 ---
 
-## Question 60
+## Question 59
 
 **What is federated learning with SVM algorithms?**
 
@@ -2514,7 +2514,7 @@ new_weights = aggregate([
 
 ---
 
-## Question 61
+## Question 60
 
 **How do you implement differential privacy for SVM models?**
 
@@ -2555,7 +2555,7 @@ def private_sgd_svm(X, y, epsilon, delta, epochs=100):
 
 ---
 
-## Question 62
+## Question 61
 
 **What are adversarial attacks on SVM and defense mechanisms?**
 
@@ -2592,7 +2592,7 @@ def adversarial_example(x, svm, epsilon=0.1):
 
 ---
 
-## Question 63
+## Question 62
 
 **How do you handle fairness and bias in SVM classification?**
 
@@ -2632,7 +2632,7 @@ Enforcing fairness often reduces overall accuracy slightly.
 
 ---
 
-## Question 64
+## Question 63
 
 **What are the considerations for SVM model deployment in production?**
 
@@ -2678,7 +2678,7 @@ def predict(x, params):
 
 ---
 
-## Question 65
+## Question 64
 
 **How do you monitor and maintain SVM models in production environments?**
 
@@ -2727,7 +2727,7 @@ class SVMMonitor:
 
 ---
 
-## Question 66
+## Question 65
 
 **What is model versioning and A/B testing for SVM algorithms?**
 
@@ -2782,7 +2782,7 @@ class ABTester:
 
 ---
 
-## Question 67
+## Question 66
 
 **How do you implement real-time inference with SVM models?**
 
@@ -2824,7 +2824,7 @@ def predict():
 
 ---
 
-## Question 68
+## Question 67
 
 **What are the considerations for SVM in edge computing and IoT?**
 
@@ -2864,7 +2864,7 @@ def predict_quantized(x_int8, weights_int8, bias_scaled):
 
 ---
 
-## Question 69
+## Question 68
 
 **How do you optimize SVM for mobile and resource-constrained devices?**
 
@@ -2904,7 +2904,7 @@ linear_svm.fit(X_approx, y)
 
 ---
 
-## Question 70
+## Question 69
 
 **What are kernel approximation methods for scalable SVM?**
 
@@ -2949,7 +2949,7 @@ X_approx = nystroem.fit_transform(X)
 
 ---
 
-## Question 71
+## Question 70
 
 **How do you implement random Fourier features for SVM acceleration?**
 
@@ -2985,7 +2985,7 @@ accuracy = rff_svm.score(X_test, y_test)
 
 ---
 
-## Question 72
+## Question 71
 
 **What is the relationship between SVM and neural networks?**
 
@@ -3015,7 +3015,7 @@ CNN features → SVM classifier (common in early deep learning)
 
 ---
 
-## Question 73
+## Question 72
 
 **How do you combine SVM with deep learning architectures?**
 
@@ -3050,7 +3050,7 @@ Use pretrained network as feature extractor, SVM as classifier.
 
 ---
 
-## Question 74
+## Question 73
 
 **What are deep kernel machines and their advantages?**
 
@@ -3085,7 +3085,7 @@ class DeepKernel:
 
 ---
 
-## Question 75
+## Question 74
 
 **How do you implement transfer learning with SVM models?**
 
@@ -3122,7 +3122,7 @@ svm_target.fit(X_target, y_target)
 
 ---
 
-## Question 76
+## Question 75
 
 **What is domain adaptation for SVM across different datasets?**
 
@@ -3164,7 +3164,7 @@ svm.fit(X_source, y_source, sample_weight=weights)
 
 ---
 
-## Question 77
+## Question 76
 
 **How do you handle multi-task learning with shared SVM components?**
 
@@ -3198,7 +3198,7 @@ Use same support vectors across tasks with different weights.
 
 ---
 
-## Question 78
+## Question 77
 
 **What are the advances in quantum SVM algorithms?**
 
@@ -3228,7 +3228,7 @@ Use same support vectors across tasks with different weights.
 
 ---
 
-## Question 79
+## Question 78
 
 **How do you implement SVM on quantum computing platforms?**
 
@@ -3260,7 +3260,7 @@ predictions = qsvc.predict(X_test)
 
 ---
 
-## Question 80
+## Question 79
 
 **What is the role of SVM in AutoML and automated model selection?**
 
@@ -3297,7 +3297,7 @@ print(automl.leaderboard())
 
 ---
 
-## Question 81
+## Question 80
 
 **How do you implement hyperparameter optimization for SVM?**
 
@@ -3345,7 +3345,7 @@ random_search.fit(X_train, y_train)
 
 ---
 
-## Question 82
+## Question 81
 
 **What are Bayesian optimization techniques for SVM tuning?**
 
@@ -3389,7 +3389,7 @@ print(f"Best params: {bayes_search.best_params_}")
 
 ---
 
-## Question 83
+## Question 82
 
 **How do you handle SVM for continual learning and lifelong learning?**
 
@@ -3435,7 +3435,7 @@ class ContinualSVM:
 
 ---
 
-## Question 84
+## Question 83
 
 **What are the emerging research directions in SVM algorithms?**
 
@@ -3467,7 +3467,7 @@ class ContinualSVM:
 
 ---
 
-## Question 85
+## Question 84
 
 **How do you implement SVM for graph-structured data?**
 
@@ -3505,7 +3505,7 @@ svm.fit(K, labels)
 
 ---
 
-## Question 86
+## Question 85
 
 **What are graph kernels and their application in SVM?**
 
@@ -3537,7 +3537,7 @@ where φ maps graphs to feature vectors.
 
 ---
 
-## Question 87
+## Question 86
 
 **How do you handle SVM for multi-modal and heterogeneous data?**
 
@@ -3576,7 +3576,7 @@ svm.fit(K_combined, y)
 
 ---
 
-## Question 88
+## Question 87
 
 **What is the integration of SVM with probabilistic graphical models?**
 
@@ -3605,7 +3605,7 @@ Combine margin maximization with graphical model structure.
 
 ---
 
-## Question 89
+## Question 88
 
 **How do you implement SVM for causal inference applications?**
 
@@ -3642,7 +3642,7 @@ treatment_effect = y1_pred - y0_pred
 
 ---
 
-## Question 90
+## Question 89
 
 **What are the considerations for SVM in reinforcement learning?**
 
@@ -3682,7 +3682,7 @@ class SVMPolicy:
 
 ---
 
-## Question 91
+## Question 90
 
 **How do you implement SVM for few-shot and zero-shot learning?**
 
@@ -3727,7 +3727,7 @@ def predict_class(predicted_attrs, class_attribute_matrix):
 
 ---
 
-## Question 92
+## Question 91
 
 **What is the future of SVM in the era of transformer models?**
 
@@ -3759,7 +3759,7 @@ def predict_class(predicted_attrs, class_attribute_matrix):
 
 ---
 
-## Question 93
+## Question 92
 
 **How do you combine SVM with modern deep learning techniques?**
 
@@ -3798,7 +3798,7 @@ Train SVM to mimic transformer outputs.
 
 ---
 
-## Question 94
+## Question 93
 
 **What are the theoretical guarantees and convergence properties of SVM?**
 
@@ -3828,7 +3828,7 @@ where R is data radius, γ is margin.
 
 ---
 
-## Question 95
+## Question 94
 
 **How do you analyze generalization bounds for SVM algorithms?**
 
@@ -3853,7 +3853,7 @@ $$R(f) \leq R_{emp}(f) + 2\mathcal{R}_n(H) + O\left(\sqrt{\frac{\log(1/\delta)}{
 
 ---
 
-## Question 96
+## Question 95
 
 **What are the ethical considerations for SVM deployment in critical systems?**
 
@@ -3883,7 +3883,7 @@ $$R(f) \leq R_{emp}(f) + 2\mathcal{R}_n(H) + O\left(\sqrt{\frac{\log(1/\delta)}{
 
 ---
 
-## Question 97
+## Question 96
 
 **How do you ensure responsible AI practices with SVM models?**
 
@@ -3921,7 +3921,7 @@ print(audit)
 
 ---
 
-## Question 98
+## Question 97
 
 **What are the regulatory compliance requirements for SVM in different domains?**
 
@@ -3950,7 +3950,7 @@ print(audit)
 
 ---
 
-## Question 99
+## Question 98
 
 **How do you implement end-to-end SVM classification pipelines?**
 
@@ -4000,7 +4000,7 @@ predictions = loaded_pipeline.predict(X_new)
 
 ---
 
-## Question 100
+## Question 99
 
 **What are the best practices for SVM algorithm selection and implementation?**
 
@@ -4048,5 +4048,349 @@ Use stratified k-fold for classification.
 - Not tuning both C and gamma
 - Using RBF kernel for very high-D sparse data
 - Training on unbalanced data without compensation
+
+---
+
+## Question 100
+
+**Discuss the difference between linear and non-linear SVM.**
+
+### Answer
+
+**Core Difference:**
+Linear SVM finds a straight hyperplane in the original feature space, while non-linear SVM uses the kernel trick to find curved decision boundaries by implicitly mapping data to higher dimensions.
+
+**Detailed Comparison:**
+
+| Aspect | Linear SVM | Non-Linear SVM |
+|--------|------------|----------------|
+| **Decision Boundary** | Straight line/hyperplane | Curved, complex shapes |
+| **Kernel** | K(x,y) = xᵀy | RBF, polynomial, sigmoid |
+| **Feature Space** | Original space | Implicitly transformed space |
+| **Complexity** | O(n × d) | O(n² × d) to O(n³) |
+| **Interpretability** | High (weights = feature importance) | Low (black box) |
+| **Best For** | High-dim data, text, linearly separable | Complex patterns, low-dim data |
+
+**When to Use Linear SVM:**
+- Text classification (TF-IDF features)
+- High-dimensional sparse data
+- n_features >> n_samples
+- Large datasets (scalability needed)
+- Interpretability required
+
+**When to Use Non-Linear SVM:**
+- Data has complex, non-linear patterns
+- Linear SVM underperforms significantly
+- Small to medium sized datasets
+- Image classification, pattern recognition
+
+**Mathematical Insight:**
+- Linear: $f(x) = w^Tx + b$
+- Non-Linear: $f(x) = \sum \alpha_i y_i K(x_i, x) + b$
+
+**Practical Tip:**
+Always try linear kernel first. If accuracy is poor, then try RBF kernel. Use cross-validation to compare.
+
+---
+
+## Question 101
+
+**Discuss the significance of the kernel parameters like sigma in the Gaussian (RBF) kernel.**
+
+### Answer
+
+**Core Concept:**
+In the RBF kernel $K(x,y) = \exp(-\gamma||x-y||^2)$, the parameter gamma (γ = 1/(2σ²)) controls the "reach" of each training example. It determines how much influence a single training point has on the decision boundary.
+
+**Impact of Gamma (γ):**
+
+| Gamma Value | Effect | Risk |
+|-------------|--------|------|
+| **High γ (small σ)** | Each point has local influence only | Overfitting: wiggly boundary, memorizes training data |
+| **Low γ (large σ)** | Each point has wide influence | Underfitting: too smooth, ignores local patterns |
+| **Optimal γ** | Balanced influence | Good generalization |
+
+**Visual Intuition:**
+- **High γ**: Decision boundary wraps tightly around individual points
+- **Low γ**: Decision boundary is smooth, may miss class clusters
+- Think of γ as "how far can a support vector's influence reach"
+
+**Relationship with C:**
+- High γ + High C = Very complex boundary (high risk of overfitting)
+- Low γ + Low C = Very simple boundary (high risk of underfitting)
+- Must tune both together
+
+**Practical Guidelines:**
+- Default: `gamma='scale'` (γ = 1 / (n_features × X.var()))
+- Try range: [0.001, 0.01, 0.1, 1, 10]
+- Use GridSearchCV to find optimal value
+- Always combine with C tuning
+
+**Mathematical Insight:**
+$$\sigma^2 = \frac{1}{2\gamma}$$
+
+Large σ → points far apart still similar (K ≈ 1)
+Small σ → only very close points similar
+
+---
+
+## Question 102
+
+**Discuss the trade-off between model complexity and generalization in SVM.**
+
+### Answer
+
+**Core Concept:**
+SVM's generalization ability depends on balancing margin width (simplicity) against training error (complexity). The C parameter controls this trade-off: high C prioritizes correct classification (complex model), low C prioritizes wide margins (simple model).
+
+**The Bias-Variance Trade-off in SVM:**
+
+| Setting | Bias | Variance | Model | Risk |
+|---------|------|----------|-------|------|
+| Low C + Low γ | High | Low | Simple, wide margin | Underfitting |
+| High C + High γ | Low | High | Complex, tight boundary | Overfitting |
+| Optimal C + γ | Balanced | Balanced | Good generalization | Best |
+
+**Factors Affecting Complexity:**
+
+1. **C Parameter (Regularization):**
+   - High C: Narrow margin, few violations, complex
+   - Low C: Wide margin, allows violations, simpler
+
+2. **Kernel Choice:**
+   - Linear: Simplest (hyperplane only)
+   - Polynomial: Moderate (degree controls complexity)
+   - RBF: Most flexible (gamma controls complexity)
+
+3. **Number of Support Vectors:**
+   - Many SVs: Complex model, potential overfitting
+   - Few SVs: Simpler model, better generalization
+
+**Practical Strategy:**
+
+1. Start with default parameters
+2. If underfitting: Increase C, increase gamma (for RBF)
+3. If overfitting: Decrease C, decrease gamma
+4. Use cross-validation to find sweet spot
+5. Monitor: training accuracy vs validation accuracy gap
+
+**Key Insight:**
+SVM's maximum margin principle inherently favors simpler solutions. The margin acts as a regularizer—wider margins = simpler decision boundaries = better generalization.
+
+---
+
+## Question 103
+
+**Discuss strategies for reducing model storage and inference time for SVMs.**
+
+### Answer
+
+**Core Challenge:**
+SVM inference time is O(n_sv × d) where n_sv = number of support vectors. Large n_sv leads to slow predictions and high memory usage since all support vectors must be stored.
+
+**Strategies for Reducing Storage and Inference Time:**
+
+| Strategy | How It Works | Trade-off |
+|----------|--------------|-----------|
+| **Reduced Set Methods** | Approximate SVs with fewer vectors | Some accuracy loss |
+| **Linear SVM** | Store only weight vector w | Limited to linear kernel |
+| **Budget SVMs** | Limit max support vectors during training | Accuracy vs speed |
+| **Nystrom Approximation** | Approximate kernel matrix | Faster but approximate |
+| **Random Fourier Features** | Map RBF kernel to finite features | Then use linear SVM |
+
+**Practical Solutions:**
+
+1. **Use LinearSVC for Large Data:**
+   - Stores only weight vector (d floats)
+   - Inference: O(d) instead of O(n_sv × d)
+
+2. **Reduce Support Vectors:**
+   - Increase C (fewer SVs but tighter margin)
+   - Use simpler kernel (linear over RBF)
+   - Sample/cluster support vectors post-training
+
+3. **Approximate Kernel Methods:**
+   ```python
+   from sklearn.kernel_approximation import RBFSampler
+   rbf_feature = RBFSampler(n_components=100)
+   X_features = rbf_feature.fit_transform(X)
+   # Now use LinearSVC on transformed features
+   ```
+
+4. **Model Compression:**
+   - Quantize support vector values
+   - Prune least important support vectors
+
+**Inference Time Comparison:**
+| Model | Storage | Inference |
+|-------|---------|-----------|
+| SVC (RBF, 1000 SVs) | 1000 × d floats | O(1000 × d) |
+| LinearSVC | d floats | O(d) |
+| RBF Approximation (100 components) | d floats + 100 | O(100 + d) |
+
+---
+
+## Question 104
+
+**Discuss the purpose of using a sigmoid kernel in SVM.**
+
+### Answer
+
+**Definition:**
+Sigmoid kernel: $K(x, y) = \tanh(\alpha x^T y + c)$
+
+It mimics the behavior of a two-layer neural network (perceptron). However, it's rarely used in practice as RBF typically performs better.
+
+**Core Concepts:**
+- Equivalent to a single hidden layer neural network
+- Parameters: α (slope) and c (intercept)
+- Not a valid Mercer kernel for all parameter values
+- Can produce negative similarity values
+
+**When to Consider Sigmoid Kernel:**
+- Replicating neural network behavior with SVM framework
+- When data characteristics match sigmoid activation
+- Legacy systems that used sigmoid
+
+**Why It's Rarely Used:**
+1. Not positive semi-definite (violates Mercer's condition for some α, c)
+2. RBF kernel almost always performs better
+3. Requires careful parameter tuning
+4. For neural network behavior, better to use actual neural networks
+
+**Practical Recommendation:**
+- Start with RBF kernel
+- Only try sigmoid if domain knowledge suggests it
+- Ensure parameters satisfy Mercer's condition
+
+---
+
+## Question 105
+
+**Discuss the Quasi-Newton methods in the context of SVM training.**
+
+### Answer
+
+**Core Concept:**
+Quasi-Newton methods (like L-BFGS) are optimization algorithms that approximate the Hessian matrix to find the minimum of the SVM objective function. They're faster than computing exact second derivatives and converge faster than basic gradient descent.
+
+**Why Used in SVM:**
+- SVM optimization is a quadratic programming problem
+- Quasi-Newton provides fast convergence for smooth objectives
+- Used in primal SVM formulations (less common than SMO for dual)
+
+**Key Quasi-Newton Methods:**
+
+| Method | Description | Use in SVM |
+|--------|-------------|------------|
+| **L-BFGS** | Limited-memory BFGS, stores few vectors | sklearn's LinearSVC default |
+| **BFGS** | Full Hessian approximation | Small problems |
+
+**Comparison with SMO:**
+- **SMO**: Optimizes dual problem, works with any kernel
+- **Quasi-Newton**: Optimizes primal, mainly linear SVM
+
+**In sklearn:**
+```python
+from sklearn.svm import LinearSVC
+# Uses liblinear which uses coordinate descent (similar efficiency)
+# For L-BFGS, use LogisticRegression or SGDClassifier
+```
+
+**Practical Relevance:**
+- Most kernel SVM implementations use SMO (not Quasi-Newton)
+- Linear SVM often uses coordinate descent or L-BFGS
+- For very large linear SVM: SGD is preferred
+
+---
+
+## Question 106
+
+**Discuss the Resse kernel and its use cases in SVM.**
+
+### Answer
+
+**Note:** "Resse kernel" appears to be a typo or less common term. The likely intended topic is either:
+1. **String kernels** (for sequence data)
+2. **ANOVA kernel** (Analysis of Variance kernel)
+3. **Custom kernels**
+
+**If referring to String/Sequence Kernels:**
+
+String kernels measure similarity between sequences (text, DNA, proteins) without explicit feature extraction.
+
+**Common String Kernels:**
+| Kernel | Use Case |
+|--------|----------|
+| **Spectrum Kernel** | Counts k-mer frequencies |
+| **Subsequence Kernel** | Matches non-contiguous subsequences |
+| **Edit Distance Kernel** | Based on Levenshtein distance |
+
+**Use Cases:**
+- Bioinformatics: Protein classification, gene prediction
+- NLP: Document similarity, spam detection
+- Genomics: DNA sequence classification
+
+**Custom Kernel Implementation:**
+```python
+from sklearn.svm import SVC
+
+def custom_kernel(X, Y):
+    # Must return similarity matrix
+    return X @ Y.T  # Example: linear kernel
+
+svm = SVC(kernel=custom_kernel)
+```
+
+**Requirements for Valid Kernel:**
+- Must satisfy Mercer's condition (positive semi-definite)
+- Symmetric: K(x,y) = K(y,x)
+
+---
+
+## Question 107
+
+**Discuss recent advances in SVM and their implications for Machine Learning.**
+
+### Answer
+
+**Current State:**
+SVMs remain relevant for specific use cases despite deep learning dominance. Recent advances focus on scalability, efficiency, and integration with modern techniques.
+
+**Recent Advances:**
+
+| Advance | Description | Implication |
+|---------|-------------|-------------|
+| **Online/Incremental SVM** | Update model with streaming data | Real-time applications |
+| **Kernel Approximation** | Random Fourier Features, Nystrom | Scale kernel SVM to big data |
+| **Deep Kernel Learning** | Learn kernels with neural networks | Best of both worlds |
+| **Sparse SVMs** | Reduce support vectors | Faster inference |
+| **Multi-task SVM** | Share information across tasks | Transfer learning |
+
+**Kernel Approximation Revolution:**
+```python
+from sklearn.kernel_approximation import RBFSampler
+# Approximate RBF kernel with random features
+# Then use fast linear SVM
+rbf_sampler = RBFSampler(n_components=1000)
+X_transformed = rbf_sampler.fit_transform(X)
+```
+
+**Integration with Deep Learning:**
+- CNN features + SVM classifier
+- Learned kernels from neural networks
+- SVM loss for neural network training
+
+**Where SVM Still Wins:**
+1. Small datasets (n < 10,000)
+2. High-dimensional sparse data (text)
+3. When interpretability matters (linear SVM)
+4. Strong theoretical guarantees needed
+
+**Industry Trends:**
+- SVM in edge devices (small, efficient)
+- Hybrid models (deep features + SVM)
+- AutoML includes SVM in model search
+- Quantum SVM research (future potential)
 
 ---

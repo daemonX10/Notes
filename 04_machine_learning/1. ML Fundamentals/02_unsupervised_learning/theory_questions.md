@@ -1,66 +1,6 @@
 # Unsupervised Learning - Theory Questions
 
-## Question 1: What is unsupervised learning and how does it differ from supervised learning?
-
-### Definition
-Unsupervised learning is a paradigm where algorithms are trained on **unlabeled data** to discover hidden patterns, structures, and relationships without a "teacher" providing correct outputs.
-
-### Key Differences
-
-| Feature | Supervised Learning | Unsupervised Learning |
-|---------|--------------------|-----------------------|
-| **Input Data** | Labeled (X, y) | Unlabeled (X only) |
-| **Goal** | Prediction | Discovery of patterns |
-| **Feedback** | Loss function compares predictions to true labels | No direct feedback; learns from data structure |
-| **Tasks** | Classification, Regression | Clustering, Dimensionality Reduction, Association Rules |
-| **Evaluation** | Objective (accuracy, RMSE) | More subjective (silhouette score) |
-
-### Analogy
-- **Supervised**: Learning with flashcards (question + answer)
-- **Unsupervised**: Sorting a box of mixed Lego bricks into logical groups
-
----
-
-## Question 2: Explain the concept of dimensionality reduction and why it's important.
-
-### Definition
-Dimensionality reduction transforms high-dimensional data into lower-dimensional space while retaining meaningful information.
-
-### Why It's Important
-
-| Reason | Explanation |
-|--------|-------------|
-| **Curse of Dimensionality** | High dimensions → sparse data → poor model performance |
-| **Reduce Overfitting** | Fewer features = simpler model = better generalization |
-| **Computational Efficiency** | Less data to process = faster training |
-| **Visualization** | Reduce to 2D/3D for human understanding |
-| **Remove Redundancy** | Eliminate correlated/collinear features |
-
-### Two Approaches
-1. **Feature Selection**: Keep subset of original features
-2. **Feature Extraction**: Create new features by combining originals (e.g., PCA)
-
----
-
-## Question 3: What is clustering, and how can it be used to gain insights into data?
-
-### Definition
-Clustering groups data points into subsets (clusters) where:
-- Points **within** a cluster are similar
-- Points **across** clusters are dissimilar
-
-### Business Insights from Clustering
-
-| Application | How It's Used | Insight |
-|-------------|---------------|---------|
-| **Customer Segmentation** | Cluster by purchase behavior | "High-spenders" vs "Bargain hunters" |
-| **Anomaly Detection** | Points not in any cluster | Fraud, outliers, errors |
-| **Document Grouping** | Cluster text by topic | Organize news, route support tickets |
-| **Image Segmentation** | Cluster pixels by color/position | Separate objects from background |
-
----
-
-## Question 4: Describe the K-means clustering algorithm and how it operates.
+## Question 1: Describe the K-means clustering algorithm and how it operates.
 
 ### Definition
 K-means partitions data into K non-overlapping clusters by minimizing within-cluster sum of squares (WCSS).
@@ -87,7 +27,7 @@ K-means partitions data into K non-overlapping clusters by minimizing within-clu
 
 ---
 
-## Question 5: What is the role of the silhouette coefficient in clustering analysis?
+## Question 2: What is the role of the silhouette coefficient in clustering analysis?
 
 ### Definition
 Silhouette coefficient measures how well-separated clusters are and how similar each point is to its own cluster vs others.
@@ -114,7 +54,7 @@ Run clustering for K = 2, 3, 4... Choose K with highest average silhouette score
 
 ---
 
-## Question 6: Explain the DBSCAN algorithm. What advantages does it offer over K-means?
+## Question 3: Explain the DBSCAN algorithm. What advantages does it offer over K-means?
 
 ### Definition
 DBSCAN (Density-Based Spatial Clustering of Applications with Noise) groups points based on density, not distance to centroids.
@@ -142,7 +82,7 @@ Sensitive to eps and min_samples parameter choices.
 
 ---
 
-## Question 7: How does the hierarchical clustering algorithm work, and when would you use it?
+## Question 4: How does the hierarchical clustering algorithm work, and when would you use it?
 
 ### Definition
 Hierarchical clustering builds a tree of clusters (dendrogram) showing nested groupings at different similarity levels.
@@ -170,7 +110,7 @@ Hierarchical clustering builds a tree of clusters (dendrogram) showing nested gr
 
 ---
 
-## Question 8: What is the difference between Agglomerative and Divisive hierarchical clustering?
+## Question 5: What is the difference between Agglomerative and Divisive hierarchical clustering?
 
 ### Comparison
 
@@ -188,7 +128,7 @@ Hierarchical clustering builds a tree of clusters (dendrogram) showing nested gr
 
 ---
 
-## Question 9: Explain the working of Principal Component Analysis (PCA).
+## Question 6: Explain the working of Principal Component Analysis (PCA).
 
 ### Definition
 PCA transforms correlated features into uncorrelated **principal components** that capture maximum variance.
@@ -213,7 +153,7 @@ PCA transforms correlated features into uncorrelated **principal components** th
 
 ---
 
-## Question 10: Describe t-Distributed Stochastic Neighbor Embedding (t-SNE) and its use cases.
+## Question 7: Describe t-Distributed Stochastic Neighbor Embedding (t-SNE) and its use cases.
 
 ### Definition
 t-SNE is a non-linear dimensionality reduction technique for **visualization** that preserves local neighborhood structure.
@@ -240,7 +180,7 @@ t-SNE is a non-linear dimensionality reduction technique for **visualization** t
 
 ---
 
-## Question 11: How does Linear Discriminant Analysis (LDA) differ from PCA, and when would you use each?
+## Question 8: How does Linear Discriminant Analysis (LDA) differ from PCA, and when would you use each?
 
 ### Core Difference
 
@@ -264,7 +204,7 @@ t-SNE is a non-linear dimensionality reduction technique for **visualization** t
 
 ---
 
-## Question 12: What is the curse of dimensionality and how does it affect machine learning models?
+## Question 9: What is the curse of dimensionality and how does it affect machine learning models?
 
 ### Definition
 Problems that arise when working with high-dimensional data due to exponentially increasing volume.
@@ -285,7 +225,7 @@ Problems that arise when working with high-dimensional data due to exponentially
 
 ---
 
-## Question 13: Explain what an autoencoder is and how it can be used for dimensionality reduction.
+## Question 10: Explain what an autoencoder is and how it can be used for dimensionality reduction.
 
 ### Definition
 An autoencoder is a neural network that learns to compress (encode) input into a latent representation, then reconstruct (decode) it.
@@ -319,7 +259,7 @@ Input → Encoder → Bottleneck (Latent Space) → Decoder → Reconstructed Ou
 
 ---
 
-## Question 14: What is association rule mining and how is it relevant to unsupervised learning?
+## Question 11: What is association rule mining and how is it relevant to unsupervised learning?
 
 ### Definition
 Association rule mining discovers relationships of the form "If A, then B" in transaction data.
@@ -344,7 +284,7 @@ Association rule mining discovers relationships of the form "If A, then B" in tr
 
 ---
 
-## Question 15: Explain the Apriori algorithm for association rule learning.
+## Question 12: Explain the Apriori algorithm for association rule learning.
 
 ### Core Principle
 "If an itemset is frequent, all its subsets are frequent."
@@ -368,7 +308,36 @@ Requires multiple database scans (one per level k) → slow for large datasets.
 
 ---
 
-## Question 16: Can you describe the FP-Growth algorithm and how it improves over the Apriori algorithm?
+## Question 13: Discuss the concepts of support, confidence, and lift in association rule learning.
+
+### For Rule: {A} → {B}
+
+| Metric | Formula | Meaning |
+|--------|---------|---------|
+| **Support** | P(A ∩ B) | How frequent is itemset? |
+| **Confidence** | P(A ∩ B) / P(A) | Given A, how likely is B? |
+| **Lift** | Support(A,B) / (Support(A) × Support(B)) | Is relationship real or coincidence? |
+
+### Example: {Diapers} → {Beer}
+
+- **Support = 0.1**: 10% of transactions have both
+- **Confidence = 0.8**: 80% of diaper buyers also buy beer
+- **Lift = 2.0**: Diaper buyers are 2× more likely to buy beer than average customer
+
+### Lift Interpretation
+
+| Lift | Meaning |
+|------|---------|
+| **> 1** | Positive correlation (useful rule) |
+| **= 1** | Independent (no relationship) |
+| **< 1** | Negative correlation (substitute products) |
+
+### Why Confidence Alone Isn't Enough
+High confidence {X} → {Bread} might just mean bread is very popular (appears in 90% of transactions), not that X drives bread purchases. Lift corrects for this.
+
+---
+
+## Question 14: Can you describe the FP-Growth algorithm and how it improves over the Apriori algorithm?
 
 ### Improvement Over Apriori
 - **Apriori**: Multiple database scans, expensive candidate generation
@@ -392,6 +361,66 @@ Requires multiple database scans (one per level k) → slow for large datasets.
 | 2 database scans | k+1 scans |
 | No candidate generation | Generates/tests many candidates |
 | Compact tree structure | Memory-intensive |
+
+---
+
+## Question 15: How can association rule learning be applied in a market-basket analysis?
+
+### The Process
+
+1. **Data**: Transaction database (items bought together)
+2. **Algorithm**: Apriori or FP-Growth
+3. **Output**: Rules like {Diapers} → {Beer}
+
+### Business Applications
+
+| Application | Insight | Action |
+|-------------|---------|--------|
+| **Store Layout** | Diapers → Beer association | Place beer near diapers |
+| **Cross-selling** | Steak → Red Wine | Recommend wine at checkout |
+| **Product Bundling** | Printer, Ink, Paper | Create "Home Office Kit" |
+| **Loss-Leader Strategy** | Milk appears with high-margin items | Discount milk to draw customers |
+
+### Metrics Used
+- **Support**: How frequent is the itemset?
+- **Confidence**: How reliable is the rule?
+- **Lift**: Is the relationship real or coincidence?
+
+---
+
+## Question 16: Discuss the Expectation-Maximization (EM) algorithm and its application in clustering.
+
+### Definition
+EM is an iterative algorithm for finding maximum likelihood estimates when there are latent (hidden) variables.
+
+### Application: Training GMMs
+
+**The Problem**: We don't know which Gaussian generated each point (latent variable)
+
+### The Two Steps
+
+**E-Step (Expectation)**:
+- Given current parameters, calculate probability each point belongs to each Gaussian
+- "Soft assignment" based on current beliefs
+
+**M-Step (Maximization)**:
+- Given soft assignments, update parameters to maximize likelihood
+- New μ = weighted average of points
+- New Σ = weighted covariance
+- New π = average responsibility
+
+### The Loop
+```
+Initialize parameters randomly
+Repeat:
+    E-step: Calculate responsibilities (who generated what?)
+    M-step: Update parameters (what are the Gaussians?)
+Until convergence
+```
+
+### Analogy
+- **E-step**: "Based on my theory, what's probability this evidence belongs to Suspect A vs B?"
+- **M-step**: "Update my theory about suspects based on these probabilities"
 
 ---
 
@@ -422,7 +451,31 @@ Unlike K-means (hard assignment), GMM provides **probability** of belonging to e
 
 ---
 
-## Question 18: Explain the concept of cluster validity indices.
+## Question 18: How can you determine the optimal number of clusters for a dataset?
+
+### Three Main Methods
+
+**1. Elbow Method**
+- Plot WCSS vs K (K = 1, 2, 3...)
+- Find "elbow" where decrease slows
+- Limitation: Elbow can be ambiguous
+
+**2. Silhouette Score**
+- Plot silhouette score vs K
+- Choose K with **highest** score
+- More reliable than Elbow
+
+**3. Gap Statistic**
+- Compare observed WCSS to null reference
+- Choose K maximizing the "gap"
+- More rigorous, but complex
+
+### Best Practice
+Combine methods: Use Elbow for range, Silhouette to pick best K. Also consider domain knowledge (how many segments can marketing handle?).
+
+---
+
+## Question 19: Explain the concept of cluster validity indices.
 
 ### Definition
 Metrics to evaluate clustering quality, used to:
@@ -447,111 +500,34 @@ Metrics to evaluate clustering quality, used to:
 
 ---
 
-## Question 19: Describe the steps you would take to scale and normalize data for clustering.
+## Question 20: What challenges do you face when clustering high-dimensional data?
 
-### Why Scale?
-Distance-based algorithms (K-means, DBSCAN) are dominated by features with larger scales.
+### The Curse of Dimensionality
 
-### Steps
+| Challenge | Impact |
+|-----------|--------|
+| **Meaningless Distances** | All points become roughly equidistant |
+| **Data Sparsity** | Points spread out, hard to find dense regions |
+| **Irrelevant Features** | Noise masks true cluster structure |
+| **Computational Cost** | Time/memory increase exponentially |
 
-**1. Separate Features**
-- Identify numerical features to scale
-- Handle categorical separately (one-hot encoding)
+### Solutions
 
-**2. Choose Scaling Method**
+1. **Dimensionality Reduction**
+   - PCA before clustering
+   - Autoencoders for non-linear compression
 
-| Method | Formula | Result | When to Use |
-|--------|---------|--------|-------------|
-| **Standardization** | (x - μ) / σ | mean=0, std=1 | Most common, robust |
-| **Min-Max** | (x - min) / (max - min) | [0, 1] | Sensitive to outliers |
+2. **Feature Selection**
+   - Remove low-variance features
+   - Use domain knowledge
 
-**3. Apply Scaling**
-```python
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-```
-
-**Important**: Fit scaler on training data only, then transform test data.
+3. **Specialized Algorithms**
+   - Subspace clustering (CLIQUE)
+   - Algorithms designed for high-D data
 
 ---
 
-## Question 20: Explain the importance of feature selection in unsupervised learning.
-
-### Why It Matters
-
-| Benefit | Explanation |
-|---------|-------------|
-| **Better Clusters** | Irrelevant features add noise, obscure true structure |
-| **Curse of Dimensionality** | Fewer features = denser, more meaningful space |
-| **Interpretability** | Clusters from 5 features easier to explain than 100 |
-| **Computational Efficiency** | Faster training |
-
-### Methods for Unsupervised Feature Selection
-
-1. **Variance Threshold**: Remove low-variance features
-2. **Correlation Analysis**: Remove highly correlated (redundant) features
-3. **PCA Loadings**: Identify most influential original features
-4. **Domain Knowledge**: Expert judgment on relevance
-
----
-
-## Question 21: Describe a scenario where unsupervised learning could add value to a business process.
-
-### Scenario: E-commerce Customer Segmentation
-
-**Problem**: One-size-fits-all marketing is inefficient
-
-**Solution**: K-means clustering on customer behavior
-
-**Features Used (RFM)**:
-- Recency: Days since last purchase
-- Frequency: Number of purchases
-- Monetary: Total spend
-
-**Process**:
-1. Scale features
-2. Run K-means, use silhouette score for optimal K
-3. Analyze cluster characteristics
-
-**Resulting Segments**:
-- **Champions**: High frequency, high value, recent
-- **At-Risk**: High past value, but long since purchase
-- **Bargain Hunters**: Medium frequency, buys only on sale
-
-**Business Action**:
-- Champions → Loyalty rewards
-- At-Risk → Re-engagement campaign
-- Bargain Hunters → Sale notifications
-
----
-
-## Question 22: Explain how recommendation systems utilize unsupervised learning techniques.
-
-### Collaborative Filtering (Unsupervised)
-
-**Core Idea**: "Users who liked similar items will like similar items in future"
-
-**Data**: User-item interaction matrix (ratings, purchases, clicks)
-
-### Types
-
-**1. Memory-Based**
-- **User-Based**: Find similar users → recommend what they liked
-- **Item-Based**: Find similar items to what user liked
-
-**2. Model-Based (Matrix Factorization)**
-- Decompose sparse user-item matrix into: **User-Factor** × **Item-Factor**
-- Discovers latent factors (genres, styles) automatically
-- Predict rating = dot product of user and item factor vectors
-
-### Why It's Unsupervised
-- No explicit labels
-- Learns "similarity" and "latent tastes" from patterns in interaction data
-
----
-
-## Question 23: What are Generative Adversarial Networks (GANs) and how do they work?
+## Question 21: What are Generative Adversarial Networks (GANs) and how do they work?
 
 ### Definition
 GANs are generative models with two competing neural networks learning to generate realistic synthetic data.
@@ -578,7 +554,7 @@ Learns data distribution without labels to generate new samples.
 
 ---
 
-## Question 24: Explain the concept of a Variational Autoencoder (VAE).
+## Question 22: Explain the concept of a Variational Autoencoder (VAE).
 
 ### Difference from Standard Autoencoder
 - **Autoencoder**: Maps input to single point in latent space
@@ -603,7 +579,35 @@ Forces continuous, well-structured latent space essential for generation.
 
 ---
 
-## Question 25: Describe the role of unsupervised pre-training in deep learning.
+## Question 23: How do unsupervised learning techniques contribute to the field of natural language processing (NLP)?
+
+### Key Contributions
+
+**1. Word Embeddings (Word2Vec, GloVe)**
+- Learn vector representations from context
+- Capture semantic relationships: king - man + woman ≈ queen
+
+**2. Topic Modeling (LDA)**
+- Discover topics in document collections
+- Each document = mixture of topics
+
+**3. Pre-trained Language Models (BERT, GPT)**
+
+| Task | Description |
+|------|-------------|
+| **Masked LM (BERT)** | Predict masked words from context |
+| **Causal LM (GPT)** | Predict next word |
+
+**Impact**: 
+- Train on massive unlabeled text
+- Fine-tune on small labeled data
+- State-of-the-art on all NLP tasks
+
+This is the **foundation of modern NLP** - unsupervised pre-training revolutionized the field.
+
+---
+
+## Question 24: Describe the role of unsupervised pre-training in deep learning.
 
 ### Definition
 Train model on large unlabeled data first, then fine-tune on smaller labeled data.
@@ -634,53 +638,42 @@ Large Unlabeled Data → Pre-train → Fine-tune on Small Labeled Data → Deplo
 
 This is now the **default approach** in modern deep learning for NLP and vision.
 
+---
+
+## Question 25: Discuss the use of self-organizing maps in unsupervised learning.
+
+### Definition
+Self-Organizing Map (SOM) is a neural network that projects high-dimensional data onto a 2D grid while preserving topological relationships.
+
+### Architecture
+- **Input Layer**: Receives high-D vectors
+- **Output Layer**: 2D grid of neurons, each with weight vector same dimension as input
+
+### Training (Competitive Learning)
+
+1. **Competition**: For each input, find Best Matching Unit (BMU) - neuron with most similar weights
+2. **Cooperation**: Update BMU and its neighbors on the grid
+3. **Adaptation**: Move weights closer to input; neighbors move less
+
+### Result
+- Neurons close on map have similar weight vectors
+- Preserves topology: similar inputs activate nearby neurons
+
+### Use Cases
+
+| Application | How |
+|-------------|-----|
+| **Visualization** | Project high-D data to 2D map |
+| **Clustering** | Neurons form natural clusters |
+| **Feature Extraction** | BMU position as new feature |
+
+### Comparison to t-SNE
+- SOM: Discrete grid, faster, good for large data
+- t-SNE: Continuous space, better local structure preservation
 
 ---
 
-# --- Missing Questions Restored from Source (Q26-Q28) ---
-
-## Question 26
-
-**Explain how unsupervised learning could assist in identifying patterns in genomic data.**
-
-### Answer
-
-Unsupervised learning is extremely valuable in genomics because biological data is high-dimensional, complex, and often lacks clear labels.
-
-**Key Applications:**
-
-| Application | Technique | Purpose |
-|-------------|-----------|---------|
-| **Gene Expression Clustering** | K-means, Hierarchical Clustering | Group genes with similar expression profiles to identify co-regulated genes |
-| **Patient Subtyping** | NMF, Consensus Clustering | Discover disease subtypes (e.g., cancer subtypes) from molecular data |
-| **Dimensionality Reduction** | PCA, t-SNE, UMAP | Visualize high-dimensional genomic data (thousands of genes) in 2D/3D |
-| **Variant Detection** | Autoencoders, GMMs | Identify rare genetic variants or mutations |
-| **Pathway Discovery** | Network Clustering | Find functional modules in gene interaction networks |
-
-**Workflow Example:**
-```
-Raw Gene Expression Data (20,000+ genes)
-    → Preprocessing (normalization, filtering)
-    → Dimensionality Reduction (PCA to ~50 components)
-    → Clustering (K-means or DBSCAN)
-    → Biological Interpretation (pathway enrichment analysis)
-```
-
-**Why Unsupervised Over Supervised?**
-- **Labels are scarce**: Most genomic data lacks ground-truth annotations
-- **Discovery-driven**: The goal is to find *unknown* patterns, not predict known ones
-- **Heterogeneity**: Diseases like cancer have subtypes not yet fully catalogued
-- **High dimensionality**: Thousands of features with few samples (p >> n)
-
-**Real-World Impact:**
-- The Cancer Genome Atlas (TCGA) used unsupervised clustering to identify molecular subtypes of breast cancer (Luminal A, Luminal B, HER2-enriched, Basal-like)
-- Single-cell RNA sequencing uses UMAP + Leiden clustering to identify novel cell types
-
----
-
-## Question 27
-
-**What are some of the latest advancements in clustering algorithms?**
+## Question 26: What are some of the latest advancements in clustering algorithms?
 
 ### Answer
 
@@ -723,9 +716,114 @@ Input Data → Encoder Network → Latent Space → Clustering Loss + Reconstruc
 
 ---
 
-## Question 28
+## Question 27: How has unsupervised learning been used in the field of reinforcement learning?
 
-**What is the role of unsupervised learning in Big Data analytics?**
+### Two Major Applications
+
+**1. Representation Learning**
+- **Problem**: High-dimensional states (e.g., raw pixels)
+- **Solution**: Use autoencoders or contrastive learning to compress state space
+- **Result**: RL agent learns policy on simpler representation
+
+**Example**: CURL (Contrastive Unsupervised Representations for RL)
+
+**2. Intrinsic Motivation for Exploration**
+- **Problem**: Sparse rewards → agent never finds signal
+- **Solution**: Create "curiosity" reward from unsupervised learning
+
+**Methods**:
+- **Prediction Error**: Reward for surprising (hard-to-predict) states
+- **State Novelty**: Reward for visiting low-density regions
+- **Skill Discovery**: Learn diverse skills unsupervised
+
+### Impact
+Makes RL more scalable and sample-efficient for complex environments.
+
+---
+
+## Question 28: Discuss the challenges of interpretability in unsupervised learning models.
+
+### Core Challenge
+No ground truth → No way to verify if discovered patterns are "correct"
+
+### Specific Challenges
+
+| Challenge | Description |
+|-----------|-------------|
+| **Cluster Labeling** | Clusters are just "0, 1, 2..." - no inherent meaning |
+| **Ambiguity** | Different algorithms/parameters → different results |
+| **Black-box Features** | PCA components, autoencoder latent space have no intuitive meaning |
+| **Validation Difficulty** | High silhouette ≠ business value |
+
+### Strategies to Improve Interpretability
+
+**1. Start Simple**
+- Use K-means before GMM
+- Centroid-based clusters easier to explain
+
+**2. Feature Importance for Clusters**
+```python
+# Train decision tree to predict cluster labels
+from sklearn.tree import DecisionTreeClassifier
+
+dt = DecisionTreeClassifier(max_depth=3)
+dt.fit(X, cluster_labels)
+# Inspect feature importances and rules
+```
+
+**3. Extensive Visualization**
+- Box plots of features per cluster
+- Parallel coordinate plots
+- t-SNE/UMAP colored by cluster
+
+**4. Domain Expert Validation**
+- Have experts review cluster characteristics
+- Ask: "Do these segments make business sense?"
+
+**5. Cluster Profiling Report**
+```python
+# For each cluster, show:
+# - Size (% of data)
+# - Mean/median of key features
+# - Distinguishing characteristics vs other clusters
+```
+
+### Key Takeaway
+Interpretability requires **human-in-the-loop** analysis. Quantitative metrics are necessary but not sufficient - domain knowledge is essential for validation.
+
+---
+
+## Question 29: How can you use unsupervised learning for cross-lingual or multilingual text analysis?
+
+### Core Approach: Multilingual Embeddings
+Create shared vector space where words/sentences from different languages with similar meanings are close together.
+
+### Methods
+
+**1. Multilingual Word Embeddings**
+- Train separate embeddings per language
+- Learn rotation matrix to align spaces
+- "cat" (English) ≈ "gato" (Spanish) ≈ "chat" (French)
+
+**2. Multilingual Transformers (State-of-the-Art)**
+- **mBERT**, **XLM-R**: Pre-trained on 100+ languages
+- Self-supervised (Masked LM) on combined multilingual corpus
+- Automatically learns shared representation space
+
+### Key Application: Zero-Shot Cross-Lingual Transfer
+
+1. Fine-tune mBERT on English sentiment data
+2. Model works on German, Spanish, French sentiment
+3. **No labeled data needed in target languages**
+
+### Other Applications
+- Cross-lingual information retrieval
+- Machine translation
+- Multilingual document clustering
+
+---
+
+## Question 30: What is the role of unsupervised learning in Big Data analytics?
 
 ### Answer
 
@@ -765,6 +863,3 @@ TensorFlow/PyTorch  → Deep learning-based unsupervised methods on GPUs
 - **Uber**: Anomaly detection in ride pricing and driver behavior
 - **Google**: Word2Vec (unsupervised) trained on billions of words → semantic understanding
 - **Twitter/X**: Topic modeling on millions of tweets for trend detection
-
----
-

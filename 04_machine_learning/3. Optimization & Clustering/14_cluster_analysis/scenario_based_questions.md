@@ -2,173 +2,6 @@
 
 ## Question 1
 
-**Discuss the importance of scaling and normalization in cluster analysis.**
-
-### Answer
-
-**Why Scaling is Critical:**
-
-Distance-based clustering algorithms (K-Means, DBSCAN, Hierarchical) calculate similarity using distance metrics. Without scaling, features with larger ranges dominate, making other features irrelevant.
-
-**The Problem:**
-```
-Feature A: Annual Income [20,000 - 200,000]
-Feature B: Items in Cart [1 - 50]
-
-Distance calculation:
-sqrt((income_diff)² + (cart_diff)²)
-     ↑ ~180,000           ↑ ~50
-     
-Income dominates! Cart contribution is negligible.
-```
-
-**Impact on Algorithms:**
-
-| Algorithm | Effect Without Scaling |
-|-----------|----------------------|
-| K-Means | Centroids pulled toward high-scale features |
-| DBSCAN | ε parameter meaningless across dimensions |
-| Hierarchical | Linkage distances distorted |
-
-**Scaling Methods:**
-
-| Method | Formula | When to Use |
-|--------|---------|-------------|
-| StandardScaler | (x - μ) / σ | Most common, robust |
-| MinMaxScaler | (x - min) / (max - min) | Need [0,1] range |
-| RobustScaler | (x - median) / IQR | Data has outliers |
-
-**Implementation:**
-```python
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-from sklearn.pipeline import Pipeline
-
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('kmeans', KMeans(n_clusters=3))
-])
-labels = pipeline.fit_predict(X)
-```
-
-**Key Takeaway:**
-Always scale before distance-based clustering. It's mandatory, not optional.
-
----
-
-## Question 2
-
-**How would you determine the number of clusters in a dataset?**
-
-### Answer
-
-**Approach: Use Multiple Methods + Domain Knowledge**
-
-**Method 1: Elbow Method (WCSS)**
-```python
-wcss = []
-for k in range(1, 11):
-    kmeans = KMeans(n_clusters=k, n_init=10)
-    kmeans.fit(X)
-    wcss.append(kmeans.inertia_)
-
-# Plot and find elbow (diminishing returns point)
-plt.plot(range(1, 11), wcss, 'bo-')
-```
-Look for: Sharp bend in curve
-
-**Method 2: Silhouette Score (Preferred)**
-```python
-from sklearn.metrics import silhouette_score
-
-scores = []
-for k in range(2, 11):
-    labels = KMeans(n_clusters=k).fit_predict(X)
-    scores.append(silhouette_score(X, labels))
-
-# Pick k with highest score
-optimal_k = range(2, 11)[np.argmax(scores)]
-```
-Look for: Maximum score
-
-**Method 3: Gap Statistic**
-- Compares WCSS against null reference distribution
-- More statistically rigorous but computationally expensive
-
-**Method 4: Dendrogram (Hierarchical)**
-- Cut at longest vertical distance without horizontal line
-- Visual, intuitive
-
-**Practical Strategy:**
-```
-1. Domain knowledge: What makes business sense? (3-7 segments typical)
-2. Run Elbow + Silhouette
-3. If they agree → use that k
-4. If not → try both, validate clusters
-5. Visualize with PCA/t-SNE for sanity check
-```
-
----
-
-## Question 3
-
-**Discuss the Expectation-Maximization (EM) algorithm and its application in clustering.**
-
-### Answer
-
-**What is EM?**
-Iterative algorithm for finding maximum likelihood estimates when data has latent (hidden) variables. In GMM clustering, the latent variable is "which Gaussian generated this point?"
-
-**Two Steps (Repeat until convergence):**
-
-**E-Step (Expectation):**
-```
-For each point, calculate probability it belongs to each cluster
-
-P(cluster k | point x) = "responsibility" of cluster k for point x
-
-Example: Point X has responsibilities [0.7, 0.2, 0.1] for clusters A, B, C
-→ Most likely from cluster A, but some uncertainty
-```
-
-**M-Step (Maximization):**
-```
-Update cluster parameters to maximize likelihood given responsibilities
-
-For each cluster k:
-- μₖ = weighted mean of all points (weights = responsibilities)
-- Σₖ = weighted covariance
-- πₖ = average responsibility (cluster weight)
-```
-
-**Algorithm Flow:**
-```
-Initialize: Random Gaussian parameters
-Repeat:
-    E-Step: Compute responsibilities (soft assignments)
-    M-Step: Update μ, Σ, π for each Gaussian
-Until: Parameters stabilize (convergence)
-```
-
-**Why It's Powerful:**
-- Provides probabilistic (soft) assignments
-- Can model elliptical clusters of different sizes/orientations
-- Handles overlapping clusters naturally
-
-**Python:**
-```python
-from sklearn.mixture import GaussianMixture
-
-gmm = GaussianMixture(n_components=3, max_iter=100)
-gmm.fit(X)
-labels = gmm.predict(X)        # Hard assignments
-probs = gmm.predict_proba(X)   # Soft probabilities
-```
-
----
-
-## Question 4
-
 **Discuss feature selection techniques appropriate for cluster analysis.**
 
 ### Answer
@@ -225,65 +58,7 @@ X_reduced = PCA(n_components=10).fit_transform(X)
 
 ---
 
-## Question 5
-
-**Discuss the benefits of using Spectral Clustering and the type of problems it can solve.**
-
-### Answer
-
-**What is Spectral Clustering?**
-Graph-based algorithm that transforms clustering into graph partitioning. Uses eigenvectors of the graph Laplacian to find structure.
-
-**How It Works:**
-```
-1. Build similarity graph (points = nodes, edges = similarity)
-2. Compute graph Laplacian matrix
-3. Find eigenvectors of Laplacian (spectral decomposition)
-4. Use smallest eigenvectors as new embedding
-5. Run K-Means on this embedding
-```
-
-**When Spectral Clustering Excels:**
-
-| Problem Type | Why It Works |
-|--------------|--------------|
-| Non-convex clusters | Uses connectivity, not centroids |
-| Intertwined shapes | Graph preserves local structure |
-| Two moons problem | Separates perfectly |
-| Image segmentation | Pixels as graph nodes |
-
-**Comparison:**
-```
-Two nested circles:
-- K-Means: Fails completely
-- Spectral: Separates perfectly
-```
-
-**Python:**
-```python
-from sklearn.cluster import SpectralClustering
-from sklearn.datasets import make_moons
-
-X, _ = make_moons(n_samples=200, noise=0.05)
-
-spectral = SpectralClustering(
-    n_clusters=2,
-    affinity='nearest_neighbors',  # Or 'rbf'
-    n_neighbors=10
-)
-labels = spectral.fit_predict(X)
-```
-
-**Limitations:**
-- Complexity: O(n³) for eigen-decomposition
-- Must specify k
-- Sensitive to similarity measure (gamma in RBF)
-
-**Use When:** Clusters have complex shapes and K-Means fails
-
----
-
-## Question 6
+## Question 2
 
 **How would you apply cluster analysis for customer segmentation in a retail business?**
 
@@ -345,7 +120,7 @@ print(profile)
 
 ---
 
-## Question 7
+## Question 3
 
 **Discuss how cluster analysis can be leveraged for image segmentation.**
 
@@ -409,7 +184,7 @@ Relative scaling between color and position determines whether clustering emphas
 
 ---
 
-## Question 8
+## Question 4
 
 **Propose a clustering strategy for identifying similar regions in geographical data.**
 
@@ -473,7 +248,7 @@ features = np.hstack([spatial * 2, attributes])
 
 ---
 
-## Question 9
+## Question 5
 
 **Discuss a potential framework for analyzing social network connectivity using clustering.**
 
@@ -541,7 +316,7 @@ for comm_id in set(partition.values()):
 
 ---
 
-## Question 10
+## Question 6
 
 **How would you approach clustering time-series data, such as stock market prices or weather patterns?**
 
@@ -615,71 +390,118 @@ labels = KMeans(n_clusters=5).fit_predict(X_scaled)
 
 ---
 
-## Question 11
+## Question 7
 
-**Discuss the role of deep learning in cluster analysis and mention any popular approaches.**
+**Describe how you would use clustering for organizing a large set of documents into topics.**
 
 ### Answer
 
-**Core Idea:**
-Use neural networks to learn better representations (embeddings) for clustering. Cluster in learned space instead of raw feature space.
+**Definition:**
+Document clustering (topic modeling) groups text documents by thematic similarity. It involves converting text to numerical vectors, then applying clustering to discover natural topic groupings.
 
-**Why Deep Learning?**
-- Raw pixels/text → poor clustering
-- Learned embeddings → meaningful similarity
-- Jointly optimize representation + clustering
+**Step-by-Step Procedure:**
 
-**Popular Approaches:**
+**1. Text Preprocessing:**
+```
+- Tokenization: Split into words
+- Lowercase: Convert to lowercase
+- Stop words: Remove "the", "is", "a"
+- Lemmatization: "running" → "run"
+- Punctuation removal
+```
 
-**1. Autoencoder + Clustering**
+**2. Feature Extraction (Vectorization):**
 ```python
-from tensorflow.keras.layers import Input, Dense
-from tensorflow.keras.models import Model
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-# Autoencoder
-input_layer = Input(shape=(784,))
-encoded = Dense(256, activation='relu')(input_layer)
-encoded = Dense(64, activation='relu')(encoded)
-latent = Dense(10, activation='relu')(encoded)  # Latent space
-decoded = Dense(64, activation='relu')(latent)
-decoded = Dense(256, activation='relu')(decoded)
-output = Dense(784, activation='sigmoid')(decoded)
+vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
+X_tfidf = vectorizer.fit_transform(documents)
+```
+TF-IDF: Words important in document but rare overall get high scores.
 
-autoencoder = Model(input_layer, output)
-encoder = Model(input_layer, latent)
+**3. Dimensionality Reduction (Optional but Recommended):**
+```python
+from sklearn.decomposition import TruncatedSVD
 
-# Train autoencoder
-autoencoder.compile(optimizer='adam', loss='mse')
-autoencoder.fit(X, X, epochs=50, batch_size=256)
-
-# Cluster in latent space
-embeddings = encoder.predict(X)
-labels = KMeans(n_clusters=10).fit_predict(embeddings)
+svd = TruncatedSVD(n_components=100)  # LSA
+X_reduced = svd.fit_transform(X_tfidf)
 ```
 
-**2. Deep Embedded Clustering (DEC)**
-```
-1. Pretrain autoencoder
-2. Initialize cluster centers in latent space
-3. Joint optimization:
-   - Update encoder to improve clustering
-   - Update cluster assignments
-4. Loss = KL divergence between soft assignments and target distribution
+**4. Clustering:**
+```python
+from sklearn.cluster import KMeans
+
+kmeans = KMeans(n_clusters=5, random_state=42)
+labels = kmeans.fit_predict(X_reduced)
 ```
 
-**3. Contrastive Learning (SimCLR)**
-```
-1. Create augmented pairs of same data
-2. Train to pull similar pairs together, push different apart
-3. Resulting embeddings cluster naturally
+**5. Topic Interpretation:**
+```python
+# Find top words per cluster
+for cluster_id in range(5):
+    center = kmeans.cluster_centers_[cluster_id]
+    top_word_indices = center.argsort()[-10:][::-1]
+    top_words = [feature_names[i] for i in top_word_indices]
+    print(f"Topic {cluster_id}: {top_words}")
 ```
 
-**When to Use:**
-- High-dimensional raw data (images, text)
-- Traditional clustering fails
-- Sufficient training data available
+**Best Practice:**
+Use Cosine similarity (inherent in normalized TF-IDF) rather than Euclidean for text.
 
-**Limitation:**
-More complex, requires tuning, computationally expensive
+---
+
+## Question 8
+
+**Explain how you would employ cluster analysis in a recommendation system.**
+
+### Answer
+
+**Definition:**
+Clustering enables collaborative filtering in recommendation systems by grouping similar users or items. Users receive recommendations based on what similar users in their cluster liked.
+
+**Two Approaches:**
+
+**1. User-Based Clustering:**
+```
+Goal: Group users with similar tastes
+
+Steps:
+1. Create user-item matrix (rows=users, cols=items, values=ratings)
+2. Cluster users based on rating patterns
+3. For target user, find their cluster
+4. Recommend items popular in that cluster but unseen by user
+```
+
+**2. Item-Based Clustering:**
+```
+Goal: Group similar items
+
+Steps:
+1. Create item-user matrix (transpose)
+2. Cluster items rated similarly by same users
+3. If user likes item X, recommend other items in X's cluster
+```
+
+**Python Example (User-Based):**
+```python
+from sklearn.cluster import KMeans
+
+# user_item_matrix: rows=users, cols=items
+kmeans = KMeans(n_clusters=5, random_state=42)
+user_clusters = kmeans.fit_predict(user_item_matrix)
+
+# For user_id, find their cluster and recommend
+user_cluster = user_clusters[user_id]
+similar_users = np.where(user_clusters == user_cluster)[0]
+# Aggregate ratings from similar users for unseen items
+```
+
+**Handling Sparsity:**
+- User-item matrices are very sparse
+- Use matrix factorization (SVD) to create dense embeddings first
+- Then cluster the dense vectors
+
+**Cold Start Problem:**
+New users/items can't be clustered due to lack of data - use content-based fallback.
 
 ---

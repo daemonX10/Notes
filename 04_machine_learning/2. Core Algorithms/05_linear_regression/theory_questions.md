@@ -929,187 +929,7 @@ result = model.fit()
 
 ---
 
-## Question 24: Describe a situation where linear regression could be applied in the finance sector.
-
-### Answer
-
-**Application: Capital Asset Pricing Model (CAPM)**
-
-**Goal:** Estimate a stock's Beta (systematic risk) and Alpha (excess return).
-
-**The Model:**
-$$R_{stock} - R_f = \alpha + \beta (R_{market} - R_f) + \epsilon$$
-
-| Term | Meaning |
-|------|---------|
-| $R_{stock} - R_f$ | Stock's excess return (target) |
-| $R_{market} - R_f$ | Market's excess return (feature) |
-| $\beta$ | Stock's volatility relative to market |
-| $\alpha$ | Stock's risk-adjusted outperformance |
-
-**Interpretation of Beta:**
-
-| Beta Value | Meaning |
-|------------|---------|
-| β = 1 | Stock moves with market |
-| β > 1 | More volatile than market |
-| β < 1 | Less volatile than market |
-| β < 0 | Moves opposite to market |
-
-**Implementation:**
-```python
-import yfinance as yf
-from sklearn.linear_model import LinearRegression
-
-# Get data
-stock = yf.download('AAPL', start='2020-01-01')
-market = yf.download('^GSPC', start='2020-01-01')
-
-# Calculate excess returns
-stock_returns = stock['Adj Close'].pct_change()
-market_returns = market['Adj Close'].pct_change()
-
-# Fit CAPM model
-model = LinearRegression()
-model.fit(market_returns.dropna().values.reshape(-1,1), 
-          stock_returns.dropna().values)
-
-print(f"Beta: {model.coef_[0]:.4f}")
-print(f"Alpha: {model.intercept_:.4f}")
-```
-
----
-
-## Question 25: Explain how you might use regression analysis to assess the effect of marketing campaigns.
-
-### Answer
-
-**Application: Marketing Mix Modeling**
-
-**Goal:** Quantify ROI of different marketing channels.
-
-**Model Structure:**
-$$\log(Sales) = \beta_0 + \beta_1\log(TV) + \beta_2\log(Radio) + \beta_3\log(Digital) + Controls + \epsilon$$
-
-**Key Feature Engineering:**
-
-| Feature | Why |
-|---------|-----|
-| **Adstock** | Captures carryover effect (ads impact lingers) |
-| **Log transform** | Models diminishing returns |
-| **Seasonality** | Control for seasonal patterns |
-| **Price** | Control for pricing effects |
-
-**Interpretation:**
-- Coefficients represent elasticity
-- β₁ = 0.1 means 10% increase in TV spend → 1% sales increase
-
-**Business Applications:**
-1. Calculate ROI per channel
-2. Optimize budget allocation
-3. Simulate "what-if" scenarios
-
-```python
-# Marketing Mix Model
-model = LinearRegression()
-model.fit(X[['log_tv_adstock', 'log_radio_adstock', 
-             'log_digital_adstock', 'price', 'season']], 
-          y_log_sales)
-
-# Interpret coefficients as elasticities
-for name, coef in zip(features, model.coef_):
-    print(f"{name}: {coef:.4f} elasticity")
-```
-
----
-
-## Question 26: Describe how linear regression models could be used in predicting real estate prices.
-
-### Answer
-
-**Application: Hedonic Pricing Model**
-
-**Features to Include:**
-
-| Category | Features |
-|----------|----------|
-| **Size** | SquareFootage, Bedrooms, Bathrooms |
-| **Location** | Neighborhood (one-hot), Distance to amenities |
-| **Quality** | OverallQuality, YearBuilt, YearRemodeled |
-| **Amenities** | HasGarage, HasPool, HasFireplace |
-
-**Common Transformations:**
-- Log(Price) - handles skewness
-- Log(SquareFootage) - linearizes relationship
-- Polynomial features for non-linear effects
-
-**Model Choice:**
-```python
-from sklearn.linear_model import LassoCV
-
-# Lasso for automatic feature selection
-model = LassoCV(cv=5)
-model.fit(X_train_scaled, y_log_price)
-
-# Interpret: value contribution of each feature
-coefficients = pd.DataFrame({
-    'Feature': features,
-    'Coefficient': model.coef_
-}).sort_values('Coefficient', ascending=False)
-```
-
-**Business Value:**
-- Automated valuation models (Zillow Zestimate)
-- Feature value estimation (how much is extra bathroom worth?)
-- Investment analysis
-
----
-
-## Question 27: Describe how you might use linear regression to optimize inventory levels in a supply chain context.
-
-### Answer
-
-**Application: Demand Forecasting**
-
-**Goal:** Predict demand to optimize stock levels.
-
-**Features:**
-
-| Category | Examples |
-|----------|----------|
-| **Time** | DayOfWeek, Month, Holiday flag |
-| **Lag** | Sales_last_week, Sales_last_month |
-| **Pricing** | Current price, Promotion flag |
-| **External** | Weather, Economic indicators |
-
-**Model:**
-$$Sales_t = \beta_0 + \beta_1 \cdot trend + \beta_2 \cdot Sales_{t-1} + \beta_3 \cdot Price + \epsilon$$
-
-**Using Forecast for Inventory:**
-
-```python
-# 1. Get demand forecast
-forecast = model.predict(X_next_week)
-
-# 2. Calculate forecast uncertainty from residuals
-forecast_std = np.std(y_train - model.predict(X_train))
-
-# 3. Set reorder point
-service_level = 0.95  # 95% service level
-z_score = 1.65
-safety_stock = z_score * forecast_std * np.sqrt(lead_time)
-
-reorder_point = forecast * lead_time + safety_stock
-```
-
-**Output:**
-- Point forecast for demand
-- Uncertainty estimate for safety stock calculation
-- Optimal reorder point
-
----
-
-## Question 28: What are the latest research trends in regularized regression techniques?
+## Question 24: What are the latest research trends in regularized regression techniques?
 
 ### Answer
 
@@ -1148,7 +968,7 @@ Moving from "just prediction" to valid statistical inference in high-dimensional
 
 ---
 
-## Question 29: Describe a situation where logistic regression might be preferred over linear regression.
+## Question 25: Describe a situation where logistic regression might be preferred over linear regression.
 
 ### Answer
 
@@ -1184,7 +1004,7 @@ from sklearn.linear_model import LogisticRegression
 
 ---
 
-## Question 30: Describe a scenario where you'd have to transition from a simple to a multiple linear regression model, and the considerations you'd have to make.
+## Question 26: Describe a scenario where you'd have to transition from a simple to a multiple linear regression model, and the considerations you'd have to make.
 
 ### Answer
 
@@ -1230,7 +1050,7 @@ print(f"Multiple: {multiple_cv.mean():.3f}")
 
 ---
 
-## Question 31: What are the mathematical foundations and assumptions underlying linear regression?
+## Question 27: What are the mathematical foundations and assumptions underlying linear regression?
 
 ### Answer
 
@@ -1259,7 +1079,7 @@ Under Gauss-Markov assumptions, OLS estimator is:
 
 ---
 
-## Question 32: How do you derive the normal equation for linear regression and when is it preferred over gradient descent?
+## Question 28: How do you derive the normal equation for linear regression and when is it preferred over gradient descent?
 
 ### Answer
 
@@ -1291,7 +1111,7 @@ Under Gauss-Markov assumptions, OLS estimator is:
 
 ---
 
-## Question 33: What is the difference between ordinary least squares (OLS) and other regression estimation methods?
+## Question 29: What is the difference between ordinary least squares (OLS) and other regression estimation methods?
 
 ### Answer
 
@@ -1327,7 +1147,7 @@ Under Gauss-Markov assumptions, OLS estimator is:
 
 # --- Missing Questions Restored from Source (Q34-Q30) ---
 
-## Question 34
+## Question 30
 
 **How do you handle categorical variables in linear regression models?**
 
@@ -1365,7 +1185,7 @@ dummies = pd.get_dummies(df['color'], drop_first=True)
 
 ---
 
-## Question 35
+## Question 31
 
 **What are polynomial regression and its relationship to linear regression?**
 
@@ -1408,7 +1228,7 @@ model = Pipeline([
 
 ---
 
-## Question 36
+## Question 32
 
 **How do you implement and interpret interaction terms in multiple linear regression?**
 
@@ -1447,7 +1267,7 @@ y = β₀ + β₁x₁ + β₂x₂ + β₃(x₁ × x₂) + ε
 
 ---
 
-## Question 37
+## Question 33
 
 **What is regularization in linear regression and why is it important?**
 
@@ -1479,7 +1299,7 @@ Regularization adds a **penalty term** to the OLS cost function that constrains 
 
 ---
 
-## Question 38
+## Question 34
 
 **Explain the differences between Ridge, Lasso, and Elastic Net regression.**
 
@@ -1507,7 +1327,7 @@ Regularization adds a **penalty term** to the OLS cost function that constrains 
 
 ---
 
-## Question 39
+## Question 35
 
 **How do you choose the optimal regularization parameter (lambda) in regularized regression?**
 
@@ -1540,7 +1360,7 @@ print(f"Optimal alpha: {model.alpha_}")
 
 ---
 
-## Question 40
+## Question 36
 
 **What is cross-validation and how is it used in linear regression model selection?**
 
@@ -1578,7 +1398,7 @@ Cross-validation (CV) estimates how well a model will **generalize to unseen dat
 
 ---
 
-## Question 41
+## Question 37
 
 **How do you detect and handle outliers in linear regression analysis?**
 
@@ -1614,7 +1434,7 @@ Cross-validation (CV) estimates how well a model will **generalize to unseen dat
 
 ---
 
-## Question 42
+## Question 38
 
 **What are residual plots and how do you use them to validate regression assumptions?**
 
@@ -1651,7 +1471,7 @@ fig = sm.graphics.plot_regress_exog(model, 'feature_name', fig=fig)
 
 ---
 
-## Question 43
+## Question 39
 
 **How do you test for heteroscedasticity and what are the remedies?**
 
@@ -1693,7 +1513,7 @@ _, p_value, _, _ = het_breuschpagan(residuals, X)
 
 ---
 
-## Question 44
+## Question 40
 
 **What is autocorrelation in regression residuals and how do you address it?**
 
@@ -1728,7 +1548,7 @@ _, p_value, _, _ = het_breuschpagan(residuals, X)
 
 ---
 
-## Question 45
+## Question 41
 
 **How do you perform feature selection in linear regression models?**
 
@@ -1763,7 +1583,7 @@ Feature selection identifies the most relevant predictors, improving model inter
 
 ---
 
-## Question 46
+## Question 42
 
 **What are forward selection, backward elimination, and stepwise regression?**
 
@@ -1800,7 +1620,7 @@ These are **wrapper-based** feature selection methods that iteratively add or re
 
 ---
 
-## Question 47
+## Question 43
 
 **How do you handle missing values in linear regression datasets?**
 
@@ -1834,7 +1654,7 @@ X_imputed = imputer.fit_transform(X_train)
 
 ---
 
-## Question 48
+## Question 44
 
 **What is the bias-variance tradeoff in the context of linear regression?**
 
@@ -1873,7 +1693,7 @@ Total Error = Bias² + Variance + Irreducible Noise
 
 ---
 
-## Question 49
+## Question 45
 
 **How do you interpret confidence intervals and prediction intervals in regression?**
 
@@ -1903,7 +1723,7 @@ Total Error = Bias² + Variance + Irreducible Noise
 
 ---
 
-## Question 50
+## Question 46
 
 **What are the differences between parametric and non-parametric regression approaches?**
 
@@ -1938,7 +1758,7 @@ Total Error = Bias² + Variance + Irreducible Noise
 
 ---
 
-## Question 51
+## Question 47
 
 **How do you implement logistic regression and its relationship to linear regression?**
 
@@ -1971,7 +1791,7 @@ log(P/(1-P)) = β₀ + β₁x₁ + ... + βₙxₙ  (this is linear!)
 
 ---
 
-## Question 52
+## Question 48
 
 **What are generalized linear models (GLMs) and how do they extend linear regression?**
 
@@ -2005,7 +1825,7 @@ Generalized Linear Models (GLMs) extend linear regression to handle **non-normal
 
 ---
 
-## Question 53
+## Question 49
 
 **How do you handle non-linear relationships in linear regression models?**
 
@@ -2040,7 +1860,7 @@ Linear regression assumes a straight-line relationship, but many real relationsh
 
 ---
 
-## Question 54
+## Question 50
 
 **What is robust regression and when should you use it instead of OLS?**
 
@@ -2073,7 +1893,7 @@ Robust regression methods are **resistant to outliers and violations of assumpti
 
 ---
 
-## Question 55
+## Question 51
 
 **How do you assess model performance using different evaluation metrics in regression?**
 
@@ -2106,7 +1926,7 @@ Robust regression methods are **resistant to outliers and violations of assumpti
 
 ---
 
-## Question 56
+## Question 52
 
 **What are the computational complexity considerations for large-scale linear regression?**
 
@@ -2137,7 +1957,7 @@ Robust regression methods are **resistant to outliers and violations of assumpti
 
 ---
 
-## Question 57
+## Question 53
 
 **How do you implement linear regression using gradient descent optimization?**
 
@@ -2182,7 +2002,7 @@ def gradient_descent(X, y, lr=0.01, epochs=1000):
 
 ---
 
-## Question 58
+## Question 54
 
 **What are the differences between batch, mini-batch, and stochastic gradient descent for regression?**
 
@@ -2218,7 +2038,7 @@ def gradient_descent(X, y, lr=0.01, epochs=1000):
 
 ---
 
-## Question 59
+## Question 55
 
 **How do you handle high-dimensional data in linear regression (p >> n problem)?**
 
@@ -2251,7 +2071,7 @@ When p (features) >> n (samples), the OLS solution is **undefined** because Xᵀ
 
 ---
 
-## Question 60
+## Question 56
 
 **What is the role of principal component regression (PCR) in dimensionality reduction?**
 
@@ -2290,7 +2110,7 @@ Principal Component Regression (PCR) combines PCA with linear regression: first 
 
 ---
 
-## Question 61
+## Question 57
 
 **How do you implement partial least squares (PLS) regression and when is it useful?**
 
@@ -2332,7 +2152,7 @@ pls.fit(X_train, y_train)
 
 ---
 
-## Question 62
+## Question 58
 
 **What are bayesian approaches to linear regression and their advantages?**
 
@@ -2374,7 +2194,7 @@ y_pred, y_std = model.predict(X_test, return_std=True)
 
 ---
 
-## Question 63
+## Question 59
 
 **How do you handle time-series data in linear regression models?**
 
@@ -2411,7 +2231,7 @@ Time-series data violates the **independence** assumption of standard linear reg
 
 ---
 
-## Question 64
+## Question 60
 
 **What is weighted least squares regression and when should you use it?**
 
@@ -2446,7 +2266,7 @@ Weighted Least Squares (WLS) assigns **different weights** to observations, givi
 
 ---
 
-## Question 65
+## Question 61
 
 **How do you perform hypothesis testing in linear regression (t-tests, F-tests)?**
 
@@ -2477,7 +2297,7 @@ Weighted Least Squares (WLS) assigns **different weights** to observations, givi
 
 ---
 
-## Question 66
+## Question 62
 
 **What are the assumptions required for valid statistical inference in linear regression?**
 
@@ -2510,7 +2330,7 @@ For valid statistical inference (reliable p-values, confidence intervals, hypoth
 
 ---
 
-## Question 67
+## Question 63
 
 **How do you handle correlated errors in regression models?**
 
@@ -2542,7 +2362,7 @@ Correlated errors (autocorrelation) occur when the error term at one observation
 
 ---
 
-## Question 68
+## Question 64
 
 **What is instrumental variable regression and when is it needed?**
 
@@ -2580,7 +2400,7 @@ Instrumental Variable (IV) regression addresses **endogeneity** — when a predi
 
 ---
 
-## Question 69
+## Question 65
 
 **How do you implement and interpret interaction effects in regression models?**
 
@@ -2620,7 +2440,7 @@ poly = PolynomialFeatures(degree=2, interaction_only=True)
 
 ---
 
-## Question 70
+## Question 66
 
 **What are mixed-effects models and their applications in regression analysis?**
 
@@ -2657,7 +2477,7 @@ Mixed-effects models (also called multilevel or hierarchical models) include bot
 
 ---
 
-## Question 71
+## Question 67
 
 **How do you perform model diagnostics and residual analysis in linear regression?**
 
@@ -2697,7 +2517,7 @@ Model diagnostics systematically check whether regression assumptions hold and i
 
 ---
 
-## Question 72
+## Question 68
 
 **What is the difference between prediction and inference in regression modeling?**
 
@@ -2728,7 +2548,7 @@ Model diagnostics systematically check whether regression assumptions hold and i
 
 ---
 
-## Question 73
+## Question 69
 
 **How do you handle seasonal patterns and trends in regression analysis?**
 
@@ -2771,7 +2591,7 @@ df['cos_1'] = np.cos(2 * np.pi * df['month'] / 12)
 
 ---
 
-## Question 74
+## Question 70
 
 **What are spline regression and local regression (LOESS) techniques?**
 
@@ -2811,7 +2631,7 @@ Both are methods for modeling **non-linear relationships** flexibly within a reg
 
 ---
 
-## Question 75
+## Question 71
 
 **How do you implement regression with constraints and penalty terms?**
 
@@ -2852,7 +2672,7 @@ beta, residual = nnls(X, y)  # All coefficients ≥ 0
 
 ---
 
-## Question 76
+## Question 72
 
 **What is quantile regression and how does it differ from ordinary regression?**
 
@@ -2889,7 +2709,7 @@ Quantile regression models the **conditional quantile** (e.g., median, 10th perc
 
 ---
 
-## Question 77
+## Question 73
 
 **How do you handle censored and truncated data in regression models?**
 
@@ -2926,7 +2746,7 @@ Estimated via Maximum Likelihood, not OLS.
 
 ---
 
-## Question 78
+## Question 74
 
 **What are the considerations for linear regression in big data environments?**
 
@@ -2961,7 +2781,7 @@ Solve: β = (XᵀX_total)⁻¹ · Xᵀy_total
 
 ---
 
-## Question 79
+## Question 75
 
 **How do you implement distributed and parallel linear regression algorithms?**
 
@@ -3003,7 +2823,7 @@ Final:        β = (XᵀX)⁻¹ · Xᵀy
 
 ---
 
-## Question 80
+## Question 76
 
 **What is online learning and adaptive linear regression for streaming data?**
 
@@ -3048,7 +2868,7 @@ for X_batch, y_batch in stream:
 
 ---
 
-## Question 81
+## Question 77
 
 **How do you handle non-linear transformations and feature engineering for regression?**
 
@@ -3087,7 +2907,7 @@ Feature engineering transforms raw features to capture **non-linear patterns** w
 
 ---
 
-## Question 82
+## Question 78
 
 **What are the ethical considerations and fairness issues in regression modeling?**
 
@@ -3124,7 +2944,7 @@ Feature engineering transforms raw features to capture **non-linear patterns** w
 
 ---
 
-## Question 83
+## Question 79
 
 **How do you implement regression models for causal inference and treatment effects?**
 
@@ -3161,7 +2981,7 @@ ATE = E[Y(1) - Y(0)]
 
 ---
 
-## Question 84
+## Question 80
 
 **What is the role of regularization paths and model selection in high-dimensional regression?**
 
@@ -3205,7 +3025,7 @@ alphas, coefs, _ = lasso_path(X, y, alphas=np.logspace(-4, 1, 100))
 
 ---
 
-## Question 85
+## Question 81
 
 **How do you handle regression with multiple output variables (multivariate regression)?**
 
@@ -3244,7 +3064,7 @@ model.fit(X_train, Y_train)
 
 ---
 
-## Question 86
+## Question 82
 
 **What are kernel methods and their applications in regression analysis?**
 
@@ -3283,7 +3103,7 @@ Kernel methods enable linear regression to capture **non-linear relationships** 
 
 ---
 
-## Question 87
+## Question 83
 
 **How do you implement regression trees and their relationship to linear models?**
 
@@ -3322,7 +3142,7 @@ Regression trees partition the feature space into **rectangular regions** and fi
 
 ---
 
-## Question 88
+## Question 84
 
 **What is ensemble regression and how do you combine multiple linear models?**
 
@@ -3366,7 +3186,7 @@ stack = StackingRegressor(
 
 ---
 
-## Question 89
+## Question 85
 
 **How do you handle regression in the presence of measurement errors?**
 
@@ -3401,7 +3221,7 @@ Measurement errors in predictors (errors-in-variables) cause **attenuation bias*
 
 ---
 
-## Question 90
+## Question 86
 
 **What are the considerations for regression model deployment in production systems?**
 
@@ -3438,7 +3258,7 @@ Validation  Same as train    Same transforms     Version tracked  Logged
 
 ---
 
-## Question 91
+## Question 87
 
 **How do you monitor and maintain linear regression models in production?**
 
@@ -3485,7 +3305,7 @@ Production Data → Feature Extraction → Model Prediction → Monitoring
 
 ---
 
-## Question 92
+## Question 88
 
 **What is transfer learning and domain adaptation for regression models?**
 
@@ -3526,7 +3346,7 @@ Transfer learning adapts a model trained on one domain (source) to perform well 
 
 ---
 
-## Question 93
+## Question 89
 
 **How do you handle privacy-preserving regression and federated learning?**
 
@@ -3570,7 +3390,7 @@ Privacy-preserving regression enables model training without exposing individual
 
 ---
 
-## Question 94
+## Question 90
 
 **What are the interpretability and explainability challenges in complex regression models?**
 
@@ -3605,7 +3425,7 @@ Privacy-preserving regression enables model training without exposing individual
 
 ---
 
-## Question 95
+## Question 91
 
 **How do you implement regression models for real-time prediction and scoring?**
 
@@ -3650,7 +3470,7 @@ result = session.run(None, {"input": features})
 
 ---
 
-## Question 96
+## Question 92
 
 **What is the role of feature importance and variable selection in regression interpretation?**
 
@@ -3690,7 +3510,7 @@ Feature importance quantifies **how much each feature contributes** to the model
 
 ---
 
-## Question 97
+## Question 93
 
 **How do you handle regression with imbalanced or skewed target distributions?**
 
@@ -3731,7 +3551,7 @@ y_pred = np.expm1(model.predict(X_test))  # exp(pred) - 1
 
 ---
 
-## Question 98
+## Question 94
 
 **What are the emerging trends and research directions in linear regression?**
 
@@ -3764,7 +3584,7 @@ y_pred = np.expm1(model.predict(X_test))  # exp(pred) - 1
 
 ---
 
-## Question 99
+## Question 95
 
 **How do you implement regression models for anomaly detection and outlier identification?**
 
@@ -3806,7 +3626,7 @@ Linear regression can identify anomalies by analyzing **prediction residuals** �
 
 ---
 
-## Question 100
+## Question 96
 
 **What are the best practices for end-to-end regression modeling pipelines?**
 
@@ -3852,6 +3672,91 @@ pipeline = Pipeline([
 ])
 pipeline.fit(X_train, y_train)
 ```
+
+---
+
+## Question 97: Can you discuss the use of spline functions in regression?
+
+### Answer
+
+**Definition:**
+Spline regression fits piecewise polynomials connected at "knots" to model complex non-linear relationships while maintaining smoothness. It's more flexible than global polynomial regression and avoids edge instability.
+
+**Core Concepts:**
+- **Knots:** Points where polynomial pieces connect
+- **Piecewise polynomials:** Different polynomial in each interval
+- **Smoothness constraints:** Function and derivatives are continuous at knots
+- **Cubic splines:** Most common (degree 3), ensures smooth curves
+
+**When to Use Splines vs Polynomial:**
+
+| Situation | Use |
+|-----------|-----|
+| Smooth non-linear relationship | Splines |
+| Local flexibility needed | Splines |
+| Simple curve, few data points | Polynomial |
+| Edge stability important | Splines |
+
+**Intuition:**
+Think of a flexible ruler that bends smoothly through data points. Unlike a single polynomial that wiggles wildly, splines bend locally without affecting distant regions.
+
+**Practical Relevance:**
+- Dose-response curves in medicine
+- Age-income relationships (non-linear but smooth)
+- Any relationship that changes pattern at certain thresholds
+
+**Interview Tip:**
+Mention that splines avoid Runge's phenomenon (oscillation at edges) that plagues high-degree polynomials.
+
+---
+
+## Question 98: Discuss recent advances in optimization algorithms for linear regression
+
+### Answer
+
+**Definition:**
+Beyond classical OLS and gradient descent, recent advances focus on scalability, sparsity, and valid inference in high-dimensional settings.
+
+**Key Advances:**
+
+**1. Stochastic Gradient Descent (SGD) Variants**
+- **Adam, AdaGrad:** Adaptive learning rates
+- **Mini-batch SGD:** Balance between batch and stochastic
+- Use case: Very large datasets that don't fit in memory
+
+**2. Coordinate Descent**
+- Optimizes one coordinate (coefficient) at a time
+- Very efficient for Lasso/Elastic Net
+- Used in scikit-learn's Lasso implementation
+
+**3. Proximal Gradient Methods**
+- Handle non-smooth penalties (L1)
+- ISTA, FISTA (Fast Iterative Shrinkage-Thresholding)
+
+**4. Adaptive Regularization**
+- **Adaptive Lasso:** Different penalties for different coefficients
+- Better variable selection consistency
+
+**5. Debiased/Double Machine Learning**
+- Valid confidence intervals after Lasso selection
+- Combines ML for nuisance parameters with classical inference
+- Important for causal inference
+
+**6. Distributed Optimization**
+- Split data across machines
+- Algorithms: ADMM, distributed SGD
+- Use case: Big data environments
+
+**Practical Relevance:**
+
+| Scenario | Recommended Approach |
+|----------|---------------------|
+| Large n, small p | Normal equation or SGD |
+| Large p, small n | Coordinate descent (Lasso) |
+| Very large n and p | Distributed SGD |
+| Causal inference | Double ML |
+
+---
 
 ---
 

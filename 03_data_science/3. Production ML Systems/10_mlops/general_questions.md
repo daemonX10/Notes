@@ -66,7 +66,7 @@
 
 ## Question 9
 
-**Given a scenario where a model’s performance has degraded suddenly, detail a plan of action to identify and correct the issue.**
+**How would you design a scalable machine learning infrastructure?**
 
 **Answer:** _[To be filled]_
 
@@ -74,7 +74,7 @@
 
 ## Question 10
 
-**Outline the steps you would take to automateretrainingof a model based on new data availability.**
+**Discuss the importance of data governance and complianceinMLOps.**
 
 **Answer:** _[To be filled]_
 

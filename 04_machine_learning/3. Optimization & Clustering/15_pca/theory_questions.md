@@ -652,85 +652,6 @@ Kernel PCA extends PCA to handle non-linear data by using the kernel trick to im
 
 ## Question 17
 
-**Explain how you would apply PCA in a stock market data analysis situation.**
-
-### Answer
-
-**Definition:**
-PCA on stock return data identifies independent factors driving market movements. The first component typically captures overall market movement, while subsequent components reveal sector or style factors.
-
-**Step-by-Step Application:**
-
-1. **Data Preparation:**
-   - Select stocks (e.g., S&P 500)
-   - Convert prices to returns (daily/weekly)
-   - Matrix: rows = days, columns = stocks
-   - Standardize returns per stock
-
-2. **Apply PCA:**
-   - Compute principal components of returns matrix
-   - Each PC = orthogonal source of market variation
-
-3. **Interpretation:**
-   - **PC1 (Market Factor)**: Positive loadings on all stocks → overall market movement
-   - **PC2+**: Sector/style factors (e.g., Tech vs Utilities, Growth vs Value)
-
-**Example Interpretation:**
-| Component | Interpretation | Loadings Pattern |
-|-----------|----------------|------------------|
-| PC1 | Market movement | All stocks positive |
-| PC2 | Growth vs Value | Tech +, Utilities - |
-| PC3 | Small vs Large cap | Small cap +, Large cap - |
-
-**Use Cases in Finance:**
-- **Factor investing**: Build strategies around principal components
-- **Risk management**: Hedge exposure to specific factors
-- **Portfolio diversification**: Ensure exposure across different PCs
-- **Anomaly detection**: Extreme PC scores = unusual market behavior
-
----
-
-## Question 18
-
-**Describe a scenario where using PCA might be detrimental to the performance of a machine learning model.**
-
-### Answer
-
-**Scenario: Low-Variance, High-Predictive-Power Features**
-
-**Setup:**
-Predicting customer churn with features:
-- `total_spend`: Range $10-$10,000 (high variance)
-- `monthly_usage`: Range 1-500 GB (high variance)  
-- `complaints_filed`: Binary 0/1 (very low variance, <5% have complaints)
-
-**The Problem:**
-- Most customers never filed complaints → low variance
-- BUT filing a complaint strongly predicts churn → high predictive power
-- PCA focuses on high-variance features (spend, usage)
-- `complaints_filed` contributes little to top components
-- When reducing dimensions, complaint information is lost
-
-**The Outcome:**
-- Model trained on PCA-transformed data performs worse
-- Critical predictor was discarded by unsupervised PCA
-- PCA equated low variance with low importance (incorrectly!)
-
-**Key Lesson:**
-PCA is unsupervised—it has NO knowledge of the target variable. High variance ≠ High predictive power.
-
-**When PCA Can Hurt:**
-- Low-variance features are strong predictors
-- Important information exists in small variations
-- Classes differ in subtle ways (not variance directions)
-
-**Alternative:**
-Use supervised feature selection (feature importance from Random Forest, RFE) when target-feature relationship matters.
-
----
-
-## Question 19
-
 **What are the best practices in visualizing the components obtained from PCA?**
 
 ### Answer
@@ -778,7 +699,7 @@ plt.legend()
 
 ---
 
-## Question 20
+## Question 18
 
 **Explain how Incremental PCA differs from standard PCA and when you would use it.**
 
@@ -828,7 +749,7 @@ Larger batch size → Better approximation but more memory.
 
 ---
 
-## Question 21
+## Question 19
 
 **How does Generalized PCA differ from standard PCA and what are its applications?**
 
@@ -869,7 +790,7 @@ Standard PCA minimizing squared error is like maximizing Gaussian likelihood. Fo
 
 ---
 
-## Question 22
+## Question 20
 
 **Define PCA and its optimization objective.**
 
@@ -903,7 +824,7 @@ Since total variance is constant:
 
 ---
 
-## Question 23
+## Question 21
 
 **Show link between PCA and eigen-decomposition of covariance.**
 
@@ -942,7 +863,7 @@ $$\text{Variance} = v^T C v = v^T (\lambda v) = \lambda$$
 
 ---
 
-## Question 24
+## Question 22
 
 **Explain variance maximization vs. reconstruction error minimization.**
 
@@ -979,7 +900,7 @@ $$\max(\text{Preserved}) \equiv \min(\text{Lost})$$
 
 ---
 
-## Question 25
+## Question 23
 
 **Derive PCA via Singular Value Decomposition.**
 
@@ -1024,7 +945,7 @@ $$T = XV = U\Sigma V^T V = U\Sigma$$
 
 ---
 
-## Question 26
+## Question 24
 
 **Discuss importance of data centering before PCA.**
 
@@ -1071,7 +992,7 @@ X_scaled = StandardScaler().fit_transform(X)
 
 ---
 
-## Question 27
+## Question 25
 
 **Why does scaling features change component loadings?**
 
@@ -1116,7 +1037,7 @@ Scaling changes feature variances, which changes their influence on PCA. Since l
 
 ---
 
-## Question 28
+## Question 26
 
 **Explain meaning of scree plot and elbow criteria.**
 
@@ -1167,7 +1088,7 @@ plt.ylabel('Eigenvalue')
 
 ---
 
-## Question 29
+## Question 27
 
 **How to decide number of components via Kaiser rule.**
 
@@ -1210,7 +1131,7 @@ Combine Kaiser rule with scree plot and cumulative variance for robust decision.
 
 ---
 
-## Question 30
+## Question 28
 
 **Describe cumulative explained variance ratio.**
 
@@ -1258,7 +1179,7 @@ k = np.argmax(cumsum >= 0.95) + 1  # +1 for 0-indexing
 
 ---
 
-## Question 31
+## Question 29
 
 **Explain whitening transformation and its risks.**
 
@@ -1302,7 +1223,7 @@ Whitening destroys the "principal" nature of PCA—all components become equally
 
 ---
 
-## Question 32
+## Question 30
 
 **Compare PCA with Factor Analysis.**
 
@@ -1327,7 +1248,7 @@ Whitening destroys the "principal" nature of PCA—all components become equally
 
 ---
 
-## Question 33
+## Question 31
 
 **Describe kernel PCA and nonlinear embeddings.**
 
@@ -1362,7 +1283,7 @@ A low-dimensional representation that preserves non-linear manifold structure.
 
 ---
 
-## Question 34
+## Question 32
 
 **Discuss incremental PCA for streaming data.**
 
@@ -1397,7 +1318,7 @@ while new_batch_arrives:
 
 ---
 
-## Question 35
+## Question 33
 
 **Explain randomized SVD acceleration.**
 
@@ -1436,7 +1357,7 @@ Very close to exact PCA for most practical purposes.
 
 ---
 
-## Question 36
+## Question 34
 
 **Describe robust PCA and handling outliers.**
 
@@ -1475,7 +1396,7 @@ Standard PCA objective uses squared error—outliers have disproportionate influ
 
 ---
 
-## Question 37
+## Question 35
 
 **Explain projecting new samples into PCA space.**
 
@@ -1516,7 +1437,7 @@ Using `fit_transform()` on test data → Creates incompatible transformation!
 
 ---
 
-## Question 38
+## Question 36
 
 **Discuss PCA for missing-value imputation.**
 
@@ -1559,7 +1480,7 @@ X_imputed = imputer.fit_transform(X_with_missing)
 
 ---
 
-## Question 39
+## Question 37
 
 **Compare PCA vs. autoencoders for dimensionality reduction.**
 
@@ -1599,7 +1520,7 @@ Linear autoencoder (no activation functions) with single hidden layer learns the
 
 ---
 
-## Question 40
+## Question 38
 
 **Explain biplot interpretation.**
 
@@ -1648,5 +1569,425 @@ for i, feature in enumerate(features):
 
 **Best For:**
 Understanding relationships between samples AND features simultaneously.
+
+---
+
+## Question 39
+
+**Derive the PCA from the optimization perspective, i.e., minimization of reconstruction error.**
+
+### Answer
+
+**Objective:**
+Find k-dimensional subspace minimizing reconstruction error.
+
+**Setup:**
+- $V_k$: Orthonormal basis (p × k)
+- Projection: $\hat{x} = V_k V_k^T x$
+- Error: $||x - \hat{x}||^2$
+
+**Derivation:**
+
+$$J = \sum_i ||x_i - V_k V_k^T x_i||^2$$
+
+Expanding:
+$$= \sum_i (x_i^T x_i - x_i^T V_k V_k^T x_i)$$
+
+First term is constant. Minimizing J = Maximizing:
+$$\sum_i x_i^T V_k V_k^T x_i = Tr(V_k^T X^T X V_k)$$
+
+**Result:**
+Maximize $Tr(V_k^T C V_k)$ subject to $V_k^T V_k = I$
+
+**Solution:** Columns of $V_k$ = top k eigenvectors of C
+
+---
+
+## Question 40
+
+**How do you determine the number of principal components to use?**
+
+### Answer
+
+**Methods:**
+
+| Method | Approach |
+|--------|----------|
+| **Cumulative Variance** | Keep k components for 90-95% variance |
+| **Scree Plot** | Find elbow where curve flattens |
+| **Kaiser Rule** | Keep components with eigenvalue > 1 |
+| **Cross-validation** | Tune k for best downstream model performance |
+
+**Recommended Approach:**
+1. Plot cumulative variance
+2. Check scree plot for elbow
+3. If for ML model, cross-validate k
+
+**Python:**
+```python
+cumsum = np.cumsum(pca.explained_variance_ratio_)
+k = np.argmax(cumsum >= 0.95) + 1
+```
+
+---
+
+## Question 41
+
+**Provide examples of how PCA can be used in image processing.**
+
+### Answer
+
+**1. Facial Recognition (Eigenfaces):**
+- Flatten face images to vectors
+- PCA finds principal "eigenfaces"
+- Represent any face as combination of eigenfaces
+- Match new faces in low-dimensional space
+
+**2. Image Compression:**
+- Divide image into blocks
+- PCA on block collection
+- Store only top component scores
+- Reconstruct with minimal quality loss
+
+**3. Hyperspectral Imaging:**
+- Hundreds of spectral bands (highly correlated)
+- PCA reduces to few components
+- Enables efficient classification
+
+**4. Handwriting Recognition:**
+- Extract principal components of digit variations
+- Use as features for classification
+
+---
+
+## Question 42
+
+**Can PCA be applied to categorical data? Why or why not?**
+
+### Answer
+
+**Short Answer:**
+Standard PCA is NOT appropriate for categorical data.
+
+**Why Not:**
+- PCA assumes continuous, Gaussian-like data
+- Covariance/correlation meaningless for categories
+- Distance metrics don't apply to categories
+- One-hot encoding creates sparse, high-dimensional data
+
+**Alternatives:**
+
+| Method | Description |
+|--------|-------------|
+| **MCA (Multiple Correspondence Analysis)** | PCA equivalent for categorical data |
+| **FAMD** | Mixed data (categorical + numerical) |
+| **Categorical PCA (CATPCA)** | Optimal scaling for categories |
+
+**If You Must Use PCA:**
+- One-hot encode categories
+- But results may be misleading
+- Better to use MCA
+
+---
+
+## Question 43
+
+**How can PCA be parallelized to handle very large datasets?**
+
+### Answer
+
+**Approaches:**
+
+**1. Incremental PCA:**
+- Process mini-batches sequentially
+- Update components iteratively
+- Memory efficient
+
+**2. Randomized SVD:**
+- Use random projections
+- Approximate top k components
+- Much faster for large matrices
+
+**3. Distributed PCA:**
+- Split data across nodes
+- Compute local covariances
+- Aggregate and decompose
+
+**4. Parallel SVD Libraries:**
+- Use GPU-accelerated libraries (cuML, RAPIDS)
+- Distributed computing (Spark MLlib)
+
+**sklearn Options:**
+```python
+# Randomized (faster)
+PCA(n_components=k, svd_solver='randomized')
+
+# Incremental (memory efficient)
+IncrementalPCA(n_components=k, batch_size=1000)
+```
+
+---
+
+## Question 44
+
+**Compare the use of PCA to select features with other feature selection methods.**
+
+### Answer
+
+**Key Distinction:**
+PCA is feature EXTRACTION (creates new features), not feature SELECTION (picks original features).
+
+**Comparison:**
+
+| Aspect | PCA | Feature Selection |
+|--------|-----|-------------------|
+| Output | New synthetic features | Subset of original features |
+| Interpretability | Less interpretable | Original feature meaning preserved |
+| Supervision | Unsupervised | Can be supervised |
+| Information | Combines all features | Discards features |
+
+**Feature Selection Methods:**
+- **Filter**: Correlation, mutual information, chi-square
+- **Wrapper**: RFE, forward/backward selection
+- **Embedded**: L1 regularization, tree importance
+
+**When to Use PCA:**
+- Multicollinearity present
+- Want decorrelated features
+- Interpretability less important
+
+**When to Use Feature Selection:**
+- Need interpretable features
+- Domain knowledge suggests specific features matter
+- Regulatory requirements for explainability
+
+---
+
+## Question 45
+
+**What recent advancements have been made concerning PCA for big data?**
+
+### Answer
+
+**Key Advancements:**
+
+**1. Randomized PCA:**
+- Probabilistic approximation
+- O(npk) instead of O(np²)
+- Near-exact results
+
+**2. Streaming/Online PCA:**
+- Processes data incrementally
+- Handles concept drift
+- Memory independent of data size
+
+**3. GPU Acceleration:**
+- RAPIDS cuML library
+- Orders of magnitude faster
+- Handles larger datasets
+
+**4. Distributed Implementations:**
+- Spark MLlib PCA
+- Handles TB-scale data
+- Parallel covariance computation
+
+**5. Sparse PCA:**
+- Produces sparse loadings
+- More interpretable components
+- Useful for high-dimensional data
+
+**6. Robust PCA:**
+- Handles outliers
+- Separates low-rank structure from sparse noise
+
+---
+
+## Question 46
+
+**Discuss the importance of the trace of a matrix in the context of PCA.**
+
+### Answer
+
+**Definition:**
+The trace of a matrix is the sum of its diagonal elements. In PCA context, the trace of the covariance matrix equals the total variance of the dataset.
+
+**Why It Matters:**
+
+**1. Total Variance:**
+$$Tr(C) = \sum_{i=1}^{p} \lambda_i = \text{Total Variance}$$
+
+The trace of covariance matrix = sum of all eigenvalues = total variance.
+
+**2. Variance Preservation:**
+When selecting k components, the preserved variance is:
+$$\text{Preserved} = \sum_{i=1}^{k} \lambda_i$$
+
+Explained variance ratio = Preserved / Tr(C)
+
+**3. Reconstruction Error:**
+$$\text{Reconstruction Error} = Tr(C) - \sum_{i=1}^{k} \lambda_i$$
+
+**Practical Implication:**
+- Trace remains constant regardless of PCA transformation
+- Helps verify PCA implementation correctness
+- Used in deriving reconstruction error formulas
+
+**Interview Point:**
+"The trace tells us the total information budget. PCA redistributes this into components, with top components getting larger shares."
+
+---
+
+## Question 47
+
+**Discuss the application of PCA in feature engineering.**
+
+### Answer
+
+**How PCA Helps Feature Engineering:**
+
+**1. Decorrelation:**
+- Original features often correlated
+- PCA produces uncorrelated components
+- Benefits: Removes multicollinearity, helps linear models
+
+**2. Noise Filtering:**
+- Keep top components, discard low-variance ones
+- Low-variance components often capture noise
+- Result: Cleaner features for downstream models
+
+**3. Dimensionality Reduction:**
+- Reduce 1000 features to 50 components (95% variance)
+- Faster training, less storage
+- Prevents overfitting
+
+**4. Creating New Features:**
+- PC scores as new engineered features
+- Can combine with original features
+- Components capture underlying patterns
+
+**Scenario Example:**
+Customer dataset with 100 purchase features:
+1. Apply PCA → First 3 components
+2. PC1 = "Overall spending" (high loadings on all purchase types)
+3. PC2 = "Online vs Offline preference"
+4. PC3 = "Luxury vs Necessity preference"
+5. Use these 3 interpretable components for segmentation
+
+**Caution:**
+PCA is unsupervised—components maximize variance, not predictive power. Validate with downstream task performance.
+
+---
+
+## Question 48
+
+**Discuss how Randomized PCA is used and its benefits over traditional PCA.**
+
+### Answer
+
+**What is Randomized PCA?**
+A probabilistic algorithm that computes approximate SVD using random projections, much faster than exact methods for large matrices.
+
+**How It Works:**
+
+1. **Random Projection**: Project data onto random low-dimensional subspace
+2. **Find Basis**: Compute orthonormal basis of projected space
+3. **Small SVD**: Do exact SVD on smaller projected matrix
+4. **Reconstruct**: Approximate original SVD from smaller decomposition
+
+**Benefits Over Traditional PCA:**
+
+| Aspect | Traditional PCA | Randomized PCA |
+|--------|-----------------|----------------|
+| **Complexity** | O(np²) or O(n²p) | O(npk) |
+| **Memory** | Full matrix operations | Lower memory footprint |
+| **Speed** | Slow for large data | 10-100x faster |
+| **Accuracy** | Exact | Near-exact for top k |
+| **When Faster** | Always exact | k << min(n,p) |
+
+**When to Use Randomized PCA:**
+- Large datasets (millions of rows)
+- High-dimensional data (thousands of features)
+- Only need top k components (k << p)
+- Speed matters more than exact precision
+
+**sklearn Usage:**
+```python
+from sklearn.decomposition import PCA
+
+# Randomized (fast)
+pca_fast = PCA(n_components=50, svd_solver='randomized')
+
+# Auto-select (sklearn chooses best)
+pca_auto = PCA(n_components=50, svd_solver='auto')
+
+# Full exact (slower)
+pca_exact = PCA(n_components=50, svd_solver='full')
+```
+
+**Practical Note:**
+sklearn defaults to 'auto' which uses randomized for large data with small k. Results are typically indistinguishable from exact PCA.
+
+---
+
+## Question 49
+
+**Discuss how robust PCA attempts to handle outliers and its practical implications.**
+
+### Answer
+
+**Problem:**
+Standard PCA is highly sensitive to outliers due to squared error objective.
+
+**Robust PCA Approach:**
+Decompose data matrix D into:
+$$D = L + S$$
+
+- $L$: Low-rank matrix (true data structure)
+- $S$: Sparse matrix (outliers/corruptions)
+
+**Optimization Objective:**
+$$\min_{L,S} ||L||_* + \lambda ||S||_1 \quad \text{s.t.} \quad D = L + S$$
+
+- $||L||_*$: Nuclear norm (encourages low rank)
+- $||S||_1$: L1 norm (encourages sparsity)
+
+**How It Handles Outliers:**
+1. Outliers captured in sparse matrix S
+2. Low-rank L contains clean structure
+3. PCA on L is robust to original outliers
+
+**Practical Implications:**
+
+| Implication | Description |
+|-------------|-------------|
+| **Automatic outlier detection** | S matrix identifies corrupted entries |
+| **Better components** | L gives clean structure |
+| **No manual preprocessing** | Algorithm handles outliers internally |
+| **Higher computation** | Slower than standard PCA |
+
+**Applications:**
+- **Video surveillance**: Background (L) vs moving objects (S)
+- **Image denoising**: Clean image (L) vs corrupted pixels (S)
+- **Data cleaning**: Identify and separate outliers
+
+**Implementation:**
+```python
+# Not in sklearn, but available in specialized packages
+# Pseudocode concept:
+from robust_pca import RobustPCA
+
+rpca = RobustPCA()
+L, S = rpca.fit_transform(X)
+
+# L contains clean low-rank approximation
+# S contains sparse outliers
+standard_pca.fit(L)  # PCA on clean data
+```
+
+**Trade-offs:**
+- More robust results
+- Higher computational cost
+- Requires tuning λ parameter
+- Best for data with gross errors, not just noisy data
 
 ---

@@ -1,5 +1,6 @@
 # Bias And Variance Interview Questions - General Questions
 
+
 ## Question 1
 
 **What do you understand by the terms bias and variance in machine learning?**
@@ -40,6 +41,7 @@ Consistent but wrong        On average correct,         Accurate and
 ```
 
 ---
+
 
 ## Question 2
 
@@ -89,7 +91,91 @@ Trade-off: Reducing one often increases the other
 
 ---
 
+
 ## Question 3
+
+**Can you explain the difference between a high-bias model and a high-variance model?**
+
+### Answer
+
+| Aspect | High-Bias Model | High-Variance Model |
+|--------|-----------------|---------------------|
+| **Definition** | Too simple, makes strong assumptions | Too complex, very flexible |
+| **Training Error** | High | Low (near zero) |
+| **Validation Error** | High (close to training) | High (much higher than training) |
+| **Gap Between Errors** | Small gap | Large gap |
+| **Problem Type** | Underfitting | Overfitting |
+| **Stability** | Very stable across datasets | Highly sensitive to training data |
+| **Examples** | Linear regression on non-linear data | Deep unpruned decision tree |
+
+**Key Characteristics:**
+
+1. **High-Bias Model:**
+   - Fails to capture the underlying patterns in the data
+   - Makes systematic errors by consistently missing the mark
+   - Adding more data won't help - model is fundamentally too simple
+   - Example: Using a straight line to fit a parabolic relationship
+
+2. **High-Variance Model:**
+   - Learns the training data too well, including noise
+   - Predictions change dramatically with different training sets
+   - Adding more data often helps reduce overfitting
+   - Example: A decision tree that grows until each leaf has one sample
+
+**Analogy:**
+- **High Bias**: An archer who consistently hits upper-left of bullseye (systematic error)
+- **High Variance**: An archer whose shots scatter randomly around the bullseye (inconsistent)
+
+---
+
+
+## Question 4
+
+**What is the bias-variance trade-off?**
+
+### Answer
+
+The **bias-variance trade-off** is the fundamental tension in supervised learning where decreasing bias typically increases variance, and vice versa.
+
+**The Core Principle:**
+- Both bias and variance contribute to model error
+- They are inversely related through model complexity
+- The goal is to find the optimal balance that minimizes total error
+
+**Mathematical Representation:**
+
+$$\text{Total Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}$$
+
+**The Trade-off Mechanism:**
+
+| Action | Effect on Bias | Effect on Variance |
+|--------|----------------|-------------------|
+| Increase model complexity | ↓ Decreases | ↑ Increases |
+| Decrease model complexity | ↑ Increases | ↓ Decreases |
+| Add regularization | ↑ Increases | ↓ Decreases |
+| Add more features | ↓ Decreases | ↑ Increases |
+
+**Visual Representation (U-Shaped Curve):**
+```
+Total Error
+    |
+    |  \                    /
+    |   \                  /
+    |    \   Optimal     /
+    |     \    ★       /
+    |      \_________/
+    |
+    +------------------------→ Model Complexity
+        High Bias    High Variance
+        (Underfit)   (Overfit)
+```
+
+**Key Insight:** The "sweet spot" is where the combined error from bias and variance is minimized - not where either is zero.
+
+---
+
+
+## Question 5
 
 **Why is it impossible to simultaneously minimize both bias and variance?**
 
@@ -143,7 +229,49 @@ Total Error
 
 ---
 
-## Question 4
+
+## Question 6
+
+**How does model complexity relate to bias and variance?**
+
+### Answer
+
+Model complexity is the **central lever** that controls the bias-variance trade-off.
+
+**What Defines Model Complexity:**
+- Number of parameters (weights in neural networks)
+- Degree of polynomial in regression
+- Depth of decision trees
+- Number of features used
+- Inverse of regularization strength
+
+**The Relationship:**
+
+| Complexity Level | Model Characteristics | Bias | Variance | Result |
+|------------------|----------------------|------|----------|--------|
+| **Low** | Few parameters, strong assumptions | High | Low | Underfitting |
+| **Medium** | Balanced flexibility | Moderate | Moderate | Optimal |
+| **High** | Many parameters, very flexible | Low | High | Overfitting |
+
+**Examples Across Complexity Spectrum:**
+
+```
+Low Complexity              →              High Complexity
+─────────────────────────────────────────────────────────
+Linear Regression    →    Polynomial    →    Deep Neural Net
+Decision Stump       →    Pruned Tree   →    Unpruned Tree
+High Regularization  →    Moderate      →    No Regularization
+```
+
+**Key Principle:**
+- **Simple models** can't capture complex patterns → High Bias
+- **Complex models** fit noise along with signal → High Variance
+- The optimal complexity depends on the true underlying function and data size
+
+---
+
+
+## Question 7
 
 **What could be the potential causes of high variance in a model?**
 
@@ -198,7 +326,8 @@ Total Error
 
 ---
 
-## Question 5
+
+## Question 8
 
 **What might be the reasons behind a model's high bias?**
 
@@ -254,544 +383,126 @@ Total Error
 
 ---
 
-## Question 6
-
-**How do you use cross-validation to estimate bias and variance?**
-
-### Answer
-
-**K-Fold Cross-Validation** helps diagnose bias-variance issues by analyzing training vs. validation performance across multiple data splits.
-
-**The Process:**
-
-```
-Original Data → Split into K folds
-     ↓
-Fold 1: Train on 2,3,4,5 | Validate on 1 → Score 1
-Fold 2: Train on 1,3,4,5 | Validate on 2 → Score 2
-Fold 3: Train on 1,2,4,5 | Validate on 3 → Score 3
-Fold 4: Train on 1,2,3,5 | Validate on 4 → Score 4
-Fold 5: Train on 1,2,3,4 | Validate on 5 → Score 5
-     ↓
-Analyze: Mean scores, Std deviation, Gap between train/val
-```
-
-**Diagnosis Framework:**
-
-| Observation | Training Score | Validation Score | Diagnosis |
-|-------------|---------------|------------------|-----------|
-| **High Bias** | Low | Low (close to training) | Underfitting |
-| **High Variance** | High | Low (far from training) | Overfitting |
-| **Good Balance** | High | High (close to training) | Well-tuned |
-
-**Interpretation Guidelines:**
-
-**Case 1: High Bias (Underfitting)**
-```
-Avg Training Accuracy:   72%
-Avg Validation Accuracy: 70%
-Gap: 2% (small)
-Std of Validation: Low
-
-→ Both scores low, small gap = Model too simple
-```
-
-**Case 2: High Variance (Overfitting)**
-```
-Avg Training Accuracy:   99%
-Avg Validation Accuracy: 75%
-Gap: 24% (large!)
-Std of Validation: High
-
-→ Perfect training, poor validation, large gap = Overfitting
-```
-
-**Case 3: Good Balance**
-```
-Avg Training Accuracy:   92%
-Avg Validation Accuracy: 89%
-Gap: 3% (acceptable)
-Std of Validation: Low
-
-→ Both high, small gap = Good generalization
-```
-
----
-
-## Question 7
-
-**What techniques are used to reduce bias in machine learning models?**
-
-### Answer
-
-**Goal:** Increase model's ability to capture complex patterns.
-
-**Key Techniques:**
-
-| Technique | How It Reduces Bias |
-|-----------|---------------------|
-| Increase model complexity | More capacity to learn patterns |
-| Add more features | More information available |
-| Reduce regularization | Less constraint on model |
-| Use boosting ensembles | Sequentially reduces errors |
-| Train longer | More time to learn patterns |
-
-**Detailed Strategies:**
-
-1. **Increase Model Complexity:**
-   ```
-   Linear Regression → Polynomial Regression
-   Shallow Tree      → Deeper Tree
-   Simple NN         → Deeper/Wider NN
-   ```
-
-2. **Feature Engineering:**
-   - Create interaction features: `feature_A * feature_B`
-   - Create polynomial features: `feature_A²`
-   - Add domain-specific features
-   - Example: Add `distance_to_schools` for house price prediction
-
-3. **Reduce Regularization:**
-   ```python
-   # Before (high bias due to strong regularization)
-   Ridge(alpha=100)
-   
-   # After (reduced regularization)
-   Ridge(alpha=1)
-   ```
-
-4. **Use Boosting:**
-   - AdaBoost, Gradient Boosting, XGBoost
-   - Each iteration corrects previous errors
-   - Combines weak learners into strong model
-   ```
-   Stump 1 → Stump 2 → ... → Stump N = Powerful model
-   (Each corrects errors of previous)
-   ```
-
-5. **Ensure Sufficient Training:**
-   - For neural networks: increase epochs
-   - Check if loss is still decreasing
-   - Model may just need more time to converge
-
----
-
-## Question 8
-
-**Can you list some methods to lower variance in a model without increasing bias?**
-
-### Answer
-
-This is challenging because most variance-reduction techniques add some bias. However, these methods minimize bias increase:
-
-**Best Methods:**
-
-| Method | Variance Reduction | Bias Impact |
-|--------|-------------------|-------------|
-| **Bagging (Random Forest)** | High | Minimal |
-| **More Training Data** | High | None |
-| **Dropout** | Moderate | Minimal |
-| **Data Augmentation** | Moderate | None |
-
-**1. Bagging / Random Forest:**
-```
-Why it works:
-- Train multiple high-variance, low-bias models
-- Each on different bootstrap sample
-- Average predictions → errors cancel out
-
-Result: Variance ↓↓↓, Bias ≈ unchanged
-```
-
-**2. Get More Training Data:**
-```
-Why it works:
-- More data = stronger signal relative to noise
-- Harder for model to memorize
-- Forces learning generalizable patterns
-
-Result: Variance ↓↓, Bias = unchanged
-        (More data doesn't change model assumptions)
-```
-
-**3. Dropout (Neural Networks):**
-```python
-model = Sequential([
-    Dense(128, activation='relu'),
-    Dropout(0.5),  # Randomly drop 50% of neurons
-    Dense(64, activation='relu'),
-    Dropout(0.3),
-    Dense(1)
-])
-```
-- Acts as implicit model averaging
-- Prevents co-adaptation of neurons
-- Minimal bias increase
-
-**4. Data Augmentation:**
-```
-For images: rotations, flips, crops, color jitter
-For text: synonym replacement, back-translation
-For tabular: SMOTE, noise injection
-```
-- Artificially increases dataset size
-- Teaches invariance to noise
-- No assumption changes → no bias increase
-
-**Key Insight:** Bagging and more data are the "purest" variance reducers because they don't simplify the model itself.
-
----
 
 ## Question 9
 
-**In what ways can feature selection impact bias and variance?**
+**How would you diagnose bias and variance issues using learning curves?**
 
 ### Answer
 
-**Feature selection** is the process of selecting a subset of relevant features. Its primary effect is **reducing variance**.
+**Learning curves** plot model performance against training set size and are powerful diagnostic tools.
 
-**Impact Summary:**
+**The Two Curves:**
+- **Training Curve**: Performance on training data
+- **Validation Curve**: Performance on held-out validation data
 
-| Action | Effect on Variance | Effect on Bias |
-|--------|-------------------|----------------|
-| Remove irrelevant features | ↓ Decreases | Minimal change |
-| Remove noisy features | ↓ Decreases | Minimal change |
-| Remove important features | ↓ Decreases | ↑ Increases |
-| Aggressive selection | ↓↓ Decreases a lot | ↑↑ Increases a lot |
+**Diagnosis Framework:**
 
-**How It Reduces Variance:**
+| Pattern | Training Error | Validation Error | Gap | Diagnosis |
+|---------|---------------|------------------|-----|-----------|
+| **High Bias** | High | High (similar) | Small | Underfitting |
+| **High Variance** | Low | High | Large | Overfitting |
+| **Good Fit** | Low | Low (similar) | Small | Optimal |
 
-```
-Before Feature Selection (100 features):
-├── Many noisy/irrelevant features
-├── Model can find spurious correlations
-├── High-dimensional space is sparse
-└── Result: HIGH VARIANCE
-
-After Feature Selection (20 features):
-├── Only informative features remain
-├── Fewer opportunities for spurious patterns
-├── Simpler, more constrained model
-└── Result: LOWER VARIANCE
-```
-
-**How It Can Increase Bias:**
+**Visual Patterns:**
 
 ```
-If important features removed:
-├── Model loses predictive information
-├── Cannot capture part of true signal
-└── Result: HIGHER BIAS
+HIGH BIAS (Underfitting):
+Error
+  │
+  │════════════════ Training (high, flat)
+  │════════════════ Validation (high, converges to training)
+  │
+  └─────────────────────→ Training Size
+
+Key Signs:
+✗ Both curves plateau at HIGH error
+✗ Small gap between curves
+✗ Adding more data WON'T help
+→ Solution: Increase model complexity
 ```
 
-**The Trade-off in Feature Selection:**
+```
+HIGH VARIANCE (Overfitting):
+Error
+  │
+  │                 ════ Training (very low)
+  │        ┌───────────── Validation (higher, still improving)
+  │   LARGE GAP
+  │
+  └─────────────────────→ Training Size
 
-| Selection Strategy | Variance | Bias | Risk |
-|--------------------|----------|------|------|
-| **Keep all features** | High | Low | Overfitting |
-| **Smart selection** | Lower | Slightly higher | Optimal |
-| **Too aggressive** | Very low | High | Underfitting |
+Key Signs:
+✗ Large persistent gap
+✗ Training error very low (near zero)
+✗ Validation curve still decreasing
+→ Solution: More data may help, or reduce complexity
+```
 
-**Best Practice:**
-1. Use methods that rank feature importance
-2. Remove clearly irrelevant/noisy features
-3. Validate on held-out data to ensure important features retained
-4. Goal: Maximum variance reduction with minimal bias increase
+```
+GOOD FIT:
+Error
+  │
+  │   ═══════════════ Training (low)
+  │   ─────────────── Validation (low, close to training)
+  │   Small Gap
+  └─────────────────────→ Training Size
+
+Key Signs:
+✓ Both curves low
+✓ Small gap
+✓ Curves have converged
+```
+
+**Actionable Insights:**
+
+| Observation | Meaning | Action |
+|-------------|---------|--------|
+| Curves converged at high error | Model too simple | More complex model |
+| Large gap, validation still improving | Need more data | Collect more data |
+| Large gap, validation plateaued | Overfitting | Regularization, simpler model |
+| Both low, small gap | Good balance | Deploy! |
 
 ---
+
 
 ## Question 10
 
-**What role does model complexity play in the bias-variance trade-off?**
+**What is the expected test error, and how does it relate to bias and variance?**
 
 ### Answer
 
-**Model complexity is the central lever** that controls the bias-variance trade-off.
+The **expected test error** (also called generalization error) is the average error a model makes on new, unseen data.
 
-**What Defines Complexity:**
-- Number of parameters
-- Polynomial degree
-- Tree depth
-- Network architecture
-- Inverse of regularization strength
+**Error Decomposition Formula:**
 
-**The Core Relationship:**
+$$E[(y - \hat{f}(x))^2] = \text{Bias}^2[\hat{f}(x)] + \text{Var}[\hat{f}(x)] + \sigma^2$$
 
-```
-                    Model Complexity
-           Low ◄─────────────────────► High
-           
-Bias       High ◄─────────────────────► Low
-Variance   Low  ◄─────────────────────► High
-```
+**Components Explained:**
 
-**Complexity Spectrum:**
+| Component | Definition | What It Measures | Controllable? |
+|-----------|------------|------------------|---------------|
+| **Bias²** | $(E[\hat{f}(x)] - f(x))^2$ | Systematic error from wrong assumptions | Yes |
+| **Variance** | $E[(\hat{f}(x) - E[\hat{f}(x)])^2]$ | Error from sensitivity to training data | Yes |
+| **σ² (Irreducible)** | Inherent noise in data | Randomness we cannot explain | No |
 
-| Complexity Level | Examples | Bias | Variance | Typical Result |
-|------------------|----------|------|----------|----------------|
-| **Very Low** | Linear model, depth-1 tree | Very High | Very Low | Severe underfit |
-| **Low** | Shallow tree, simple NN | High | Low | Underfit |
-| **Medium** | Moderate depth, regularized | Balanced | Balanced | Optimal |
-| **High** | Deep tree, wide NN | Low | High | Overfit |
-| **Very High** | Unlimited depth, no regularization | Very Low | Very High | Severe overfit |
+**Intuitive Interpretation:**
 
-**The U-Shaped Test Error:**
+1. **Bias² Term:**
+   - How far off is the average prediction from the truth?
+   - Even if we could train on infinite datasets and average predictions, we'd still be this far off
+   - This is the error of underfitting
 
-```
-Total Test Error
-      │
-      │╲                          ╱
-      │ ╲   High Bias           ╱  High Variance
-      │  ╲                     ╱
-      │   ╲    Optimal ★     ╱
-      │    ╲_______________╱
-      │
-      └──────────────────────────────► Complexity
-```
+2. **Variance Term:**
+   - How much do predictions vary across different training sets?
+   - Measures instability of the model
+   - This is the error of overfitting
 
-**Key Insight:** The goal of model selection and hyperparameter tuning is to find the complexity level at the bottom of this U-curve — the optimal trade-off point.
+3. **Irreducible Error:**
+   - The noise inherent in the problem
+   - Measurement errors, missing variables, randomness
+   - No model can do better than this
+
+**Key Insight:** To minimize test error, minimize (Bias² + Variance), as irreducible error cannot be changed.
 
 ---
-
-## Question 11
-
-**In neural networks, how do you control for bias and variance through architectural decisions?**
-
-### Answer
-
-Neural network architecture directly controls complexity and the bias-variance trade-off.
-
-**Controlling Bias (Reducing Underfitting):**
-
-| Architectural Change | Effect | Use When |
-|---------------------|--------|----------|
-| Add more layers (depth) | ↓ Bias | Model too simple |
-| Add more neurons (width) | ↓ Bias | Insufficient capacity |
-| Reduce regularization | ↓ Bias | Over-constrained |
-| Choose complex activations | ↓ Bias | Need more nonlinearity |
-
-**Controlling Variance (Reducing Overfitting):**
-
-| Architectural Change | Effect | Use When |
-|---------------------|--------|----------|
-| Fewer layers/neurons | ↓ Variance | Model too complex |
-| Add Dropout layers | ↓ Variance | Overfitting |
-| Add Batch Normalization | ↓ Variance (slight) | Unstable training |
-| Add Weight Decay (L2) | ↓ Variance | Large weights |
-| Use Transfer Learning | ↓ Variance | Limited data |
-
-**Practical Architecture Patterns:**
-
-```python
-# High Bias Architecture (too simple)
-model = Sequential([
-    Dense(8, activation='relu'),
-    Dense(1)
-])
-
-# High Variance Architecture (too complex)
-model = Sequential([
-    Dense(512, activation='relu'),
-    Dense(512, activation='relu'),
-    Dense(512, activation='relu'),
-    Dense(1)
-])
-
-# Balanced Architecture (with regularization)
-model = Sequential([
-    Dense(128, activation='relu'),
-    Dropout(0.3),
-    BatchNormalization(),
-    Dense(64, activation='relu'),
-    Dropout(0.2),
-    Dense(1)
-])
-```
-
-**Standard Workflow:**
-1. Start with established architecture (ResNet, etc.)
-2. If underfitting → increase depth/width, reduce regularization
-3. If overfitting → add Dropout, weight decay, early stopping
-4. Most commonly: models overfit → focus on variance reduction
-
----
-
-## Question 12
-
-**How do hyperparameters tuning in gradient boosting models affect bias and variance?**
-
-### Answer
-
-Gradient boosting hyperparameters directly control the bias-variance trade-off.
-
-**Key Hyperparameters:**
-
-| Parameter | Low Value | High Value |
-|-----------|-----------|------------|
-| `n_estimators` | High Bias | Low Bias (risk: variance) |
-| `learning_rate` | Higher Bias | Lower Bias (risk: variance) |
-| `max_depth` | High Bias | Low Bias (risk: variance) |
-| `min_child_weight` | Low Bias | High Bias |
-| `subsample` | Lower Variance | Higher Variance |
-| `colsample_bytree` | Lower Variance | Higher Variance |
-
-**Detailed Effects:**
-
-**1. n_estimators (Number of Trees):**
-```
-Few trees (10):     High Bias, Low Variance
-Many trees (1000):  Low Bias, High Variance (if no early stopping)
-```
-
-**2. learning_rate (Shrinkage):**
-```
-High (0.3):  Fast learning, risk of overfitting
-Low (0.01): Slow learning, more robust, needs more trees
-```
-- Trade-off: low learning_rate + more trees = better generalization
-
-**3. max_depth (Tree Depth):**
-```
-Shallow (3): Simple trees → High Bias, Low Variance
-Deep (10):   Complex trees → Low Bias, High Variance
-```
-
-**4. Subsampling Parameters:**
-```python
-subsample=0.8        # Use 80% of rows per tree
-colsample_bytree=0.8 # Use 80% of features per tree
-```
-- Introduces randomness → reduces variance (like Random Forest)
-
-**Tuning Strategy:**
-
-| Goal | Parameter Adjustments |
-|------|----------------------|
-| **Reduce Bias** | ↑ n_estimators, ↑ max_depth |
-| **Reduce Variance** | ↓ learning_rate, ↓ max_depth, enable subsampling, ↑ min_child_weight |
-
-**Recommended Approach:**
-1. Set low `learning_rate` (0.01-0.1)
-2. Use early stopping to find optimal `n_estimators`
-3. Tune tree parameters with cross-validation
-
----
-
-## Question 13
-
-**What do you think about the potential impacts of deep learning techniques on bias and variance?**
-
-### Answer
-
-Deep learning has fundamentally changed how we approach the bias-variance trade-off.
-
-**Primary Impact: Drastically Reducing Bias**
-
-| Aspect | Impact |
-|--------|--------|
-| Deep architectures | Can learn hierarchical features |
-| Universal approximation | Can fit any continuous function |
-| Massive capacity | Millions/billions of parameters |
-| Result | Extremely low bias achievable |
-
-**This Shifts the Challenge:**
-```
-Traditional ML:  Balance bias and variance
-                      ↓
-Deep Learning:   Bias is easy → Focus on variance control
-```
-
-**Variance Control in Deep Learning:**
-
-| Technique | How It Helps |
-|-----------|--------------|
-| **Massive Datasets** | ImageNet, web-scale data |
-| **Dropout** | Implicit model averaging |
-| **Batch Normalization** | Stabilizes and regularizes |
-| **Data Augmentation** | Critical for image tasks |
-| **Transfer Learning** | Pre-trained features reduce variance |
-| **Early Stopping** | Prevents over-training |
-| **Weight Decay** | Standard regularization |
-
-**The "Double Descent" Phenomenon:**
-
-Recent research shows surprising behavior:
-```
-Classical View:
-Error ↘ then ↗ (U-shaped with complexity)
-
-Double Descent:
-Error ↘ then ↗ then ↘ again (in ultra-high complexity regime)
-```
-
-Massive over-parameterized models can sometimes generalize well despite having more parameters than training samples!
-
-**Key Insight:**
-- Deep learning achieves unprecedented low bias
-- The field's innovation has been in powerful variance control techniques
-- Modern practice: Use large models + strong regularization
-- This operates at a different point in the trade-off than classical ML
-
----
-
-## Question 14
-
-**How could you potentially leverage active learning to mitigate bias and/or variance in a model?**
-
-### Answer
-
-**Active learning** lets the model choose which data points to label, enabling targeted bias and variance reduction.
-
-**Active Learning Loop:**
-```
-Unlabeled Pool → Model makes predictions → Select most valuable samples
-                          ↑                           ↓
-                    Retrain model ← Oracle labels selected samples
-```
-
-**Mitigating Variance (Primary Use):**
-
-Strategy: **Uncertainty Sampling**
-
-```
-1. Train initial model on small labeled set
-2. Predict on unlabeled pool
-3. Find points where model is MOST UNCERTAIN
-   (predictions close to 0.5 for binary classification)
-4. Request labels for these uncertain points
-5. Retrain and repeat
-```
-
-| Why It Reduces Variance |
-|------------------------|
-| Targets points near decision boundary |
-| Resolves model uncertainty efficiently |
-| Solidifies the boundary → more stable predictions |
-| Better than random labeling for variance reduction |
-
-**Mitigating Bias (Secondary Use):**
-
-Strategy: **Diversity Sampling / Query-by-Committee**
-
-```
-1. Train ensemble of diverse models
-2. Find points where models DISAGREE most
-3. These are likely areas where model has wrong assumptions
-4. Labeling these corrects systematic errors
-```
-
-| Why It Reduces Bias |
-|---------------------|
-| Identifies unexplored regions of feature space |
-| Exposes model's incorrect assumptions |
-| Example: Model thinks "all birds fly" → query penguin → corrects bias |
-
-**Combined Strategy:**
-
-| Method | Target | Effect |
-|--------|--------|--------|
-| Uncertainty Sampling | High variance regions | ↓ Variance |
-| Diversity Sampling | Misunderstood regions | ↓ Bias |
-| Query-by-Committee | Model disagreements | ↓ Both |
-
-**Key Benefit:** Active learning achieves better models with **fewer labeled samples** by strategically targeting the most informative data points.

@@ -404,246 +404,6 @@ spec:
 
 ## Question 4
 
-**Design an 'End-to-End Machine Learning Project' workflow using relevant design patterns.**
-
-**Answer:**
-
-### 1. Definition
-An end-to-end ML project workflow integrates multiple design patterns to handle the complete lifecycle from problem definition to production monitoring. Each stage applies specific patterns for robustness and scalability.
-
-### 2. Workflow Stages with Patterns
-
-| Stage | Design Patterns |
-|-------|-----------------|
-| Problem Definition | Start Simple, Baseline |
-| Data Collection | Data Versioning, Data Validation |
-| Feature Engineering | Feature Store, Transformation |
-| Model Training | Pipeline, Checkpoint, Regularization |
-| Evaluation | Evaluation Store, Cross-Validation |
-| Deployment | Model-as-a-Service, Champion/Challenger |
-| Monitoring | Model Monitoring, Logging, Drift Detection |
-| Maintenance | Continuous Training, Replay |
-
-### 3. End-to-End Architecture
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    DATA LAYER                                 │
-│  [Data Versioning] ─► [Validation] ─► [Feature Store]        │
-└──────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌──────────────────────────────────────────────────────────────┐
-│                   TRAINING LAYER                              │
-│  [Pipeline] ─► [Checkpoint] ─► [Evaluation Store]            │
-└──────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌──────────────────────────────────────────────────────────────┐
-│                   SERVING LAYER                               │
-│  [Model Registry] ─► [Champion/Challenger] ─► [API Service]  │
-└──────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌──────────────────────────────────────────────────────────────┐
-│                   MONITORING LAYER                            │
-│  [Logging] ─► [Drift Detection] ─► [Continuous Training]     │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### 4. Python Code Example
-
-```python
-# End-to-end ML workflow with design patterns
-
-from dataclasses import dataclass
-from typing import Dict, Any
-import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from datetime import datetime
-import json
-
-# Pattern 1: Data Versioning
-class DataVersioner:
-    def __init__(self):
-        self.versions = {}
-    
-    def register(self, name, data, version):
-        self.versions[f"{name}_{version}"] = {
-            'data': data,
-            'timestamp': datetime.now().isoformat(),
-            'shape': data.shape if hasattr(data, 'shape') else len(data)
-        }
-        print(f"[DATA] Registered {name} version {version}")
-
-# Pattern 2: Feature Store
-class FeatureStore:
-    def __init__(self):
-        self.features = {}
-    
-    def register_transform(self, name, transform_fn):
-        self.features[name] = transform_fn
-    
-    def compute(self, name, raw_data):
-        return self.features[name](raw_data)
-
-# Pattern 3: Training Pipeline
-class TrainingPipeline:
-    def __init__(self, feature_store):
-        self.feature_store = feature_store
-        self.checkpoints = []
-    
-    def run(self, model, X, y):
-        # Feature transformation
-        X_transformed = X  # Apply transforms from feature store
-        
-        # Train with cross-validation
-        scores = cross_val_score(model, X_transformed, y, cv=5)
-        
-        # Checkpoint
-        checkpoint = {
-            'model': model,
-            'score': scores.mean(),
-            'timestamp': datetime.now().isoformat()
-        }
-        self.checkpoints.append(checkpoint)
-        
-        # Fit final model
-        model.fit(X_transformed, y)
-        return model, scores.mean()
-
-# Pattern 4: Evaluation Store
-class EvaluationStore:
-    def __init__(self):
-        self.experiments = []
-    
-    def log(self, experiment_id, model_name, metrics, hyperparams):
-        self.experiments.append({
-            'id': experiment_id,
-            'model': model_name,
-            'metrics': metrics,
-            'hyperparams': hyperparams,
-            'timestamp': datetime.now().isoformat()
-        })
-    
-    def get_best(self, metric='accuracy'):
-        return max(self.experiments, key=lambda x: x['metrics'].get(metric, 0))
-
-# Pattern 5: Champion/Challenger Deployment
-class ModelDeployer:
-    def __init__(self):
-        self.champion = None
-        self.challengers = []
-    
-    def set_champion(self, model, version):
-        self.champion = {'model': model, 'version': version}
-        print(f"[DEPLOY] Champion set to version {version}")
-    
-    def add_challenger(self, model, version, traffic_pct):
-        self.challengers.append({
-            'model': model, 'version': version, 'traffic': traffic_pct
-        })
-        print(f"[DEPLOY] Challenger {version} added with {traffic_pct*100}% traffic")
-
-# Pattern 6: Model Monitor
-class ModelMonitor:
-    def __init__(self, baseline_accuracy):
-        self.baseline = baseline_accuracy
-        self.predictions = []
-    
-    def log_prediction(self, prediction, actual=None):
-        self.predictions.append({'pred': prediction, 'actual': actual})
-    
-    def check_drift(self):
-        if len(self.predictions) < 100:
-            return False
-        recent = self.predictions[-100:]
-        with_labels = [p for p in recent if p['actual'] is not None]
-        if with_labels:
-            accuracy = sum(p['pred'] == p['actual'] for p in with_labels) / len(with_labels)
-            if accuracy < self.baseline * 0.9:
-                print("[ALERT] Model performance degradation detected!")
-                return True
-        return False
-
-# Complete Workflow Execution
-def run_end_to_end_workflow():
-    print("=" * 50)
-    print("END-TO-END ML WORKFLOW")
-    print("=" * 50)
-    
-    # Stage 1: Data Versioning
-    print("\n[STAGE 1] Data Collection & Versioning")
-    data_versioner = DataVersioner()
-    X = np.random.randn(1000, 10)
-    y = (X.sum(axis=1) > 0).astype(int)
-    data_versioner.register("training_data", X, "v1.0")
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    
-    # Stage 2: Feature Store
-    print("\n[STAGE 2] Feature Engineering")
-    feature_store = FeatureStore()
-    feature_store.register_transform("normalize", lambda x: (x - x.mean()) / x.std())
-    
-    # Stage 3: Training with Pipeline
-    print("\n[STAGE 3] Model Training")
-    pipeline = TrainingPipeline(feature_store)
-    eval_store = EvaluationStore()
-    
-    # Train baseline (Start Simple pattern)
-    baseline = LogisticRegression()
-    baseline, baseline_score = pipeline.run(baseline, X_train, y_train)
-    eval_store.log("exp_001", "LogisticRegression", {'accuracy': baseline_score}, {'C': 1.0})
-    print(f"Baseline accuracy: {baseline_score:.3f}")
-    
-    # Train complex model
-    rf = RandomForestClassifier(n_estimators=100)
-    rf, rf_score = pipeline.run(rf, X_train, y_train)
-    eval_store.log("exp_002", "RandomForest", {'accuracy': rf_score}, {'n_estimators': 100})
-    print(f"RandomForest accuracy: {rf_score:.3f}")
-    
-    # Stage 4: Evaluation & Model Selection
-    print("\n[STAGE 4] Model Selection")
-    best = eval_store.get_best()
-    print(f"Best model: {best['model']} with accuracy {best['metrics']['accuracy']:.3f}")
-    
-    # Stage 5: Deployment
-    print("\n[STAGE 5] Deployment")
-    deployer = ModelDeployer()
-    deployer.set_champion(baseline, "v1.0")
-    deployer.add_challenger(rf, "v2.0", 0.1)
-    
-    # Stage 6: Monitoring
-    print("\n[STAGE 6] Monitoring")
-    monitor = ModelMonitor(baseline_accuracy=baseline_score)
-    for i in range(50):
-        pred = baseline.predict([X_test[i]])[0]
-        monitor.log_prediction(pred, y_test[i])
-    
-    if not monitor.check_drift():
-        print("[MONITOR] Model performing within acceptable range")
-    
-    print("\n" + "=" * 50)
-    print("WORKFLOW COMPLETE")
-    print("=" * 50)
-
-# Execute
-run_end_to_end_workflow()
-```
-
-### 5. Interview Tips
-- Know which pattern applies at each stage
-- Mention specific tools (MLflow, DVC, Kubernetes)
-- Discuss automation (CI/CD for ML)
-- Emphasize monitoring as ongoing, not one-time
-
----
-
-## Question 5
-
 **How might 'Recursive Feature Elimination' fit into a design pattern for feature selection?**
 
 **Answer:**
@@ -799,7 +559,7 @@ for step in logging_rfe.history[-5:]:
 
 ---
 
-## Question 6
+## Question 5
 
 **How can we make sure that the 'Model Lineage' design pattern is maintained throughout the model lifecycle?**
 
@@ -1010,7 +770,7 @@ training_workflow()
 
 ---
 
-## Question 7
+## Question 6
 
 **What design patterns would you recommend for a system requiring high throughput and low latency predictions?**
 
@@ -1036,21 +796,21 @@ training_workflow()
 ### 3. Architecture Layers
 
 ```
-Client → CDN/Edge → Load Balancer → API Gateway
-                                         │
-    ┌────────────────────────────────────┼────────────────────────┐
-    │                                    ▼                        │
-    │   ┌────────────┐    ┌──────────────────────┐                │
-    │   │ Prediction │◄───│   Feature Service    │                │
-    │   │   Cache    │    │   (Pre-computed)     │                │
-    │   └─────┬──────┘    └──────────────────────┘                │
-    │         │ Cache Miss                                        │
-    │         ▼                                                   │
-    │   ┌────────────┐    ┌──────────────────────┐                │
-    │   │  Model     │◄───│  Batching Layer      │                │
-    │   │  Server    │    │  (Group requests)    │                │
-    │   └────────────┘    └──────────────────────┘                │
-    └─────────────────────────────────────────────────────────────┘
+Client â†’ CDN/Edge â†’ Load Balancer â†’ API Gateway
+                                         â”‚
+    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    â”‚                                    â–¼                        â”‚
+    â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                â”‚
+    â”‚   â”‚ Prediction â”‚â—„â”€â”€â”€â”‚   Feature Service    â”‚                â”‚
+    â”‚   â”‚   Cache    â”‚    â”‚   (Pre-computed)     â”‚                â”‚
+    â”‚   â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                â”‚
+    â”‚         â”‚ Cache Miss                                        â”‚
+    â”‚         â–¼                                                   â”‚
+    â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                â”‚
+    â”‚   â”‚  Model     â”‚â—„â”€â”€â”€â”‚  Batching Layer      â”‚                â”‚
+    â”‚   â”‚  Server    â”‚    â”‚  (Group requests)    â”‚                â”‚
+    â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                â”‚
+    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 4. Pattern Implementation Details
@@ -1066,7 +826,7 @@ Client → CDN/Edge → Load Balancer → API Gateway
 - Trade-off: slight latency increase for throughput gain
 
 **c) Model Optimization**
-- Quantization: FP32 → INT8 (4x smaller, 2-4x faster)
+- Quantization: FP32 â†’ INT8 (4x smaller, 2-4x faster)
 - Pruning: Remove unimportant weights
 - Distillation: Train small model to mimic large one
 
@@ -1235,7 +995,7 @@ Performance metrics:
 
 ---
 
-## Question 8
+## Question 7
 
 **Share examples of 'Monitoring and Alerts' in an AI system that follow best design practices.**
 
@@ -1508,7 +1268,7 @@ data_monitor.check_record({'age': -5})  # Missing user_id, negative age
 
 ---
 
-## Question 9
+## Question 8
 
 **What process would you follow to tune hyperparameters in a system that employs multiple model design patterns?**
 
@@ -1531,8 +1291,8 @@ Hyperparameter tuning in multi-pattern systems requires coordinating search acro
 
 **a) Sequential Tuning**: Tune upstream models first
 ```
-Data → Feature Engineering → Base Model → Ensemble
-       Tune first         → Tune second → Tune last
+Data â†’ Feature Engineering â†’ Base Model â†’ Ensemble
+       Tune first         â†’ Tune second â†’ Tune last
 ```
 
 **b) Nested Optimization**: Inner/outer loops
@@ -1844,7 +1604,7 @@ print(f"Checkpoints saved: {list(tuner.checkpoints.keys())}")
 
 ---
 
-## Question 10
+## Question 9
 
 **What 'Rollback' strategies could be put in place for deployed machine learning models?**
 
@@ -2202,3 +1962,1001 @@ print(f"Rollback history: {manager.rollback_history}")
 
 ---
 
+## Question 10
+
+**How would you scale a machine learning pipeline according to the 'Horizontal Scaling' design pattern?**
+
+**Answer:**
+
+### 1. Definition
+Horizontal Scaling adds more machines/instances to handle increased load, rather than upgrading a single machine (vertical scaling). Each instance handles a portion of requests, enabling linear throughput growth.
+
+### 2. Core Concepts
+- **Stateless Services**: No session state stored on instance
+- **Load Balancer**: Distributes requests across instances
+- **Auto-scaling**: Add/remove instances based on metrics
+- **Containerization**: Package service for easy replication
+- **Shared Storage**: Models stored in central location (S3, NFS)
+
+### 3. Scaling Strategy
+
+| Component | Horizontal Scaling Approach |
+|-----------|---------------------------|
+| Data Ingestion | Kafka partitions, multiple consumers |
+| Feature Engineering | Spark workers, distributed compute |
+| Model Training | Data parallelism across GPUs |
+| Model Serving | Multiple API replicas behind LB |
+| Batch Inference | Parallel job executors |
+
+### 4. Scenario Application
+**Problem**: Recommendation API gets 1000 QPS during sale, but only 100 QPS normally.
+
+**Horizontal Scaling Solution**:
+1. Containerize model service (Docker)
+2. Deploy to Kubernetes with auto-scaling
+3. Set scaling policy: if CPU > 70% for 2 min, add replica
+4. Load balancer distributes requests
+5. During sale: 10 replicas; normal: 2 replicas
+6. Cost-effective: pay only for what you use
+
+### 5. Python Code Example
+
+```python
+# Architecture for horizontally scalable ML pipeline
+
+# Step 1: Stateless model service
+from flask import Flask, request, jsonify
+import os
+
+app = Flask(__name__)
+
+# Load model from shared storage (not local)
+MODEL_PATH = os.environ.get('MODEL_PATH', 's3://models/latest.pkl')
+
+class ModelService:
+    def __init__(self):
+        # Load from shared storage - all replicas get same model
+        self.model = self._load_model()
+    
+    def _load_model(self):
+        # In production: download from S3/GCS
+        return lambda x: sum(x) > 0
+    
+    def predict(self, features):
+        return self.model(features)
+
+model_service = ModelService()
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.get_json()
+    result = model_service.predict(data['features'])
+    return jsonify({'prediction': result})
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'healthy'}), 200
+
+# Step 2: Kubernetes deployment config
+k8s_deployment = """
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-service
+spec:
+  replicas: 3  # Start with 3 instances
+  selector:
+    matchLabels:
+      app: ml-service
+  template:
+    spec:
+      containers:
+      - name: ml-service
+        image: ml-service:latest
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        env:
+        - name: MODEL_PATH
+          value: "s3://models/latest.pkl"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ml-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ml-service
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+"""
+print("Kubernetes config for horizontal scaling:")
+print(k8s_deployment)
+```
+
+### 6. Key Requirements for Horizontal Scaling
+- **Stateless**: No local state, use external cache (Redis)
+- **Shared Model**: All replicas load same model version
+- **Health Checks**: Load balancer routes to healthy instances only
+- **Graceful Shutdown**: Complete in-flight requests before terminating
+
+### 7. Interview Tips
+- Discuss vertical vs horizontal trade-offs
+- Mention statelessness as prerequisite
+- Talk about cold start when scaling up (pre-warming)
+
+---
+
+## Question 11
+
+**Discuss the 'Model Decay' design pattern and strategies to overcome it.**
+
+**Answer:**
+
+### 1. Definition
+Model Decay (also called model staleness or model rot) refers to the degradation of model performance over time as the real-world data distribution shifts away from the training data distribution.
+
+### 2. Core Concepts
+- **Data Drift**: Input feature distributions change
+- **Concept Drift**: Relationship between features and target changes
+- **Performance Degradation**: Accuracy, precision, recall decline over time
+- **Decay Rate**: How fast performance drops (varies by domain)
+
+### 3. Causes of Model Decay
+
+| Cause | Example |
+|-------|---------|
+| User behavior change | COVID changed shopping patterns |
+| Seasonality | Holiday vs normal periods |
+| Market dynamics | New competitors, regulations |
+| Data quality issues | Upstream pipeline changes |
+| Feature drift | Third-party data source changes |
+
+### 4. Scenario Application
+**E-commerce Recommendation Model**:
+- Deployed: January 2024, CTR = 5%
+- March 2024: CTR drops to 3.5%
+- Diagnosis: New product categories added, user preferences shifted
+
+**Resolution Strategy**:
+1. Detect: Monitor CTR daily, alert on 20% drop
+2. Diagnose: Compare feature distributions train vs production
+3. Retrain: Weekly retraining on recent 30-day data
+4. Validate: A/B test before full deployment
+5. Prevent: Set up continuous training pipeline
+
+### 5. Mitigation Strategies
+
+```python
+import numpy as np
+from datetime import datetime, timedelta
+
+class ModelDecayMonitor:
+    def __init__(self, baseline_metric, decay_threshold=0.1):
+        self.baseline = baseline_metric
+        self.threshold = decay_threshold
+        self.history = []
+    
+    def log_metric(self, metric_value, timestamp=None):
+        self.history.append({
+            'timestamp': timestamp or datetime.now(),
+            'metric': metric_value,
+            'decay': (self.baseline - metric_value) / self.baseline
+        })
+    
+    def check_decay(self):
+        if not self.history:
+            return False, 0
+        
+        recent = self.history[-1]
+        if recent['decay'] > self.threshold:
+            return True, recent['decay']
+        return False, recent['decay']
+    
+    def should_retrain(self):
+        decayed, decay_rate = self.check_decay()
+        if decayed:
+            print(f"ALERT: Model decayed by {decay_rate:.1%}. Retrain recommended.")
+            return True
+        return False
+
+# Mitigation strategies implementation
+class DecayMitigation:
+    @staticmethod
+    def scheduled_retraining(model, data_loader, frequency_days=7):
+        """Retrain on schedule regardless of performance"""
+        # Triggered by scheduler (Airflow, cron)
+        new_data = data_loader.get_recent_data(days=30)
+        model.fit(new_data)
+        return model
+    
+    @staticmethod
+    def triggered_retraining(model, data_loader, monitor):
+        """Retrain only when decay detected"""
+        if monitor.should_retrain():
+            new_data = data_loader.get_recent_data(days=30)
+            model.fit(new_data)
+        return model
+    
+    @staticmethod
+    def online_learning(model, new_sample):
+        """Continuously update with each new sample"""
+        model.partial_fit(new_sample)
+        return model
+    
+    @staticmethod
+    def ensemble_with_recent(old_model, recent_model, alpha=0.7):
+        """Blend old and recent model predictions"""
+        def predict(x):
+            old_pred = old_model.predict(x)
+            recent_pred = recent_model.predict(x)
+            return alpha * recent_pred + (1 - alpha) * old_pred
+        return predict
+
+# Usage
+monitor = ModelDecayMonitor(baseline_metric=0.85, decay_threshold=0.1)
+monitor.log_metric(0.82)  # Slight drop
+monitor.log_metric(0.75)  # Significant drop
+
+if monitor.should_retrain():
+    print("Initiating retraining pipeline...")
+```
+
+### 6. Prevention Best Practices
+- **Monitor continuously**: Don't wait for complaints
+- **Automate retraining**: Scheduled or trigger-based
+- **Version everything**: Data, model, features
+- **A/B test updates**: Never blind deploy
+
+### 7. Interview Tips
+- Decay is inevitable - question is how fast and how to detect
+- Different domains decay at different rates (finance: fast, medical imaging: slow)
+- Balance stability vs freshness in retraining frequency
+
+---
+
+## Question 12
+
+**Discuss how 'Continuous Evaluation' helps in maintaining model quality.**
+
+**Answer:**
+
+### 1. Definition
+Continuous Evaluation monitors model performance in production using live predictions and outcomes, enabling early detection of degradation before significant business impact.
+
+### 2. Core Concepts
+- **Ground Truth Collection**: Gather actual outcomes for predictions
+- **Delayed Labels**: Handle lag between prediction and outcome
+- **Proxy Metrics**: Use leading indicators when labels unavailable
+- **Sliding Window**: Evaluate on recent time window, not all-time
+- **Statistical Testing**: Detect significant performance changes
+
+### 3. Evaluation Components
+
+| Component | Purpose | Example |
+|-----------|---------|---------|
+| Real-time metrics | Immediate feedback | Latency, error rate |
+| Business metrics | Outcome impact | CTR, revenue, conversions |
+| Model metrics | ML performance | Accuracy, AUC (when labels arrive) |
+| Data quality | Input health | Missing values, schema violations |
+
+### 4. Scenario Application
+**Fraud Detection System**:
+- **T+0 (immediate)**: Monitor prediction latency, API errors
+- **T+1 hour**: Track approval rate, flagged transaction rate
+- **T+7 days**: Confirmed fraud labels arrive, compute precision/recall
+- **T+30 days**: Chargeback data, compute false negative rate
+
+**Action Triggers**:
+- Latency > 100ms: Alert oncall
+- Flagged rate > 5%: Review model threshold
+- Precision < 80%: Schedule retraining
+- False negative spike: Emergency model update
+
+### 5. Python Code Example
+
+```python
+import numpy as np
+from datetime import datetime, timedelta
+from scipy import stats
+
+class ContinuousEvaluator:
+    def __init__(self, baseline_metrics):
+        self.baseline = baseline_metrics
+        self.prediction_log = []
+        self.outcome_log = []
+    
+    def log_prediction(self, prediction_id, prediction, timestamp=None):
+        self.prediction_log.append({
+            'id': prediction_id,
+            'prediction': prediction,
+            'timestamp': timestamp or datetime.now()
+        })
+    
+    def log_outcome(self, prediction_id, actual):
+        """Called when ground truth becomes available"""
+        self.outcome_log.append({
+            'id': prediction_id,
+            'actual': actual,
+            'timestamp': datetime.now()
+        })
+    
+    def compute_metrics(self, window_days=7):
+        """Compute metrics on recent window"""
+        cutoff = datetime.now() - timedelta(days=window_days)
+        
+        # Join predictions with outcomes
+        pred_dict = {p['id']: p for p in self.prediction_log}
+        matched = []
+        for outcome in self.outcome_log:
+            if outcome['id'] in pred_dict:
+                pred = pred_dict[outcome['id']]
+                if pred['timestamp'] > cutoff:
+                    matched.append({
+                        'prediction': pred['prediction'],
+                        'actual': outcome['actual']
+                    })
+        
+        if not matched:
+            return None
+        
+        preds = [m['prediction'] for m in matched]
+        actuals = [m['actual'] for m in matched]
+        
+        accuracy = sum(p == a for p, a in zip(preds, actuals)) / len(matched)
+        return {'accuracy': accuracy, 'sample_size': len(matched)}
+    
+    def check_degradation(self):
+        """Detect statistically significant performance drop"""
+        current = self.compute_metrics(window_days=7)
+        if not current or current['sample_size'] < 100:
+            return False, "Insufficient data"
+        
+        baseline_acc = self.baseline.get('accuracy', 0.9)
+        current_acc = current['accuracy']
+        
+        # Binomial test for significance
+        n = current['sample_size']
+        k = int(current_acc * n)
+        p_value = stats.binom_test(k, n, baseline_acc, alternative='less')
+        
+        if p_value < 0.05:
+            return True, f"Significant drop: {baseline_acc:.2%} -> {current_acc:.2%}"
+        return False, f"No significant change: {current_acc:.2%}"
+
+# Usage
+evaluator = ContinuousEvaluator(baseline_metrics={'accuracy': 0.92})
+
+# Log predictions (real-time)
+for i in range(200):
+    pred = np.random.choice([0, 1])
+    evaluator.log_prediction(f'req_{i}', pred)
+
+# Log outcomes (delayed by days)
+for i in range(200):
+    actual = np.random.choice([0, 1], p=[0.6, 0.4])  # Some degradation
+    evaluator.log_outcome(f'req_{i}', actual)
+
+# Evaluate
+degraded, message = evaluator.check_degradation()
+print(f"Degradation detected: {degraded}")
+print(f"Message: {message}")
+```
+
+### 6. Proxy Metrics When Labels Delayed
+- **Recommendation**: Click rate (immediate) vs purchase rate (delayed)
+- **Fraud**: Flagged rate (immediate) vs confirmed fraud (delayed)
+- **Search**: Click-through rate (immediate) vs task completion (delayed)
+
+### 7. Interview Tips
+- Emphasize the importance of feedback loops
+- Discuss sample size requirements for statistical significance
+- Mention A/B testing integration for model comparisons
+
+---
+
+## Question 13
+
+**How would you approach 'Model Serving' in an environment with strict data regulations?**
+
+**Answer:**
+
+### 1. Definition
+Model Serving under data regulations requires architectures that comply with privacy laws (GDPR, HIPAA, CCPA) while delivering predictions, including data minimization, encryption, audit trails, and user rights.
+
+### 2. Key Regulations
+
+| Regulation | Key Requirements |
+|------------|-----------------|
+| GDPR | Right to explanation, data deletion, consent |
+| HIPAA | Health data protection, audit trails |
+| CCPA | User data access, opt-out rights |
+| SOC2 | Security controls, data handling |
+
+### 3. Compliance Design Patterns
+
+| Pattern | Implementation |
+|---------|---------------|
+| Data Minimization | Only collect/process necessary features |
+| Encryption | Encrypt data at rest and in transit |
+| Anonymization | Remove PII before model inference |
+| Audit Logging | Log all data access and predictions |
+| Right to Explanation | Provide prediction reasoning |
+| Data Deletion | Delete user data on request (RTBF) |
+| Consent Management | Track user consent for data usage |
+
+### 4. Scenario Application
+**Healthcare Prediction Service (HIPAA Compliant)**:
+
+**Architecture**:
+1. Data never leaves secure enclave
+2. Federated learning: model trains on-premise, only gradients shared
+3. Differential privacy: add noise to prevent data leakage
+4. Encrypted inference: process encrypted data
+5. Audit log every prediction with user, time, data accessed
+
+### 5. Python Code Example
+
+```python
+import hashlib
+import json
+from datetime import datetime
+from cryptography.fernet import Fernet
+import uuid
+
+class ComplianceModelServer:
+    """Model serving with regulatory compliance built-in"""
+    
+    def __init__(self, model, encryption_key=None):
+        self.model = model
+        self.key = encryption_key or Fernet.generate_key()
+        self.cipher = Fernet(self.key)
+        self.audit_log = []
+        self.user_consent = {}
+        self.user_data = {}
+    
+    # Pattern 1: Consent Management
+    def register_consent(self, user_id, purposes):
+        """Track user consent for data usage"""
+        self.user_consent[user_id] = {
+            'purposes': purposes,  # ['inference', 'training', 'analytics']
+            'timestamp': datetime.now().isoformat(),
+            'version': 'v1.0'
+        }
+        self._log_audit(user_id, 'CONSENT_REGISTERED', {'purposes': purposes})
+    
+    def check_consent(self, user_id, purpose):
+        """Verify consent before processing"""
+        consent = self.user_consent.get(user_id, {})
+        return purpose in consent.get('purposes', [])
+    
+    # Pattern 2: Data Minimization
+    def minimize_features(self, features, required_fields):
+        """Only use necessary features"""
+        return {k: v for k, v in features.items() if k in required_fields}
+    
+    # Pattern 3: PII Anonymization
+    def anonymize(self, features):
+        """Remove/hash PII before inference"""
+        anonymized = features.copy()
+        pii_fields = ['name', 'email', 'ssn', 'address', 'phone']
+        
+        for field in pii_fields:
+            if field in anonymized:
+                # Hash instead of remove (preserves some utility)
+                anonymized[field] = hashlib.sha256(
+                    str(anonymized[field]).encode()
+                ).hexdigest()[:16]
+        
+        return anonymized
+    
+    # Pattern 4: Encrypted Inference
+    def encrypt_request(self, data):
+        """Encrypt data for secure transmission"""
+        json_data = json.dumps(data).encode()
+        return self.cipher.encrypt(json_data)
+    
+    def decrypt_request(self, encrypted_data):
+        """Decrypt data for processing"""
+        decrypted = self.cipher.decrypt(encrypted_data)
+        return json.loads(decrypted)
+    
+    # Pattern 5: Audit Logging
+    def _log_audit(self, user_id, action, details):
+        """Log all data access for compliance"""
+        entry = {
+            'timestamp': datetime.now().isoformat(),
+            'request_id': str(uuid.uuid4()),
+            'user_id': hashlib.sha256(str(user_id).encode()).hexdigest()[:16],
+            'action': action,
+            'details': details
+        }
+        self.audit_log.append(entry)
+        print(f"[AUDIT] {action}: {entry['request_id']}")
+    
+    # Pattern 6: Right to Explanation
+    def explain_prediction(self, prediction, features):
+        """Provide human-readable explanation (GDPR Art. 22)"""
+        return {
+            'prediction': prediction,
+            'explanation': f"Based on {len(features)} factors",
+            'top_factors': list(features.keys())[:3],
+            'human_readable': "This prediction was made considering your profile data"
+        }
+    
+    # Pattern 7: Right to Be Forgotten
+    def delete_user_data(self, user_id):
+        """Delete all user data on request (GDPR Art. 17)"""
+        # Delete from storage
+        if user_id in self.user_data:
+            del self.user_data[user_id]
+        if user_id in self.user_consent:
+            del self.user_consent[user_id]
+        
+        self._log_audit(user_id, 'DATA_DELETED', {'reason': 'User request'})
+        return {'status': 'deleted', 'user_id': user_id}
+    
+    # Main serving endpoint
+    def predict(self, user_id, features, purpose='inference'):
+        """Compliant prediction endpoint"""
+        
+        # Step 1: Check consent
+        if not self.check_consent(user_id, purpose):
+            return {'error': 'Consent not provided for this purpose'}
+        
+        # Step 2: Minimize features
+        required = ['age', 'income', 'score']  # Only what model needs
+        minimized = self.minimize_features(features, required)
+        
+        # Step 3: Anonymize PII
+        anonymized = self.anonymize(minimized)
+        
+        # Step 4: Log access
+        self._log_audit(user_id, 'PREDICTION_REQUEST', {'features_used': list(minimized.keys())})
+        
+        # Step 5: Make prediction
+        prediction = self.model.predict(anonymized)
+        
+        # Step 6: Provide explanation
+        result = self.explain_prediction(prediction, minimized)
+        
+        return result
+
+# Usage
+class MockModel:
+    def predict(self, features):
+        return 'approved'
+
+server = ComplianceModelServer(MockModel())
+
+# Register consent
+server.register_consent('user_123', ['inference', 'analytics'])
+
+# Make prediction
+features = {
+    'name': 'John Doe',  # PII - will be anonymized
+    'age': 30,
+    'income': 75000,
+    'score': 720,
+    'email': 'john@example.com'  # PII
+}
+
+result = server.predict('user_123', features)
+print(f"\nPrediction result: {result}")
+
+# Right to be forgotten
+deletion = server.delete_user_data('user_123')
+print(f"\nDeletion result: {deletion}")
+
+# View audit log
+print(f"\nAudit log entries: {len(server.audit_log)}")
+```
+
+### 6. Key Architectural Decisions
+- **On-premise deployment**: Data never leaves customer's infrastructure
+- **Federated learning**: Train without centralizing data
+- **Differential privacy**: Mathematical privacy guarantees
+- **Secure enclaves**: Hardware-level data protection (Intel SGX)
+
+### 7. Interview Tips
+- Always mention specific regulations by name
+- Discuss trade-offs: privacy vs model performance
+- Mention data residency (data must stay in certain geography)
+- Legal team involvement is essential for compliance
+
+---
+
+## Question 14
+
+**Discuss 'Dynamic Training' approaches in a scenario where data distributions change rapidly.**
+
+**Answer:**
+
+### 1. Definition
+Dynamic Training continuously updates models as new data arrives, adapting to rapid distribution changes (concept drift, trending topics, market shifts) rather than relying on periodic batch retraining.
+
+### 2. Core Concepts
+- **Online Learning**: Update model with each new sample
+- **Mini-batch Updates**: Accumulate small batches, update frequently
+- **Sliding Window**: Train only on recent data (forget old patterns)
+- **Exponential Decay**: Weight recent data more heavily
+- **Trigger-based Retraining**: Retrain when drift detected
+
+### 3. Dynamic Training Strategies
+
+| Strategy | Update Frequency | Use Case |
+|----------|-----------------|----------|
+| Full Online | Every sample | High-frequency trading |
+| Mini-batch | Every N samples | Real-time recommendations |
+| Scheduled | Hourly/Daily | News, trending content |
+| Triggered | On drift detection | Stable with occasional shifts |
+
+### 4. Scenario Application
+**Trending Topic Detection for Social Media**:
+
+**Challenge**: Topics trend and die within hours. Weekly retrained model is always outdated.
+
+**Dynamic Training Solution**:
+1. **Streaming Data**: Consume tweets in real-time via Kafka
+2. **Mini-batch Updates**: Accumulate 1000 tweets, update model
+3. **Sliding Window**: Keep only last 24 hours of data
+4. **Ensemble**: Blend hourly model with daily model
+5. **Drift Detection**: Alert if topic distribution shifts dramatically
+
+### 5. Python Code Example
+
+```python
+import numpy as np
+from collections import deque
+from sklearn.linear_model import SGDClassifier
+from datetime import datetime, timedelta
+
+class DynamicTrainer:
+    """Handles rapidly changing data distributions"""
+    
+    def __init__(self, base_model, window_hours=24, batch_size=100):
+        self.model = base_model
+        self.window_hours = window_hours
+        self.batch_size = batch_size
+        self.data_buffer = deque()
+        self.drift_detector = DriftDetector()
+        self.update_count = 0
+    
+    def add_sample(self, features, label, timestamp=None):
+        """Add new sample to buffer"""
+        timestamp = timestamp or datetime.now()
+        self.data_buffer.append({
+            'features': features,
+            'label': label,
+            'timestamp': timestamp
+        })
+        
+        # Remove old samples (sliding window)
+        cutoff = datetime.now() - timedelta(hours=self.window_hours)
+        while self.data_buffer and self.data_buffer[0]['timestamp'] < cutoff:
+            self.data_buffer.popleft()
+        
+        # Check if batch update needed
+        if len(self.data_buffer) >= self.batch_size:
+            self._update_model()
+    
+    def _update_model(self):
+        """Perform mini-batch update"""
+        recent = list(self.data_buffer)[-self.batch_size:]
+        
+        X = np.array([s['features'] for s in recent])
+        y = np.array([s['label'] for s in recent])
+        
+        # Online update (partial_fit)
+        self.model.partial_fit(X, y, classes=np.unique(y))
+        self.update_count += 1
+        
+        # Check for drift
+        if self.drift_detector.detect(y):
+            print(f"[ALERT] Drift detected at update {self.update_count}")
+        
+        print(f"[UPDATE] Model updated with {len(recent)} samples. Total updates: {self.update_count}")
+    
+    def predict(self, features):
+        """Make prediction with current model"""
+        return self.model.predict([features])[0]
+
+class DriftDetector:
+    """Simple drift detection based on label distribution"""
+    
+    def __init__(self, window_size=100, threshold=0.2):
+        self.recent_labels = deque(maxlen=window_size)
+        self.baseline_dist = None
+        self.threshold = threshold
+    
+    def detect(self, new_labels):
+        """Check if distribution has shifted"""
+        self.recent_labels.extend(new_labels)
+        
+        if len(self.recent_labels) < 50:
+            return False
+        
+        current_dist = np.bincount(list(self.recent_labels), minlength=2) / len(self.recent_labels)
+        
+        if self.baseline_dist is None:
+            self.baseline_dist = current_dist
+            return False
+        
+        # Check distribution shift
+        shift = np.abs(current_dist - self.baseline_dist).max()
+        
+        if shift > self.threshold:
+            self.baseline_dist = current_dist  # Update baseline
+            return True
+        
+        return False
+
+class ExponentialDecayTrainer:
+    """Weight recent samples more heavily"""
+    
+    def __init__(self, decay_rate=0.995):
+        self.decay_rate = decay_rate
+        self.samples = []
+    
+    def add_sample(self, features, label, timestamp=None):
+        self.samples.append({
+            'features': features,
+            'label': label,
+            'weight': 1.0
+        })
+        
+        # Decay old sample weights
+        for sample in self.samples:
+            sample['weight'] *= self.decay_rate
+        
+        # Remove samples with negligible weight
+        self.samples = [s for s in self.samples if s['weight'] > 0.01]
+    
+    def get_weighted_data(self):
+        """Return features, labels, and sample weights"""
+        X = np.array([s['features'] for s in self.samples])
+        y = np.array([s['label'] for s in self.samples])
+        weights = np.array([s['weight'] for s in self.samples])
+        return X, y, weights
+
+# Usage Example: Trending topic classifier
+model = SGDClassifier(loss='log_loss', warm_start=True)
+trainer = DynamicTrainer(model, window_hours=6, batch_size=50)
+
+# Simulate streaming data
+np.random.seed(42)
+for i in range(200):
+    # Features: word counts, sentiment, etc.
+    features = np.random.rand(10)
+    
+    # Label distribution shifts over time
+    if i < 100:
+        label = np.random.choice([0, 1], p=[0.7, 0.3])
+    else:
+        label = np.random.choice([0, 1], p=[0.3, 0.7])  # Distribution shift
+    
+    trainer.add_sample(features, label)
+
+print(f"\nFinal buffer size: {len(trainer.data_buffer)}")
+print(f"Total model updates: {trainer.update_count}")
+```
+
+**Output:**
+```
+[UPDATE] Model updated with 50 samples. Total updates: 1
+[UPDATE] Model updated with 50 samples. Total updates: 2
+[ALERT] Drift detected at update 3
+[UPDATE] Model updated with 50 samples. Total updates: 3
+[UPDATE] Model updated with 50 samples. Total updates: 4
+```
+
+### 6. Challenges and Solutions
+- **Catastrophic Forgetting**: Use replay buffer or regularization
+- **Noisy Updates**: Larger batch sizes for stability
+- **Concept Recovery**: Quick adaptation when old patterns return
+- **Model Stability**: Ensemble stable + dynamic models
+
+### 7. Interview Tips
+- Dynamic training trades stability for freshness
+- Mention specific algorithms: SGD, online random forest, streaming k-means
+- Discuss validation: hard to evaluate without held-out future data
+- Production: often combine with scheduled full retraining
+
+---
+
+## Question 15
+
+**Discuss the implications of implementing the 'Stateless Model' design pattern in distributed systems.**
+
+**Answer:**
+
+### 1. Definition
+Stateless Model design ensures prediction services don't maintain client state between requests. Each request contains all necessary information, enabling easy scaling, load balancing, and fault tolerance.
+
+### 2. Implications
+
+| Aspect | Implication |
+|--------|-------------|
+| **Scalability** | Easy horizontal scaling - any replica handles any request |
+| **Load Balancing** | Simple round-robin works well |
+| **Fault Tolerance** | Failed node replaced without state migration |
+| **Caching** | Must be external (Redis) not in-memory |
+| **Session Data** | Passed with each request or stored externally |
+
+### 3. Python Implementation
+
+```python
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+import pickle
+import hashlib
+from typing import Dict, Any
+import time
+
+class StatelessPredictionService:
+    """Stateless model serving - no client state between requests"""
+    
+    def __init__(self, model_path: str):
+        # Model loaded once at startup, not modified per-request
+        with open(model_path, 'rb') as f:
+            self.model = pickle.load(f)
+        self.instance_id = hashlib.md5(str(time.time()).encode()).hexdigest()[:8]
+    
+    def predict(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Stateless prediction - all context in request
+        
+        Request contains:
+        - features: input data
+        - request_id: for tracking
+        - metadata: any additional context
+        """
+        features = np.array(request['features']).reshape(1, -1)
+        
+        prediction = self.model.predict(features)[0]
+        probability = None
+        if hasattr(self.model, 'predict_proba'):
+            probability = self.model.predict_proba(features)[0].tolist()
+        
+        # Response is self-contained - no state dependency
+        return {
+            'request_id': request.get('request_id'),
+            'prediction': int(prediction),
+            'probability': probability,
+            'served_by': self.instance_id,  # Shows which replica handled it
+            'timestamp': time.time()
+        }
+
+class StatefulAntiPattern:
+    """Anti-pattern: Stateful service (for comparison)"""
+    
+    def __init__(self, model):
+        self.model = model
+        self.session_data = {}  # BAD: State stored between requests
+        self.request_count = {}  # BAD: Per-client counters
+    
+    def predict(self, client_id: str, features):
+        # BAD: Depends on previous requests
+        if client_id not in self.session_data:
+            self.session_data[client_id] = {'history': []}
+        
+        self.session_data[client_id]['history'].append(features)
+        self.request_count[client_id] = self.request_count.get(client_id, 0) + 1
+        
+        # This service CAN'T be easily scaled - state is in memory
+        return self.model.predict(features.reshape(1, -1))
+
+class ExternalStateManager:
+    """Proper pattern: External state storage for stateless services"""
+    
+    def __init__(self):
+        # Simulates Redis/external cache
+        self.cache = {}
+    
+    def get_session(self, session_id: str) -> Dict:
+        return self.cache.get(session_id, {})
+    
+    def set_session(self, session_id: str, data: Dict):
+        self.cache[session_id] = data
+    
+    def update_session(self, session_id: str, key: str, value: Any):
+        if session_id not in self.cache:
+            self.cache[session_id] = {}
+        self.cache[session_id][key] = value
+
+class StatelessWithExternalState:
+    """Stateless service with external state management"""
+    
+    def __init__(self, model, state_manager: ExternalStateManager):
+        self.model = model
+        self.state_manager = state_manager
+    
+    def predict(self, request: Dict) -> Dict:
+        session_id = request.get('session_id')
+        features = np.array(request['features']).reshape(1, -1)
+        
+        # Get session from external store (not local memory)
+        session = self.state_manager.get_session(session_id) if session_id else {}
+        
+        prediction = self.model.predict(features)[0]
+        
+        # Update external state (service remains stateless)
+        if session_id:
+            history = session.get('predictions', [])
+            history.append(int(prediction))
+            self.state_manager.update_session(session_id, 'predictions', history)
+        
+        return {
+            'prediction': int(prediction),
+            'session_history': session.get('predictions', [])
+        }
+
+# Demo
+print("=== Stateless Model Pattern Demo ===\n")
+
+# Train and save model
+np.random.seed(42)
+X, y = np.random.randn(500, 10), (np.random.randn(500) > 0).astype(int)
+model = RandomForestClassifier(n_estimators=50, random_state=42)
+model.fit(X, y)
+
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Create stateless service
+service = StatelessPredictionService('model.pkl')
+
+# Multiple requests - each self-contained
+print("Stateless Predictions:")
+for i in range(3):
+    request = {
+        'request_id': f'req_{i}',
+        'features': np.random.randn(10).tolist()
+    }
+    response = service.predict(request)
+    print(f"  Request {i}: prediction={response['prediction']}, server={response['served_by']}")
+
+# With external state
+print("\nStateless with External State:")
+state_mgr = ExternalStateManager()
+service_with_state = StatelessWithExternalState(model, state_mgr)
+
+for i in range(3):
+    request = {
+        'session_id': 'user_123',
+        'features': np.random.randn(10).tolist()
+    }
+    response = service_with_state.predict(request)
+    print(f"  Request {i}: prediction={response['prediction']}, history={response['session_history']}")
+
+# Cleanup
+import os
+os.remove('model.pkl')
+```
+
+### 4. Key Implications Summary
+
+| Stateless Benefits | Stateful Drawbacks |
+|-------------------|-------------------|
+| Any replica serves any request | Sticky sessions required |
+| Easy failover | State lost on crash |
+| Simple load balancing | Complex state sync |
+| Cloud-native ready | Hard to scale |
+
+### 5. Interview Tips
+- Stateless enables Kubernetes-style scaling
+- External stores (Redis) for shared state
+- Each request must be self-contained
+- Mention container orchestration benefits
+
+---

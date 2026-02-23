@@ -1,41 +1,6 @@
 # Linear Regression Interview Questions - Scenario-Based Questions
 
-## Question 1: Can you discuss the use of spline functions in regression?
-
-### Answer
-
-**Definition:**
-Spline regression fits piecewise polynomials connected at "knots" to model complex non-linear relationships while maintaining smoothness. It's more flexible than global polynomial regression and avoids edge instability.
-
-**Core Concepts:**
-- **Knots:** Points where polynomial pieces connect
-- **Piecewise polynomials:** Different polynomial in each interval
-- **Smoothness constraints:** Function and derivatives are continuous at knots
-- **Cubic splines:** Most common (degree 3), ensures smooth curves
-
-**When to Use Splines vs Polynomial:**
-
-| Situation | Use |
-|-----------|-----|
-| Smooth non-linear relationship | Splines |
-| Local flexibility needed | Splines |
-| Simple curve, few data points | Polynomial |
-| Edge stability important | Splines |
-
-**Intuition:**
-Think of a flexible ruler that bends smoothly through data points. Unlike a single polynomial that wiggles wildly, splines bend locally without affecting distant regions.
-
-**Practical Relevance:**
-- Dose-response curves in medicine
-- Age-income relationships (non-linear but smooth)
-- Any relationship that changes pattern at certain thresholds
-
-**Interview Tip:**
-Mention that splines avoid Runge's phenomenon (oscillation at edges) that plagues high-degree polynomials.
-
----
-
-## Question 2: Discuss how linear regression can be used for sales forecasting
+## Question 1: Discuss how linear regression can be used for sales forecasting
 
 ### Answer
 
@@ -81,7 +46,7 @@ $$Sales = \beta_0 + \beta_1 \cdot trend + \beta_2 \cdot price + \beta_3 \cdot pr
 
 ---
 
-## Question 3: How would you approach building a linear regression model to predict customer churn?
+## Question 2: How would you approach building a linear regression model to predict customer churn?
 
 ### Answer
 
@@ -121,7 +86,7 @@ If asked about "linear regression for churn," politely clarify that logistic reg
 
 ---
 
-## Question 4: Propose a framework for using regression to evaluate promotional impact on sales
+## Question 3: Propose a framework for using regression to evaluate promotional impact on sales
 
 ### Answer
 
@@ -168,55 +133,7 @@ $$\log(Sales) = \beta_0 + \beta_1\log(TV_{adstock}) + \beta_2\log(Radio_{adstock
 
 ---
 
-## Question 5: Discuss recent advances in optimization algorithms for linear regression
-
-### Answer
-
-**Definition:**
-Beyond classical OLS and gradient descent, recent advances focus on scalability, sparsity, and valid inference in high-dimensional settings.
-
-**Key Advances:**
-
-**1. Stochastic Gradient Descent (SGD) Variants**
-- **Adam, AdaGrad:** Adaptive learning rates
-- **Mini-batch SGD:** Balance between batch and stochastic
-- Use case: Very large datasets that don't fit in memory
-
-**2. Coordinate Descent**
-- Optimizes one coordinate (coefficient) at a time
-- Very efficient for Lasso/Elastic Net
-- Used in scikit-learn's Lasso implementation
-
-**3. Proximal Gradient Methods**
-- Handle non-smooth penalties (L1)
-- ISTA, FISTA (Fast Iterative Shrinkage-Thresholding)
-
-**4. Adaptive Regularization**
-- **Adaptive Lasso:** Different penalties for different coefficients
-- Better variable selection consistency
-
-**5. Debiased/Double Machine Learning**
-- Valid confidence intervals after Lasso selection
-- Combines ML for nuisance parameters with classical inference
-- Important for causal inference
-
-**6. Distributed Optimization**
-- Split data across machines
-- Algorithms: ADMM, distributed SGD
-- Use case: Big data environments
-
-**Practical Relevance:**
-
-| Scenario | Recommended Approach |
-|----------|---------------------|
-| Large n, small p | Normal equation or SGD |
-| Large p, small n | Coordinate descent (Lasso) |
-| Very large n and p | Distributed SGD |
-| Causal inference | Double ML |
-
----
-
-## Question 6: Discuss the role of linear regression in AI for personalized medicine
+## Question 4: Discuss the role of linear regression in AI for personalized medicine
 
 ### Answer
 
@@ -262,7 +179,7 @@ $$Response = \beta_0 + \beta_1 \cdot Dose + \beta_2 \cdot Age + \beta_3 \cdot We
 
 ---
 
-## Question 7: How would you explain linear regression to a non-technical stakeholder?
+## Question 5: How would you explain linear regression to a non-technical stakeholder?
 
 ### Answer
 
@@ -308,7 +225,7 @@ Draw a scatter plot with a line through it. Show:
 
 ---
 
-## Question 8: How would you use A/B testing to validate a linear regression model in production?
+## Question 6: How would you use A/B testing to validate a linear regression model in production?
 
 ### Answer
 
@@ -365,3 +282,183 @@ A/B testing validates that the regression model's recommendations actually impro
 **After Validation:**
 - Gradual rollout (10% → 50% → 100%)
 - Monitor for drift over time
+
+## Question 7: Describe a situation where linear regression could be applied in the finance sector.
+
+### Answer
+
+**Application: Capital Asset Pricing Model (CAPM)**
+
+**Goal:** Estimate a stock's Beta (systematic risk) and Alpha (excess return).
+
+**The Model:**
+$$R_{stock} - R_f = \alpha + \beta (R_{market} - R_f) + \epsilon$$
+
+| Term | Meaning |
+|------|---------|
+| $R_{stock} - R_f$ | Stock's excess return (target) |
+| $R_{market} - R_f$ | Market's excess return (feature) |
+| $\beta$ | Stock's volatility relative to market |
+| $\alpha$ | Stock's risk-adjusted outperformance |
+
+**Interpretation of Beta:**
+
+| Beta Value | Meaning |
+|------------|---------|
+| β = 1 | Stock moves with market |
+| β > 1 | More volatile than market |
+| β < 1 | Less volatile than market |
+| β < 0 | Moves opposite to market |
+
+**Implementation:**
+```python
+import yfinance as yf
+from sklearn.linear_model import LinearRegression
+
+# Get data
+stock = yf.download('AAPL', start='2020-01-01')
+market = yf.download('^GSPC', start='2020-01-01')
+
+# Calculate excess returns
+stock_returns = stock['Adj Close'].pct_change()
+market_returns = market['Adj Close'].pct_change()
+
+# Fit CAPM model
+model = LinearRegression()
+model.fit(market_returns.dropna().values.reshape(-1,1), 
+          stock_returns.dropna().values)
+
+print(f"Beta: {model.coef_[0]:.4f}")
+print(f"Alpha: {model.intercept_:.4f}")
+```
+
+---
+
+## Question 8: Explain how you might use regression analysis to assess the effect of marketing campaigns.
+
+### Answer
+
+**Application: Marketing Mix Modeling**
+
+**Goal:** Quantify ROI of different marketing channels.
+
+**Model Structure:**
+$$\log(Sales) = \beta_0 + \beta_1\log(TV) + \beta_2\log(Radio) + \beta_3\log(Digital) + Controls + \epsilon$$
+
+**Key Feature Engineering:**
+
+| Feature | Why |
+|---------|-----|
+| **Adstock** | Captures carryover effect (ads impact lingers) |
+| **Log transform** | Models diminishing returns |
+| **Seasonality** | Control for seasonal patterns |
+| **Price** | Control for pricing effects |
+
+**Interpretation:**
+- Coefficients represent elasticity
+- β₁ = 0.1 means 10% increase in TV spend → 1% sales increase
+
+**Business Applications:**
+1. Calculate ROI per channel
+2. Optimize budget allocation
+3. Simulate "what-if" scenarios
+
+```python
+# Marketing Mix Model
+model = LinearRegression()
+model.fit(X[['log_tv_adstock', 'log_radio_adstock', 
+             'log_digital_adstock', 'price', 'season']], 
+          y_log_sales)
+
+# Interpret coefficients as elasticities
+for name, coef in zip(features, model.coef_):
+    print(f"{name}: {coef:.4f} elasticity")
+```
+
+---
+
+## Question 9: Describe how linear regression models could be used in predicting real estate prices.
+
+### Answer
+
+**Application: Hedonic Pricing Model**
+
+**Features to Include:**
+
+| Category | Features |
+|----------|----------|
+| **Size** | SquareFootage, Bedrooms, Bathrooms |
+| **Location** | Neighborhood (one-hot), Distance to amenities |
+| **Quality** | OverallQuality, YearBuilt, YearRemodeled |
+| **Amenities** | HasGarage, HasPool, HasFireplace |
+
+**Common Transformations:**
+- Log(Price) - handles skewness
+- Log(SquareFootage) - linearizes relationship
+- Polynomial features for non-linear effects
+
+**Model Choice:**
+```python
+from sklearn.linear_model import LassoCV
+
+# Lasso for automatic feature selection
+model = LassoCV(cv=5)
+model.fit(X_train_scaled, y_log_price)
+
+# Interpret: value contribution of each feature
+coefficients = pd.DataFrame({
+    'Feature': features,
+    'Coefficient': model.coef_
+}).sort_values('Coefficient', ascending=False)
+```
+
+**Business Value:**
+- Automated valuation models (Zillow Zestimate)
+- Feature value estimation (how much is extra bathroom worth?)
+- Investment analysis
+
+---
+
+## Question 10: Describe how you might use linear regression to optimize inventory levels in a supply chain context.
+
+### Answer
+
+**Application: Demand Forecasting**
+
+**Goal:** Predict demand to optimize stock levels.
+
+**Features:**
+
+| Category | Examples |
+|----------|----------|
+| **Time** | DayOfWeek, Month, Holiday flag |
+| **Lag** | Sales_last_week, Sales_last_month |
+| **Pricing** | Current price, Promotion flag |
+| **External** | Weather, Economic indicators |
+
+**Model:**
+$$Sales_t = \beta_0 + \beta_1 \cdot trend + \beta_2 \cdot Sales_{t-1} + \beta_3 \cdot Price + \epsilon$$
+
+**Using Forecast for Inventory:**
+
+```python
+# 1. Get demand forecast
+forecast = model.predict(X_next_week)
+
+# 2. Calculate forecast uncertainty from residuals
+forecast_std = np.std(y_train - model.predict(X_train))
+
+# 3. Set reorder point
+service_level = 0.95  # 95% service level
+z_score = 1.65
+safety_stock = z_score * forecast_std * np.sqrt(lead_time)
+
+reorder_point = forecast * lead_time + safety_stock
+```
+
+**Output:**
+- Point forecast for demand
+- Uncertainty estimate for safety stock calculation
+- Optimal reorder point
+
+---

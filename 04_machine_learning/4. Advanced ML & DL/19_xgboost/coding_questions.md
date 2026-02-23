@@ -2,144 +2,6 @@
 
 ## Question 1
 
-**What is early stopping in XGBoost and how can it be implemented?**
-
-### Answer
-
-**Definition:**
-Early stopping halts training when the validation metric stops improving for a specified number of rounds, preventing overfitting and reducing training time. It automatically finds the optimal number of boosting rounds.
-
-**How It Works:**
-```
-Round 1-50: Validation score improving → Continue
-Round 51-70: Validation score plateaus → Continue watching
-Round 71-100: Still no improvement for 50 rounds → STOP at round 50
-```
-
-**Implementation:**
-
-```python
-import xgboost as xgb
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import make_classification
-import matplotlib.pyplot as plt
-
-# Generate data
-X, y = make_classification(n_samples=10000, n_features=20, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Further split for validation
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
-
-# Method 1: Using XGBClassifier API
-model = xgb.XGBClassifier(
-    n_estimators=1000,            # Set high
-    early_stopping_rounds=50,     # Stop if no improvement for 50 rounds
-    learning_rate=0.1,
-    max_depth=6,
-    eval_metric='logloss'
-)
-
-model.fit(
-    X_train, y_train,
-    eval_set=[(X_train, 'train'), (X_val, 'validation')],
-    verbose=10  # Print every 10 rounds
-)
-
-print(f"Best iteration: {model.best_iteration}")
-print(f"Best score: {model.best_score:.4f}")
-
-# Predictions use best_iteration automatically
-y_pred = model.predict(X_test)
-
-
-# Method 2: Using native xgb.train API
-dtrain = xgb.DMatrix(X_train, label=y_train)
-dval = xgb.DMatrix(X_val, label=y_val)
-dtest = xgb.DMatrix(X_test, label=y_test)
-
-params = {
-    'objective': 'binary:logistic',
-    'eval_metric': 'logloss',
-    'max_depth': 6,
-    'eta': 0.1
-}
-
-evals = [(dtrain, 'train'), (dval, 'validation')]
-evals_result = {}
-
-model_native = xgb.train(
-    params,
-    dtrain,
-    num_boost_round=1000,
-    evals=evals,
-    early_stopping_rounds=50,
-    evals_result=evals_result,
-    verbose_eval=20
-)
-
-print(f"Best iteration: {model_native.best_iteration}")
-
-
-# Method 3: Plot learning curves
-def plot_learning_curve(evals_result):
-    """Plot training and validation curves."""
-    train_metric = evals_result['train']['logloss']
-    val_metric = evals_result['validation']['logloss']
-    
-    plt.figure(figsize=(10, 6))
-    plt.plot(train_metric, label='Train')
-    plt.plot(val_metric, label='Validation')
-    plt.axvline(model_native.best_iteration, color='r', linestyle='--', label=f'Best iteration: {model_native.best_iteration}')
-    plt.xlabel('Boosting Round')
-    plt.ylabel('Log Loss')
-    plt.legend()
-    plt.title('Learning Curves with Early Stopping')
-    plt.show()
-
-# plot_learning_curve(evals_result)
-
-
-# Method 4: Custom early stopping callback
-class EarlyStoppingCallback:
-    """Custom early stopping with additional logic."""
-    def __init__(self, stopping_rounds, min_delta=0.001):
-        self.stopping_rounds = stopping_rounds
-        self.min_delta = min_delta
-        self.best_score = float('inf')
-        self.best_iteration = 0
-        self.counter = 0
-    
-    def __call__(self, env):
-        current_score = env.evaluation_result_list[-1][1]
-        
-        if current_score < self.best_score - self.min_delta:
-            self.best_score = current_score
-            self.best_iteration = env.iteration
-            self.counter = 0
-        else:
-            self.counter += 1
-            
-        if self.counter >= self.stopping_rounds:
-            print(f"Early stopping at round {env.iteration}")
-            raise xgb.core.EarlyStopException(env.iteration)
-```
-
-**Key Parameters:**
-- `n_estimators`: Set high (early stopping will find optimal)
-- `early_stopping_rounds`: Patience (typically 20-100)
-- `eval_set`: Required for early stopping
-- `eval_metric`: Metric to monitor
-
-**Best Practices:**
-- Always use separate validation set (not test)
-- Set `n_estimators` high enough
-- Patience depends on learning rate (lower η → more patience)
-
----
-
-## Question 2
-
 **Write a Python code to load a dataset, create an XGBoost model, and fit it to the data.**
 
 ### Answer
@@ -332,7 +194,7 @@ AUC-ROC: 0.9912
 
 ---
 
-## Question 3
+## Question 2
 
 **Implement a Python function that uses cross-validation to optimize the hyperparameters of an XGBoost model.**
 
@@ -568,7 +430,7 @@ best_model, results = random_search_xgboost(X, y, n_iter=30)
 
 ---
 
-## Question 4
+## Question 3
 
 **Code a Python script that demonstrates how to use XGBoost's built-in feature importance to rank features.**
 
@@ -768,7 +630,7 @@ comparison = compare_importance_methods(model, X_test, y_test, X.columns.tolist(
 
 ---
 
-## Question 5
+## Question 4
 
 **Implement an XGBoost model on a given dataset and use SHAP values to interpret the model's predictions.**
 
@@ -1024,3 +886,6 @@ compare_predictions(model, explainer, X_test, y_test, 0, 5)
 
 **Interview Point:**
 "SHAP provides mathematically grounded explanations. For any prediction, I can show exactly how much each feature contributed, making it suitable for regulated industries requiring model transparency."
+
+---
+

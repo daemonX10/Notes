@@ -2,166 +2,7 @@
 
 ---
 
-## Question 1: How would you deal with class imbalance in a dataset for supervised anomaly detection?
-
-### Answer
-
-**Challenge**: Anomalies are rare (often <1%), causing classifiers to be biased toward the majority class.
-
-**Impact of Imbalance**:
-
-```
-Imbalanced Dataset:
-Normal:   █████████████████████████ 99%
-Anomaly:  █                          1%
-
-Model behavior:
-- Predicts all as "normal" → 99% accuracy but 0% anomaly recall
-- Decision boundary biased toward majority class
-```
-
-**Solution Strategies**:
-
-| Strategy | Approach | When to Use |
-|----------|----------|-------------|
-| **Resampling** | SMOTE, undersampling | Moderate imbalance |
-| **Cost-sensitive** | Higher misclassification cost for anomalies | Business-driven |
-| **Ensemble** | Balanced bagging, EasyEnsemble | Large datasets |
-| **Threshold adjustment** | Lower decision threshold | Post-training |
-| **One-class methods** | Train only on normal | Extreme imbalance |
-
-**Python Implementation**:
-
-```python
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from imblearn.over_sampling import SMOTE, ADASYN
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.ensemble import BalancedRandomForestClassifier, EasyEnsembleClassifier
-
-class ImbalancedAnomalyDetector:
-    """Handle class imbalance for supervised anomaly detection."""
-    
-    def __init__(self, method='smote', class_weight=None):
-        self.method = method
-        self.class_weight = class_weight
-        self.resampler = None
-        self.classifier = None
-    
-    def fit(self, X, y):
-        """Fit with imbalance handling."""
-        
-        if self.method == 'smote':
-            # Oversample minority class
-            self.resampler = SMOTE(random_state=42)
-            X_resampled, y_resampled = self.resampler.fit_resample(X, y)
-            self.classifier = RandomForestClassifier(random_state=42)
-            self.classifier.fit(X_resampled, y_resampled)
-        
-        elif self.method == 'adasyn':
-            # Adaptive synthetic sampling
-            self.resampler = ADASYN(random_state=42)
-            X_resampled, y_resampled = self.resampler.fit_resample(X, y)
-            self.classifier = RandomForestClassifier(random_state=42)
-            self.classifier.fit(X_resampled, y_resampled)
-        
-        elif self.method == 'class_weight':
-            # Cost-sensitive learning
-            weights = {0: 1, 1: (y == 0).sum() / (y == 1).sum()}
-            self.classifier = RandomForestClassifier(class_weight=weights, random_state=42)
-            self.classifier.fit(X, y)
-        
-        elif self.method == 'balanced_ensemble':
-            # Balanced Random Forest
-            self.classifier = BalancedRandomForestClassifier(
-                n_estimators=100,
-                random_state=42
-            )
-            self.classifier.fit(X, y)
-        
-        elif self.method == 'easy_ensemble':
-            # EasyEnsemble: Multiple balanced subsets
-            self.classifier = EasyEnsembleClassifier(
-                n_estimators=10,
-                random_state=42
-            )
-            self.classifier.fit(X, y)
-        
-        return self
-    
-    def predict_proba(self, X):
-        """Get probability scores."""
-        return self.classifier.predict_proba(X)
-    
-    def predict(self, X, threshold=0.5):
-        """Predict with adjustable threshold."""
-        proba = self.predict_proba(X)[:, 1]
-        return (proba >= threshold).astype(int)
-
-
-def optimize_threshold_for_imbalanced(model, X_val, y_val, metric='f1'):
-    """Find optimal threshold for imbalanced classification."""
-    from sklearn.metrics import f1_score, precision_score, recall_score
-    
-    probas = model.predict_proba(X_val)[:, 1]
-    
-    thresholds = np.linspace(0.1, 0.9, 50)
-    best_threshold = 0.5
-    best_score = 0
-    
-    for thresh in thresholds:
-        preds = (probas >= thresh).astype(int)
-        
-        if metric == 'f1':
-            score = f1_score(y_val, preds)
-        elif metric == 'recall':
-            score = recall_score(y_val, preds)
-        elif metric == 'precision':
-            score = precision_score(y_val, preds)
-        
-        if score > best_score:
-            best_score = score
-            best_threshold = thresh
-    
-    return best_threshold, best_score
-
-
-# Cost-sensitive loss for neural networks
-import tensorflow as tf
-
-def create_cost_sensitive_model(input_dim, pos_weight=10):
-    """Neural network with cost-sensitive loss."""
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(64, activation='relu', input_shape=(input_dim,)),
-        tf.keras.layers.Dropout(0.3),
-        tf.keras.layers.Dense(32, activation='relu'),
-        tf.keras.layers.Dense(1, activation='sigmoid')
-    ])
-    
-    # Weighted binary crossentropy
-    def weighted_bce(y_true, y_pred):
-        bce = tf.keras.losses.binary_crossentropy(y_true, y_pred)
-        weight = y_true * pos_weight + (1 - y_true)
-        return bce * weight
-    
-    model.compile(optimizer='adam', loss=weighted_bce, metrics=['accuracy'])
-    return model
-```
-
-**Strategy Selection Guide**:
-
-| Imbalance Ratio | Recommended Approach |
-|-----------------|---------------------|
-| 1:10 | Class weights |
-| 1:100 | SMOTE + class weights |
-| 1:1000 | One-class methods or EasyEnsemble |
-| 1:10000+ | One-class SVM or Isolation Forest |
-
-**Interview Tip**: Always evaluate with appropriate metrics (PR-AUC, F1) not accuracy. Consider the business cost of false positives vs. false negatives.
-
----
-
-## Question 2: How would you approach anomaly detection in a network security context?
+## Question 1: How would you approach anomaly detection in a network security context?
 
 ### Answer
 
@@ -420,7 +261,7 @@ class RealTimeNetworkMonitor:
 
 ---
 
-## Question 3: Propose a method for detecting fraud in credit card transactions
+## Question 2: Propose a method for detecting fraud in credit card transactions
 
 ### Answer
 
@@ -675,7 +516,7 @@ class RulesEngine:
 
 ---
 
-## Question 4: Discuss how you would set up an anomaly detection system for monitoring industrial equipment
+## Question 3: Discuss how you would set up an anomaly detection system for monitoring industrial equipment
 
 ### Answer
 
@@ -955,7 +796,7 @@ class VibrationAnalyzer:
 
 ---
 
-## Question 5: Describe your approach to identifying bot behavior in web traffic data
+## Question 4: Describe your approach to identifying bot behavior in web traffic data
 
 ### Answer
 
@@ -1235,6 +1076,213 @@ class RealTimeBotScorer:
 | Honeypots | Hidden links trap bots | Medium |
 
 **Interview Tip**: Mention that sophisticated bots evolve constantly - a good bot detection system needs continuous model updates and A/B testing of detection strategies.
+
+---
+
+## Question 5: Present a framework for detecting anomalies in social media trend data
+
+### Answer
+
+**Framework Overview**:
+
+```
+Social Media Trend Anomaly Detection Framework
+
+┌─────────────────────────────────────────────────────────┐
+│                    DATA COLLECTION                       │
+│  • Post volumes, engagement rates, sentiment scores      │
+│  • Hashtag frequencies, user activity patterns           │
+└───────────────────────────┬─────────────────────────────┘
+                            ↓
+┌───────────────────────────┴─────────────────────────────┐
+│                    PREPROCESSING                         │
+│  • Time-series aggregation (hourly/daily)               │
+│  • Seasonal decomposition                                │
+│  • Feature engineering                                   │
+└───────────────────────────┬─────────────────────────────┘
+                            ↓
+┌───────────────────────────┴─────────────────────────────┐
+│                  ANOMALY DETECTION                       │
+│  • Trend anomalies (unexpected spikes/drops)            │
+│  • Behavioral anomalies (bot detection)                  │
+│  • Content anomalies (unusual topics)                    │
+└───────────────────────────┬─────────────────────────────┘
+                            ↓
+┌───────────────────────────┴─────────────────────────────┐
+│                    ALERT & ACTION                        │
+│  • Real-time notifications                               │
+│  • Investigation dashboard                               │
+│  • Automated responses                                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Types of Social Media Anomalies**:
+
+| Anomaly Type | Description | Detection Method |
+|--------------|-------------|------------------|
+| **Viral spike** | Sudden trend explosion | Time-series threshold |
+| **Bot activity** | Coordinated fake engagement | Behavioral clustering |
+| **Sentiment shift** | Unusual opinion change | NLP + statistical |
+| **Trending manipulation** | Artificial trend inflation | Pattern analysis |
+
+**Python Implementation**:
+
+```python
+import numpy as np
+import pandas as pd
+from scipy import stats
+from sklearn.ensemble import IsolationForest
+
+class SocialMediaAnomalyDetector:
+    """Framework for detecting anomalies in social media trends."""
+    
+    def __init__(self, baseline_window=168):  # 1 week of hourly data
+        self.baseline_window = baseline_window
+        self.trend_detector = None
+        self.behavior_detector = None
+    
+    def preprocess_trend_data(self, df):
+        """
+        Preprocess raw social media data.
+        
+        Expected columns: timestamp, post_count, engagement, sentiment
+        """
+        df = df.copy()
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.set_index('timestamp').sort_index()
+        
+        # Resample to hourly
+        df_hourly = df.resample('1H').agg({
+            'post_count': 'sum',
+            'engagement': 'mean',
+            'sentiment': 'mean'
+        }).fillna(method='ffill')
+        
+        # Add time features
+        df_hourly['hour'] = df_hourly.index.hour
+        df_hourly['dayofweek'] = df_hourly.index.dayofweek
+        df_hourly['is_weekend'] = df_hourly['dayofweek'].isin([5, 6]).astype(int)
+        
+        # Rolling statistics
+        df_hourly['post_count_rolling_mean'] = df_hourly['post_count'].rolling(24).mean()
+        df_hourly['post_count_rolling_std'] = df_hourly['post_count'].rolling(24).std()
+        
+        # Deviation from rolling baseline
+        df_hourly['post_count_zscore'] = (
+            (df_hourly['post_count'] - df_hourly['post_count_rolling_mean']) /
+            (df_hourly['post_count_rolling_std'] + 1e-10)
+        )
+        
+        return df_hourly.dropna()
+    
+    def detect_trend_anomalies(self, df, threshold=3):
+        """
+        Detect unusual spikes/drops in trend metrics.
+        """
+        anomalies = {}
+        
+        # Z-score based detection for each metric
+        for col in ['post_count', 'engagement', 'sentiment']:
+            col_zscore = f'{col}_zscore' if f'{col}_zscore' in df.columns else None
+            if col_zscore:
+                anomalies[col] = np.abs(df[col_zscore]) > threshold
+            else:
+                # Calculate z-score
+                z = stats.zscore(df[col])
+                anomalies[col] = np.abs(z) > threshold
+        
+        return pd.DataFrame(anomalies, index=df.index)
+    
+    def detect_viral_events(self, df, growth_threshold=5):
+        """
+        Detect viral events based on rapid growth.
+        """
+        df = df.copy()
+        
+        # Hour-over-hour growth rate
+        df['growth_rate'] = df['post_count'].pct_change()
+        
+        # Viral = growth rate > threshold AND absolute volume significant
+        volume_threshold = df['post_count'].quantile(0.75)
+        
+        viral = (
+            (df['growth_rate'] > growth_threshold) &
+            (df['post_count'] > volume_threshold)
+        )
+        
+        return viral
+    
+    def detect_bot_patterns(self, user_activity_df):
+        """
+        Detect bot-like behavior patterns.
+        
+        Features: posting_frequency, time_regularity, content_similarity
+        """
+        features = user_activity_df[['posting_frequency', 'time_regularity', 
+                                     'content_similarity', 'follower_ratio']]
+        
+        # Isolation Forest for behavioral anomalies
+        self.behavior_detector = IsolationForest(contamination=0.05)
+        predictions = self.behavior_detector.fit_predict(features)
+        
+        return predictions == -1  # True = suspected bot
+    
+    def detect_sentiment_anomalies(self, df, window=24):
+        """
+        Detect unusual sentiment shifts.
+        """
+        df = df.copy()
+        
+        # Sentiment change rate
+        df['sentiment_change'] = df['sentiment'].diff(window)
+        
+        # Anomaly if sudden large shift
+        threshold = 2 * df['sentiment_change'].std()
+        anomalies = np.abs(df['sentiment_change']) > threshold
+        
+        return anomalies
+
+
+# Real-time monitoring example
+class RealTimeSocialMonitor:
+    """Real-time social media trend monitoring."""
+    
+    def __init__(self, detector, alert_callback=None):
+        self.detector = detector
+        self.alert_callback = alert_callback or print
+        self.buffer = []
+        self.buffer_size = 100
+    
+    def process_event(self, event):
+        """Process single social media event."""
+        self.buffer.append(event)
+        
+        if len(self.buffer) >= self.buffer_size:
+            # Convert buffer to DataFrame and detect
+            df = pd.DataFrame(self.buffer)
+            df_processed = self.detector.preprocess_trend_data(df)
+            
+            # Check for anomalies in latest data
+            anomalies = self.detector.detect_trend_anomalies(df_processed.tail(10))
+            
+            if anomalies.any().any():
+                self.alert_callback(f"ALERT: Anomaly detected at {df_processed.index[-1]}")
+                self.alert_callback(f"Details: {anomalies[anomalies.any(axis=1)]}")
+            
+            # Keep only recent data in buffer
+            self.buffer = self.buffer[-50:]
+```
+
+**Alert Prioritization**:
+
+| Anomaly Type | Priority | Action |
+|--------------|----------|--------|
+| Viral negative sentiment | High | Immediate PR response |
+| Bot attack detected | High | Security team alert |
+| Unusual engagement spike | Medium | Marketing opportunity |
+| Gradual trend decline | Low | Strategic review |
+
+**Interview Tip**: Emphasize the need for domain context - what's anomalous on social media depends on the platform, topic, and time (e.g., election night vs. normal day).
 
 ---
 
@@ -1581,272 +1629,3 @@ class CloudAnomalyMonitor:
 
 ---
 
-## Question 7: Discuss recent advances in deep learning for anomaly detection
-
-### Answer
-
-**Recent Deep Learning Advances**:
-
-| Approach | Method | Key Innovation |
-|----------|--------|----------------|
-| **Autoencoders** | VAE, AE-GAN | Probabilistic latent space |
-| **Transformers** | Anomaly Transformer | Attention for temporal |
-| **Self-supervised** | Contrastive learning | No labels needed |
-| **Graph Neural Networks** | GNN-AD | Structural anomalies |
-
-**1. Variational Autoencoders (VAE) for Anomaly Detection**:
-
-```python
-import tensorflow as tf
-import numpy as np
-
-class VAEAnomalyDetector:
-    """Variational Autoencoder for anomaly detection."""
-    
-    def __init__(self, input_dim, latent_dim=32):
-        self.input_dim = input_dim
-        self.latent_dim = latent_dim
-        self.model = self._build_model()
-    
-    def _build_model(self):
-        # Encoder
-        encoder_inputs = tf.keras.layers.Input(shape=(self.input_dim,))
-        x = tf.keras.layers.Dense(128, activation='relu')(encoder_inputs)
-        x = tf.keras.layers.Dense(64, activation='relu')(x)
-        
-        z_mean = tf.keras.layers.Dense(self.latent_dim)(x)
-        z_log_var = tf.keras.layers.Dense(self.latent_dim)(x)
-        
-        # Sampling layer
-        def sampling(args):
-            z_mean, z_log_var = args
-            epsilon = tf.random.normal(shape=tf.shape(z_mean))
-            return z_mean + tf.exp(0.5 * z_log_var) * epsilon
-        
-        z = tf.keras.layers.Lambda(sampling)([z_mean, z_log_var])
-        
-        # Decoder
-        decoder_inputs = tf.keras.layers.Dense(64, activation='relu')(z)
-        decoder_outputs = tf.keras.layers.Dense(128, activation='relu')(decoder_inputs)
-        outputs = tf.keras.layers.Dense(self.input_dim)(decoder_outputs)
-        
-        # Full model
-        model = tf.keras.Model(encoder_inputs, outputs)
-        
-        # VAE loss
-        reconstruction_loss = tf.keras.losses.mse(encoder_inputs, outputs)
-        reconstruction_loss *= self.input_dim
-        kl_loss = -0.5 * tf.reduce_sum(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var), axis=-1)
-        vae_loss = tf.reduce_mean(reconstruction_loss + kl_loss)
-        
-        model.add_loss(vae_loss)
-        model.compile(optimizer='adam')
-        
-        return model
-    
-    def fit(self, X_normal, epochs=100):
-        """Train on normal data."""
-        self.model.fit(X_normal, X_normal, epochs=epochs, batch_size=32, validation_split=0.1, verbose=0)
-        
-        # Compute threshold from training data
-        reconstructions = self.model.predict(X_normal)
-        self.reconstruction_errors = np.mean((X_normal - reconstructions)**2, axis=1)
-        self.threshold = np.percentile(self.reconstruction_errors, 95)
-    
-    def detect(self, X):
-        """Detect anomalies."""
-        reconstructions = self.model.predict(X)
-        errors = np.mean((X - reconstructions)**2, axis=1)
-        return errors > self.threshold, errors
-```
-
-**2. Transformer-based Anomaly Detection**:
-
-```python
-import tensorflow as tf
-
-class AnomalyTransformer:
-    """Transformer for time-series anomaly detection."""
-    
-    def __init__(self, seq_len, n_features, d_model=64, n_heads=4, n_layers=2):
-        self.seq_len = seq_len
-        self.n_features = n_features
-        self.model = self._build_model(d_model, n_heads, n_layers)
-    
-    def _build_model(self, d_model, n_heads, n_layers):
-        inputs = tf.keras.layers.Input(shape=(self.seq_len, self.n_features))
-        
-        # Positional encoding
-        positions = tf.range(start=0, limit=self.seq_len, delta=1)
-        position_embedding = tf.keras.layers.Embedding(self.seq_len, d_model)(positions)
-        
-        # Project input
-        x = tf.keras.layers.Dense(d_model)(inputs)
-        x = x + position_embedding
-        
-        # Transformer blocks
-        for _ in range(n_layers):
-            # Multi-head attention
-            attn_output = tf.keras.layers.MultiHeadAttention(
-                num_heads=n_heads, key_dim=d_model // n_heads
-            )(x, x)
-            x = tf.keras.layers.LayerNormalization()(x + attn_output)
-            
-            # Feed-forward
-            ff = tf.keras.layers.Dense(d_model * 4, activation='relu')(x)
-            ff = tf.keras.layers.Dense(d_model)(ff)
-            x = tf.keras.layers.LayerNormalization()(x + ff)
-        
-        # Output projection
-        outputs = tf.keras.layers.Dense(self.n_features)(x)
-        
-        model = tf.keras.Model(inputs, outputs)
-        model.compile(optimizer='adam', loss='mse')
-        
-        return model
-    
-    def fit(self, X_sequences, epochs=50):
-        """Train on normal sequences."""
-        # Self-supervised: predict next step
-        X_input = X_sequences[:, :-1, :]
-        X_target = X_sequences[:, 1:, :]
-        
-        self.model.fit(X_input, X_target, epochs=epochs, batch_size=32, validation_split=0.1, verbose=0)
-    
-    def detect(self, X_sequence):
-        """Detect anomalies in sequence."""
-        X_input = X_sequence[:-1].reshape(1, -1, self.n_features)
-        X_target = X_sequence[1:]
-        
-        prediction = self.model.predict(X_input)[0]
-        errors = np.mean((X_target - prediction)**2, axis=1)
-        
-        return errors
-```
-
-**3. Self-Supervised Contrastive Learning**:
-
-```python
-class ContrastiveAnomalyDetector:
-    """Contrastive learning for anomaly detection."""
-    
-    def __init__(self, input_dim, embedding_dim=64, temperature=0.5):
-        self.temperature = temperature
-        self.encoder = self._build_encoder(input_dim, embedding_dim)
-    
-    def _build_encoder(self, input_dim, embedding_dim):
-        return tf.keras.Sequential([
-            tf.keras.layers.Dense(128, activation='relu', input_shape=(input_dim,)),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(embedding_dim),
-            tf.keras.layers.Lambda(lambda x: tf.math.l2_normalize(x, axis=1))
-        ])
-    
-    def _augment(self, x):
-        """Create augmented views of data."""
-        # Add noise
-        noise = tf.random.normal(tf.shape(x), stddev=0.1)
-        x_aug1 = x + noise
-        
-        # Random masking
-        mask = tf.random.uniform(tf.shape(x)) > 0.1
-        x_aug2 = x * tf.cast(mask, tf.float32)
-        
-        return x_aug1, x_aug2
-    
-    def contrastive_loss(self, z1, z2):
-        """NT-Xent loss."""
-        batch_size = tf.shape(z1)[0]
-        
-        # Similarity matrix
-        z = tf.concat([z1, z2], axis=0)
-        sim = tf.matmul(z, z, transpose_b=True) / self.temperature
-        
-        # Positive pairs
-        pos_mask = tf.eye(batch_size * 2, dtype=tf.bool)
-        pos_mask = tf.roll(pos_mask, batch_size, axis=1)
-        
-        # Negative pairs (all others)
-        neg_mask = ~tf.eye(batch_size * 2, dtype=tf.bool)
-        
-        # Loss
-        exp_sim = tf.exp(sim)
-        pos_sim = tf.reduce_sum(exp_sim * tf.cast(pos_mask, tf.float32), axis=1)
-        neg_sim = tf.reduce_sum(exp_sim * tf.cast(neg_mask, tf.float32), axis=1)
-        
-        loss = -tf.reduce_mean(tf.math.log(pos_sim / (pos_sim + neg_sim)))
-        
-        return loss
-    
-    def fit(self, X_normal, epochs=100, batch_size=256):
-        """Train encoder with contrastive learning."""
-        optimizer = tf.keras.optimizers.Adam(1e-3)
-        
-        for epoch in range(epochs):
-            # Sample batch
-            idx = np.random.choice(len(X_normal), batch_size)
-            x_batch = X_normal[idx]
-            
-            with tf.GradientTape() as tape:
-                x_aug1, x_aug2 = self._augment(x_batch)
-                z1 = self.encoder(x_aug1)
-                z2 = self.encoder(x_aug2)
-                loss = self.contrastive_loss(z1, z2)
-            
-            gradients = tape.gradient(loss, self.encoder.trainable_variables)
-            optimizer.apply_gradients(zip(gradients, self.encoder.trainable_variables))
-        
-        # Store normal embeddings for detection
-        self.normal_embeddings = self.encoder.predict(X_normal)
-    
-    def detect(self, X):
-        """Detect anomalies based on embedding distance."""
-        embeddings = self.encoder.predict(X)
-        
-        # Distance to nearest normal embedding
-        distances = []
-        for emb in embeddings:
-            dist = np.min(np.linalg.norm(self.normal_embeddings - emb, axis=1))
-            distances.append(dist)
-        
-        return np.array(distances)
-```
-
-**4. Graph Neural Networks for Anomaly Detection**:
-
-```python
-# Simplified GNN for structural anomalies
-class GNNAnomalyDetector:
-    """Graph-based anomaly detection."""
-    
-    def compute_structural_features(self, adjacency_matrix, node_features):
-        """Compute graph structural features."""
-        import networkx as nx
-        
-        G = nx.from_numpy_array(adjacency_matrix)
-        
-        features = []
-        for node in G.nodes():
-            node_feat = {
-                'degree': G.degree(node),
-                'clustering': nx.clustering(G, node),
-                'betweenness': nx.betweenness_centrality(G)[node],
-                'pagerank': nx.pagerank(G)[node]
-            }
-            features.append(node_feat)
-        
-        return pd.DataFrame(features)
-```
-
-**Comparison of Deep Learning Methods**:
-
-| Method | Strengths | Weaknesses | Best For |
-|--------|-----------|------------|----------|
-| VAE | Probabilistic, interpretable | Blurry reconstructions | Continuous data |
-| Transformer | Long-range dependencies | Computational cost | Sequential data |
-| Contrastive | No reconstruction needed | Requires good augmentations | High-dimensional |
-| GNN | Captures structure | Requires graph structure | Network data |
-
-**Interview Tip**: Highlight that deep learning methods shine for high-dimensional, complex data but traditional methods often work well for simpler cases with less computational cost.
-
----

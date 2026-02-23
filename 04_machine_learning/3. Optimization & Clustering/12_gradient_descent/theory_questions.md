@@ -622,34 +622,6 @@ Batch Normalization stabilizes training by normalizing inputs to each layer (mea
 
 ## Question 20
 
-**Describe a scenario where gradient descent might fail to find the optimal solution and what alternatives could mitigate this.**
-
-**Answer:**
-
-Gradient descent fails on: (1) Non-convex functions - gets stuck in poor local minima, (2) Saddle points - gradient near 0 but not minimum. Mitigations: momentum, random restarts, learning rate schedules, or gradient-free methods for non-differentiable problems.
-
-**Scenarios and Solutions:**
-
-| Failure | Mitigation |
-|---------|------------|
-| Poor local minimum | Momentum, random restarts |
-| Saddle point | SGD noise, momentum |
-| Non-differentiable | Subgradient methods |
-
----
-
-## Question 21
-
-**Explain how you would use gradient descent to optimize hyperparameters in a machine learning model.**
-
-**Answer:**
-
-Gradient-based hyperparameter optimization computes hypergradient by differentiating validation loss w.r.t. hyperparameters through the training process. Complex to implement; works for continuous hyperparameters only (learning rate, regularization), not discrete (number of layers).
-
----
-
-## Question 22
-
 **What are the latest research insights on adaptive gradient methods?**
 
 **Answer:**
@@ -658,7 +630,7 @@ Key insights: (1) Adam may find sharper minima that generalize worse, (2) AdamW 
 
 ---
 
-## Question 23
+## Question 21
 
 **How does the choice of optimizer affect the training of deep learning models with specific architectures like CNNs or RNNs?**
 
@@ -673,7 +645,7 @@ For CNNs: AdamW for fast experimentation; SGD with momentum for state-of-the-art
 
 ---
 
-## Question 24
+## Question 22
 
 **Explain the relationship between gradient descent and the backpropagation algorithm in training neural networks.**
 
@@ -689,7 +661,7 @@ They are complementary: Backpropagation computes the gradient (using chain rule,
 
 ---
 
-## Question 25
+## Question 23
 
 **What role does Hessian-based optimization play in the context of gradient descent, and what is the computational trade-off?**
 
@@ -699,7 +671,7 @@ Hessian provides curvature information for more direct optimization paths. Trade
 
 ---
 
-## Question 26
+## Question 24
 
 **What are the mathematical foundations of gradient descent optimization?**
 
@@ -714,7 +686,7 @@ Based on Taylor's theorem: J(theta + delta) approx J(theta) + gradient_transpose
 
 ---
 
-## Question 27
+## Question 25
 
 **How do you derive the gradient descent update rule from first principles?**
 
@@ -724,7 +696,7 @@ From Taylor expansion: J(theta - lr*g) approx J(theta) - lr*g_transpose*g = J(th
 
 ---
 
-## Question 28
+## Question 26
 
 **What is the convergence analysis for gradient descent algorithms?**
 
@@ -734,7 +706,7 @@ For convex functions with L-smooth gradients: GD converges at rate O(1/k) for k 
 
 ---
 
-## Question 29
+## Question 27
 
 **How do convexity and smoothness affect gradient descent convergence?**
 
@@ -746,7 +718,7 @@ For convex functions with L-smooth gradients: GD converges at rate O(1/k) for k 
 
 ---
 
-## Question 30
+## Question 28
 
 **What are the convergence rates for different types of gradient descent?**
 
@@ -760,7 +732,7 @@ For convex functions with L-smooth gradients: GD converges at rate O(1/k) for k 
 
 ---
 
-## Question 31
+## Question 29
 
 **How do you implement momentum-based gradient descent algorithms?**
 
@@ -781,7 +753,7 @@ Key: Velocity accumulates past gradients, accelerating consistent directions.
 
 ---
 
-## Question 32
+## Question 30
 
 **What is Nesterov accelerated gradient and its advantages?**
 
@@ -802,7 +774,7 @@ theta = theta - v
 
 ---
 
-## Question 33
+## Question 31
 
 **How does AdaGrad adaptively adjust learning rates?**
 
@@ -820,7 +792,7 @@ theta = theta - (lr / sqrt(G + epsilon)) * gradient
 
 ---
 
-## Question 34
+## Question 32
 
 **What is RMSprop and how does it improve upon AdaGrad?**
 
@@ -838,7 +810,7 @@ beta typically = 0.9. Recent gradients matter more than old ones.
 
 ---
 
-## Question 35
+## Question 33
 
 **How does Adam optimizer combine momentum and adaptive learning rates?**
 
@@ -859,7 +831,7 @@ Defaults: beta1=0.9, beta2=0.999, epsilon=1e-8
 
 ---
 
-## Question 36
+## Question 34
 
 **What are the variants of Adam optimizer (AdaMax, Nadam, AdamW)?**
 
@@ -875,7 +847,7 @@ Defaults: beta1=0.9, beta2=0.999, epsilon=1e-8
 
 ---
 
-## Question 37
+## Question 35
 
 **How do you implement second-order optimization methods like Newton's method?**
 
@@ -894,7 +866,7 @@ def newton_step(theta, gradient, hessian):
 
 ---
 
-## Question 38
+## Question 36
 
 **What is the L-BFGS algorithm and its advantages over basic gradient descent?**
 
@@ -911,7 +883,7 @@ L-BFGS (Limited-memory BFGS) approximates the inverse Hessian using only the las
 
 ---
 
-## Question 39
+## Question 37
 
 **How do you handle non-convex optimization with gradient descent?**
 
@@ -929,7 +901,7 @@ In practice, most local minima in deep learning are good enough for generalizati
 
 ---
 
-## Question 40
+## Question 38
 
 **What are saddle points and how do they affect gradient descent?**
 
@@ -947,7 +919,7 @@ Saddle points are stationary points (gradient = 0) that are minimum in some dime
 
 ---
 
-## Question 41
+## Question 39
 
 **How do you implement coordinate descent optimization?**
 
@@ -966,7 +938,7 @@ for iteration in range(max_iter):
 
 ---
 
-## Question 42
+## Question 40
 
 **What is proximal gradient descent for non-smooth optimization?**
 
@@ -982,7 +954,7 @@ For L1: prox is soft-thresholding operator (shrinks values toward zero).
 
 ---
 
-## Question 43
+## Question 41
 
 **How do you handle constrained optimization with gradient descent?**
 
@@ -997,7 +969,7 @@ Methods for constraints:
 
 ---
 
-## Question 44
+## Question 42
 
 **What is projected gradient descent and its applications?**
 
@@ -1014,7 +986,7 @@ theta = project_onto_feasible_set(theta)  # e.g., clip to [0, 1]
 
 ---
 
-## Question 45
+## Question 43
 
 **How do you implement gradient descent for large-scale optimization?**
 
@@ -1039,7 +1011,7 @@ for i, batch in enumerate(batches):
 
 ---
 
-## Question 46
+## Question 44
 
 **What are distributed and parallel gradient descent algorithms?**
 
@@ -1055,7 +1027,7 @@ for i, batch in enumerate(batches):
 
 ---
 
-## Question 47
+## Question 45
 
 **How do you implement asynchronous gradient descent for distributed systems?**
 
@@ -1075,7 +1047,7 @@ while not converged:
 
 ---
 
-## Question 48
+## Question 46
 
 **What is federated averaging and its relationship to gradient descent?**
 
@@ -1094,7 +1066,7 @@ Federated Averaging (FedAvg) is distributed GD for privacy-preserving learning. 
 
 ---
 
-## Question 49
+## Question 47
 
 **How do you handle gradient compression and communication efficiency?**
 
@@ -1111,7 +1083,7 @@ Trade-off: More compression = less communication but potentially slower converge
 
 ---
 
-## Question 50
+## Question 48
 
 **What are variance reduction techniques in stochastic gradient descent?**
 
@@ -1127,7 +1099,7 @@ SGD gradients have high variance (noisy). Variance reduction techniques:
 
 ---
 
-## Question 51
+## Question 49
 
 **How does SVRG (Stochastic Variance Reduced Gradient) work?**
 
@@ -1152,7 +1124,7 @@ for _ in range(m):
 
 ---
 
-## Question 52
+## Question 50
 
 **What is SAGA optimizer and its advantages over basic SGD?**
 
@@ -1176,7 +1148,7 @@ theta = theta - lr * g_saga
 
 ---
 
-## Question 53
+## Question 51
 
 **How do you implement gradient descent for neural network training?**
 
@@ -1205,7 +1177,7 @@ for epoch in range(num_epochs):
 
 ---
 
-## Question 54
+## Question 52
 
 **What is backpropagation and its relationship to gradient descent?**
 
@@ -1225,7 +1197,7 @@ Without backprop, computing gradients for deep networks would be intractable.
 
 ---
 
-## Question 55
+## Question 53
 
 **How do you handle vanishing and exploding gradients?**
 
@@ -1249,7 +1221,7 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
 ---
 
-## Question 56
+## Question 54
 
 **What is gradient clipping and when should you use it?**
 
@@ -1273,7 +1245,7 @@ if ||gradient|| > threshold:
 
 ---
 
-## Question 57
+## Question 55
 
 **How do you implement gradient descent for reinforcement learning?**
 
@@ -1299,7 +1271,7 @@ Key difference: Policy methods use gradient ascent to maximize reward.
 
 ---
 
-## Question 58
+## Question 56
 
 **What is policy gradient methods in reinforcement learning?**
 
@@ -1320,7 +1292,7 @@ gradient_J = E[G_t * grad_log_policy(a|s)]
 
 ---
 
-## Question 59
+## Question 57
 
 **How do you handle gradient descent in adversarial training?**
 
@@ -1346,7 +1318,7 @@ optimizer.step()
 
 ---
 
-## Question 60
+## Question 58
 
 **What are generative adversarial networks and gradient-based training?**
 
@@ -1374,7 +1346,7 @@ optimizer_G.step()
 
 ---
 
-## Question 61
+## Question 59
 
 **How do you implement natural gradient descent?**
 
@@ -1393,7 +1365,7 @@ Natural gradient uses Fisher Information Matrix to account for parameter space g
 
 ---
 
-## Question 62
+## Question 60
 
 **What is the Fisher information matrix in natural gradients?**
 
@@ -1412,7 +1384,7 @@ Fisher Information Matrix measures curvature of the probability distribution spa
 
 ---
 
-## Question 63
+## Question 61
 
 **How do you handle gradient descent for meta-learning?**
 
@@ -1434,7 +1406,7 @@ theta = theta - beta * grad_meta_loss(phi(theta))  # Meta update
 
 ---
 
-## Question 64
+## Question 62
 
 **What is MAML (Model-Agnostic Meta-Learning) and gradient-based meta-learning?**
 
@@ -1453,7 +1425,7 @@ MAML finds initialization that enables fast adaptation to new tasks.
 
 ---
 
-## Question 65
+## Question 63
 
 **How do you implement gradient descent for few-shot learning?**
 
@@ -1475,7 +1447,7 @@ theta = theta - beta * grad_meta_loss
 
 ---
 
-## Question 66
+## Question 64
 
 **What are zeroth-order optimization methods and gradient-free approaches?**
 
@@ -1497,7 +1469,7 @@ Zeroth-order methods optimize without computing gradients.
 
 ---
 
-## Question 67
+## Question 65
 
 **How do you handle gradient descent with noisy or approximate gradients?**
 
@@ -1514,7 +1486,7 @@ Noise in gradients is normal in SGD. Key strategies:
 
 ---
 
-## Question 68
+## Question 66
 
 **What is differential privacy in gradient descent optimization?**
 
@@ -1534,7 +1506,7 @@ Differential privacy provides formal guarantees against information leakage.
 
 ---
 
-## Question 69
+## Question 67
 
 **How do you implement privacy-preserving gradient descent?**
 
@@ -1557,7 +1529,7 @@ loss = loss_fn(pred, target, reduction='none')
 
 ---
 
-## Question 70
+## Question 68
 
 **What are the considerations for gradient descent in federated learning?**
 
@@ -1573,7 +1545,7 @@ loss = loss_fn(pred, target, reduction='none')
 
 ---
 
-## Question 71
+## Question 69
 
 **How do you handle gradient descent for online learning scenarios?**
 
@@ -1598,7 +1570,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 72
+## Question 70
 
 **What is regret minimization in online gradient descent?**
 
@@ -1614,7 +1586,7 @@ Regret measures how much worse online algorithm performs vs best fixed model in 
 
 ---
 
-## Question 73
+## Question 71
 
 **How do you implement adaptive learning rate schedules?**
 
@@ -1643,7 +1615,7 @@ for epoch in range(epochs):
 
 ---
 
-## Question 74
+## Question 72
 
 **What are learning rate decay strategies and their effectiveness?**
 
@@ -1661,7 +1633,7 @@ for epoch in range(epochs):
 
 ---
 
-## Question 75
+## Question 73
 
 **How do you handle gradient descent for multi-objective optimization?**
 
@@ -1686,7 +1658,7 @@ optimizer.step()
 
 ---
 
-## Question 76
+## Question 74
 
 **What is Pareto optimization with gradient-based methods?**
 
@@ -1704,7 +1676,7 @@ Pareto optimization finds solutions where no objective can be improved without w
 
 ---
 
-## Question 77
+## Question 75
 
 **How do you implement gradient descent for autoML and neural architecture search?**
 
@@ -1727,7 +1699,7 @@ output = sum(softmax(alpha_op) * op(x) for op in operations)
 
 ---
 
-## Question 78
+## Question 76
 
 **What is differentiable architecture search using gradient descent?**
 
@@ -1745,7 +1717,7 @@ DARTS relaxes discrete architecture search to continuous optimization.
 
 ---
 
-## Question 79
+## Question 77
 
 **How do you handle gradient descent in quantum machine learning?**
 
@@ -1766,7 +1738,7 @@ dC/d_theta = (C(theta + pi/2) - C(theta - pi/2)) / 2
 
 ---
 
-## Question 80
+## Question 78
 
 **What are quantum gradient descent algorithms and their advantages?**
 
@@ -1785,7 +1757,7 @@ dC/d_theta = (C(theta + pi/2) - C(theta - pi/2)) / 2
 
 ---
 
-## Question 81
+## Question 79
 
 **How do you implement gradient descent for continual learning?**
 
@@ -1806,7 +1778,7 @@ loss = task_loss + lambda * sum(F_i * (theta_i - theta_old_i)^2)
 
 ---
 
-## Question 82
+## Question 80
 
 **What is elastic weight consolidation and gradient-based continual learning?**
 
@@ -1826,7 +1798,7 @@ L_total = L_B + (lambda/2) * sum(F_A[i] * (theta[i] - theta_A[i])^2)
 
 ---
 
-## Question 83
+## Question 81
 
 **How do you handle gradient descent for transfer learning?**
 
@@ -1847,7 +1819,7 @@ Transfer learning adapts pre-trained models to new tasks.
 
 ---
 
-## Question 84
+## Question 82
 
 **What are fine-tuning strategies using gradient descent?**
 
@@ -1870,7 +1842,7 @@ optimizer = Adam([
 
 ---
 
-## Question 85
+## Question 83
 
 **How do you implement gradient descent for self-supervised learning?**
 
@@ -1894,7 +1866,7 @@ optimizer.step()
 
 ---
 
-## Question 86
+## Question 84
 
 **What are contrastive learning and gradient-based representation learning?**
 
@@ -1915,7 +1887,7 @@ Gradient descent organizes embedding space by semantic similarity.
 
 ---
 
-## Question 87
+## Question 85
 
 **How do you handle gradient descent for edge computing and resource constraints?**
 
@@ -1935,7 +1907,7 @@ Edge device constraints require efficient GD implementations.
 
 ---
 
-## Question 88
+## Question 86
 
 **What are efficient gradient computation techniques for mobile devices?**
 
@@ -1961,7 +1933,7 @@ scaler.step(optimizer)
 
 ---
 
-## Question 89
+## Question 87
 
 **How do you implement gradient descent for real-time optimization?**
 
@@ -1987,7 +1959,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 90
+## Question 88
 
 **What are the considerations for gradient descent in production systems?**
 
@@ -2004,7 +1976,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 91
+## Question 89
 
 **How do you monitor and debug gradient descent optimization?**
 
@@ -2029,7 +2001,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 92
+## Question 90
 
 **What are the emerging trends in gradient descent research?**
 
@@ -2045,7 +2017,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 93
+## Question 91
 
 **How do you implement gradient descent for novel architectures and models?**
 
@@ -2064,7 +2036,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 94
+## Question 92
 
 **What is the future of optimization beyond gradient descent?**
 
@@ -2082,7 +2054,7 @@ for x, y in data_stream:
 
 ---
 
-## Question 95
+## Question 93
 
 **How do you handle gradient descent for interpretable machine learning?**
 
@@ -2107,7 +2079,7 @@ saliency = input.grad.abs()
 
 ---
 
-## Question 96
+## Question 94
 
 **What are the ethical considerations in optimization algorithm design?**
 
@@ -2124,7 +2096,7 @@ saliency = input.grad.abs()
 
 ---
 
-## Question 97
+## Question 95
 
 **How do you ensure fairness and bias mitigation in gradient descent?**
 
@@ -2145,7 +2117,7 @@ loss = accuracy_loss + lambda * fairness_penalty
 
 ---
 
-## Question 98
+## Question 96
 
 **What are the best practices for gradient descent implementation?**
 
@@ -2163,7 +2135,7 @@ loss = accuracy_loss + lambda * fairness_penalty
 
 ---
 
-## Question 99
+## Question 97
 
 **How do you troubleshoot common gradient descent problems?**
 
@@ -2179,7 +2151,7 @@ loss = accuracy_loss + lambda * fairness_penalty
 
 ---
 
-## Question 100
+## Question 98
 
 **What is the comprehensive guide to gradient descent optimization?**
 
@@ -2210,5 +2182,123 @@ loss = accuracy_loss + lambda * fairness_penalty
    - Interpretability (saliency maps)
 
 **Master these pillars for effective ML optimization.**
+
+---
+
+## Question 99
+
+**Discuss the concept of stochastic gradient descent (SGD) and its advantages and disadvantages.**
+
+**Answer:**
+
+SGD updates parameters after each single training example instead of the full dataset. This makes it much faster per iteration but introduces noise in the gradient estimate.
+
+**How it Works:**
+1. Shuffle training data
+2. For each sample: compute gradient, update parameters
+3. Repeat for multiple epochs
+
+**Advantages:**
+- Very fast iterations (processes one sample at a time)
+- Low memory requirement
+- Noise helps escape local minima and saddle points
+- Can do online learning (learn from streaming data)
+- Better generalization in some cases
+
+**Disadvantages:**
+- Very noisy updates - loss fluctuates significantly
+- May never fully converge (oscillates around minimum)
+- Loses benefits of vectorized computation (GPUs)
+- High variance in gradient estimate
+
+**When to Use:**
+- Very large datasets that don't fit in memory
+- Online learning scenarios
+- When noise is beneficial for escaping local minima
+
+**In Practice:** Mini-batch GD (batch size 32-256) is preferred as it balances speed and stability.
+
+---
+
+## Question 100
+
+**Discuss the significance of weight initialization in optimizing a model with gradient descent.**
+
+**Answer:**
+
+Weight initialization determines the starting point on the loss surface and critically affects gradient flow. Poor initialization causes vanishing/exploding gradients, making training impossible. Good initialization keeps signals in a reasonable range throughout the network.
+
+**Why It Matters:**
+
+| Bad Init | Problem | Consequence |
+|----------|---------|-------------|
+| All zeros | All neurons compute same thing | Network can't learn |
+| Too small | Signals shrink layer by layer | Vanishing gradients |
+| Too large | Signals explode layer by layer | Exploding gradients |
+
+**Common Initialization Schemes:**
+
+| Method | Formula | Best For |
+|--------|---------|----------|
+| Xavier/Glorot | W ~ N(0, 2/(n_in + n_out)) | Sigmoid, Tanh |
+| He | W ~ N(0, 2/n_in) | ReLU and variants |
+| LeCun | W ~ N(0, 1/n_in) | SELU |
+
+**Intuition:**
+- Goal: Keep variance of activations roughly constant across layers
+- Xavier: Balances variance for forward and backward pass
+- He: Accounts for ReLU zeroing half the neurons
+
+**Practical Guidelines:**
+1. Use He initialization with ReLU (default in PyTorch)
+2. Use Xavier with Tanh/Sigmoid
+3. For transfer learning: use pretrained weights (best init!)
+4. Batch normalization reduces sensitivity to initialization
+
+**In Interview:**
+"Good initialization ensures signals neither vanish nor explode as they propagate through the network, enabling gradient-based learning from the start."
+
+---
+
+## Question 101
+
+**Discuss the concept of second-order optimization methods and their practicality in large-scale machine learning.**
+
+**Answer:**
+
+Second-order methods use Hessian (second derivatives) for better curvature information, enabling faster convergence in iterations. However, they're impractical for large-scale ML due to O(N^2) storage and O(N^3) computation for N parameters.
+
+**Comparison:**
+
+| Aspect | First-Order (GD) | Second-Order (Newton) |
+|--------|-----------------|----------------------|
+| Uses | Gradient | Gradient + Hessian |
+| Per-iteration cost | O(N) | O(N^3) |
+| Memory | O(N) | O(N^2) |
+| Iterations to converge | Many | Few |
+| Practical for DL | Yes | No |
+
+**Why Second-Order is Impractical:**
+- For N = 1 million parameters:
+  - Hessian has 10^12 elements
+  - Inverting costs 10^18 operations
+  - Storage needs terabytes
+
+**Practical Alternatives:**
+
+| Method | Idea | Practicality |
+|--------|------|--------------|
+| L-BFGS | Approximate inverse Hessian from gradients | Good for small-medium problems |
+| Diagonal approximation | Only use diagonal of Hessian | Some speedup, limited benefit |
+| Adam | Approximate per-parameter curvature | Practical, widely used |
+| Natural Gradient | Use Fisher information matrix | Theoretical interest |
+
+**When to Use What:**
+- **Small models (< 10K params):** L-BFGS can work well
+- **Medium models:** Adam (practical approximation)
+- **Large models:** SGD with momentum or Adam
+
+**In Interview:**
+"Second-order methods offer faster convergence per iteration, but their O(N^2) memory and O(N^3) computation make them impractical for modern deep learning. Instead, we use Adam, which provides per-parameter adaptive learning rates as a practical approximation to second-order information."
 
 ---

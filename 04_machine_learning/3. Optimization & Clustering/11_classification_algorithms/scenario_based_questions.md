@@ -507,96 +507,6 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 
 ## Question 7
 
-**Discuss the differences between L1 and L2 regularization in the context of Logistic Regression.**
-
-### Answer
-
-**Definition:**
-L1 (Lasso) and L2 (Ridge) regularization add penalty terms to the loss function to prevent overfitting. L1 adds absolute weight sum (promotes sparsity), while L2 adds squared weight sum (shrinks all weights evenly). In Logistic Regression, they control model complexity differently.
-
-**Mathematical Formulation:**
-
-| Regularization | Loss Function |
-|----------------|---------------|
-| No Regularization | $J = -\sum[y\log(\hat{y}) + (1-y)\log(1-\hat{y})]$ |
-| L1 (Lasso) | $J + \lambda\sum|w_i|$ |
-| L2 (Ridge) | $J + \lambda\sum w_i^2$ |
-| Elastic Net | $J + \lambda_1\sum|w_i| + \lambda_2\sum w_i^2$ |
-
-**Key Differences:**
-
-| Aspect | L1 (Lasso) | L2 (Ridge) |
-|--------|------------|------------|
-| Penalty | $\sum\|w_i\|$ | $\sum w_i^2$ |
-| Effect | Sparse weights (some = 0) | Small weights (none = 0) |
-| Feature Selection | Yes, automatic | No |
-| Solution | May have multiple | Unique |
-| When features correlated | Picks one randomly | Keeps all, shrinks equally |
-| Computation | Harder (non-differentiable at 0) | Easier (smooth) |
-
-**Visual Intuition:**
-```
-L1: Diamond-shaped constraint    L2: Circle-shaped constraint
-    More likely to hit corners       Hits boundary smoothly
-    → Sparse solution (w=0)          → All weights small but non-zero
-```
-
-**When to Use:**
-
-| Scenario | Recommendation |
-|----------|----------------|
-| Many irrelevant features | L1 (feature selection) |
-| All features important | L2 (keep all) |
-| Highly correlated features | L2 or Elastic Net |
-| Interpretability needed | L1 (fewer features) |
-| Unsure | Elastic Net (combines both) |
-
-**Python Code Example:**
-```python
-from sklearn.linear_model import LogisticRegression
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-import numpy as np
-
-# Create dataset with some irrelevant features
-X, y = make_classification(n_samples=1000, n_features=20, 
-                          n_informative=5, n_redundant=5, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-# L1 Regularization (Lasso)
-l1_model = LogisticRegression(penalty='l1', solver='saga', C=0.1)
-l1_model.fit(X_train, y_train)
-print(f"L1 - Non-zero coefficients: {np.sum(l1_model.coef_ != 0)}")
-print(f"L1 Accuracy: {l1_model.score(X_test, y_test):.3f}")
-
-# L2 Regularization (Ridge)
-l2_model = LogisticRegression(penalty='l2', C=0.1)
-l2_model.fit(X_train, y_train)
-print(f"L2 - Non-zero coefficients: {np.sum(l2_model.coef_ != 0)}")
-print(f"L2 Accuracy: {l2_model.score(X_test, y_test):.3f}")
-
-# Elastic Net (L1 + L2)
-en_model = LogisticRegression(penalty='elasticnet', solver='saga', 
-                              C=0.1, l1_ratio=0.5)
-en_model.fit(X_train, y_train)
-print(f"Elastic Net Accuracy: {en_model.score(X_test, y_test):.3f}")
-
-# Compare coefficient magnitudes
-print(f"\nL1 coefficients: {l1_model.coef_[0][:5].round(3)}")
-print(f"L2 coefficients: {l2_model.coef_[0][:5].round(3)}")
-```
-
-**Interview Tips:**
-- L1 = Lasso = Feature selection = Sparse
-- L2 = Ridge = Shrinkage = Keeps all features
-- C in sklearn is inverse of λ (smaller C = stronger regularization)
-- Elastic Net is useful when you're unsure or have correlated features
-- L1 is computationally harder due to non-differentiability at 0
-
----
-
-## Question 8
-
 **Discuss the concept of multi-label classification and how it differs from multiclass classification.**
 
 ### Answer
@@ -690,7 +600,7 @@ y_pred_nn = (y_prob > 0.5).astype(int)
 
 ---
 
-## Question 9
+## Question 8
 
 **Discuss the impact of deep learning on traditional classification algorithms.**
 
@@ -786,7 +696,7 @@ model.fit(X_sequences, labels, epochs=10)
 
 ---
 
-## Question 10
+## Question 9
 
 **Discuss the role of attention mechanisms in classification tasks.**
 
@@ -904,5 +814,215 @@ attended = mha(x, x)  # Self-attention
 - Attention weights provide interpretability (which words/pixels matter)
 - Multi-head attention captures different relationship types
 - Self-attention is $O(n^2)$ complexity; mention efficiency variants
+
+---
+
+## Question 10
+
+**What considerations would you take into account when building a credit scoring model?**
+
+### Answer
+
+**Definition:**
+Credit scoring predicts loan default probability. It requires special considerations for regulatory compliance, interpretability, fairness, and business impact of errors.
+
+**Key Considerations:**
+
+| Area | Consideration | Why It Matters |
+|------|---------------|----------------|
+| **Regulatory** | Explainability | Laws require explanation of denial |
+| | Fair lending | Cannot discriminate on protected attributes |
+| | Documentation | Audit trail required |
+| **Model Choice** | Interpretable models | Logistic Regression, Scorecard |
+| | Feature importance | Must explain each factor |
+| **Features** | Avoid proxies | ZIP code may proxy race |
+| | Economic cycles | Features may behave differently |
+| **Metrics** | Cost-sensitive | FN (default) more costly than FP |
+| | Calibration | Predicted probabilities must be accurate |
+| **Monitoring** | Concept drift | Economic changes affect patterns |
+| | Population stability | Monitor feature distributions |
+
+**Recommended Approach:**
+
+| Step | Action |
+|------|--------|
+| 1 | Use interpretable models (Logistic Regression, Scorecard) |
+| 2 | Feature engineering with domain knowledge |
+| 3 | Check for disparate impact on protected groups |
+| 4 | Optimize for business metrics (expected loss) |
+| 5 | Calibrate probabilities |
+| 6 | Document everything |
+| 7 | Monitor in production |
+
+**Important Metrics:**
+
+| Metric | Purpose |
+|--------|---------|
+| Gini/KS | Discriminatory power |
+| PSI | Population stability |
+| Expected Loss | Business impact |
+| Adverse Action Reasons | Compliance |
+
+**Interview Tips:**
+- Emphasize interpretability and compliance
+- Mention fair lending and protected classes
+- Discuss cost of FP vs FN (business perspective)
+- Know that black-box models face regulatory challenges
+- Mention model monitoring and drift detection
+
+---
+
+## Question 11
+
+**Describe how you would build a spam detection classifier.**
+
+### Answer
+
+**Pipeline:**
+```
+Raw Text -> Preprocessing -> Feature Extraction -> Model Training -> Evaluation
+```
+
+**Steps:**
+
+1. **Data Collection**: Labeled emails (spam/ham)
+
+2. **Preprocessing**:
+   - Lowercase
+   - Remove HTML, special chars
+   - Tokenization
+   - Remove stopwords
+   - Stemming
+
+3. **Feature Extraction**:
+   - TF-IDF
+   - N-grams
+   - Additional: caps ratio, links count
+
+4. **Model Selection**:
+   - Naive Bayes (fast, good for text)
+   - Logistic Regression (interpretable)
+
+**Python Code Example:**
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+import re
+
+emails = [
+    "Congratulations! You won $1000!",
+    "Meeting tomorrow at 3pm",
+    "FREE gift card!",
+    "Please review the document"
+]
+labels = [1, 0, 1, 0]  # 1=spam
+
+def preprocess(text):
+    return re.sub(r'[^a-zA-Z\s]', '', text.lower())
+
+emails_clean = [preprocess(e) for e in emails]
+vectorizer = TfidfVectorizer(stop_words='english')
+X = vectorizer.fit_transform(emails_clean)
+
+model = MultinomialNB().fit(X, labels)
+```
+
+**Interview Tips:**
+- Emphasize precision (false positives costly)
+- Need continuous retraining (spam evolves)
+- Handle imbalanced data
+
+---
+
+## Question 12
+
+**Describe a real-world application where precision is more important than recall, and vice versa.**
+
+### Answer
+
+**Definitions:**
+- **Precision** = TP / (TP + FP) - "Of predicted positive, how many correct?"
+- **Recall** = TP / (TP + FN) - "Of actual positive, how many caught?"
+
+**Precision More Important:**
+
+**Example: Spam Detection**
+- FP: Important email marked spam (missed meeting!)
+- FN: Spam reaches inbox (minor annoyance)
+- **Better to let spam through than lose important emails**
+
+**Recall More Important:**
+
+**Example: Cancer Screening**
+- FP: Healthy person flagged (extra tests)
+- FN: Cancer missed (life-threatening)
+- **Better to over-test than miss cancer**
+
+**Summary:**
+| Scenario | Prioritize | Reason |
+|----------|-----------|--------|
+| Spam filter | Precision | Don't lose emails |
+| Cancer screening | Recall | Don't miss cases |
+| Fraud detection | Recall | Catch maximum fraud |
+
+**Interview Tips:**
+- Relate to business impact
+- Threshold tuning: lower threshold -> higher recall
+- F1-score balances both
+
+---
+
+## Question 13
+
+**Explain how you could use classification models to predict customer churn.**
+
+### Answer
+
+**Definition:**
+Binary classification identifying customers likely to stop using a service. Model learns from historical behavior to flag at-risk customers.
+
+**Pipeline:**
+```
+Data Collection -> Feature Engineering -> Model Training -> Prediction -> Intervention
+```
+
+**Feature Engineering:**
+| Category | Examples |
+|----------|---------|
+| Behavioral | Days since last login |
+| Financial | Monthly spend |
+| Support | Number of complaints |
+| Trend | Declining usage |
+
+**Challenges:**
+- Class imbalance (5-15% churn rate)
+- Use SMOTE, class weights
+
+**Python Code Example:**
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+import numpy as np
+
+# Simulated data
+np.random.seed(42)
+n = 1000
+X = np.random.randn(n, 5)
+y = (np.random.random(n) < 0.15).astype(int)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = RandomForestClassifier(class_weight='balanced', n_estimators=100)
+model.fit(X_train, y_train)
+
+y_prob = model.predict_proba(X_test)[:, 1]
+print(f"ROC-AUC: {roc_auc_score(y_test, y_prob):.3f}")
+```
+
+**Interview Tips:**
+- Emphasize business impact
+- Handle imbalanced data properly
+- Feature engineering is crucial
 
 ---

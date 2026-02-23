@@ -873,122 +873,6 @@ Large datasets that don't fit in memory; preprocessing step before final cluster
 
 ## Question 22
 
-**Describe how you would use clustering for organizing a large set of documents into topics.**
-
-### Answer
-
-**Definition:**
-Document clustering (topic modeling) groups text documents by thematic similarity. It involves converting text to numerical vectors, then applying clustering to discover natural topic groupings.
-
-**Step-by-Step Procedure:**
-
-**1. Text Preprocessing:**
-```
-- Tokenization: Split into words
-- Lowercase: Convert to lowercase
-- Stop words: Remove "the", "is", "a"
-- Lemmatization: "running" → "run"
-- Punctuation removal
-```
-
-**2. Feature Extraction (Vectorization):**
-```python
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
-X_tfidf = vectorizer.fit_transform(documents)
-```
-TF-IDF: Words important in document but rare overall get high scores.
-
-**3. Dimensionality Reduction (Optional but Recommended):**
-```python
-from sklearn.decomposition import TruncatedSVD
-
-svd = TruncatedSVD(n_components=100)  # LSA
-X_reduced = svd.fit_transform(X_tfidf)
-```
-
-**4. Clustering:**
-```python
-from sklearn.cluster import KMeans
-
-kmeans = KMeans(n_clusters=5, random_state=42)
-labels = kmeans.fit_predict(X_reduced)
-```
-
-**5. Topic Interpretation:**
-```python
-# Find top words per cluster
-for cluster_id in range(5):
-    center = kmeans.cluster_centers_[cluster_id]
-    top_word_indices = center.argsort()[-10:][::-1]
-    top_words = [feature_names[i] for i in top_word_indices]
-    print(f"Topic {cluster_id}: {top_words}")
-```
-
-**Best Practice:**
-Use Cosine similarity (inherent in normalized TF-IDF) rather than Euclidean for text.
-
----
-
-## Question 23
-
-**Explain how you would employ cluster analysis in a recommendation system.**
-
-### Answer
-
-**Definition:**
-Clustering enables collaborative filtering in recommendation systems by grouping similar users or items. Users receive recommendations based on what similar users in their cluster liked.
-
-**Two Approaches:**
-
-**1. User-Based Clustering:**
-```
-Goal: Group users with similar tastes
-
-Steps:
-1. Create user-item matrix (rows=users, cols=items, values=ratings)
-2. Cluster users based on rating patterns
-3. For target user, find their cluster
-4. Recommend items popular in that cluster but unseen by user
-```
-
-**2. Item-Based Clustering:**
-```
-Goal: Group similar items
-
-Steps:
-1. Create item-user matrix (transpose)
-2. Cluster items rated similarly by same users
-3. If user likes item X, recommend other items in X's cluster
-```
-
-**Python Example (User-Based):**
-```python
-from sklearn.cluster import KMeans
-
-# user_item_matrix: rows=users, cols=items
-kmeans = KMeans(n_clusters=5, random_state=42)
-user_clusters = kmeans.fit_predict(user_item_matrix)
-
-# For user_id, find their cluster and recommend
-user_cluster = user_clusters[user_id]
-similar_users = np.where(user_clusters == user_cluster)[0]
-# Aggregate ratings from similar users for unseen items
-```
-
-**Handling Sparsity:**
-- User-item matrices are very sparse
-- Use matrix factorization (SVD) to create dense embeddings first
-- Then cluster the dense vectors
-
-**Cold Start Problem:**
-New users/items can't be clustered due to lack of data - use content-based fallback.
-
----
-
-## Question 24
-
 **How does consensus clustering improve the robustness and stability of cluster assignments?**
 
 ### Answer
@@ -1034,7 +918,7 @@ Critical applications where cluster reliability matters (medical diagnosis, risk
 
 ---
 
-## Question 25
+## Question 23
 
 **What is subspace clustering, and how does it apply to high-dimensional data?**
 
@@ -1080,7 +964,7 @@ Gene expression analysis where different gene groups (clusters) are defined by d
 
 ---
 
-## Question 26
+## Question 24
 
 **Explain the challenges and solutions for clustering large-scale datasets.**
 
@@ -1132,7 +1016,7 @@ model = kmeans.fit(df)
 
 ---
 
-## Question 27
+## Question 25
 
 **Explain the core idea of DBSCAN clustering.**
 
@@ -1167,7 +1051,7 @@ Imagine dropping ink drops on paper - dense areas spread and merge, isolated dro
 
 ---
 
-## Question 28
+## Question 26
 
 **Define ε-neighborhood and MinPts in DBSCAN.**
 
@@ -1205,7 +1089,7 @@ MinPts = "how many people must hear you to call it a crowd"
 
 ---
 
-## Question 29
+## Question 27
 
 **Describe core, border, and noise points in DBSCAN.**
 
@@ -1243,7 +1127,7 @@ Given point p:
 
 ---
 
-## Question 30
+## Question 28
 
 **How does DBSCAN discover clusters of arbitrary shape?**
 
@@ -1288,7 +1172,7 @@ labels = DBSCAN(eps=0.3, min_samples=5).fit_predict(X)
 
 ---
 
-## Question 31
+## Question 29
 
 **Discuss parameter selection difficulties for ε and MinPts in DBSCAN.**
 
@@ -1343,7 +1227,7 @@ For varying densities, switch to algorithms designed for this problem.
 
 ---
 
-## Question 32
+## Question 30
 
 **Explain time complexity of DBSCAN with index structures.**
 
@@ -1396,7 +1280,7 @@ Indexes make DBSCAN practical for large datasets but don't solve the high-dimens
 
 ---
 
-## Question 33
+## Question 31
 
 **Compare DBSCAN with K-Means for density-based clusters.**
 
@@ -1436,7 +1320,7 @@ Always consider data characteristics (shape, outliers, density) when choosing be
 
 ---
 
-## Question 34
+## Question 32
 
 **Describe reachability and density-reachability concepts in DBSCAN.**
 
@@ -1491,7 +1375,7 @@ All connected through chain = same cluster
 
 ---
 
-## Question 35
+## Question 33
 
 **Explain why DBSCAN is robust to outliers.**
 
@@ -1540,7 +1424,7 @@ DBSCAN: Clusters [1,2,3,4], labels 100 as noise
 
 ---
 
-## Question 36
+## Question 34
 
 **Discuss limitations of DBSCAN on varying density clusters.**
 
@@ -1593,7 +1477,7 @@ labels = clusterer.fit_predict(X)
 
 ---
 
-## Question 37
+## Question 35
 
 **Explain how to use k-distance plot to choose ε.**
 
@@ -1656,7 +1540,7 @@ plt.show()
 
 ---
 
-## Question 38
+## Question 36
 
 **Describe OPTICS and how it extends DBSCAN.**
 
@@ -1713,7 +1597,7 @@ labels = optics.fit_predict(X)
 
 ---
 
-## Question 39
+## Question 37
 
 **Explain how DBSCAN handles high-dimensional data.**
 
@@ -1770,7 +1654,7 @@ Don't apply DBSCAN directly to high-D data (D > 20) without preprocessing.
 
 ---
 
-## Question 40
+## Question 38
 
 **Discuss distance metrics supported in DBSCAN implementations.**
 
@@ -1814,7 +1698,7 @@ labels = db.fit_predict(distance_matrix)
 
 ---
 
-## Question 41
+## Question 39
 
 **Explain DBSCAN's sensitivity to data scale.**
 
@@ -1878,7 +1762,7 @@ labels = pipeline.fit_predict(X)
 
 ---
 
-## Question 42
+## Question 40
 
 **Describe parallel implementations of DBSCAN.**
 
@@ -1928,7 +1812,7 @@ The overlap region between partitions is crucial for correctly identifying clust
 
 ---
 
-## Question 43
+## Question 41
 
 **Explain usage of spatial indexing (KD-Tree, BallTree) in sklearn DBSCAN.**
 
@@ -1981,7 +1865,7 @@ db = DBSCAN(eps=0.5, min_samples=5, algorithm='brute')
 
 ---
 
-## Question 44
+## Question 42
 
 **Discuss minPts heuristic (≥ D+1 where D is dimension).**
 
@@ -2036,7 +1920,7 @@ db = DBSCAN(eps=0.5, min_samples=min_samples)
 
 ---
 
-## Question 45
+## Question 43
 
 **Explain difference between border noise and outlier noise.**
 
@@ -2081,7 +1965,7 @@ Points labeled as noise in DBSCAN may not all be equal - some are genuine outlie
 
 ---
 
-## Question 46
+## Question 44
 
 **Describe incremental DBSCAN for streaming data.**
 
@@ -2134,7 +2018,7 @@ Real-time anomaly detection, continuous monitoring systems.
 
 ---
 
-## Question 47
+## Question 45
 
 **Discuss memory consumption vs dataset size in DBSCAN.**
 
@@ -2184,7 +2068,7 @@ With indexing, DBSCAN's memory scales linearly - feasible if data fits in RAM.
 
 ---
 
-## Question 48
+## Question 46
 
 **Explain how DBSCAN clusters image pixels for segmentation.**
 
@@ -2241,7 +2125,7 @@ segmented = labels.reshape(image_height, image_width)
 
 ---
 
-## Question 49
+## Question 47
 
 **Describe shortcomings when clusters vary widely in density.**
 
@@ -2294,7 +2178,7 @@ When asked about DBSCAN limitations, varying density is the #1 answer. Always me
 
 ---
 
-## Question 50
+## Question 48
 
 **Explain grid-based acceleration methods for DBSCAN.**
 
@@ -2357,7 +2241,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 # DBSCAN Interview Questions - Theory Questions
 
-## Question 1
+## Question 49
 
 **Discuss DBSCAN* variant to reduce neighborhood queries.**
 
@@ -2365,7 +2249,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 2
+## Question 50
 
 **Describe performance on Asiatic vs Euclidean spaces.**
 
@@ -2373,7 +2257,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 3
+## Question 51
 
 **Explain distance threshold effect on cluster count.**
 
@@ -2381,7 +2265,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 4
+## Question 52
 
 **Discuss evaluation metrics suitable for DBSCAN clusters.**
 
@@ -2389,7 +2273,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 5
+## Question 53
 
 **Explain cluster labeling reproducibility issues.**
 
@@ -2397,7 +2281,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 6
+## Question 54
 
 **Describe HDBSCAN and its advantages.**
 
@@ -2405,7 +2289,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 7
+## Question 55
 
 **Explain why DBSCAN cannot cluster nested clusters well.**
 
@@ -2413,7 +2297,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 8
+## Question 56
 
 **Discuss DBSCAN for geospatial lat-long data.**
 
@@ -2421,7 +2305,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 9
+## Question 57
 
 **Explain integrating DBSCAN in anomaly detection pipelines.**
 
@@ -2429,7 +2313,7 @@ High-D data or uneven distributions → KD-Tree or Ball Tree
 
 ---
 
-## Question 10
+## Question 58
 
 **Provide pseudo-code for DBSCAN algorithm.**
 
@@ -2475,7 +2359,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 11
+## Question 59
 
 **Explain complexity difference with pre-computed distances.**
 
@@ -2483,7 +2367,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 12
+## Question 60
 
 **Discuss GPU-accelerated DBSCAN (cuml, cuML DBSCAN).**
 
@@ -2491,7 +2375,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 13
+## Question 61
 
 **Describe combining DBSCAN with K-Means (hybrid).**
 
@@ -2499,7 +2383,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 14
+## Question 62
 
 **Explain parameter tuning automation for DBSCAN.**
 
@@ -2507,7 +2391,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 15
+## Question 63
 
 **Discuss using DBSCAN with cosine similarity.**
 
@@ -2515,7 +2399,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 16
+## Question 64
 
 **Explain noise ratio impact on cluster purity.**
 
@@ -2523,7 +2407,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 17
+## Question 65
 
 **Describe visualization of DBSCAN clusters in 3D.**
 
@@ -2531,7 +2415,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 18
+## Question 66
 
 **Discuss scalability of DBSCAN in BigQuery ML.**
 
@@ -2539,7 +2423,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 19
+## Question 67
 
 **Explain strengths of DBSCAN in market basket analysis.**
 
@@ -2547,7 +2431,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 20
+## Question 68
 
 **Describe cluster fragmentation problem.**
 
@@ -2555,7 +2439,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 21
+## Question 69
 
 **Explain using DBSCAN for time-series subsequence clustering.**
 
@@ -2563,7 +2447,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 22
+## Question 70
 
 **Discuss root causes when DBSCAN finds single giant cluster.**
 
@@ -2571,7 +2455,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 23
+## Question 71
 
 **Explain algorithm behavior on uniform random noise data.**
 
@@ -2579,7 +2463,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 24
+## Question 72
 
 **Discuss case study: customer GPS trajectory clustering.**
 
@@ -2587,7 +2471,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 25
+## Question 73
 
 **Explain evaluation via adjusted Rand index for DBSCAN.**
 
@@ -2595,7 +2479,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 26
+## Question 74
 
 **Predict research trends in adaptive density-based clustering.**
 
@@ -2610,7 +2494,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 # Hierarchical Clustering Interview Questions - Theory Questions
 
-## Question 1
+## Question 75
 
 **Distinguish between agglomerative and divisive strategies.**
 
@@ -2618,7 +2502,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 2
+## Question 76
 
 **Explain "linkage criterion" and list four common variants.**
 
@@ -2626,7 +2510,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 3
+## Question 77
 
 **Why does single linkage suffer from chaining, and how can you detect it?**
 
@@ -2634,7 +2518,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 4
+## Question 78
 
 **Derive the computational complexity of naïve agglomerative clustering.**
 
@@ -2642,7 +2526,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 5
+## Question 79
 
 **How does Ward's method minimize total within-cluster variance?**
 
@@ -2650,7 +2534,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 6
+## Question 80
 
 **What is the Lance–Williams update formula?**
 
@@ -2658,7 +2542,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 7
+## Question 81
 
 **Describe the steps to build a dendrogram from scratch.**
 
@@ -2666,7 +2550,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 8
+## Question 82
 
 **Interpret cophenetic distance and the cophenetic correlation coefficient.**
 
@@ -2674,7 +2558,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 9
+## Question 83
 
 **Explain how inconsistency coefficients flag unreliable merges.**
 
@@ -2682,7 +2566,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 10
+## Question 84
 
 **Compare hierarchical clustering with K-means for non-spherical data.**
 
@@ -2690,7 +2574,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 11
+## Question 85
 
 **When would you truncate (cut) a dendrogram, and how do you pick the level?**
 
@@ -2698,7 +2582,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 12
+## Question 86
 
 **Discuss advantages of monotonicity in merge distances.**
 
@@ -2706,7 +2590,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 13
+## Question 87
 
 **Explain the effect of different distance metrics (Euclidean vs. Manhattan).**
 
@@ -2714,7 +2598,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 14
+## Question 88
 
 **How does centroid linkage differ from average linkage?**
 
@@ -2722,7 +2606,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 15
+## Question 89
 
 **Describe space-saving algorithms for massive datasets (e.g., CURE, BIRCH).**
 
@@ -2730,7 +2614,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 16
+## Question 90
 
 **What role does cluster variance play in Ward's criterion?**
 
@@ -2738,7 +2622,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 17
+## Question 91
 
 **Show how you would visualize ultrametric property violations.**
 
@@ -2746,7 +2630,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 18
+## Question 92
 
 **Why is hierarchical clustering deterministic for a fixed linkage metric?**
 
@@ -2754,7 +2638,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 19
+## Question 93
 
 **Discuss scalability trade-offs of SLINK vs. naive algorithms.**
 
@@ -2762,7 +2646,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 20
+## Question 94
 
 **How does HAC handle categorical variables encoded as one-hot?**
 
@@ -2770,7 +2654,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 21
+## Question 95
 
 **Outline a method to cluster streaming data hierarchically.**
 
@@ -2778,7 +2662,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 22
+## Question 96
 
 **Explain dendrogram purity as an external evaluation metric.**
 
@@ -2786,7 +2670,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 23
+## Question 97
 
 **What is the effect of standardizing features before HAC?**
 
@@ -2794,7 +2678,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 24
+## Question 98
 
 **Describe the "reversal" phenomenon in dendrograms.**
 
@@ -2802,7 +2686,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 25
+## Question 99
 
 **Compare bottom-up HAC with OPTICS reachability plots.**
 
@@ -2810,7 +2694,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 26
+## Question 100
 
 **How can bootstrap resampling assess cluster stability in HAC?**
 
@@ -2818,7 +2702,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 27
+## Question 101
 
 **Explain how to cut a dendrogram by distance threshold vs. cluster count.**
 
@@ -2826,7 +2710,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 28
+## Question 102
 
 **Discuss interpretability advantages over DBSCAN.**
 
@@ -2834,7 +2718,7 @@ Time complexity: O(n²) without index, O(n log n) with spatial index (KD-tree/Ba
 
 ---
 
-## Question 29
+## Question 103
 
 **Provide a pseudocode sketch of the SLINK algorithm.**
 
@@ -2872,7 +2756,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 30
+## Question 104
 
 **Why does centroid linkage risk inversions?**
 
@@ -2880,7 +2764,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 31
+## Question 105
 
 **Describe hybrid clustering (HAC + K-means) and its benefit.**
 
@@ -2888,7 +2772,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 32
+## Question 106
 
 **What is complete linkage's bias regarding cluster shape?**
 
@@ -2896,7 +2780,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 33
+## Question 107
 
 **Explain average silhouette width computation for HAC results.**
 
@@ -2904,7 +2788,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 34
+## Question 108
 
 **Discuss memory requirements of pairwise distance matrices.**
 
@@ -2912,7 +2796,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 35
+## Question 109
 
 **How can you prune irrelevant branches early during agglomeration?**
 
@@ -2920,7 +2804,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 36
+## Question 110
 
 **Describe time complexity improvements with nearest-neighbor chains.**
 
@@ -2928,7 +2812,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 37
+## Question 111
 
 **Explain "monotone chain" rule used in single-link implementations.**
 
@@ -2936,7 +2820,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 38
+## Question 112
 
 **Contrast hierarchical clustering with hierarchical DBSCAN (HDBSCAN).**
 
@@ -2944,7 +2828,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 39
+## Question 113
 
 **Discuss meaningfulness of cluster centroids in HAC outputs.**
 
@@ -2952,7 +2836,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 40
+## Question 114
 
 **What are ultrametrics and how do they relate to dendrogram heights?**
 
@@ -2960,7 +2844,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 41
+## Question 115
 
 **Explain dynamic tree cut for automatic cluster extraction.**
 
@@ -2968,7 +2852,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 42
+## Question 116
 
 **Describe visual assessment of cluster tendency (VAT) before HAC.**
 
@@ -2976,7 +2860,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 43
+## Question 117
 
 **How do graph-based minimum-spanning-tree methods relate to single linkage?**
 
@@ -2984,7 +2868,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 44
+## Question 118
 
 **Explain taxonomy construction in biology via HAC.**
 
@@ -2992,7 +2876,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 45
+## Question 119
 
 **Discuss noise sensitivity of HAC compared with OPTICS.**
 
@@ -3000,7 +2884,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 46
+## Question 120
 
 **How would you parallelize HAC on a GPU?**
 
@@ -3008,7 +2892,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 47
+## Question 121
 
 **Show how HAC can precede Gaussian mixture EM initialization.**
 
@@ -3016,7 +2900,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 48
+## Question 122
 
 **Explain hierarchical soft clustering (e.g., hierarchical EM).**
 
@@ -3024,7 +2908,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 49
+## Question 123
 
 **Provide an industrial use case where HAC outperformed flat clustering.**
 
@@ -3032,7 +2916,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 50
+## Question 124
 
 **Predict future research directions in hierarchical scalable algorithms.**
 
@@ -3047,7 +2931,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 # Gaussian Mixture Models Interview Questions - Theory Questions
 
-## Question 1
+## Question 125
 
 **Define a finite mixture model formally.**
 
@@ -3055,7 +2939,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 2
+## Question 126
 
 **Explain the EM algorithm for parameter-learning in GMMs.**
 
@@ -3063,7 +2947,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 3
+## Question 127
 
 **Why does the E-step compute posterior responsibilities?**
 
@@ -3071,7 +2955,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 4
+## Question 128
 
 **Derive the M-step update for component means.**
 
@@ -3079,7 +2963,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 5
+## Question 129
 
 **Describe diagonal vs. full covariance trade-offs.**
 
@@ -3087,7 +2971,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 6
+## Question 130
 
 **How does GMM relate to K-means as covariances → 0?**
 
@@ -3095,7 +2979,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 7
+## Question 131
 
 **Explain model selection with BIC/AIC for choosing k.**
 
@@ -3103,7 +2987,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 8
+## Question 132
 
 **Discuss singular covariance issues and remedies.**
 
@@ -3111,7 +2995,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 9
+## Question 133
 
 **Explain identifiability problems when permuting components.**
 
@@ -3119,7 +3003,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 10
+## Question 134
 
 **Illustrate spherical, tied, and full-covariance models in scikit-learn.**
 
@@ -3127,7 +3011,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 11
+## Question 135
 
 **Compare EM convergence to local vs. global maxima.**
 
@@ -3135,7 +3019,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 12
+## Question 136
 
 **How would you initialize GMMs robustly (k-means++, k-means, random)?**
 
@@ -3143,7 +3027,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 13
+## Question 137
 
 **Discuss using Dirichlet priors for Bayesian GMMs.**
 
@@ -3151,7 +3035,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 14
+## Question 138
 
 **Explain collapsed Gibbs sampling for mixture models.**
 
@@ -3159,7 +3043,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 15
+## Question 139
 
 **Describe variational Bayes GMM and automatic relevance determination.**
 
@@ -3167,7 +3051,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 16
+## Question 140
 
 **How does regularization of covariance matrices prevent overfitting?**
 
@@ -3175,7 +3059,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 17
+## Question 141
 
 **Show how to compute log-likelihood for held-out validation data.**
 
@@ -3183,7 +3067,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 18
+## Question 142
 
 **Explain degeneracy when a component captures one point.**
 
@@ -3191,7 +3075,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 19
+## Question 143
 
 **Discuss split-and-merge EM accelerations.**
 
@@ -3199,7 +3083,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 20
+## Question 144
 
 **Describe semi-supervised GMMs with partially labeled data.**
 
@@ -3207,7 +3091,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 21
+## Question 145
 
 **Explain expectation-conditional maximization (ECM) variants.**
 
@@ -3215,7 +3099,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 22
+## Question 146
 
 **Discuss application of GMMs in speaker diarization.**
 
@@ -3223,7 +3107,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 23
+## Question 147
 
 **How do you perform anomaly detection with GMM scores?**
 
@@ -3231,7 +3115,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 24
+## Question 148
 
 **Explain mixture of factor analysers vs. standard GMMs.**
 
@@ -3239,7 +3123,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 25
+## Question 149
 
 **Describe using GMMs for background subtraction in video.**
 
@@ -3247,7 +3131,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 26
+## Question 150
 
 **How does mean-shift clustering approximate an adaptive GMM?**
 
@@ -3255,7 +3139,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 27
+## Question 151
 
 **Discuss EM stopping criteria and sensitivity.**
 
@@ -3263,7 +3147,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 28
+## Question 152
 
 **Explain covariance determinant and cluster volume interpretation.**
 
@@ -3271,7 +3155,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 29
+## Question 153
 
 **Why do log probabilities improve numerical stability?**
 
@@ -3279,7 +3163,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 30
+## Question 154
 
 **Illustrate shape control via covariance eigen-decomposition.**
 
@@ -3287,7 +3171,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 31
+## Question 155
 
 **Explain incremental / online EM for streaming data.**
 
@@ -3295,7 +3179,7 @@ Time: O(n²), Space: O(n). The pi array encodes the dendrogram: pi[i] points to 
 
 ---
 
-## Question 32
+## Question 156
 
 **Provide pseudo-code for a single EM iteration.**
 
@@ -3325,7 +3209,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 33
+## Question 157
 
 **Discuss propensity of EM to find saddle points.**
 
@@ -3333,7 +3217,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 34
+## Question 158
 
 **How does heteroscedasticity violate GMM assumptions?**
 
@@ -3341,7 +3225,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 35
+## Question 159
 
 **Compare Dirichlet Process GMM with finite GMM.**
 
@@ -3349,7 +3233,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 36
+## Question 160
 
 **Describe mixture models on non-Euclidean manifolds.**
 
@@ -3357,7 +3241,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 37
+## Question 161
 
 **Explain mixture of von Mises distributions for circular data.**
 
@@ -3365,7 +3249,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 38
+## Question 162
 
 **Describe hard EM (classification EM) and its drawbacks.**
 
@@ -3373,7 +3257,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 39
+## Question 163
 
 **Discuss information-theoretic merging of redundant components.**
 
@@ -3381,7 +3265,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 40
+## Question 164
 
 **How does annealed EM escape poor local maxima?**
 
@@ -3389,7 +3273,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 41
+## Question 165
 
 **Provide a method to visualize high-dimensional GMM clusters.**
 
@@ -3397,7 +3281,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 42
+## Question 166
 
 **Explain parameter ties across mixture components.**
 
@@ -3405,7 +3289,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 43
+## Question 167
 
 **How would you parallelize EM on MapReduce?**
 
@@ -3413,7 +3297,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 44
+## Question 168
 
 **Discuss GPU acceleration for large-n, small-d GMMs.**
 
@@ -3421,7 +3305,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 45
+## Question 169
 
 **Describe mixture models for heterogeneous data (mixed types).**
 
@@ -3429,7 +3313,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 46
+## Question 170
 
 **Explain subspace-constrained GMMs (Mixture of PPCA).**
 
@@ -3437,7 +3321,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 47
+## Question 171
 
 **Discuss calibration of component weights for class imbalance.**
 
@@ -3445,7 +3329,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 48
+## Question 172
 
 **Provide an industrial success story using GMMs.**
 
@@ -3453,7 +3337,7 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 49
+## Question 173
 
 **Predict research trends in Bayesian nonparametric mixtures.**
 
@@ -3461,10 +3345,397 @@ The E-step costs O(NKd²) for computing N×K Gaussian log-densities (each requir
 
 ---
 
-## Question 50
+## Question 174
 
 **Summarize pros/cons of GMMs vs. density-based clustering.**
 
 **Answer:** **GMM pros**: (1) Produces a full generative probabilistic model with density estimates, soft assignments, and calibrated probabilities, (2) Well-suited for ellipsoidal clusters of varying size and orientation, (3) Provides BIC/AIC for principled model selection, (4) Naturally extends to Bayesian inference with uncertainty quantification, (5) Efficient O(NKd²) per iteration. **GMM cons**: (1) Assumes Gaussian components—poor for non-ellipsoidal shapes, (2) Requires specifying K (unless using DPGMM), (3) Sensitive to initialization and local optima, (4) Struggles with varying-density and non-convex clusters. **Density-based (DBSCAN/HDBSCAN) pros**: (1) Discovers arbitrary-shaped clusters, (2) Automatically identifies noise/outliers, (3) No K specification needed, (4) Handles varying densities (HDBSCAN). **Density-based cons**: (1) No probabilistic model or density estimate (just cluster labels), (2) Sensitive to ε and minPts parameters (DBSCAN), (3) Struggles when clusters have significantly different densities (DBSCAN), (4) No soft assignments or generative capability. **When to use which**: GMMs for ellipsoidal clusters needing probability scores; density-based for arbitrary shapes, noise robustness, and exploratory analysis.
+
+---
+
+## Question 175
+
+**How do Gaussian Mixture Models (GMM) contribute to cluster analysis?**
+
+### Answer
+
+**Definition:**
+GMM is a probabilistic, model-based clustering algorithm that assumes data is generated from a mixture of Gaussian distributions. Each Gaussian represents a cluster, and GMM provides soft (probabilistic) cluster assignments.
+
+**Core Concepts:**
+- Each cluster = one Gaussian distribution with mean μ and covariance Σ
+- Provides probability of belonging to each cluster (soft clustering)
+- Can model elliptical clusters of different sizes and orientations
+- Trained using Expectation-Maximization (EM) algorithm
+
+**Comparison with K-Means:**
+
+| Aspect | K-Means | GMM |
+|--------|---------|-----|
+| Cluster Shape | Spherical only | Elliptical (any orientation) |
+| Assignment | Hard (one cluster) | Soft (probabilities) |
+| Output | Label | [0.7, 0.2, 0.1] probabilities |
+
+**EM Algorithm Steps:**
+1. **E-Step:** Calculate probability each point belongs to each Gaussian
+2. **M-Step:** Update Gaussian parameters (mean, covariance, weight) based on probabilities
+3. **Repeat:** Until convergence
+
+**Python Code:**
+```python
+from sklearn.mixture import GaussianMixture
+
+gmm = GaussianMixture(n_components=3, covariance_type='full')
+gmm.fit(X)
+labels = gmm.predict(X)          # Hard assignments
+probs = gmm.predict_proba(X)     # Soft probabilities
+```
+
+**Use When:**
+- Clusters are non-spherical
+- Probabilistic assignments are meaningful
+- Points may belong to multiple categories
+
+---
+
+## Question 176
+
+**How can reinforcement learning theoretically be utilized for optimizing cluster analysis tasks?**
+
+### Answer
+
+**Definition:**
+RL can theoretically frame clustering as sequential decision-making, where an agent learns to assign points to clusters by maximizing rewards tied to clustering quality metrics.
+
+**Conceptual Framework:**
+
+| RL Component | Clustering Mapping |
+|--------------|-------------------|
+| Agent | Decision-maker for assignments |
+| State | Current cluster configuration |
+| Action | Assign point, move centroid, adjust k |
+| Reward | Silhouette score improvement |
+| Environment | Dataset + current partition |
+
+**Possible Actions:**
+- Incremental: Assign one point at a time
+- Center adjustment: Move centroids
+- Parameter selection: Learn optimal k, ε, etc.
+
+**Theoretical Algorithm:**
+```
+1. Initialize random clustering state
+2. For each episode:
+   - Observe current state (cluster config)
+   - Choose action (assign/move/split/merge)
+   - Execute action, observe new state
+   - Calculate reward (Δ silhouette score)
+   - Update policy using RL algorithm
+3. Repeat until policy converges
+```
+
+**Challenges:**
+- Huge state/action space (exponential in n)
+- Reward function design is difficult
+- Computationally much more expensive than traditional algorithms
+
+**Practical Status:**
+- Primarily research area
+- Not practical for standard clustering tasks
+- Potential for complex adaptive scenarios
+
+---
+
+## Question 177
+
+**Discuss the importance of scaling and normalization in cluster analysis.**
+
+### Answer
+
+**Why Scaling is Critical:**
+
+Distance-based clustering algorithms (K-Means, DBSCAN, Hierarchical) calculate similarity using distance metrics. Without scaling, features with larger ranges dominate, making other features irrelevant.
+
+**The Problem:**
+```
+Feature A: Annual Income [20,000 - 200,000]
+Feature B: Items in Cart [1 - 50]
+
+Distance calculation:
+sqrt((income_diff)² + (cart_diff)²)
+     ↑ ~180,000           ↑ ~50
+     
+Income dominates! Cart contribution is negligible.
+```
+
+**Impact on Algorithms:**
+
+| Algorithm | Effect Without Scaling |
+|-----------|----------------------|
+| K-Means | Centroids pulled toward high-scale features |
+| DBSCAN | ε parameter meaningless across dimensions |
+| Hierarchical | Linkage distances distorted |
+
+**Scaling Methods:**
+
+| Method | Formula | When to Use |
+|--------|---------|-------------|
+| StandardScaler | (x - μ) / σ | Most common, robust |
+| MinMaxScaler | (x - min) / (max - min) | Need [0,1] range |
+| RobustScaler | (x - median) / IQR | Data has outliers |
+
+**Implementation:**
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('kmeans', KMeans(n_clusters=3))
+])
+labels = pipeline.fit_predict(X)
+```
+
+**Key Takeaway:**
+Always scale before distance-based clustering. It's mandatory, not optional.
+
+---
+
+## Question 178
+
+**How would you determine the number of clusters in a dataset?**
+
+### Answer
+
+**Approach: Use Multiple Methods + Domain Knowledge**
+
+**Method 1: Elbow Method (WCSS)**
+```python
+wcss = []
+for k in range(1, 11):
+    kmeans = KMeans(n_clusters=k, n_init=10)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_)
+
+# Plot and find elbow (diminishing returns point)
+plt.plot(range(1, 11), wcss, 'bo-')
+```
+Look for: Sharp bend in curve
+
+**Method 2: Silhouette Score (Preferred)**
+```python
+from sklearn.metrics import silhouette_score
+
+scores = []
+for k in range(2, 11):
+    labels = KMeans(n_clusters=k).fit_predict(X)
+    scores.append(silhouette_score(X, labels))
+
+# Pick k with highest score
+optimal_k = range(2, 11)[np.argmax(scores)]
+```
+Look for: Maximum score
+
+**Method 3: Gap Statistic**
+- Compares WCSS against null reference distribution
+- More statistically rigorous but computationally expensive
+
+**Method 4: Dendrogram (Hierarchical)**
+- Cut at longest vertical distance without horizontal line
+- Visual, intuitive
+
+**Practical Strategy:**
+```
+1. Domain knowledge: What makes business sense? (3-7 segments typical)
+2. Run Elbow + Silhouette
+3. If they agree → use that k
+4. If not → try both, validate clusters
+5. Visualize with PCA/t-SNE for sanity check
+```
+
+---
+
+## Question 179
+
+**Discuss the Expectation-Maximization (EM) algorithm and its application in clustering.**
+
+### Answer
+
+**What is EM?**
+Iterative algorithm for finding maximum likelihood estimates when data has latent (hidden) variables. In GMM clustering, the latent variable is "which Gaussian generated this point?"
+
+**Two Steps (Repeat until convergence):**
+
+**E-Step (Expectation):**
+```
+For each point, calculate probability it belongs to each cluster
+
+P(cluster k | point x) = "responsibility" of cluster k for point x
+
+Example: Point X has responsibilities [0.7, 0.2, 0.1] for clusters A, B, C
+→ Most likely from cluster A, but some uncertainty
+```
+
+**M-Step (Maximization):**
+```
+Update cluster parameters to maximize likelihood given responsibilities
+
+For each cluster k:
+- μₖ = weighted mean of all points (weights = responsibilities)
+- Σₖ = weighted covariance
+- πₖ = average responsibility (cluster weight)
+```
+
+**Algorithm Flow:**
+```
+Initialize: Random Gaussian parameters
+Repeat:
+    E-Step: Compute responsibilities (soft assignments)
+    M-Step: Update μ, Σ, π for each Gaussian
+Until: Parameters stabilize (convergence)
+```
+
+**Why It's Powerful:**
+- Provides probabilistic (soft) assignments
+- Can model elliptical clusters of different sizes/orientations
+- Handles overlapping clusters naturally
+
+**Python:**
+```python
+from sklearn.mixture import GaussianMixture
+
+gmm = GaussianMixture(n_components=3, max_iter=100)
+gmm.fit(X)
+labels = gmm.predict(X)        # Hard assignments
+probs = gmm.predict_proba(X)   # Soft probabilities
+```
+
+---
+
+## Question 180
+
+**Discuss the benefits of using Spectral Clustering and the type of problems it can solve.**
+
+### Answer
+
+**What is Spectral Clustering?**
+Graph-based algorithm that transforms clustering into graph partitioning. Uses eigenvectors of the graph Laplacian to find structure.
+
+**How It Works:**
+```
+1. Build similarity graph (points = nodes, edges = similarity)
+2. Compute graph Laplacian matrix
+3. Find eigenvectors of Laplacian (spectral decomposition)
+4. Use smallest eigenvectors as new embedding
+5. Run K-Means on this embedding
+```
+
+**When Spectral Clustering Excels:**
+
+| Problem Type | Why It Works |
+|--------------|--------------|
+| Non-convex clusters | Uses connectivity, not centroids |
+| Intertwined shapes | Graph preserves local structure |
+| Two moons problem | Separates perfectly |
+| Image segmentation | Pixels as graph nodes |
+
+**Comparison:**
+```
+Two nested circles:
+- K-Means: Fails completely
+- Spectral: Separates perfectly
+```
+
+**Python:**
+```python
+from sklearn.cluster import SpectralClustering
+from sklearn.datasets import make_moons
+
+X, _ = make_moons(n_samples=200, noise=0.05)
+
+spectral = SpectralClustering(
+    n_clusters=2,
+    affinity='nearest_neighbors',  # Or 'rbf'
+    n_neighbors=10
+)
+labels = spectral.fit_predict(X)
+```
+
+**Limitations:**
+- Complexity: O(n³) for eigen-decomposition
+- Must specify k
+- Sensitive to similarity measure (gamma in RBF)
+
+**Use When:** Clusters have complex shapes and K-Means fails
+
+---
+
+## Question 181
+
+**Discuss the role of deep learning in cluster analysis and mention any popular approaches.**
+
+### Answer
+
+**Core Idea:**
+Use neural networks to learn better representations (embeddings) for clustering. Cluster in learned space instead of raw feature space.
+
+**Why Deep Learning?**
+- Raw pixels/text → poor clustering
+- Learned embeddings → meaningful similarity
+- Jointly optimize representation + clustering
+
+**Popular Approaches:**
+
+**1. Autoencoder + Clustering**
+```python
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+
+# Autoencoder
+input_layer = Input(shape=(784,))
+encoded = Dense(256, activation='relu')(input_layer)
+encoded = Dense(64, activation='relu')(encoded)
+latent = Dense(10, activation='relu')(encoded)  # Latent space
+decoded = Dense(64, activation='relu')(latent)
+decoded = Dense(256, activation='relu')(decoded)
+output = Dense(784, activation='sigmoid')(decoded)
+
+autoencoder = Model(input_layer, output)
+encoder = Model(input_layer, latent)
+
+# Train autoencoder
+autoencoder.compile(optimizer='adam', loss='mse')
+autoencoder.fit(X, X, epochs=50, batch_size=256)
+
+# Cluster in latent space
+embeddings = encoder.predict(X)
+labels = KMeans(n_clusters=10).fit_predict(embeddings)
+```
+
+**2. Deep Embedded Clustering (DEC)**
+```
+1. Pretrain autoencoder
+2. Initialize cluster centers in latent space
+3. Joint optimization:
+   - Update encoder to improve clustering
+   - Update cluster assignments
+4. Loss = KL divergence between soft assignments and target distribution
+```
+
+**3. Contrastive Learning (SimCLR)**
+```
+1. Create augmented pairs of same data
+2. Train to pull similar pairs together, push different apart
+3. Resulting embeddings cluster naturally
+```
+
+**When to Use:**
+- High-dimensional raw data (images, text)
+- Traditional clustering fails
+- Sufficient training data available
+
+**Limitation:**
+More complex, requires tuning, computationally expensive
 
 ---

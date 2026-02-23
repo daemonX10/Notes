@@ -2,41 +2,6 @@
 
 ## Question 1
 
-**Discuss the concept of stochastic gradient descent (SGD) and its advantages and disadvantages.**
-
-**Answer:**
-
-SGD updates parameters after each single training example instead of the full dataset. This makes it much faster per iteration but introduces noise in the gradient estimate.
-
-**How it Works:**
-1. Shuffle training data
-2. For each sample: compute gradient, update parameters
-3. Repeat for multiple epochs
-
-**Advantages:**
-- Very fast iterations (processes one sample at a time)
-- Low memory requirement
-- Noise helps escape local minima and saddle points
-- Can do online learning (learn from streaming data)
-- Better generalization in some cases
-
-**Disadvantages:**
-- Very noisy updates - loss fluctuates significantly
-- May never fully converge (oscillates around minimum)
-- Loses benefits of vectorized computation (GPUs)
-- High variance in gradient estimate
-
-**When to Use:**
-- Very large datasets that don't fit in memory
-- Online learning scenarios
-- When noise is beneficial for escaping local minima
-
-**In Practice:** Mini-batch GD (batch size 32-256) is preferred as it balances speed and stability.
-
----
-
-## Question 2
-
 **What could cause gradient descent to converge very slowly, and how would you counteract it?**
 
 **Answer:**
@@ -83,47 +48,7 @@ SGD updates parameters after each single training example instead of the full da
 
 ---
 
-## Question 3
-
-**Discuss the significance of weight initialization in optimizing a model with gradient descent.**
-
-**Answer:**
-
-Weight initialization determines the starting point on the loss surface and critically affects gradient flow. Poor initialization causes vanishing/exploding gradients, making training impossible. Good initialization keeps signals in a reasonable range throughout the network.
-
-**Why It Matters:**
-
-| Bad Init | Problem | Consequence |
-|----------|---------|-------------|
-| All zeros | All neurons compute same thing | Network can't learn |
-| Too small | Signals shrink layer by layer | Vanishing gradients |
-| Too large | Signals explode layer by layer | Exploding gradients |
-
-**Common Initialization Schemes:**
-
-| Method | Formula | Best For |
-|--------|---------|----------|
-| Xavier/Glorot | W ~ N(0, 2/(n_in + n_out)) | Sigmoid, Tanh |
-| He | W ~ N(0, 2/n_in) | ReLU and variants |
-| LeCun | W ~ N(0, 1/n_in) | SELU |
-
-**Intuition:**
-- Goal: Keep variance of activations roughly constant across layers
-- Xavier: Balances variance for forward and backward pass
-- He: Accounts for ReLU zeroing half the neurons
-
-**Practical Guidelines:**
-1. Use He initialization with ReLU (default in PyTorch)
-2. Use Xavier with Tanh/Sigmoid
-3. For transfer learning: use pretrained weights (best init!)
-4. Batch normalization reduces sensitivity to initialization
-
-**In Interview:**
-"Good initialization ensures signals neither vanish nor explode as they propagate through the network, enabling gradient-based learning from the start."
-
----
-
-## Question 4
+## Question 2
 
 **Discuss the importance of convergence criteria in gradient descent.**
 
@@ -169,7 +94,7 @@ for epoch in epochs:
 
 ---
 
-## Question 5
+## Question 3
 
 **How would you adapt gradient descent to handle a large amount of data that does not fit into memory?**
 
@@ -224,7 +149,7 @@ for i, batch in enumerate(batches):
 
 ---
 
-## Question 6
+## Question 4
 
 **Discuss how you might use feature engineering to improve the performance of gradient descent in a model.**
 
@@ -273,45 +198,46 @@ X_poly = poly.fit_transform(X)
 
 ---
 
-## Question 7
+## Question 5
 
-**Discuss the concept of second-order optimization methods and their practicality in large-scale machine learning.**
+**Present a strategy to choose the right optimizer for a given ML problem.**
 
 **Answer:**
 
-Second-order methods use Hessian (second derivatives) for better curvature information, enabling faster convergence in iterations. However, they're impractical for large-scale ML due to O(N^2) storage and O(N^3) computation for N parameters.
+Start with AdamW as robust default. For CNN SOTA, use SGD + momentum. For Transformers, use AdamW + warmup. For RNNs, use Adam + gradient clipping.
 
-**Comparison:**
+| Architecture | Optimizer | Extra |
+|--------------|-----------|-------|
+| CNN | SGD + Momentum or AdamW | LR schedule |
+| RNN/LSTM | Adam | Gradient Clipping |
+| Transformer | AdamW | Warmup + Decay |
 
-| Aspect | First-Order (GD) | Second-Order (Newton) |
-|--------|-----------------|----------------------|
-| Uses | Gradient | Gradient + Hessian |
-| Per-iteration cost | O(N) | O(N^3) |
-| Memory | O(N) | O(N^2) |
-| Iterations to converge | Many | Few |
-| Practical for DL | Yes | No |
+---
 
-**Why Second-Order is Impractical:**
-- For N = 1 million parameters:
-  - Hessian has 10^12 elements
-  - Inverting costs 10^18 operations
-  - Storage needs terabytes
+## Question 6
 
-**Practical Alternatives:**
+**Describe a scenario where gradient descent might fail to find the optimal solution and what alternatives could mitigate this.**
 
-| Method | Idea | Practicality |
-|--------|------|--------------|
-| L-BFGS | Approximate inverse Hessian from gradients | Good for small-medium problems |
-| Diagonal approximation | Only use diagonal of Hessian | Some speedup, limited benefit |
-| Adam | Approximate per-parameter curvature | Practical, widely used |
-| Natural Gradient | Use Fisher information matrix | Theoretical interest |
+**Answer:**
 
-**When to Use What:**
-- **Small models (< 10K params):** L-BFGS can work well
-- **Medium models:** Adam (practical approximation)
-- **Large models:** SGD with momentum or Adam
+Gradient descent fails on: (1) Non-convex functions - gets stuck in poor local minima, (2) Saddle points - gradient near 0 but not minimum. Mitigations: momentum, random restarts, learning rate schedules, or gradient-free methods for non-differentiable problems.
 
-**In Interview:**
-"Second-order methods offer faster convergence per iteration, but their O(N^2) memory and O(N^3) computation make them impractical for modern deep learning. Instead, we use Adam, which provides per-parameter adaptive learning rates as a practical approximation to second-order information."
+**Scenarios and Solutions:**
+
+| Failure | Mitigation |
+|---------|------------|
+| Poor local minimum | Momentum, random restarts |
+| Saddle point | SGD noise, momentum |
+| Non-differentiable | Subgradient methods |
+
+---
+
+## Question 7
+
+**Explain how you would use gradient descent to optimize hyperparameters in a machine learning model.**
+
+**Answer:**
+
+Gradient-based hyperparameter optimization computes hypergradient by differentiating validation loss w.r.t. hyperparameters through the training process. Complex to implement; works for continuous hyperparameters only (learning rate, regularization), not discrete (number of layers).
 
 ---

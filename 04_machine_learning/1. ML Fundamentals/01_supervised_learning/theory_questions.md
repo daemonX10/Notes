@@ -2,237 +2,9 @@
 
 ---
 
-## Question 1: What is Supervised Learning?
+## Linear Models and General Techniques
 
-**Definition:**  
-Supervised learning is a machine learning paradigm where the model learns a mapping function from input features (X) to output labels (y) using a labeled dataset. The algorithm iteratively adjusts its parameters to minimize the error between predictions and true labels, enabling it to predict outputs for new, unseen inputs.
-
-**Core Concepts:**
-- Requires labeled data: (input, output) pairs
-- Learns mapping: f(X) → y
-- Two phases: Training (learning) and Inference (prediction)
-- Uses loss function to measure prediction error
-- Optimizer adjusts model parameters to minimize loss
-
-**Mathematical Formulation:**
-$$\hat{y} = f(X; \theta)$$
-$$\theta^* = \arg\min_\theta \mathcal{L}(y, \hat{y})$$
-
-Where $\theta$ are model parameters and $\mathcal{L}$ is the loss function.
-
-**Intuition:**  
-Like learning with a teacher - the model sees examples with correct answers, learns patterns, and then predicts on new examples.
-
-**Practical Relevance:**
-- Spam detection (email → spam/not spam)
-- House price prediction (features → price)
-- Medical diagnosis (symptoms → disease)
-- Credit scoring (customer data → approve/deny)
-
----
-
-## Question 2: What are the types of problems solved with Supervised Learning?
-
-**Definition:**  
-Supervised learning problems are categorized into **Classification** (predicting discrete categories) and **Regression** (predicting continuous values) based on the nature of the target variable.
-
-**Core Concepts:**
-
-| Type | Output | Examples |
-|------|--------|----------|
-| **Binary Classification** | 2 classes | Spam/Not Spam, Churn/No Churn |
-| **Multi-class Classification** | >2 classes, one per sample | Digit recognition (0-9) |
-| **Multi-label Classification** | Multiple classes per sample | Article tagging |
-| **Regression** | Continuous value | Price prediction, Temperature |
-
-**Algorithms:**
-- Classification: Logistic Regression, SVM, Decision Trees, Neural Networks
-- Regression: Linear Regression, Ridge, Lasso, Gradient Boosting
-
-**Practical Relevance:**
-- Classification: Fraud detection, image recognition, sentiment analysis
-- Regression: Sales forecasting, demand prediction, age estimation
-
----
-
-## Question 3: Describe how Training and Testing datasets are used
-
-**Definition:**  
-The labeled dataset is split into a **training set** (to teach the model), **validation set** (to tune hyperparameters), and **test set** (to evaluate final performance on unseen data). This prevents overfitting and provides honest performance estimates.
-
-**Core Concepts:**
-- **Training Set (70-80%):** Model learns patterns by minimizing loss
-- **Validation Set (10-15%):** Used for hyperparameter tuning, early stopping
-- **Test Set (10-15%):** Final unbiased evaluation, used only once
-
-**Why This Split Matters:**
-- Test set simulates real-world unseen data
-- Validation set prevents test set contamination
-- Performance gap between train and test indicates overfitting
-
-**Python Code Example:**
-```python
-from sklearn.model_selection import train_test_split
-
-# Step 1: Split data into train+val and test
-X_temp, X_test, y_temp, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
-
-# Step 2: Split train+val into train and validation
-X_train, X_val, y_train, y_val = train_test_split(X_temp, y_temp, test_size=0.18, random_state=42)
-
-# Result: ~70% train, ~15% val, ~15% test
-print(f"Train: {len(X_train)}, Val: {len(X_val)}, Test: {len(X_test)}")
-```
-
-**Interview Tip:** Always emphasize that the test set must remain untouched until final evaluation.
-
----
-
-## Question 4: What is the role of a Loss Function?
-
-**Definition:**  
-A loss function quantifies the error between predicted values and actual labels. It produces a single scalar value that the model minimizes during training through optimization algorithms like gradient descent.
-
-**Core Concepts:**
-- Measures "badness" of predictions
-- Guides the optimizer to adjust model parameters
-- Choice depends on problem type (classification vs regression)
-
-**Mathematical Formulation:**
-
-| Problem | Loss Function | Formula |
-|---------|---------------|---------|
-| Regression | MSE | $\frac{1}{N}\sum(y - \hat{y})^2$ |
-| Regression | MAE | $\frac{1}{N}\sum|y - \hat{y}|$ |
-| Classification | Cross-Entropy | $-\sum y \log(\hat{y})$ |
-| SVM | Hinge Loss | $\max(0, 1 - y \cdot \hat{y})$ |
-
-**Intuition:**
-- MSE: Penalizes large errors heavily (squared)
-- MAE: Robust to outliers (linear penalty)
-- Cross-Entropy: Penalizes confident wrong predictions severely
-
-**Training Loop:**
-1. Forward pass: Make prediction
-2. Calculate loss
-3. Backward pass: Compute gradients
-4. Update parameters
-
----
-
-## Question 5: Explain Overfitting and Underfitting
-
-**Definition:**  
-**Underfitting** occurs when a model is too simple to capture data patterns (high bias). **Overfitting** occurs when a model memorizes training data including noise, failing to generalize (high variance). Both lead to poor performance on unseen data.
-
-**Core Concepts:**
-
-| Aspect | Underfitting | Overfitting |
-|--------|--------------|-------------|
-| Model | Too simple | Too complex |
-| Training Error | High | Very Low |
-| Test Error | High | High |
-| Cause | Insufficient capacity | Memorizes noise |
-| Bias-Variance | High bias | High variance |
-
-**Solutions:**
-
-| Underfitting | Overfitting |
-|--------------|-------------|
-| Use more complex model | Add regularization (L1/L2) |
-| Add more features | Get more training data |
-| Train longer | Use dropout (neural nets) |
-| Reduce regularization | Early stopping |
-| | Simplify model |
-
-**Intuition:**  
-- Underfitting: Student who didn't study - fails practice and exam
-- Overfitting: Student who memorized answers - aces practice, fails exam
-
-**Interview Tip:** Draw learning curves showing train/test error vs model complexity.
-
----
-
-## Question 6: Explain Validation Sets and Cross-Validation
-
-**Definition:**  
-A **validation set** is a held-out portion of training data used for hyperparameter tuning. **Cross-validation** rotates through multiple validation folds to get a more robust performance estimate, especially with limited data.
-
-**Core Concepts:**
-
-**K-Fold Cross-Validation Process:**
-1. Split training data into K equal folds
-2. For each fold i:
-   - Use fold i as validation
-   - Train on remaining K-1 folds
-   - Record validation score
-3. Average all K scores
-
-**Mathematical Formulation:**
-$$CV_{score} = \frac{1}{K}\sum_{i=1}^{K} Score_i$$
-
-**Python Code Example:**
-```python
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestClassifier
-
-model = RandomForestClassifier()
-
-# 5-fold cross-validation
-scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')
-
-print(f"CV Scores: {scores}")
-print(f"Mean: {scores.mean():.4f} (+/- {scores.std():.4f})")
-```
-
-**Advantages of Cross-Validation:**
-- More robust estimate than single validation split
-- Every data point gets to be in validation once
-- Better for small datasets
-
-**Interview Tip:** Mention that CV is computationally expensive (K times training).
-
----
-
-## Question 7: What is Regularization and how does it work?
-
-**Definition:**  
-Regularization adds a penalty term to the loss function that discourages model complexity (large weights), preventing overfitting by trading a small increase in bias for a large reduction in variance.
-
-**Mathematical Formulation:**
-$$\text{New Loss} = \text{Original Loss} + \lambda \cdot \text{Regularization Term}$$
-
-**Types:**
-
-| Type | Penalty Term | Effect |
-|------|--------------|--------|
-| L2 (Ridge) | $\lambda\sum w_j^2$ | Shrinks weights toward zero |
-| L1 (Lasso) | $\lambda\sum |w_j|$ | Forces some weights to exactly zero |
-| Elastic Net | $\lambda_1\sum|w_j| + \lambda_2\sum w_j^2$ | Combination of L1 and L2 |
-| Dropout | Random neuron deactivation | Prevents co-adaptation |
-
-**Intuition:**
-- Large weights → model too sensitive to specific features → overfitting
-- Penalty discourages large weights → simpler, more generalizable model
-
-**Python Code Example:**
-```python
-from sklearn.linear_model import Ridge, Lasso
-
-# Ridge Regression (L2)
-ridge = Ridge(alpha=1.0)  # alpha is lambda
-ridge.fit(X_train, y_train)
-
-# Lasso Regression (L1) - performs feature selection
-lasso = Lasso(alpha=0.1)
-lasso.fit(X_train, y_train)
-```
-
-**Interview Tip:** L1 produces sparse models (feature selection), L2 produces small but non-zero weights.
-
----
-
-## Question 8: Describe Linear Regression
+### Question 1: Describe Linear Regression
 
 **Definition:**  
 Linear Regression is a supervised algorithm that models the relationship between input features and a continuous target as a linear function. It finds the best-fit line/hyperplane by minimizing the sum of squared errors (Ordinary Least Squares).
@@ -278,7 +50,7 @@ print(f"R2 Score: {r2_score(y_test, y_pred):.4f}")
 
 ---
 
-## Question 9: Difference between Simple and Multiple Linear Regression
+### Question 2: Difference between Simple and Multiple Linear Regression
 
 **Definition:**  
 **Simple Linear Regression** uses one input feature to predict the target, modeling a straight line. **Multiple Linear Regression** uses two or more features, modeling a hyperplane in multi-dimensional space.
@@ -309,7 +81,7 @@ print(f"R2 Score: {r2_score(y_test, y_pred):.4f}")
 
 ---
 
-## Question 10: What is Logistic Regression and when is it used?
+### Question 3: What is Logistic Regression and when is it used?
 
 **Definition:**  
 Logistic Regression is a classification algorithm that predicts the probability of a binary outcome by applying the sigmoid function to a linear combination of features. Despite its name, it's used for classification, not regression.
@@ -352,7 +124,7 @@ print(classification_report(y_test, y_pred))
 
 ---
 
-## Question 11: How does Ridge Regression prevent Overfitting?
+### Question 4: How does Ridge Regression prevent Overfitting?
 
 **Definition:**  
 Ridge Regression prevents overfitting by adding an L2 penalty (sum of squared weights) to the loss function. This forces the model to keep coefficients small, reducing model complexity and sensitivity to training data noise.
@@ -388,7 +160,7 @@ print(f"Coefficients: {ridge_cv.coef_}")
 
 ---
 
-## Question 12: Describe Lasso Regression and its Unique Property
+### Question 5: Describe Lasso Regression and its Unique Property
 
 **Definition:**  
 Lasso Regression uses L1 regularization (sum of absolute weights) which has the unique property of forcing some coefficients to exactly zero, performing **automatic feature selection** and producing sparse models.
@@ -427,7 +199,7 @@ print(f"Number of features used: {np.sum(lasso.coef_ != 0)}")
 
 ---
 
-## Question 13: Explain the Principle of Support Vector Machine (SVM)
+### Question 6: Explain the Principle of Support Vector Machine (SVM)
 
 **Definition:**  
 SVM finds the optimal hyperplane that maximizes the margin (distance) between classes. The decision boundary is defined by support vectors (nearest points to the boundary). For non-linear data, the kernel trick projects data to higher dimensions where it becomes linearly separable.
@@ -466,7 +238,42 @@ print(f"Number of support vectors: {len(svm_rbf.support_vectors_)}")
 
 ---
 
-## Question 14: What are Ensemble Methods?
+### Question 7: Handling Categorical Variables
+
+**Definition:**  
+Categorical variables must be converted to numerical format for most ML models. The encoding method depends on whether the variable is **nominal** (no order) or **ordinal** (has order).
+
+**Encoding Methods:**
+
+| Variable Type | Method | Description |
+|---------------|--------|-------------|
+| **Nominal** (no order) | One-Hot Encoding | Create binary column per category |
+| **Ordinal** (has order) | Label Encoding | Assign integers based on rank |
+| **High Cardinality** | Target Encoding | Replace with mean of target |
+| **High Cardinality** | Feature Hashing | Hash to fixed-size vector |
+
+**Python Code Example:**
+```python
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+import pandas as pd
+
+# One-Hot Encoding (nominal)
+ohe = OneHotEncoder(sparse=False, handle_unknown='ignore')
+X_encoded = ohe.fit_transform(df[['color']])  # color: red, blue, green
+
+# Label Encoding (ordinal)
+le = LabelEncoder()
+df['education_encoded'] = le.fit_transform(df['education'])  # HS=0, BS=1, MS=2
+
+# Pandas get_dummies (quick one-hot)
+df_encoded = pd.get_dummies(df, columns=['color'], drop_first=True)
+```
+
+**Interview Tip:** Never use Label Encoding for nominal variables - model assumes false ordering.
+
+---
+
+### Question 8: What are Ensemble Methods?
 
 **Definition:**  
 Ensemble methods combine predictions from multiple individual models (base learners) to produce a final prediction. They improve performance by reducing variance (bagging), reducing bias (boosting), or leveraging diverse model strengths (stacking).
@@ -504,7 +311,7 @@ print(f"Ensemble Accuracy: {ensemble.score(X_test, y_test):.4f}")
 
 ---
 
-## Question 15: Difference between Bagging and Boosting
+### Question 9: Difference between Bagging and Boosting
 
 **Definition:**  
 **Bagging** trains models independently on random data subsets and averages predictions (reduces variance). **Boosting** trains models sequentially where each model corrects errors of previous ones (reduces bias).
@@ -552,7 +359,7 @@ boosting = AdaBoostClassifier(
 
 ---
 
-## Question 16: Explain Feature Scaling and its Importance
+### Question 10: Explain Feature Scaling and its Importance
 
 **Definition:**  
 Feature scaling transforms numerical features to a similar scale/range. It's critical for gradient-based algorithms (convergence speed) and distance-based algorithms (equal feature contribution), but not needed for tree-based models.
@@ -591,7 +398,9 @@ X_test_norm = minmax.transform(X_test)
 
 ---
 
-## Question 17: How is a Decision Tree Constructed?
+## Decision Trees and Random Forests
+
+### Question 11: How is a Decision Tree Constructed?
 
 **Definition:**  
 A decision tree is built using recursive partitioning. At each node, the algorithm finds the best feature and split point that maximizes purity (minimizes impurity) in the resulting child nodes. This process repeats until stopping criteria are met.
@@ -628,7 +437,7 @@ plt.show()
 
 ---
 
-## Question 18: Pros and Cons of Decision Trees
+### Question 12: Pros and Cons of Decision Trees
 
 **Definition:**  
 Decision trees are interpretable models that recursively partition data based on feature thresholds. They're easy to understand but prone to overfitting and instability.
@@ -655,7 +464,7 @@ Decision trees are interpretable models that recursively partition data based on
 
 ---
 
-## Question 19: Explain Gini Impurity and Information Gain
+### Question 13: Explain Gini Impurity and Information Gain
 
 **Definition:**  
 **Gini Impurity** measures probability of misclassifying a randomly chosen element. **Information Gain** (based on Entropy) measures reduction in uncertainty after a split. Both guide the tree to find the best splits.
@@ -701,7 +510,7 @@ print(f"Entropy: {entropy(y):.4f}")
 
 ---
 
-## Question 20: How Random Forest Improves on Decision Trees
+### Question 14: How Random Forest Improves on Decision Trees
 
 **Definition:**  
 Random Forest improves on single decision trees by using two sources of randomness: **Bootstrap Aggregating (Bagging)** trains trees on random data samples, and **Feature Randomness** considers random feature subsets at each split. This creates decorrelated trees whose averaged predictions reduce variance.
@@ -737,7 +546,7 @@ print(f"Feature Importances: {rf.feature_importances_}")
 
 ---
 
-## Question 21: What is Feature Importance?
+### Question 15: What is Feature Importance?
 
 **Definition:**  
 Feature importance scores indicate how useful each feature was for making predictions. In tree-based models, it's calculated as the total reduction in impurity (Gini/Entropy) brought by that feature across all splits, averaged over all trees.
@@ -775,7 +584,9 @@ perm_imp = permutation_importance(rf, X_test, y_test, n_repeats=10)
 
 ---
 
-## Question 22: Basic Components of a Neural Network
+## Neural Networks and Deep Learning
+
+### Question 16: Basic Components of a Neural Network
 
 **Definition:**  
 A neural network consists of **neurons** organized in **layers** (input, hidden, output), connected by **weights**. Each neuron computes a weighted sum of inputs, adds a **bias**, and applies an **activation function** to introduce non-linearity.
@@ -818,7 +629,7 @@ class SimpleNN(nn.Module):
 
 ---
 
-## Question 23: Role of Activation Functions
+### Question 17: Role of Activation Functions
 
 **Definition:**  
 Activation functions introduce non-linearity into neural networks. Without them, any deep network would collapse to a single linear transformation and couldn't learn complex patterns.
@@ -846,7 +657,91 @@ Activation functions introduce non-linearity into neural networks. Without them,
 
 ---
 
-## Question 24: Shallow vs Deep Neural Networks
+### Question 18: Preventing Overfitting in Neural Networks
+
+**Definition:**  
+Neural networks are especially prone to overfitting due to their high capacity. Key techniques include Dropout, weight regularization, data augmentation, early stopping, and batch normalization.
+
+**Techniques:**
+
+| Technique | How It Works |
+|-----------|--------------|
+| **Dropout** | Randomly set neurons to 0 during training |
+| **L2 Regularization (Weight Decay)** | Add penalty for large weights |
+| **Data Augmentation** | Create modified training samples |
+| **Early Stopping** | Stop when validation loss plateaus |
+| **Batch Normalization** | Normalize layer inputs (slight regularization) |
+| **Reduce Architecture** | Fewer layers/neurons |
+| **Transfer Learning** | Start from pretrained weights |
+
+**Python Code Example (Keras):**
+```python
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+
+model = Sequential([
+    Dense(128, activation='relu', kernel_regularizer=l2(0.01)),  # L2
+    BatchNormalization(),
+    Dropout(0.5),  # 50% dropout
+    Dense(64, activation='relu', kernel_regularizer=l2(0.01)),
+    Dropout(0.3),
+    Dense(1, activation='sigmoid')
+])
+
+early_stop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+model.fit(X, y, validation_split=0.2, callbacks=[early_stop], epochs=100)
+```
+
+---
+
+### Question 19: Discuss backpropagation and its significance in neural networks.
+
+### Definition
+Backpropagation is the algorithm used to compute gradients of the loss function with respect to all weights in a neural network, enabling gradient descent optimization.
+
+### Why It Matters
+
+1. **Enables Training**: Without backprop, we couldn't train multi-layer networks efficiently
+2. **Computational Efficiency**: Uses chain rule to compute all gradients in one backward pass
+3. **Foundation of Deep Learning**: Made modern neural networks possible
+
+### Core Mechanism
+
+**Forward Pass:**
+```
+Input → Hidden Layers → Output → Loss
+```
+
+**Backward Pass:**
+```
+Loss → Gradients flow backward → Update all weights
+```
+
+### Mathematical Essence (Chain Rule)
+
+For a weight $w$ in layer $l$:
+
+$$\frac{\partial L}{\partial w^{(l)}} = \frac{\partial L}{\partial a^{(L)}} \cdot \frac{\partial a^{(L)}}{\partial a^{(L-1)}} \cdots \frac{\partial a^{(l+1)}}{\partial a^{(l)}} \cdot \frac{\partial a^{(l)}}{\partial w^{(l)}}$$
+
+### Key Steps
+
+1. **Forward Pass**: Compute activations layer by layer, store intermediate values
+2. **Compute Output Loss**: Calculate loss at final layer
+3. **Backward Pass**: Propagate error gradients from output to input layer
+4. **Weight Update**: $w_{new} = w_{old} - \eta \cdot \nabla_w L$
+
+### Common Issues
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Vanishing Gradients | Sigmoid/tanh squash gradients | Use ReLU, skip connections |
+| Exploding Gradients | Gradients multiply and grow | Gradient clipping, batch norm |
+
+---
+
+### Question 20: Shallow vs Deep Neural Networks
 
 **Definition:**  
 A **shallow network** has one hidden layer; a **deep network** has two or more. Depth enables hierarchical feature learning where early layers learn simple patterns and later layers learn complex abstractions.
@@ -874,7 +769,9 @@ A **shallow network** has one hidden layer; a **deep network** has two or more. 
 
 ---
 
-## Question 25: Confusion Matrix, Precision, Recall, F1 Score
+## Evaluation Metrics
+
+### Question 21: Confusion Matrix, Precision, Recall, F1 Score
 
 **Definition:**  
 A **confusion matrix** summarizes classification results into TP, TN, FP, FN. **Precision** measures accuracy of positive predictions. **Recall** measures coverage of actual positives. **F1 Score** is the harmonic mean balancing both.
@@ -912,7 +809,33 @@ print(classification_report(y_test, y_pred))
 
 ---
 
-## Question 26: ROC Curve and AUC
+### Question 22: Accuracy and Why It's Not Always the Best Metric
+
+**Definition:**  
+Accuracy = (Correct Predictions) / (Total Predictions). It's misleading for **imbalanced datasets** because a model predicting only the majority class achieves high accuracy while being useless.
+
+**Formula:**
+$$Accuracy = \frac{TP + TN}{TP + TN + FP + FN}$$
+
+**The Problem:**
+
+| Dataset | Class Distribution | Naive Model Strategy | Accuracy |
+|---------|-------------------|---------------------|----------|
+| Fraud Detection | 99% legit, 1% fraud | Always predict "legit" | 99% |
+| Disease Diagnosis | 95% healthy, 5% sick | Always predict "healthy" | 95% |
+
+**Better Metrics for Imbalanced Data:**
+- **Precision:** Of predicted positive, how many correct?
+- **Recall:** Of actual positive, how many found?
+- **F1 Score:** Harmonic mean of precision and recall
+- **AUC-ROC:** Discrimination ability across thresholds
+- **AUPRC:** Precision-Recall curve (best for severe imbalance)
+
+**Interview Tip:** Always ask about class distribution before choosing metrics.
+
+---
+
+### Question 23: ROC Curve and AUC
 
 **Definition:**  
 **ROC curve** plots True Positive Rate (Recall) vs False Positive Rate at various classification thresholds. **AUC** (Area Under Curve) summarizes performance as a single value between 0 and 1, where 1 is perfect and 0.5 is random.
@@ -954,7 +877,133 @@ plt.show()
 
 ---
 
-## Question 27: Grid Search for Hyperparameter Optimization
+### Question 24: Compare RMSE and MAE
+
+**Definition:**  
+Both are regression error metrics. **MAE** (Mean Absolute Error) treats all errors equally. **RMSE** (Root Mean Squared Error) penalizes large errors more heavily due to squaring.
+
+**Formulas:**
+$$MAE = \frac{1}{N}\sum|y_i - \hat{y}_i|$$
+$$RMSE = \sqrt{\frac{1}{N}\sum(y_i - \hat{y}_i)^2}$$
+
+**Comparison:**
+
+| Aspect | MAE | RMSE |
+|--------|-----|------|
+| Error Penalty | Linear | Quadratic |
+| Outlier Sensitivity | Robust | Sensitive |
+| Interpretation | "Average error magnitude" | "Std dev of errors" |
+| Differentiability | Not at zero | Everywhere |
+
+**When to Use:**
+- **RMSE:** Large errors are especially bad (critical systems)
+- **MAE:** Outliers present, want robust metric
+
+**Python Code Example:**
+```python
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import numpy as np
+
+mae = mean_absolute_error(y_true, y_pred)
+rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+
+print(f"MAE: {mae:.4f}")
+print(f"RMSE: {rmse:.4f}")
+```
+
+---
+
+### Question 25: When to Use MAPE
+
+**Definition:**  
+MAPE (Mean Absolute Percentage Error) measures average percentage error. Use it when you need **relative error** that's easy to explain to stakeholders or when comparing forecasts across different scales.
+
+**Formula:**
+$$MAPE = \frac{100\%}{N}\sum\left|\frac{y_i - \hat{y}_i}{y_i}\right|$$
+
+**When to Use:**
+- Business stakeholders need intuitive interpretation ("5% error")
+- Comparing forecasts across different scales (sales of different products)
+
+**When to AVOID:**
+- Actual values can be **zero** (division by zero)
+- Data has values near zero (inflates percentage)
+- **Asymmetric penalty:** Under-predictions penalized less than over-predictions
+
+**Alternative:** sMAPE (Symmetric MAPE) uses average of actual and predicted in denominator.
+
+**Python Code Example:**
+```python
+import numpy as np
+
+def mape(y_true, y_pred):
+    # Avoid division by zero
+    mask = y_true != 0
+    return np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
+
+print(f"MAPE: {mape(y_true, y_pred):.2f}%")
+```
+
+---
+
+## Model Tuning and Optimization
+
+### Question 26: Importance of Hyperparameter Tuning
+
+### Definition
+Hyperparameter tuning is the process of finding optimal values for model parameters that are set before training (not learned from data).
+
+### Why It's Critical
+
+1. **Performance**: Right hyperparameters can dramatically improve accuracy
+2. **Generalization**: Prevents overfitting/underfitting
+3. **Efficiency**: Wrong settings waste compute time
+
+### Types of Hyperparameters
+
+| Model Type | Common Hyperparameters |
+|------------|----------------------|
+| Neural Networks | Learning rate, batch size, layers, neurons, dropout |
+| Decision Trees | max_depth, min_samples_split, min_samples_leaf |
+| SVM | C (regularization), kernel type, gamma |
+| Random Forest | n_estimators, max_features, max_depth |
+
+### Tuning Methods
+
+| Method | How It Works | Pros/Cons |
+|--------|--------------|-----------|
+| **Grid Search** | Try all combinations | Thorough but expensive |
+| **Random Search** | Sample random combinations | More efficient, good coverage |
+| **Bayesian Optimization** | Use past results to guide search | Smart, efficient, complex setup |
+
+### Python Example
+
+```python
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+
+# Grid Search
+param_grid = {'max_depth': [3, 5, 7], 'n_estimators': [50, 100, 200]}
+grid_search = GridSearchCV(RandomForestClassifier(), param_grid, cv=5)
+grid_search.fit(X_train, y_train)
+print(grid_search.best_params_)
+
+# Random Search (more efficient)
+from scipy.stats import randint
+param_dist = {'max_depth': randint(3, 10), 'n_estimators': randint(50, 300)}
+random_search = RandomizedSearchCV(RandomForestClassifier(), param_dist, n_iter=20, cv=5)
+random_search.fit(X_train, y_train)
+```
+
+### Best Practices
+
+1. Always use cross-validation during tuning
+2. Start with coarse search, then refine
+3. Focus on most impactful hyperparameters first
+4. Keep a held-out test set for final evaluation
+
+---
+
+### Question 27: Grid Search for Hyperparameter Optimization
 
 **Definition:**  
 Grid Search exhaustively evaluates all combinations of specified hyperparameter values using cross-validation. It's guaranteed to find the best combination within the grid but is computationally expensive.
@@ -993,7 +1042,7 @@ best_model = grid_search.best_estimator_
 
 ---
 
-## Question 28: Random Search vs Grid Search
+### Question 28: Random Search vs Grid Search
 
 **Definition:**  
 Random Search samples random hyperparameter combinations from specified distributions instead of exhaustively searching a grid. It's more efficient because it explores the search space more broadly with fewer evaluations.
@@ -1036,7 +1085,59 @@ print(f"Best parameters: {random_search.best_params_}")
 
 ---
 
-## Question 29: What is Early Stopping?
+### Question 29: Role of Learning Rate in Neural Network Convergence
+
+### Definition
+The learning rate (η) controls the step size when updating weights during gradient descent. It determines how much to adjust weights based on the computed gradient.
+
+### Weight Update Rule
+
+$$w_{new} = w_{old} - \eta \cdot \frac{\partial L}{\partial w}$$
+
+### Impact on Training
+
+| Learning Rate | Behavior | Outcome |
+|--------------|----------|---------|
+| **Too High** | Large steps, overshoots minimum | Divergence, loss explodes |
+| **Too Low** | Tiny steps, slow progress | Very slow convergence, may get stuck |
+| **Optimal** | Balanced steps | Fast, stable convergence |
+
+### Visual Intuition
+
+```
+Too High:    ↗↘↗↘ (oscillating, never converges)
+Too Low:     →→→→→→→→→... (takes forever)
+Just Right:  →→→→ ✓ (smooth descent to minimum)
+```
+
+### Learning Rate Schedules
+
+| Schedule | Description | Use Case |
+|----------|-------------|----------|
+| **Constant** | Same rate throughout | Simple, works for small problems |
+| **Step Decay** | Reduce by factor every N epochs | Common, easy to implement |
+| **Exponential Decay** | $\eta_t = \eta_0 \cdot e^{-kt}$ | Smooth reduction |
+| **Cosine Annealing** | Follows cosine curve | Popular in deep learning |
+| **Warmup** | Start low, increase, then decay | Stabilizes training initially |
+
+### Adaptive Methods
+
+| Optimizer | Learning Rate Behavior |
+|-----------|----------------------|
+| **Adam** | Per-parameter adaptive rates |
+| **RMSprop** | Adapts based on recent gradient magnitudes |
+| **AdaGrad** | Decreases rate for frequent features |
+
+### Practical Tips
+
+1. **Start with 0.001** for Adam, **0.01** for SGD
+2. Use learning rate finder: increase rate until loss explodes
+3. Reduce rate if validation loss plateaus
+4. Use adaptive optimizers (Adam) for most cases
+
+---
+
+### Question 30: What is Early Stopping?
 
 **Definition:**  
 Early stopping monitors validation loss during training and halts when it stops improving for a specified number of epochs (patience). It prevents overfitting by stopping before the model memorizes training noise.
@@ -1070,70 +1171,54 @@ model.fit(
 
 ---
 
-## Question 30: Supervised Learning for Recommender Systems
+## Algorithm-Specific Questions
+
+### Question 31: Handling Imbalanced Datasets
 
 **Definition:**  
-Recommendation can be framed as supervised learning by predicting user-item interactions (ratings or click probability). Features are engineered from user attributes, item attributes, and contextual information, then fed to models like Gradient Boosting or Neural Networks.
+Imbalanced datasets have skewed class distributions. Solutions include appropriate metrics, resampling techniques, and algorithm-level modifications like class weights.
 
-**Approach:**
-1. **Target:** Rating (regression) or Will interact? (classification)
-2. **Features:** User features + Item features + Context
-3. **Model:** XGBoost, Neural Network, Factorization Machines
+**Three-Pronged Strategy:**
 
-**Feature Categories:**
-- **User:** Demographics, history, preferences
-- **Item:** Category, price, popularity
-- **Context:** Time, device, location
+**1. Choose Right Metrics:**
+- F1-Score, Precision-Recall AUC (not accuracy)
+
+**2. Data-Level Techniques:**
+
+| Technique | Method |
+|-----------|--------|
+| **Oversampling** | Duplicate/SMOTE minority class |
+| **Undersampling** | Remove majority class samples |
+
+**3. Algorithm-Level Techniques:**
+
+| Technique | Method |
+|-----------|--------|
+| **Class Weights** | Penalize minority misclassification more |
+| **Threshold Adjustment** | Lower decision threshold |
 
 **Python Code Example:**
 ```python
-import pandas as pd
-from sklearn.ensemble import GradientBoostingClassifier
+from imblearn.over_sampling import SMOTE
+from sklearn.ensemble import RandomForestClassifier
 
-# Features: user_age, user_history_count, item_category, item_price, etc.
-# Target: clicked (0/1)
+# SMOTE oversampling
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
 
-X = df[['user_age', 'user_avg_rating', 'item_popularity', 'item_price']]
-y = df['clicked']
+# Class weights
+rf = RandomForestClassifier(class_weight='balanced')  # Auto-adjust
+rf.fit(X_train, y_train)
 
-model = GradientBoostingClassifier(n_estimators=100)
-model.fit(X_train, y_train)
-
-# Predict click probability for user-item pairs
-click_prob = model.predict_proba(X_candidates)[:, 1]
-
-# Recommend top-N items
-top_n_items = candidates.iloc[click_prob.argsort()[-10:][::-1]]
+# Or manual weights
+rf = RandomForestClassifier(class_weight={0: 1, 1: 10})  # 10x penalty for class 1
 ```
 
-**Advantage:** Handles cold start with features; Pure collaborative filtering cannot.
+**Interview Tip:** Never resample test set - it must reflect real distribution.
 
 ---
 
-## Question 31: Supervised Learning in Healthcare Diagnostics
-
-**Definition:**  
-Supervised learning in healthcare frames diagnosis as classification (disease present/absent, severity levels). Models are trained on labeled medical data (images, EHR) annotated by experts, requiring rigorous validation and interpretability.
-
-**Key Applications:**
-
-| Application | Data Type | Model | Example |
-|-------------|-----------|-------|---------|
-| Medical Imaging | X-ray, CT, MRI | CNN | Diabetic retinopathy detection |
-| Clinical Prediction | EHR tabular data | XGBoost | Sepsis prediction |
-| Genomics | Gene expression | Random Forest | Tumor subtyping |
-
-**Critical Considerations:**
-- **Interpretability:** Clinicians need to understand why (SHAP, Grad-CAM)
-- **Validation:** External validation on different hospital data
-- **Privacy:** HIPAA compliance
-- **Class Imbalance:** Diseases often rare
-
-**Interview Tip:** Emphasize collaboration with medical experts for labeling and validation.
-
----
-
-## Question 32: SVMs with Non-linear Kernels
+### Question 32: SVMs with Non-linear Kernels
 
 **Definition:**  
 When data isn't linearly separable, SVMs use the **kernel trick** to implicitly map data to higher-dimensional space where a linear boundary becomes possible. The RBF kernel is most common, enabling complex, curved decision boundaries.
@@ -1169,7 +1254,69 @@ param_grid = {'C': [0.1, 1, 10], 'gamma': [0.01, 0.1, 1]}
 
 ---
 
-## Question 33: AdaBoost Algorithm
+### Question 33: How Decision Trees are Pruned
+
+### Why Prune?
+
+An unpruned tree overfits by memorizing training noise. Pruning removes unnecessary branches to improve generalization.
+
+### Two Types of Pruning
+
+#### 1. Pre-Pruning (Early Stopping)
+
+**How**: Stop tree growth before full depth
+
+| Parameter | Effect |
+|-----------|--------|
+| `max_depth` | Limits tree depth |
+| `min_samples_split` | Minimum samples needed to split a node |
+| `min_samples_leaf` | Minimum samples in leaf nodes |
+| `min_impurity_decrease` | Minimum impurity reduction for split |
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier(
+    max_depth=5,
+    min_samples_split=10,
+    min_samples_leaf=5
+)
+```
+
+**Pros**: Computationally efficient
+**Cons**: May stop too early (greedy)
+
+#### 2. Post-Pruning (Cost-Complexity Pruning)
+
+**How**: Grow full tree, then prune back
+
+**Process**:
+1. Build complete tree
+2. Calculate cost-complexity: $R_\alpha(T) = R(T) + \alpha |T|$
+   - $R(T)$ = misclassification cost
+   - $|T|$ = number of leaves
+   - $\alpha$ = complexity penalty
+3. Prune subtrees where removing improves cross-validation score
+
+```python
+# Find optimal alpha
+path = tree.cost_complexity_pruning_path(X_train, y_train)
+alphas = path.ccp_alphas
+
+# Cross-validate to find best alpha
+best_tree = DecisionTreeClassifier(ccp_alpha=best_alpha)
+```
+
+**Pros**: Considers full tree structure, often better results
+**Cons**: More computationally expensive
+
+### Practical Recommendation
+
+Use pre-pruning via hyperparameter tuning with cross-validation - simpler and usually sufficient.
+
+---
+
+### Question 34: AdaBoost Algorithm
 
 **Definition:**  
 AdaBoost (Adaptive Boosting) sequentially trains weak learners (typically stumps), giving more weight to misclassified samples after each iteration. The final prediction is a weighted vote where better-performing models have higher influence.
@@ -1200,7 +1347,7 @@ ada.fit(X_train, y_train)
 
 ---
 
-## Question 34: Gradient Boosting vs AdaBoost
+### Question 35: Gradient Boosting vs AdaBoost
 
 **Definition:**  
 Both are boosting methods that train models sequentially. **AdaBoost** reweights samples based on misclassification. **Gradient Boosting** fits each new model to the residual errors of the current ensemble, making it more flexible with any differentiable loss function.
@@ -1236,7 +1383,9 @@ gb.fit(X_train, y_train)
 
 ---
 
-## Question 35: Handling Missing Data
+## Dataset Handling
+
+### Question 36: Handling Missing Data
 
 **Definition:**  
 Missing data handling depends on the mechanism (MCAR, MAR, MNAR) and percentage missing. Strategies include deletion, simple imputation (mean/median/mode), or advanced imputation (KNN, iterative models).
@@ -1273,7 +1422,7 @@ imputer = SimpleImputer(strategy='constant', fill_value=-999)
 
 ---
 
-## Question 36: Dataset Preparation Steps
+### Question 37: Dataset Preparation Steps
 
 **Definition:**  
 Dataset preparation involves systematic cleaning, engineering, transformation, and splitting of data before model training. Proper preparation prevents data leakage and ensures model reliability.
@@ -1320,7 +1469,105 @@ full_pipeline = Pipeline([
 
 ---
 
-## Question 37: Data Augmentation Techniques
+### Question 38: Handling Textual Data in Supervised Learning
+
+### Step 1: Text Preprocessing
+
+```python
+import re
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+
+def preprocess(text):
+    text = text.lower()                           # Lowercase
+    text = re.sub(r'[^\w\s]', '', text)          # Remove punctuation
+    tokens = text.split()                         # Tokenize
+    tokens = [w for w in tokens if w not in stopwords.words('english')]
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(w) for w in tokens]
+    return ' '.join(tokens)
+```
+
+### Step 2: Vectorization Methods
+
+| Method | Description | When to Use |
+|--------|-------------|-------------|
+| **CountVectorizer** | Word counts | Simple baseline |
+| **TF-IDF** | Weighted by importance | Strong baseline for most tasks |
+| **Word2Vec/GloVe** | Dense word embeddings | Need semantic similarity |
+| **BERT** | Contextual embeddings | State-of-the-art performance |
+
+### Approach Comparison
+
+#### Traditional (Fast, Simple)
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+
+tfidf = TfidfVectorizer(max_features=5000)
+X_tfidf = tfidf.fit_transform(texts)
+model = LogisticRegression()
+model.fit(X_tfidf, y)
+```
+
+#### Deep Learning (Best Performance)
+
+```python
+from transformers import BertTokenizer, BertForSequenceClassification
+
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
+# Fine-tune on your labeled data
+```
+
+### My Strategy
+
+1. **Always start with TF-IDF + Logistic Regression** as baseline
+2. If not sufficient, move to **fine-tuned BERT** for state-of-the-art results
+3. BERT understands context ("not good" vs "good") while TF-IDF doesn't
+
+---
+
+### Question 39: When is Dimensionality Reduction Useful?
+
+**Definition:**  
+Dimensionality reduction reduces the number of features to combat curse of dimensionality, reduce overfitting, speed up training, handle multicollinearity, and enable visualization.
+
+**When to Use:**
+- Too many features relative to samples
+- Features are highly correlated
+- Need to visualize high-dimensional data
+- Training is too slow
+
+**Methods:**
+
+| Category | Technique | Description |
+|----------|-----------|-------------|
+| **Feature Selection** | Filter (correlation) | Rank features statistically |
+| **Feature Selection** | Wrapper (RFE) | Search feature subsets |
+| **Feature Selection** | Embedded (Lasso) | Built into model |
+| **Feature Extraction** | PCA | Linear, maximize variance |
+| **Feature Extraction** | t-SNE, UMAP | Non-linear, for visualization |
+| **Feature Extraction** | Autoencoder | Neural network compression |
+
+**Python Code Example:**
+```python
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, f_classif
+
+# PCA - feature extraction
+pca = PCA(n_components=0.95)  # Keep 95% variance
+X_pca = pca.fit_transform(X)
+
+# SelectKBest - feature selection
+selector = SelectKBest(f_classif, k=10)
+X_selected = selector.fit_transform(X, y)
+```
+
+---
+
+### Question 40: Data Augmentation Techniques
 
 **Definition:**  
 Data augmentation artificially increases training data by creating modified copies of existing samples. This regularizes the model, prevents overfitting, and improves generalization.
@@ -1358,7 +1605,70 @@ X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
 
 ---
 
-## Question 38: End-to-End Learning
+## Advanced Topics
+
+### Question 41: Transfer Learning in Supervised Models
+
+### Definition
+Transfer learning reuses a model trained on a large general dataset as a starting point for a specific task with limited data.
+
+### Why It Matters
+
+| Benefit | Explanation |
+|---------|-------------|
+| **Overcome Data Scarcity** | Build accurate models with limited labeled data |
+| **Faster Training** | Pre-trained weights converge quickly |
+| **Better Performance** | Leverages knowledge from massive datasets |
+| **Regularization** | Pre-trained features prevent overfitting |
+
+### Two Main Approaches
+
+#### 1. Feature Extraction
+- Freeze pre-trained layers
+- Only train new classification head
+- Use when: very limited data
+
+#### 2. Fine-Tuning
+- Unfreeze some/all pre-trained layers
+- Train end-to-end with low learning rate
+- Use when: more data, need task-specific adaptation
+
+### Examples
+
+| Domain | Pre-trained Model | Trained On | Fine-tune For |
+|--------|------------------|------------|---------------|
+| **Vision** | ResNet, EfficientNet | ImageNet (1.2M images) | Medical imaging, defect detection |
+| **NLP** | BERT, GPT | Web text corpus | Sentiment, Q&A, classification |
+
+### Code Example (Vision)
+
+```python
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+from tensorflow.keras.models import Model
+
+# Load pre-trained model without top layer
+base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+
+# Freeze base layers
+for layer in base_model.layers:
+    layer.trainable = False
+
+# Add custom classification head
+x = GlobalAveragePooling2D()(base_model.output)
+x = Dense(256, activation='relu')(x)
+output = Dense(num_classes, activation='softmax')(x)
+
+model = Model(inputs=base_model.input, outputs=output)
+model.compile(optimizer='adam', loss='categorical_crossentropy')
+```
+
+### Key Point
+Transfer learning is now the **default approach** in deep learning, not an optimization.
+
+---
+
+### Question 42: End-to-End Learning
 
 **Definition:**  
 End-to-end learning trains a single neural network to directly map raw inputs to final outputs, automatically learning all intermediate representations. It eliminates manual feature engineering but requires large data and compute.
@@ -1388,7 +1698,7 @@ End-to-end learning trains a single neural network to directly map raw inputs to
 
 ---
 
-## Question 39: Multitask Learning
+### Question 43: Multitask Learning
 
 **Definition:**  
 Multitask learning trains a single model to perform multiple related tasks simultaneously, sharing representations in common layers. This acts as regularization, improves generalization, and is more efficient than separate models.
@@ -1416,71 +1726,66 @@ Single model with shared CNN backbone:
 
 ---
 
-## Question 40: Predictive Maintenance System
+### Question 44: Framing RL as Supervised Learning
 
 **Definition:**  
-Predictive maintenance uses supervised learning to predict equipment failures before they occur. It's framed as classification (failure within N days?) or regression (remaining useful life) using sensor data features.
+Reinforcement Learning can be framed as supervised learning through **Imitation Learning** (predict expert actions from states) or **Value Function Fitting** (predict Q-values using regression).
 
-**Approach:**
+**Method 1: Imitation Learning (Behavioral Cloning)**
+- Input (X): States observed by expert
+- Label (y): Actions expert took
+- Problem: Classification (discrete actions) or Regression (continuous actions)
 
-| Step | Action |
-|------|--------|
-| **1. Problem Definition** | Classify: Fail in next N days? or Regress: RUL |
-| **2. Data Collection** | Sensor time-series, maintenance logs, machine attributes |
-| **3. Feature Engineering** | Rolling statistics, trend features, FFT features |
-| **4. Labeling** | Mark N-day window before failure as positive |
-| **5. Model Training** | XGBoost/LightGBM (handles imbalance well) |
-| **6. Deployment** | Real-time scoring, alert when threshold exceeded |
+**Method 2: Q-Learning as Regression**
+- Input (X): State-action pairs
+- Target (y): Calculated target Q-value = r + gamma * max Q(s', a')
+- Problem: Regression
 
-**Feature Engineering Example:**
+**Python Code Example (Behavioral Cloning):**
 ```python
-# Rolling statistics from sensor data
-df['temp_mean_24h'] = df['temperature'].rolling(24).mean()
-df['temp_std_24h'] = df['temperature'].rolling(24).std()
-df['vibration_max_24h'] = df['vibration'].rolling(24).max()
-df['temp_trend'] = df['temperature'].diff(24)  # slope
+# Expert demonstrations: (state, action) pairs
+states = expert_states      # observations
+actions = expert_actions    # what expert did
+
+# Train supervised classifier to mimic expert
+from sklearn.ensemble import RandomForestClassifier
+policy = RandomForestClassifier()
+policy.fit(states, actions)
+
+# Agent uses learned policy
+predicted_action = policy.predict(new_state)
 ```
 
-**Handle Imbalance:** Weighted loss, SMOTE, or use Precision-Recall AUC for evaluation.
+**Limitation:** Imitation learning can't exceed expert performance.
 
 ---
 
-## Question 41: Automating Medical Image Diagnosis
+### Question 45: Role of Attention Mechanisms
 
 **Definition:**  
-Medical image diagnosis automation uses CNNs with transfer learning to classify or segment medical images. It requires expert-labeled data, rigorous validation, interpretability (Grad-CAM), and careful deployment as a clinical decision support tool.
+Attention mechanisms allow neural networks to dynamically focus on relevant parts of input when generating output. They compute weighted combinations of input elements, where weights indicate importance for the current task.
 
-**Approach:**
+**The Problem Before Attention:**
+- Entire input compressed to fixed-size vector (bottleneck)
+- Lost information for long sequences
 
-| Step | Action |
-|------|--------|
-| **1. Expert Collaboration** | Define problem, label data with radiologists |
-| **2. Data Preparation** | Anonymize, normalize intensity, resize, augment |
-| **3. Model Development** | Transfer learning from ImageNet (ResNet, EfficientNet) |
-| **4. Validation** | Patient-level split, external validation, sensitivity/specificity |
-| **5. Interpretability** | Grad-CAM heatmaps to show model focus |
-| **6. Deployment** | As "second reader" supporting human experts |
+**How Attention Works:**
+1. **Query:** Current decoder state asks "what's relevant?"
+2. **Keys:** Each input element provides a key
+3. **Scores:** Compute similarity (Query x Keys)
+4. **Weights:** Softmax to get attention distribution
+5. **Context:** Weighted sum of Values
 
-**Transfer Learning Strategy:**
-```python
-import torch
-import torchvision.models as models
+**Mathematical Formulation:**
+$$Attention(Q, K, V) = softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
-# Load pretrained model
-model = models.resnet50(pretrained=True)
+**Benefits:**
+- Handles long sequences
+- Interpretable (visualize attention weights)
+- Foundation of Transformers (BERT, GPT)
 
-# Replace final layer for our task (binary classification)
-model.fc = torch.nn.Linear(model.fc.in_features, 2)
+**Self-Attention:** Query, Key, Value all come from same sequence - each element attends to all others.
 
-# Training strategy:
-# 1. Freeze backbone, train classifier head
-# 2. Unfreeze all, fine-tune with low learning rate
-```
-
-**Critical Considerations:**
-- Split by patient ID (not image) to avoid leakage
-- External validation on different hospital data
-- Regulatory approval (FDA clearance for clinical use)
-- Interpretability for clinician trust
+**Interview Tip:** Transformers replaced RNNs/LSTMs by using only attention (no recurrence).
 
 ---

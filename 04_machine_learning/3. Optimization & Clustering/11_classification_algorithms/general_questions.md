@@ -160,61 +160,6 @@ early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=
 
 ## Question 4
 
-**What considerations would you take into account when building a credit scoring model?**
-
-### Answer
-
-**Definition:**
-Credit scoring predicts loan default probability. It requires special considerations for regulatory compliance, interpretability, fairness, and business impact of errors.
-
-**Key Considerations:**
-
-| Area | Consideration | Why It Matters |
-|------|---------------|----------------|
-| **Regulatory** | Explainability | Laws require explanation of denial |
-| | Fair lending | Cannot discriminate on protected attributes |
-| | Documentation | Audit trail required |
-| **Model Choice** | Interpretable models | Logistic Regression, Scorecard |
-| | Feature importance | Must explain each factor |
-| **Features** | Avoid proxies | ZIP code may proxy race |
-| | Economic cycles | Features may behave differently |
-| **Metrics** | Cost-sensitive | FN (default) more costly than FP |
-| | Calibration | Predicted probabilities must be accurate |
-| **Monitoring** | Concept drift | Economic changes affect patterns |
-| | Population stability | Monitor feature distributions |
-
-**Recommended Approach:**
-
-| Step | Action |
-|------|--------|
-| 1 | Use interpretable models (Logistic Regression, Scorecard) |
-| 2 | Feature engineering with domain knowledge |
-| 3 | Check for disparate impact on protected groups |
-| 4 | Optimize for business metrics (expected loss) |
-| 5 | Calibrate probabilities |
-| 6 | Document everything |
-| 7 | Monitor in production |
-
-**Important Metrics:**
-
-| Metric | Purpose |
-|--------|---------|
-| Gini/KS | Discriminatory power |
-| PSI | Population stability |
-| Expected Loss | Business impact |
-| Adverse Action Reasons | Compliance |
-
-**Interview Tips:**
-- Emphasize interpretability and compliance
-- Mention fair lending and protected classes
-- Discuss cost of FP vs FN (business perspective)
-- Know that black-box models face regulatory challenges
-- Mention model monitoring and drift detection
-
----
-
-## Question 5
-
 **Compare and contrast shallow and deep learning classifiers.**
 
 ### Answer
@@ -270,7 +215,7 @@ Shallow learning uses traditional ML with manual feature engineering (SVM, Rando
 
 ---
 
-## Question 6
+## Question 5
 
 **How do decision tree splitting criteria like Gini impurity and entropy affect the model?**
 
@@ -343,7 +288,7 @@ print(f"Entropy depth: {tree_entropy.get_depth()}")
 
 ---
 
-## Question 7
+## Question 6
 
 **How do Convolutional Neural Networks (CNNs) differ from regular Neural Networks in classification tasks related to images?**
 
@@ -424,7 +369,7 @@ print(f"CNN params: {cnn.count_params():,}")
 
 ---
 
-## Question 8
+## Question 7
 
 **How has the field of Natural Language Processing evolved with advancements in classification models?**
 

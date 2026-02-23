@@ -2,222 +2,6 @@
 
 ## Question 1
 
-**What is bagging, and how is it implemented in a Random Forest?**
-
-### Answer
-
-**Definition:**
-Bagging (Bootstrap Aggregating) is an ensemble technique that trains multiple models on different bootstrap samples (random samples with replacement) and aggregates their predictions. Random Forest implements bagging with decision trees plus feature randomness.
-
-**How Bagging Works:**
-
-```
-Original Dataset (n samples)
-        ↓
-[Bootstrap Sample 1] → [Model 1] → Prediction 1
-[Bootstrap Sample 2] → [Model 2] → Prediction 2
-[Bootstrap Sample 3] → [Model 3] → Prediction 3
-        ...
-[Bootstrap Sample B] → [Model B] → Prediction B
-        ↓
-    Aggregate: Vote (classification) / Average (regression)
-        ↓
-    Final Prediction
-```
-
-**Implementation from Scratch:**
-
-```python
-import numpy as np
-from sklearn.tree import DecisionTreeClassifier
-from collections import Counter
-
-class SimpleBaggingClassifier:
-    def __init__(self, n_estimators=10, max_features=None):
-        self.n_estimators = n_estimators
-        self.max_features = max_features
-        self.trees = []
-        self.feature_indices = []
-    
-    def _bootstrap_sample(self, X, y):
-        n_samples = X.shape[0]
-        indices = np.random.choice(n_samples, size=n_samples, replace=True)
-        return X[indices], y[indices]
-    
-    def _get_feature_subset(self, n_features):
-        if self.max_features is None:
-            return np.arange(n_features)
-        m = min(self.max_features, n_features)
-        return np.random.choice(n_features, size=m, replace=False)
-    
-    def fit(self, X, y):
-        self.trees = []
-        self.feature_indices = []
-        n_features = X.shape[1]
-        
-        for _ in range(self.n_estimators):
-            # Bootstrap sample
-            X_boot, y_boot = self._bootstrap_sample(X, y)
-            
-            # Feature subset (Random Forest style)
-            feat_idx = self._get_feature_subset(n_features)
-            self.feature_indices.append(feat_idx)
-            
-            # Train tree on subset
-            tree = DecisionTreeClassifier()
-            tree.fit(X_boot[:, feat_idx], y_boot)
-            self.trees.append(tree)
-        
-        return self
-    
-    def predict(self, X):
-        # Get predictions from all trees
-        predictions = np.array([
-            tree.predict(X[:, feat_idx])
-            for tree, feat_idx in zip(self.trees, self.feature_indices)
-        ])
-        
-        # Majority vote
-        final_predictions = []
-        for i in range(X.shape[0]):
-            votes = predictions[:, i]
-            most_common = Counter(votes).most_common(1)[0][0]
-            final_predictions.append(most_common)
-        
-        return np.array(final_predictions)
-
-# Usage
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-
-X, y = make_classification(n_samples=1000, n_features=20, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-bagging = SimpleBaggingClassifier(n_estimators=50, max_features=5)
-bagging.fit(X_train, y_train)
-y_pred = bagging.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
-```
-
-**Random Forest Adds:**
-- Feature randomness at each split (not just per tree)
-- Typically deeper trees
-- OOB error estimation
-
----
-
-## Question 2
-
-**What are some common implementation challenges with Random Forest?**
-
-### Answer
-
-**Definition:**
-Common challenges include handling memory constraints with large forests, slow prediction times, dealing with categorical features, and ensuring reproducibility across runs.
-
-**Challenges and Solutions:**
-
-**1. Memory Issues:**
-```python
-# Problem: Large forests consume significant memory
-# Solution: Limit tree complexity
-
-rf = RandomForestClassifier(
-    n_estimators=100,
-    max_depth=15,           # Limit depth
-    min_samples_leaf=10,    # Larger leaves
-    max_leaf_nodes=100,     # Limit total leaves
-    n_jobs=-1
-)
-
-# Or use incremental training (not native to sklearn)
-# Consider LightGBM or XGBoost for memory efficiency
-```
-
-**2. Slow Prediction:**
-```python
-# Problem: Querying many trees is slow
-# Solutions:
-
-# a) Fewer trees
-rf = RandomForestClassifier(n_estimators=50)
-
-# b) Compile model
-import treelite
-import treelite_runtime
-
-# Convert to compiled model
-model = treelite.sklearn.import_model(rf)
-model.export_lib(toolchain='gcc', libpath='./mymodel.so')
-
-# c) Parallel prediction
-predictions = rf.predict(X_test)  # Already parallel with n_jobs=-1
-```
-
-**3. Categorical Variables:**
-```python
-# Problem: sklearn RF doesn't handle categories natively
-# Solutions:
-
-# a) One-hot encoding
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-
-preprocessor = ColumnTransformer([
-    ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols),
-    ('num', 'passthrough', numerical_cols)
-])
-
-# b) Use category-native implementation
-import lightgbm as lgb
-lgb_model = lgb.LGBMClassifier()
-# Specify categorical features directly
-```
-
-**4. Reproducibility:**
-```python
-# Problem: Results vary between runs
-# Solution: Set random_state everywhere
-
-import numpy as np
-np.random.seed(42)
-
-rf = RandomForestClassifier(
-    n_estimators=100,
-    random_state=42,  # Critical for reproducibility
-    n_jobs=1          # n_jobs > 1 can affect reproducibility
-)
-```
-
-**5. Handling Imbalanced Data:**
-```python
-# Problem: Majority class dominates
-# Solutions:
-
-# a) Class weights
-rf = RandomForestClassifier(class_weight='balanced')
-
-# b) Balanced Random Forest
-from imblearn.ensemble import BalancedRandomForestClassifier
-brf = BalancedRandomForestClassifier(n_estimators=100)
-```
-
-**6. Feature Importance Bias:**
-```python
-# Problem: Gini importance biased toward high-cardinality features
-# Solution: Use permutation importance
-
-from sklearn.inspection import permutation_importance
-
-perm_imp = permutation_importance(rf, X_test, y_test, n_repeats=10)
-# Use perm_imp.importances_mean instead of rf.feature_importances_
-```
-
----
-
-## Question 3
-
 **Write a Python code to train a Random Forest Classifier using scikit-learn on a given dataset.**
 
 ### Answer
@@ -317,7 +101,7 @@ Classification Report:
 
 ---
 
-## Question 4
+## Question 2
 
 **Create a function that computes the OOB error for a Random Forest model.**
 
@@ -439,7 +223,7 @@ print(f"Sklearn OOB Error: {oob_error_sklearn:.4f}")
 
 ---
 
-## Question 5
+## Question 3
 
 **Write Python code that selects the most important features using a trained Random Forest model.**
 
@@ -587,7 +371,7 @@ evaluate_feature_selection(X_train, X_test, y_train, y_test, selected_perm, feat
 
 ---
 
-## Question 6
+## Question 4
 
 **Implement from scratch a simplified version of the Random Forest algorithm in Python.**
 
@@ -843,7 +627,7 @@ print(f"Sklearn RF OOB Score: {rf_sklearn.oob_score_:.4f}")
 
 ---
 
-## Question 7
+## Question 5
 
 **Write a function to visualize an individual decision tree from a Random Forest in Python.**
 
@@ -1020,3 +804,6 @@ Tree #1 Structure:
 - For large trees, use text representation
 - Graphviz produces highest quality images
 - dtreeviz adds data distribution visualizations
+
+---
+

@@ -1087,152 +1087,254 @@ for layer in base_model.layers:
 
 ---
 
-## Question 23: How do you engineer features for recommendation systems?
+## Question 23: Discuss how Random Forest can be used for feature importance estimation.
 
 ### Answer
 
-**Three Categories of Features:**
+**Approach:**
 
-**1. User Features:**
+Random Forest provides built-in feature importance through two methods:
+1. **Mean Decrease in Impurity (MDI)** - Gini/entropy importance
+2. **Mean Decrease in Accuracy (MDA)** - Permutation importance
+
+**Step-by-Step Implementation:**
+
 ```python
-user_features = {
-    'user_age': 28,
-    'user_gender': 'M',
-    'user_location': 'NYC',
-    'avg_rating_given': 3.8,
-    'num_ratings': 150,
-    'favorite_genres': ['action', 'comedy'],
-    'user_embedding': [0.1, 0.3, ...]  # From collaborative filtering
-}
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+# Load data
+from sklearn.datasets import load_breast_cancer
+data = load_breast_cancer()
+X = pd.DataFrame(data.data, columns=data.feature_names)
+y = data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+# Method 1: Built-in Feature Importance (MDI)
+mdi_importance = pd.DataFrame({
+    'feature': X.columns,
+    'importance_mdi': rf.feature_importances_
+}).sort_values('importance_mdi', ascending=False)
+
+print("Top 10 Features (MDI):")
+print(mdi_importance.head(10))
+
+# Method 2: Permutation Importance (MDA) - More reliable
+perm_importance = permutation_importance(rf, X_test, y_test, n_repeats=10, random_state=42)
+perm_df = pd.DataFrame({
+    'feature': X.columns,
+    'importance_perm': perm_importance.importances_mean,
+    'std': perm_importance.importances_std
+}).sort_values('importance_perm', ascending=False)
+
+print("\nTop 10 Features (Permutation):")
+print(perm_df.head(10))
 ```
 
-**2. Item Features:**
+**Feature Selection Strategy:**
+
 ```python
-item_features = {
-    'item_category': 'electronics',
-    'item_price': 299.99,
-    'item_avg_rating': 4.2,
-    'num_reviews': 1500,
-    'description_embedding': [0.2, 0.4, ...],  # From NLP
-    'item_popularity': 0.85
-}
+def select_features_by_importance(X, y, threshold_pct=0.90, min_features=5):
+    """
+    Select features based on cumulative importance.
+    
+    Args:
+        threshold_pct: Keep features until this % of importance is covered
+        min_features: Minimum features to keep
+    """
+    rf = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf.fit(X, y)
+    
+    # Get importance
+    importance_df = pd.DataFrame({
+        'feature': X.columns,
+        'importance': rf.feature_importances_
+    }).sort_values('importance', ascending=False)
+    
+    # Calculate cumulative importance
+    importance_df['cumulative'] = importance_df['importance'].cumsum()
+    importance_df['cumulative_pct'] = importance_df['cumulative'] / importance_df['importance'].sum()
+    
+    # Select features
+    mask = importance_df['cumulative_pct'] <= threshold_pct
+    selected = importance_df[mask]['feature'].tolist()
+    
+    # Ensure minimum features
+    if len(selected) < min_features:
+        selected = importance_df.head(min_features)['feature'].tolist()
+    
+    return selected, importance_df
+
+selected_features, importance_df = select_features_by_importance(X, y, threshold_pct=0.90)
+print(f"Selected {len(selected_features)} features covering 90% importance")
 ```
 
-**3. Interaction Features (Most Powerful):**
+**Visualization:**
+
 ```python
-interaction_features = {
-    'user_item_similarity': 0.72,
-    'user_category_affinity': 0.8,
-    'days_since_last_interaction': 5,
-    'num_previous_purchases': 3,
-    'context_time_of_day': 'evening',
-    'context_device': 'mobile'
-}
+def plot_feature_importance(importance_df, top_n=15):
+    """Visualize feature importance."""
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # Bar plot
+    top_features = importance_df.head(top_n)
+    axes[0].barh(top_features['feature'], top_features['importance'])
+    axes[0].set_xlabel('Importance')
+    axes[0].set_title(f'Top {top_n} Feature Importances')
+    axes[0].invert_yaxis()
+    
+    # Cumulative plot
+    axes[1].plot(range(len(importance_df)), importance_df['cumulative_pct'])
+    axes[1].axhline(y=0.90, color='r', linestyle='--', label='90% threshold')
+    axes[1].set_xlabel('Number of Features')
+    axes[1].set_ylabel('Cumulative Importance')
+    axes[1].set_title('Cumulative Feature Importance')
+    axes[1].legend()
+    
+    plt.tight_layout()
+    plt.show()
 ```
 
-**Feature Engineering Pipeline:**
-```python
-# Collaborative filtering embeddings
-from sklearn.decomposition import TruncatedSVD
-
-# Create user-item matrix
-user_item_matrix = create_user_item_matrix(interactions)
-
-# Get embeddings
-svd = TruncatedSVD(n_components=50)
-user_embeddings = svd.fit_transform(user_item_matrix)
-item_embeddings = svd.components_.T
-
-# Interaction features
-def create_interaction_features(user_id, item_id, df):
-    features = {}
-    features['user_item_sim'] = cosine_similarity(
-        user_embeddings[user_id], item_embeddings[item_id]
-    )
-    features['user_avg_rating_for_category'] = df[
-        (df['user_id'] == user_id) & 
-        (df['category'] == item_category)
-    ]['rating'].mean()
-    return features
-```
+**Best Practices:**
+1. **Use Permutation Importance** for final selection (less biased)
+2. **Cross-validate** the selection process
+3. **Compare** MDI and Permutation results
+4. **Consider domain knowledge** - important features should make sense
+5. **Check for multicollinearity** - correlated features split importance
 
 ---
 
-## Question 24: Describe feature engineering for customer churn prediction.
+## Question 24: Discuss the concept of Independent Component Analysis (ICA) for feature extraction.
 
 ### Answer
 
-**Feature Categories:**
+**ICA (Independent Component Analysis):**
 
-**1. Static/Demographic Features:**
+ICA separates a multivariate signal into independent, non-Gaussian source signals. Unlike PCA which maximizes variance, ICA maximizes statistical independence.
+
+**Key Differences from PCA:**
+
+| Aspect | PCA | ICA |
+|--------|-----|-----|
+| **Goal** | Maximize variance | Maximize independence |
+| **Assumption** | Orthogonal components | Independent components |
+| **Distribution** | Gaussian assumed | Non-Gaussian required |
+| **Use Case** | Dimensionality reduction | Signal separation |
+
+**Practical Example: Blind Source Separation**
+
 ```python
-static_features = [
-    'age', 'gender', 'location', 'acquisition_channel',
-    'subscription_tier', 'payment_method', 'signup_date'
-]
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import FastICA, PCA
+
+# Create mixed signals (simulating real-world scenario)
+np.random.seed(42)
+n_samples = 2000
+time = np.linspace(0, 8, n_samples)
+
+# Original source signals
+s1 = np.sin(2 * time)  # Sinusoidal
+s2 = np.sign(np.sin(3 * time))  # Square wave
+s3 = (time % 1) - 0.5  # Sawtooth
+
+sources = np.c_[s1, s2, s3]
+
+# Mix signals (unknown mixing matrix in real scenario)
+mixing_matrix = np.array([[1, 1, 1], [0.5, 2, 1], [1.5, 1, 2]])
+mixed_signals = np.dot(sources, mixing_matrix.T)
+
+# Apply ICA
+ica = FastICA(n_components=3, random_state=42, max_iter=500)
+recovered_signals = ica.fit_transform(mixed_signals)
+
+# Compare with PCA
+pca = PCA(n_components=3)
+pca_signals = pca.fit_transform(mixed_signals)
+
+# Visualization
+fig, axes = plt.subplots(4, 3, figsize=(15, 12))
+
+titles = ['Original Sources', 'Mixed Signals', 'ICA Recovered']
+for i, (signals, title) in enumerate([(sources, titles[0]), 
+                                       (mixed_signals, titles[1]),
+                                       (recovered_signals, titles[2])]):
+    for j in range(3):
+        axes[j, i].plot(time, signals[:, j])
+        axes[j, i].set_title(f'{title} - Component {j+1}')
+
+# PCA comparison
+for j in range(3):
+    axes[3, j].plot(time, pca_signals[:, j], alpha=0.7)
+    axes[3, j].set_title(f'PCA - Component {j+1}')
+
+plt.tight_layout()
+plt.show()
+
+print("ICA successfully separated mixed signals into original sources!")
 ```
 
-**2. Behavioral Features (Time-Windowed):**
+**Feature Extraction Use Case: EEG Signal Processing**
+
 ```python
-def create_behavioral_features(df, window_days):
-    features = {
-        'login_frequency_30d': count_logins(df, 30),
-        'login_frequency_90d': count_logins(df, 90),
-        'time_since_last_login': days_since_last_login(df),
-        'feature_usage_counts': count_feature_usage(df),
-        'session_duration_avg': avg_session_duration(df),
-        'pages_viewed_per_session': avg_pages_per_session(df)
-    }
-    return features
+from sklearn.decomposition import FastICA
+
+def extract_ica_features(data, n_components=10):
+    """
+    Extract ICA features from multi-channel signal data.
+    
+    Args:
+        data: Shape (n_samples, n_channels)
+        n_components: Number of independent components
+        
+    Returns:
+        Independent components as features
+    """
+    ica = FastICA(n_components=n_components, random_state=42, max_iter=1000)
+    ica_features = ica.fit_transform(data)
+    
+    # Get mixing matrix for interpretation
+    mixing_matrix = ica.mixing_
+    
+    return ica_features, ica, mixing_matrix
+
+
+# Example with sensor data
+np.random.seed(42)
+n_samples = 1000
+n_channels = 20
+
+# Simulated multi-channel sensor data
+sensor_data = np.random.randn(n_samples, n_channels)
+
+# Extract ICA features
+ica_features, ica_model, mixing = extract_ica_features(sensor_data, n_components=5)
+
+print(f"Original shape: {sensor_data.shape}")
+print(f"ICA features shape: {ica_features.shape}")
+print(f"Mixing matrix shape: {mixing.shape}")
 ```
 
-**3. Trend Features (Critical for Churn):**
-```python
-def create_trend_features(df):
-    return {
-        'usage_trend_30d_vs_90d': (
-            usage_30d - usage_90d_avg
-        ) / usage_90d_avg,
-        'activity_slope': calculate_activity_slope(df),
-        'engagement_decay_rate': calculate_decay_rate(df)
-    }
-```
+**When to Use ICA:**
+- Separating mixed signals (audio, EEG, financial)
+- When sources are statistically independent
+- When non-Gaussianity is important
+- Cocktail party problem (separating voices)
 
-**4. Support/Billing Features:**
-```python
-support_features = {
-    'num_support_tickets_90d': count_tickets(df, 90),
-    'avg_satisfaction_score': avg_csat(df),
-    'num_failed_payments': count_failed_payments(df),
-    'days_since_last_complaint': days_since_complaint(df)
-}
-```
-
-**Complete Pipeline:**
-```python
-def engineer_churn_features(df, snapshot_date):
-    features = {}
-    
-    # Static
-    features.update(get_static_features(df))
-    
-    # Behavioral (multiple windows)
-    for window in [7, 30, 90]:
-        features.update(create_behavioral_features(df, window))
-    
-    # Trends
-    features.update(create_trend_features(df))
-    
-    # Support
-    features.update(get_support_features(df))
-    
-    # Preprocessing
-    features_df = pd.DataFrame([features])
-    features_df = pd.get_dummies(features_df, columns=categorical_cols)
-    features_df = StandardScaler().fit_transform(features_df)
-    
-    return features_df
-```
+**Limitations:**
+- Cannot determine scale of components
+- Order of components is arbitrary
+- Requires enough samples
+- Assumes linear mixing
 
 ---
 
@@ -1758,10 +1860,6 @@ def calculate_vif(df):
 2. Then, remove redundant features (feature-feature analysis)
 3. Validate with cross-validation
 ```
-
----
-
-
 
 ---
 
