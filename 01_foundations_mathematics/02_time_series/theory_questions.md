@@ -1,6 +1,7 @@
 # Time Series Interview Questions - Theory Questions
 
 ## Question 1
+- [ ] Done
 
 **What is a time series?**
 
@@ -59,6 +60,7 @@ plt.show()
 ---
 
 ## Question 2
+- [ ] Done
 
 **In the context of time series, what is stationarity, and why is it important?**
 
@@ -121,6 +123,7 @@ else:
 ---
 
 ## Question 3
+- [ ] Done
 
 **What is seasonality in time series analysis, and how do you detect it?**
 
@@ -176,6 +179,7 @@ plt.show()
 ---
 
 ## Question 4
+- [ ] Done
 
 **Explain the concept of trend in time series analysis.**
 
@@ -232,6 +236,7 @@ print(f"Differenced mean: {differenced.mean():.2f}")  # ~2 (the slope)
 ---
 
 ## Question 5
+- [ ] Done
 
 **Describe the difference between white noise and a random walk in time series.**
 
@@ -294,6 +299,7 @@ plt.show()
 ---
 
 ## Question 6
+- [ ] Done
 
 **What is meant by autocorrelation, and how is it quantified in time series?**
 
@@ -354,6 +360,7 @@ plt.show()
 ---
 
 ## Question 7
+- [ ] Done
 
 **Explain the purpose of differencing in time series analysis.**
 
@@ -416,6 +423,7 @@ adf_test(differenced, "Differenced")   # p < 0.05 (stationary)
 ---
 
 ## Question 8
+- [ ] Done
 
 **What is an AR model (Autoregressive Model) in time series?**
 
@@ -482,6 +490,7 @@ AR Model Identification:
 ---
 
 ## Question 9
+- [ ] Done
 
 **Describe a MA model (Moving Average Model) and its use in time series.**
 
@@ -548,6 +557,7 @@ print(f"MA Coefficients: {model.params}")
 ---
 
 ## Question 10
+- [ ] Done
 
 **Explain the ARMA (Autoregressive Moving Average) model.**
 
@@ -613,6 +623,7 @@ for p in [1, 2]:
 ---
 
 ## Question 11
+- [ ] Done
 
 **How does the ARIMA (Autoregressive Integrated Moving Average) model extend the ARMA model?**
 
@@ -691,6 +702,7 @@ print(f"Next 10 forecasts: {forecast[:5]}...")
 ---
 
 ## Question 12
+- [ ] Done
 
 **What is the role of the ACF (autocorrelation function) and PACF (partial autocorrelation function) in time series analysis?**
 
@@ -759,6 +771,7 @@ Model Selection from ACF/PACF:
 ---
 
 ## Question 13
+- [ ] Done
 
 **What is Exponential Smoothing, and when would you use it in time series forecasting?**
 
@@ -826,6 +839,7 @@ print(f"Holt forecast: {holt_forecast[0]:.2f}")
 ---
 
 ## Question 14
+- [ ] Done
 
 **Describe the steps involved in building atime series forecasting model.**
 
@@ -916,6 +930,7 @@ print(f"MAE: {mae:.2f}")
 ---
 
 ## Question 15
+- [ ] Done
 
 **Explain the concept of cross-validation in the context of time series analysis.**
 
@@ -1005,6 +1020,7 @@ print(f"Average MAE across folds: {np.mean(errors):.3f}")
 ---
 
 ## Question 16
+- [ ] Done
 
 **How does the ARCH (Autoregressive Conditional Heteroskedasticity) model deal with time series volatility?**
 
@@ -1073,6 +1089,7 @@ print(f"\nForecast variance: {forecast.variance.values[-1]}")
 ---
 
 ## Question 17
+- [ ] Done
 
 **Describe the GARCH (Generalized Autoregressive Conditional Heteroskedasticity) model and its application.**
 
@@ -1144,6 +1161,7 @@ print("\nVolatility forecast:", np.sqrt(forecast.variance.values[-1]))
 ---
 
 ## Question 18
+- [ ] Done
 
 **Explain the concepts of cointegration and error correction models in time series.**
 
@@ -1217,6 +1235,7 @@ if pvalue < 0.05:
 ---
 
 ## Question 19
+- [ ] Done
 
 **What is meant by multivariate time series analysis, and how does it differ from univariate time series analysis?**
 
@@ -1289,6 +1308,7 @@ print("Joint forecast:\n", pd.DataFrame(forecast, columns=['Y', 'X']))
 ---
 
 ## Question 20
+- [ ] Done
 
 **Explain the concept of Granger causality in time series analysis.**
 
@@ -1360,6 +1380,7 @@ result = grangercausalitytests(data[['Y', 'X']], maxlag=3, verbose=True)
 ---
 
 ## Question 21
+- [ ] Done
 
 **Describe howtime series analysiscould be used fordemand forecastinginretail.**
 
@@ -1437,6 +1458,7 @@ print(f"95% CI: {forecast.conf_int().iloc[:3]}")
 ---
 
 ## Question 22
+- [ ] Done
 
 **Describe how you would usetime series datato optimizepricing strategiesover time.**
 
@@ -1514,6 +1536,7 @@ print(f"Revenue Gain: ${revenue(optimal_price) - revenue(base_price):.2f}")
 ---
 
 ## Question 23
+- [ ] Done
 
 **What are some currentresearch areasintime series analysis and forecasting?**
 
@@ -1573,6 +1596,7 @@ Time series research is rapidly evolving, driven by big data, compute power, and
 ---
 
 ## Question 24
+- [ ] Done
 
 **Describe the concept ofwavelet analysisin the context oftime series.**
 

@@ -1,6 +1,7 @@
 # Time Series Interview Questions - Scenario_Based Questions
 
 ## Question 1
+- [ ] Done
 
 **Discuss the importance oflag selectioninARMA/ARIMAmodels.**
 
@@ -50,6 +51,7 @@ print(model.summary())
 ---
 
 ## Question 2
+- [ ] Done
 
 **Discuss the use and considerations ofrolling-window analysisintime series.**
 
@@ -108,6 +110,7 @@ plt.show()
 ---
 
 ## Question 3
+- [ ] Done
 
 **Discuss the advantage of usingstate-space modelsand theKalman filterfortime series analysis.**
 
@@ -151,6 +154,7 @@ smoothed_states = result.smoothed_state
 ---
 
 ## Question 4
+- [ ] Done
 
 **How would you approach building atime series modelto forecaststock prices?**
 
@@ -202,6 +206,7 @@ Most models barely beat naive baseline. Focus on risk management over prediction
 ---
 
 ## Question 5
+- [ ] Done
 
 **Discuss the challenges and strategies of usingtime series analysisinanomaly detectionforsystem monitoring.**
 
@@ -255,6 +260,7 @@ anomalies = model.fit_predict(features)
 ---
 
 ## Question 6
+- [ ] Done
 
 **How would you usetime series analysisto predictelectricity consumption patterns?**
 
@@ -310,6 +316,7 @@ forecast = model.predict(future)
 ---
 
 ## Question 7
+- [ ] Done
 
 **Propose a strategy for forecastingtourist arrivalsusingtime series data.**
 
@@ -364,6 +371,7 @@ result = model.fit()
 ---
 
 ## Question 8
+- [ ] Done
 
 **How would you analyze and predict theload on a serverusingtime series?**
 
@@ -415,6 +423,7 @@ if forecast_next_hour > capacity_threshold:
 ---
 
 ## Question 9
+- [ ] Done
 
 **Discuss your approach to evaluating the impact ofpromotional campaignsonsalesusingtime series analysis.**
 
@@ -467,6 +476,7 @@ impact.summary()
 ---
 
 ## Question 10
+- [ ] Done
 
 **Discuss the potential ofrecurrent neural networks (RNNs)intime series forecasting.**
 

@@ -1,6 +1,7 @@
 # Time Series Interview Questions - Coding Questions
 
 ## Question 1
+- [ ] Done
 
 **Implement aPython functionto performsimple exponential smoothingon atime series.**
 
@@ -51,6 +52,7 @@ print(f"Smoothed: {[round(x, 2) for x in smoothed]}")
 ---
 
 ## Question 2
+- [ ] Done
 
 **Usingpandas, write ascriptto detectseasonalityin atime series dataset.**
 
@@ -102,6 +104,7 @@ plt.show()
 ---
 
 ## Question 3
+- [ ] Done
 
 **Code anARIMA modelinPythonon a given dataset and visualize the forecasts.**
 
@@ -159,6 +162,7 @@ print(f"MAE: {mae:.2f}")
 ---
 
 ## Question 4
+- [ ] Done
 
 **Fit aGARCH modelto afinancial time series datasetand interpret the results.**
 
@@ -214,6 +218,7 @@ plt.show()
 ---
 
 ## Question 5
+- [ ] Done
 
 **Create aPython scriptthat decomposes atime seriesintotrend,seasonality, andresidualsusingstatsmodels library.**
 
@@ -276,6 +281,7 @@ print(f"Reconstruction error: {np.mean(np.abs(ts - reconstructed)):.6f}")
 ---
 
 ## Question 6
+- [ ] Done
 
 **Write aPython functionto calculate and plot theACFandPACFfor a giventime series.**
 

@@ -1,6 +1,7 @@
 # Time Series Interview Questions - General Questions
 
 ## Question 1
+- [ ] Done
 
 **How do time series differ from cross-sectional data?**
 
@@ -31,6 +32,7 @@
 ---
 
 ## Question 2
+- [ ] Done
 
 **How is seasonality addressed in the SARIMA (Seasonal ARIMA) model?**
 
@@ -63,6 +65,7 @@ result = model.fit()
 ---
 
 ## Question 3
+- [ ] Done
 
 **What metrics are commonly used to evaluate the accuracy of time series models?**
 
@@ -98,6 +101,7 @@ mape = np.mean(np.abs((actual - forecast) / actual)) * 100
 ---
 
 ## Question 4
+- [ ] Done
 
 **How do you ensure that a time series forecasting model is not overfitting?**
 
@@ -129,6 +133,7 @@ mape = np.mean(np.abs((actual - forecast) / actual)) * 100
 ---
 
 ## Question 5
+- [ ] Done
 
 **In what ways can machine learning models be applied to time series forecasting?**
 
@@ -172,6 +177,7 @@ model.fit(X_train, y_train)
 ---
 
 ## Question 6
+- [ ] Done
 
 **What considerations should be taken into account when using time series analysis for climate change research?**
 
@@ -193,6 +199,7 @@ model.fit(X_train, y_train)
 ---
 
 ## Question 7
+- [ ] Done
 
 **How can time series models improve the forecasting of inventory levels in supply chain management?**
 
@@ -215,6 +222,7 @@ model.fit(X_train, y_train)
 ---
 
 ## Question 8
+- [ ] Done
 
 **Outline a time series analysis method to identify trends in social media engagement.**
 
@@ -241,6 +249,7 @@ result.plot()
 ---
 
 ## Question 9
+- [ ] Done
 
 **How are Fourier transforms used in analyzing time series data?**
 
@@ -274,6 +283,7 @@ frequencies = np.fft.fftfreq(len(signal), d=1/sampling_rate)
 ---
 
 ## Question 10
+- [ ] Done
 
 **How candeep learning models, such asLong Short-Term Memory (LSTM) networks, be utilized for complextime series analysis tasks?**
 

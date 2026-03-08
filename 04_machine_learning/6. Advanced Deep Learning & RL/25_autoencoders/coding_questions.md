@@ -1,6 +1,7 @@
 # Autoencoders Interview Questions - Coding Questions
 
 ## Question 1
+- [ ] Done
 
 **Implement a basic autoencoder in TensorFlow/Keras to compress and reconstruct images.**
 
@@ -78,6 +79,7 @@ plt.show()
 ---
 
 ## Question 2
+- [ ] Done
 
 **Write a Python function that visualizes the latent space representation of data after going through an autoencoder.**
 
@@ -143,6 +145,7 @@ latent_2d = visualize_latent_space(encoder, x_test_flat[:5000], y_test[:5000])
 ---
 
 ## Question 3
+- [ ] Done
 
 **Create a denoising autoencoder using PyTorch that can clean noisy images.**
 
@@ -261,6 +264,7 @@ plt.show()
 ---
 
 ## Question 4
+- [ ] Done
 
 **Develop a variational autoencoder (VAE) using TensorFlow/Keras and demonstrate its generative capabilities.**
 
@@ -374,6 +378,7 @@ generate_images(decoder)
 ---
 
 ## Question 5
+- [ ] Done
 
 **Code a sparse autoencoder from scratch in Python to learn a representation of text data.**
 
@@ -513,6 +518,7 @@ print(f"Sparsity (% near zero): {np.mean(sparse_features < 0.1):.2%}")
 ---
 
 ## Question 6
+- [ ] Done
 
 **Using scikit-learn, create a pipeline that includes feature extraction with an autoencoder followed by a classification model.**
 
@@ -621,6 +627,7 @@ print(f"CV scores: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
 ---
 
 ## Question 7
+- [ ] Done
 
 **Build a convolutional autoencoder for video frame prediction using TensorFlow/Keras.**
 
@@ -743,6 +750,7 @@ plt.show()
 ---
 
 ## Question 8
+- [ ] Done
 
 **Implement a stacked autoencoder for multi-label classification and compare its performance with a basic neural network.**
 
