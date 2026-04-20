@@ -1,7 +1,7 @@
 # Linear Algebra Interview Questions - Coding Questions
 
 ## Question 1
-- [ ] Done
+- [x] Done
 
 **Write code to add, subtract, and multiply two matrices without using external libraries.**
 
