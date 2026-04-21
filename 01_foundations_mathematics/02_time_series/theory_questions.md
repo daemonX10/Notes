@@ -1,7 +1,7 @@
 # Time Series Interview Questions - Theory Questions
 
 ## Question 1
-- [ ] Done
+- [x] Done
 
 **What is a time series?**
 
