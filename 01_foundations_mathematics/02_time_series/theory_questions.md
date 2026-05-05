@@ -60,7 +60,7 @@ plt.show()
 ---
 
 ## Question 2
-- [ ] Done
+- [x] Done
 
 **In the context of time series, what is stationarity, and why is it important?**
 
@@ -123,7 +123,7 @@ else:
 ---
 
 ## Question 3
-- [ ] Done
+- [x] Done
 
 **What is seasonality in time series analysis, and how do you detect it?**
 
