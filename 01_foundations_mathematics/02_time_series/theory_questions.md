@@ -179,7 +179,7 @@ plt.show()
 ---
 
 ## Question 4
-- [ ] Done
+- [x] Done
 
 **Explain the concept of trend in time series analysis.**
 
@@ -236,7 +236,7 @@ print(f"Differenced mean: {differenced.mean():.2f}")  # ~2 (the slope)
 ---
 
 ## Question 5
-- [ ] Done
+- [x] Done
 
 **Describe the difference between white noise and a random walk in time series.**
 
@@ -299,7 +299,7 @@ plt.show()
 ---
 
 ## Question 6
-- [ ] Done
+- [x] Done
 
 **What is meant by autocorrelation, and how is it quantified in time series?**
 
@@ -360,7 +360,7 @@ plt.show()
 ---
 
 ## Question 7
-- [ ] Done
+- [x] Done
 
 **Explain the purpose of differencing in time series analysis.**
 
