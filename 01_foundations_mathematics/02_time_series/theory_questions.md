@@ -423,7 +423,7 @@ adf_test(differenced, "Differenced")   # p < 0.05 (stationary)
 ---
 
 ## Question 8
-- [ ] Done
+- [x] Done
 
 **What is an AR model (Autoregressive Model) in time series?**
 
@@ -490,7 +490,7 @@ AR Model Identification:
 ---
 
 ## Question 9
-- [ ] Done
+- [x] Done
 
 **Describe a MA model (Moving Average Model) and its use in time series.**
 
@@ -557,7 +557,7 @@ print(f"MA Coefficients: {model.params}")
 ---
 
 ## Question 10
-- [ ] Done
+- [x] Done
 
 **Explain the ARMA (Autoregressive Moving Average) model.**
 
