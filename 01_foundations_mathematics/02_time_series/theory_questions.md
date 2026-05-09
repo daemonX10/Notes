@@ -623,7 +623,7 @@ for p in [1, 2]:
 ---
 
 ## Question 11
-- [ ] Done
+- [x] Done
 
 **How does the ARIMA (Autoregressive Integrated Moving Average) model extend the ARMA model?**
 
@@ -702,7 +702,7 @@ print(f"Next 10 forecasts: {forecast[:5]}...")
 ---
 
 ## Question 12
-- [ ] Done
+- [x] Done
 
 **What is the role of the ACF (autocorrelation function) and PACF (partial autocorrelation function) in time series analysis?**
 
@@ -771,7 +771,7 @@ Model Selection from ACF/PACF:
 ---
 
 ## Question 13
-- [ ] Done
+- [x] Done
 
 **What is Exponential Smoothing, and when would you use it in time series forecasting?**
 
@@ -839,7 +839,7 @@ print(f"Holt forecast: {holt_forecast[0]:.2f}")
 ---
 
 ## Question 14
-- [ ] Done
+- [x] Done
 
 **Describe the steps involved in building atime series forecasting model.**
 
