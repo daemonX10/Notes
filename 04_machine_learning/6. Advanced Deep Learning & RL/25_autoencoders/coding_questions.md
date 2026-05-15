@@ -261,8 +261,6 @@ plt.tight_layout()
 plt.show()
 ```
 
----
-
 ## Question 4
 - [ ] Done
 
@@ -518,7 +516,7 @@ print(f"Sparsity (% near zero): {np.mean(sparse_features < 0.1):.2%}")
 ---
 
 ## Question 6
-- [ ] Done
+- [ ] Done 
 
 **Using scikit-learn, create a pipeline that includes feature extraction with an autoencoder followed by a classification model.**
 
@@ -882,4 +880,62 @@ plt.title('Final Comparison')
 
 plt.tight_layout()
 plt.show()
+```
+
+---
+
+## Question 9
+- [ ] Done
+
+**Train a Sparse Autoencoder on Residual-Stream Activations (full-batch GD).**
+
+**Pipeline:**
+```
+1. Forward: pre -> ReLU -> reconstruction
+2. Loss: MSE over all elements + L1 sparsity over samples
+3. Backprop with ReLU mask and L1 term
+4. Update W_enc, W_dec, b_enc for num_steps
+5. Return final loss on the same batch
+```
+
+**Code:**
+
+```python
+import numpy as np
+
+def train_sae(X, W_enc, W_dec, b_enc, lr, l1_coef, num_steps):
+    X = np.array(X, dtype=float)
+    W_enc = np.array(W_enc, dtype=float)
+    W_dec = np.array(W_dec, dtype=float)
+    b_enc = np.array(b_enc, dtype=float)
+    N, D = X.shape
+
+    for _ in range(num_steps):
+        pre   = X @ W_enc + b_enc
+        z     = np.maximum(0, pre)
+        x_hat = z @ W_dec
+
+        d_xhat  = 2 * (x_hat - X) / (N * D)
+        d_W_dec = z.T @ d_xhat
+        d_z     = d_xhat @ W_dec.T + l1_coef / N
+        d_pre   = d_z * (pre > 0)
+        d_W_enc = X.T @ d_pre
+        d_b_enc = np.sum(d_pre, axis=0)
+
+        W_enc -= lr * d_W_enc
+        W_dec -= lr * d_W_dec
+        b_enc -= lr * d_b_enc
+
+    pre   = X @ W_enc + b_enc
+    z     = np.maximum(0, pre)
+    x_hat = z @ W_dec
+    return float(np.mean((x_hat - X)**2) + l1_coef * np.mean(np.sum(z, axis=1)))
+    
+# Example usage
+X = np.random.randn(8, 4)
+W_enc = np.random.randn(4, 6)
+W_dec = np.random.randn(6, 4)
+b_enc = np.zeros(6)
+loss = train_sae(X, W_enc, W_dec, b_enc, lr=0.1, l1_coef=0.05, num_steps=50)
+print(loss)
 ```
