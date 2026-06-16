@@ -1,4 +1,9 @@
 # Linear Algebra Interview Questions - Coding Questions
+<!-- progress-summary:start -->
+| Progress | Done | Total | % |
+|:--------:|----:|------:|--:|
+| **1/9** | **1** | **9** | **11%** |
+<!-- progress-summary:end -->
 
 ## Question 1
 - [x] Done
@@ -144,7 +149,7 @@ print("Transpose:", transpose(A))  # [[1,4], [2,5], [3,6]] - now 3x2
 - Know the `zip(*matrix)` trick for one-liner
 - Remember: (AB)^T = B^T A^T (order reverses!)
 - Symmetric matrix: A = A^T (e.g., covariance matrix)
-
+```python
 # ========================================
 # SPECIAL CASES
 # ========================================
